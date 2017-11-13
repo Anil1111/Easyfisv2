@@ -30,6 +30,7 @@ namespace easyfis.ApiControllers
                                              select new Models.TrnJournal
                                              {
                                                  DocumentReference = d.DocumentReference,
+                                                 ManualDocumentCode = d.STId != null ? d.TrnStockTransfer.ManualSTNumber : "",
                                                  AccountCode = d.MstAccount.AccountCode,
                                                  Account = d.MstAccount.Account,
                                                  Article = d.MstArticle.Article,

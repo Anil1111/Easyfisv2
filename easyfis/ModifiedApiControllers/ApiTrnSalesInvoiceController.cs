@@ -65,7 +65,7 @@ namespace easyfis.ModifiedApiControllers
 
             var salesInvoice = from d in db.TrnSalesInvoices.OrderByDescending(d => d.Id)
                                where d.BranchId == branchId
-                               && d.Id >= Convert.ToInt32(id)
+                               && d.Id == Convert.ToInt32(id)
                                select new Entities.TrnSalesInvoice
                                {
                                    Id = d.Id,

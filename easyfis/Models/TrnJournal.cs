@@ -31,6 +31,7 @@ namespace easyfis.Models
         public Int32? OTId { get; set; }
         public Int32? STId { get; set; }
         public String DocumentReference { get; set; }
+        public String ManualDocumentCode { get; set; }
         public Int32? APRRId { get; set; }
         public Int32? ARSIId { get; set; }
 
