@@ -621,22 +621,29 @@
             var purchaseSummaryReport = [];
             var fileName = 'PurchaseSummaryReport.CSV';
 
-            for (i = 0; i < purchaseSummaryReportCollections.items.length; i++) {
-                var IsClose = purchaseSummaryReportCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            for (var p = 1; p <= purchaseSummaryReportCollections.pageCount; p++) {
+                for (i = 0; i < purchaseSummaryReportCollections.items.length; i++) {
+                    var IsClose = purchaseSummaryReportCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    purchaseSummaryReport.push({
+                        Branch: purchaseSummaryReportCollections.items[i].Branch,
+                        PONumber: purchaseSummaryReportCollections.items[i].PONumberForCSV,
+                        PODate: purchaseSummaryReportCollections.items[i].PODate,
+                        Supplier: purchaseSummaryReportCollections.items[i].Supplier,
+                        Remarks: purchaseSummaryReportCollections.items[i].Remarks,
+                        IsClose: isPOClose,
+                        Amount: purchaseSummaryReportCollections.items[i].Amount,
+                    });
                 }
 
-                purchaseSummaryReport.push({
-                    Branch: purchaseSummaryReportCollections.items[i].Branch,
-                    PONumber: purchaseSummaryReportCollections.items[i].PONumberForCSV,
-                    PODate: purchaseSummaryReportCollections.items[i].PODate,
-                    Supplier: purchaseSummaryReportCollections.items[i].Supplier,
-                    Remarks: purchaseSummaryReportCollections.items[i].Remarks,
-                    IsClose: isPOClose,
-                    Amount: purchaseSummaryReportCollections.items[i].Amount,
-                });
+                purchaseSummaryReportCollections.moveToNextPage();
+                if (p == purchaseSummaryReportCollections.pageCount) {
+                    purchaseSummaryReportCollections.moveToFirstPage();
+                }
             }
 
             var Headers = [];

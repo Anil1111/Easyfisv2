@@ -837,22 +837,30 @@
             var accountPayables = [];
             var fileName = 'AccountsPayableReport.CSV';
 
-            for (i = 0; i < accountsPayableCollections.items.length; i++) {
-                accountPayables.push({
-                    Branch: accountsPayableCollections.items[i].Branch,
-                    RRNumber: accountsPayableCollections.items[i].RRNumberCSVValue,
-                    Account: accountsPayableCollections.items[i].Account,
-                    Supplier: accountsPayableCollections.items[i].Supplier,
-                    RRDate: accountsPayableCollections.items[i].RRDate,
-                    DocumentReference: accountsPayableCollections.items[i].DocumentReference,
-                    DueDate: accountsPayableCollections.items[i].DueDate,
-                    BalanceAmount: accountsPayableCollections.items[i].BalanceAmount,
-                    CurrentAmount: accountsPayableCollections.items[i].CurrentAmount,
-                    Age30Amount: accountsPayableCollections.items[i].Age30Amount,
-                    Age60Amount: accountsPayableCollections.items[i].Age60Amount,
-                    Age90Amount: accountsPayableCollections.items[i].Age90Amount,
-                    Age120Amount: accountsPayableCollections.items[i].Age120Amount
-                });
+
+            for (var p = 1; p <= accountsPayableCollections.pageCount; p++) {
+                for (i = 0; i < accountsPayableCollections.items.length; i++) {
+                    accountPayables.push({
+                        Branch: accountsPayableCollections.items[i].Branch,
+                        RRNumber: accountsPayableCollections.items[i].RRNumberCSVValue,
+                        Account: accountsPayableCollections.items[i].Account,
+                        Supplier: accountsPayableCollections.items[i].Supplier,
+                        RRDate: accountsPayableCollections.items[i].RRDate,
+                        DocumentReference: accountsPayableCollections.items[i].DocumentReference,
+                        DueDate: accountsPayableCollections.items[i].DueDate,
+                        BalanceAmount: accountsPayableCollections.items[i].BalanceAmount,
+                        CurrentAmount: accountsPayableCollections.items[i].CurrentAmount,
+                        Age30Amount: accountsPayableCollections.items[i].Age30Amount,
+                        Age60Amount: accountsPayableCollections.items[i].Age60Amount,
+                        Age90Amount: accountsPayableCollections.items[i].Age90Amount,
+                        Age120Amount: accountsPayableCollections.items[i].Age120Amount
+                    });
+                }
+
+                accountsPayableCollections.moveToNextPage();
+                if (p == accountsPayableCollections.pageCount) {
+                    accountsPayableCollections.moveToFirstPage();
+                }
             }
 
             var Headers = [];
