@@ -182,6 +182,7 @@
         var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
         var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
         var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ====================
         // Get Parameter Values
@@ -749,21 +750,25 @@
 
             btnFirstPageGrid.addEventListener('click', function () {
                 accountsPayableCollections.moveToFirstPage();
+                currentPageIndex = accountsPayableCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnPreviousPageGrid.addEventListener('click', function () {
                 accountsPayableCollections.moveToPreviousPage();
+                currentPageIndex = accountsPayableCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnNextPageGrid.addEventListener('click', function () {
                 accountsPayableCollections.moveToNextPage();
+                currentPageIndex = accountsPayableCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnLastPageGrid.addEventListener('click', function () {
                 accountsPayableCollections.moveToLastPage();
+                currentPageIndex = accountsPayableCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
         }
@@ -837,6 +842,7 @@
             var accountPayables = [];
             var fileName = 'AccountsPayableReport.CSV';
 
+            accountsPayableCollections.moveToFirstPage();
 
             for (var p = 1; p <= accountsPayableCollections.pageCount; p++) {
                 for (i = 0; i < accountsPayableCollections.items.length; i++) {
@@ -859,7 +865,7 @@
 
                 accountsPayableCollections.moveToNextPage();
                 if (p == accountsPayableCollections.pageCount) {
-                    accountsPayableCollections.moveToFirstPage();
+                    accountsPayableCollections.moveToPage(currentPageIndex - 1);
                 }
             }
 

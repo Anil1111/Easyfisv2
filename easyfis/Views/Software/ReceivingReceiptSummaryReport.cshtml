@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Show</b></span>
+                                        <div class="comboBox-wide" id="cboAPReceivingReceiptSummaryReportShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnReceivingReceiptSummaryReportCSVOnclick()" id="btnReceivingReceiptSummaryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnReceivingReceiptSummaryReportPrintPDFOnclick()" id="btnReceivingReceiptSummaryReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsPayable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,22 +87,44 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="receivingReceiptSummaryReportGrid" class="grid"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="receivingReceiptSummaryReportGrid" class="grid"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -118,6 +147,13 @@
         var receivingReceiptSummaryReportCollections;
         var receivingReceiptSummaryReportGrid;
         var isAPReceivingReceiptSummaryReportCompanySelected = false;
+        var cboAPReceivingReceiptSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPReceivingReceiptSummaryReportShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -272,13 +308,70 @@
                             }
                         });
 
-                        if (!isAPReceivingReceiptSummaryReportCompanySelected) {
-                            createReceivingReceiptSummaryReportFlexGrid();
-                        } else {
-                            refreshReceivingReceiptSummaryReportFlexGrid();
-                        }
+                        createCboShowRows();
                     }
                 });
+            }
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboAPReceivingReceiptSummaryReportShowNumberOfRows.dispose();
+            cboAPReceivingReceiptSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPReceivingReceiptSummaryReportShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboAPReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
+                        receivingReceiptSummaryReportCollections.pageSize = parseInt(numberOfRows);
+                        receivingReceiptSummaryReportCollections.refresh();
+                        receivingReceiptSummaryReportGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isAPReceivingReceiptSummaryReportCompanySelected) {
+                createReceivingReceiptSummaryReportFlexGrid();
+            } else {
+                refreshReceivingReceiptSummaryReportFlexGrid();
             }
         }
 
@@ -342,12 +435,41 @@
             return receivingReceiptSummaryReports;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (receivingReceiptSummaryReportCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (receivingReceiptSummaryReportCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (receivingReceiptSummaryReportCollections.pageIndex === (receivingReceiptSummaryReportCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (receivingReceiptSummaryReportCollections.pageIndex + 1) + ' / ' + receivingReceiptSummaryReportCollections.pageCount;
+        }
+
         // =================
         // Refresh Flex Grid
         // =================
         function refreshReceivingReceiptSummaryReportFlexGrid() {
             receivingReceiptSummaryReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReport());
             receivingReceiptSummaryReportCollections.canFilter = true;
+            receivingReceiptSummaryReportCollections.pageSize = cboAPReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -373,6 +495,10 @@
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
             }
+
+            receivingReceiptSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             receivingReceiptSummaryReportGrid.itemsSource = receivingReceiptSummaryReportCollections;
             receivingReceiptSummaryReportGrid.trackChanges = true;
@@ -384,6 +510,7 @@
         function createReceivingReceiptSummaryReportFlexGrid() {
             receivingReceiptSummaryReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReport());
             receivingReceiptSummaryReportCollections.canFilter = true;
+            receivingReceiptSummaryReportCollections.pageSize = cboAPReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -409,6 +536,10 @@
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
             }
+
+            receivingReceiptSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             receivingReceiptSummaryReportGrid = new wijmo.grid.FlexGrid('#receivingReceiptSummaryReportGrid');
             receivingReceiptSummaryReportGrid.initialize({
@@ -461,6 +592,32 @@
             });
 
             receivingReceiptSummaryReportGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                receivingReceiptSummaryReportCollections.moveToFirstPage();
+                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                receivingReceiptSummaryReportCollections.moveToPreviousPage();
+                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                receivingReceiptSummaryReportCollections.moveToNextPage();
+                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                receivingReceiptSummaryReportCollections.moveToLastPage();
+                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -471,16 +628,25 @@
             var receivingReceiptSummaryReport = [];
             var fileName = 'ReceivingReceiptSummaryReport.CSV';
 
-            for (i = 0; i < receivingReceiptSummaryReportCollections.items.length; i++) {
-                receivingReceiptSummaryReport.push({
-                    Branch: receivingReceiptSummaryReportCollections.items[i].Branch,
-                    RRNumber: receivingReceiptSummaryReportCollections.items[i].RRNumberForCSV,
-                    RRDate: receivingReceiptSummaryReportCollections.items[i].RRDate,
-                    DocumentReference: receivingReceiptSummaryReportCollections.items[i].DocumentReference,
-                    Supplier: receivingReceiptSummaryReportCollections.items[i].Supplier,
-                    Remarks: receivingReceiptSummaryReportCollections.items[i].Remarks,
-                    Amount: receivingReceiptSummaryReportCollections.items[i].Amount
-                });
+            receivingReceiptSummaryReportCollections.moveToFirstPage();
+
+            for (var p = 1; p <= receivingReceiptSummaryReportCollections.pageCount; p++) {
+                for (i = 0; i < receivingReceiptSummaryReportCollections.items.length; i++) {
+                    receivingReceiptSummaryReport.push({
+                        Branch: receivingReceiptSummaryReportCollections.items[i].Branch,
+                        RRNumber: receivingReceiptSummaryReportCollections.items[i].RRNumberForCSV,
+                        RRDate: receivingReceiptSummaryReportCollections.items[i].RRDate,
+                        DocumentReference: receivingReceiptSummaryReportCollections.items[i].DocumentReference,
+                        Supplier: receivingReceiptSummaryReportCollections.items[i].Supplier,
+                        Remarks: receivingReceiptSummaryReportCollections.items[i].Remarks,
+                        Amount: receivingReceiptSummaryReportCollections.items[i].Amount
+                    });
+                }
+
+                receivingReceiptSummaryReportCollections.moveToNextPage();
+                if (p == receivingReceiptSummaryReportCollections.pageCount) {
+                    receivingReceiptSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
