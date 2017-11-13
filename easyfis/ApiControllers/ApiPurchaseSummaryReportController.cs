@@ -13,6 +13,25 @@ namespace easyfis.ApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ===============================
+        // Get Purchase Order Total Amount
+        // ===============================
+        public Decimal GetPurchaseOrderTotalAmount(Int32 POId)
+        {
+            var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
+                                     where d.POId == POId
+                                     select d;
+
+            if (purchaseOrderItems.Any())
+            {
+                return purchaseOrderItems.Sum(d => d.Amount);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         // ===================
         // Purchase Order List
         // ===================
@@ -36,7 +55,7 @@ namespace easyfis.ApiControllers
                                      Supplier = d.MstArticle.Article,
                                      Remarks = d.Remarks,
                                      IsClose = d.IsClose,
-                                     Amount = d.TrnPurchaseOrderItems.Sum(a => a.Amount)
+                                     Amount = GetPurchaseOrderTotalAmount(d.Id)
                                  };
 
             return purchaseOrders.ToList();
