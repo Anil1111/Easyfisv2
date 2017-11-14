@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnSeniorCitizenSalesSummaryReportVATSalesCSVOnclick()" id="btnSeniorCitizenSalesSummaryReportVATSalesCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <!-- <button onclick="btnSeniorCitizenSalesSummaryReportVATSalesPrintPDFOnclick()" id="btnSeniorCitizenSalesSummaryReportVATSalesPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button> -->
                                     <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,28 +87,50 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="seniorCitizenSalesSummaryReportVATSalesGrid" class="grid" style="font-size: 12px;"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="seniorCitizenSalesSummaryReportVATSalesGrid" class="grid" style="font-size: 12px;"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Total Discount Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalDiscountAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Discount Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalDiscountAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -124,6 +153,13 @@
         var seniorCitizenSalesSummaryReportVATSalesCollections;
         var seniorCitizenSalesSummaryReportVATSalesGrid;
         var isARSeniorCitizenSalesSummaryReportVATSalesCompanySelected = false;
+        var cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows = new wijmo.input.ComboBox('#cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -278,13 +314,70 @@
                             }
                         });
 
-                        if (!isARSeniorCitizenSalesSummaryReportVATSalesCompanySelected) {
-                            createSeniorCitizenSalesSummaryReportVATSalesFlexGrid();
-                        } else {
-                            refreshSeniorCitizenSalesSummaryReportVATSalesFlexGrid();
-                        }
+                        createCboShowRows();
                     }
                 });
+            }
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows.dispose();
+            cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows = new wijmo.input.ComboBox('#cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows.selectedValue;
+                        seniorCitizenSalesSummaryReportVATSalesCollections.pageSize = parseInt(numberOfRows);
+                        seniorCitizenSalesSummaryReportVATSalesCollections.refresh();
+                        seniorCitizenSalesSummaryReportVATSalesGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isARSeniorCitizenSalesSummaryReportVATSalesCompanySelected) {
+                createSeniorCitizenSalesSummaryReportVATSalesFlexGrid();
+            } else {
+                refreshSeniorCitizenSalesSummaryReportVATSalesFlexGrid();
             }
         }
 
@@ -365,12 +458,41 @@
             return seniorCitizenSalesSummaryReportVATSaless;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (seniorCitizenSalesSummaryReportVATSalesCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex === (seniorCitizenSalesSummaryReportVATSalesCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex + 1) + ' / ' + seniorCitizenSalesSummaryReportVATSalesCollections.pageCount;
+        }
+
         // =================
         // Refresh Flex Grid
         // =================
         function refreshSeniorCitizenSalesSummaryReportVATSalesFlexGrid() {
             seniorCitizenSalesSummaryReportVATSalesCollections = new wijmo.collections.CollectionView(getSeniorCitizenSalesSummaryReportVATSales());
             seniorCitizenSalesSummaryReportVATSalesCollections.canFilter = true;
+            seniorCitizenSalesSummaryReportVATSalesCollections.pageSize = cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -397,6 +519,10 @@
                     || !filterText || (item.ItemInventory.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
+
+            seniorCitizenSalesSummaryReportVATSalesCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             seniorCitizenSalesSummaryReportVATSalesGrid.itemsSource = seniorCitizenSalesSummaryReportVATSalesCollections;
             seniorCitizenSalesSummaryReportVATSalesGrid.trackChanges = true;
@@ -408,6 +534,7 @@
         function createSeniorCitizenSalesSummaryReportVATSalesFlexGrid() {
             seniorCitizenSalesSummaryReportVATSalesCollections = new wijmo.collections.CollectionView(getSeniorCitizenSalesSummaryReportVATSales());
             seniorCitizenSalesSummaryReportVATSalesCollections.canFilter = true;
+            seniorCitizenSalesSummaryReportVATSalesCollections.pageSize = cboARSeniorCitizenSalesSummaryReportVATSalesShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -434,6 +561,10 @@
                     || !filterText || (item.ItemInventory.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
+
+            seniorCitizenSalesSummaryReportVATSalesCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             seniorCitizenSalesSummaryReportVATSalesGrid = new wijmo.grid.FlexGrid('#seniorCitizenSalesSummaryReportVATSalesGrid');
             seniorCitizenSalesSummaryReportVATSalesGrid.initialize({
@@ -552,6 +683,32 @@
             seniorCitizenSalesSummaryReportVATSalesGrid.columnHeaders.setCellData(0, 9, 'Amount');
 
             seniorCitizenSalesSummaryReportVATSalesGrid.rows.defaultSize = 50;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                seniorCitizenSalesSummaryReportVATSalesCollections.moveToFirstPage();
+                currentPageIndex = seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                seniorCitizenSalesSummaryReportVATSalesCollections.moveToPreviousPage();
+                currentPageIndex = seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                seniorCitizenSalesSummaryReportVATSalesCollections.moveToNextPage();
+                currentPageIndex = seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                seniorCitizenSalesSummaryReportVATSalesCollections.moveToLastPage();
+                currentPageIndex = seniorCitizenSalesSummaryReportVATSalesCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -562,27 +719,36 @@
             var seniorCitizenSalesSummaryReportVATSales = [];
             var fileName = 'SeniorCitizenSalesSummaryReportVATSales.CSV';
 
-            for (i = 0; i < seniorCitizenSalesSummaryReportVATSalesCollections.items.length; i++) {
-                var IsClose = seniorCitizenSalesSummaryReportVATSalesCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            seniorCitizenSalesSummaryReportVATSalesCollections.moveToFirstPage();
+
+            for (var p = 1; p <= seniorCitizenSalesSummaryReportVATSalesCollections.pageCount; p++) {
+                for (i = 0; i < seniorCitizenSalesSummaryReportVATSalesCollections.items.length; i++) {
+                    var IsClose = seniorCitizenSalesSummaryReportVATSalesCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    seniorCitizenSalesSummaryReportVATSales.push({
+                        Branch: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Branch,
+                        SINumber: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].SIForCSV,
+                        SIDate: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].SIDate,
+                        Customer: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Customer,
+                        Item: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Item,
+                        Price: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Price,
+                        Unit: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Unit,
+                        Quantity: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Quantity,
+                        Discount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Discount,
+                        DiscountRate: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].DiscountRate,
+                        DiscountAmount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].DiscountRate,
+                        Amount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Amount,
+                    });
                 }
 
-                seniorCitizenSalesSummaryReportVATSales.push({
-                    Branch: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Branch,
-                    SINumber: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].SIForCSV,
-                    SIDate: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].SIDate,
-                    Customer: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Customer,
-                    Item: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Item,
-                    Price: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Price,
-                    Unit: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Unit,
-                    Quantity: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Quantity,
-                    Discount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Discount,
-                    DiscountRate: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].DiscountRate,
-                    DiscountAmount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].DiscountRate,
-                    Amount: seniorCitizenSalesSummaryReportVATSalesCollections.items[i].Amount,
-                });
+                seniorCitizenSalesSummaryReportVATSalesCollections.moveToNextPage();
+                if (p == seniorCitizenSalesSummaryReportVATSalesCollections.pageCount) {
+                    seniorCitizenSalesSummaryReportVATSalesCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
