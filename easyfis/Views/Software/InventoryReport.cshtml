@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboInventoryReportShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnInventoryReportCSVOnclick()" id="btnInventoryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnInventoryReportPrintPDFOnclick()" id="btnInventoryReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,24 +87,10 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="panel-heading">
-                        <table style="width: 100%" border="0">
-                            <tr>
-                                <td style="width: 24%">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><b>Show</b></span>
-                                        <div class="comboBox-wide" id="cboInventoryReportShowNumberOfRows"></div>
-                                    </div>
-                                </td>
-                                <td style="width: 76%"></td>
-                            </tr>
-                        </table>
+                    <div class="panel-body">
+                        <div id="inventoryReportGrid" class="grid" style="font-size: 12.5px;"></div>
                     </div>
-                </div>
-                <div id="inventoryReportGrid" class="grid" style="font-size: 12.5px;"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
+                    <div class="panel-footer">
                         <div class="row">
                             <div class="btn-group col-md-7" id="naviagtionPageGrid">
                                 <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
@@ -115,23 +108,29 @@
                                 </button>
                             </div>
                         </div>
-                        <br />
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Total Variance Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalVarianceAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Variance Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalVarianceAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -160,6 +159,7 @@
         var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
         var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
         var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -332,19 +332,19 @@
 
                 if (i == 0) {
                     rows = 15;
-                    rowsString = "15 Rows";
+                    rowsString = "Show 15 Rows";
                 } else if (i == 1) {
                     rows = 50;
-                    rowsString = "50 Rows";
+                    rowsString = "Show 50 Rows";
                 } else if (i == 2) {
                     rows = 100;
-                    rowsString = "100 Rows";
-                } else if (i == 3){
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
                     rows = 150;
-                    rowsString = "150 Rows";
+                    rowsString = "Show 150 Rows";
                 } else {
                     rows = 200;
-                    rowsString = "200 Rows";
+                    rowsString = "Show 200 Rows";
                 }
 
                 rowsObservableArray.push({
@@ -709,21 +709,25 @@
 
             btnFirstPageGrid.addEventListener('click', function () {
                 inventoryReportCollections.moveToFirstPage();
+                currentPageIndex = inventoryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnPreviousPageGrid.addEventListener('click', function () {
                 inventoryReportCollections.moveToPreviousPage();
+                currentPageIndex = inventoryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnNextPageGrid.addEventListener('click', function () {
                 inventoryReportCollections.moveToNextPage();
+                currentPageIndex = inventoryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
             btnLastPageGrid.addEventListener('click', function () {
                 inventoryReportCollections.moveToLastPage();
+                currentPageIndex = inventoryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
         }
@@ -736,22 +740,31 @@
             var inventoryReport = [];
             var fileName = 'InventoryReport.CSV';
 
-            for (i = 0; i < inventoryReportCollections.items.length; i++) {
-                inventoryReport.push({
-                    Branch: inventoryReportCollections.items[i].Branch,
-                    InventoryCode: inventoryReportCollections.items[i].InventoryCode,
-                    Article: inventoryReportCollections.items[i].ArticleForCSV,
-                    Unit: inventoryReportCollections.items[i].Unit,
-                    Cost: inventoryReportCollections.items[i].Cost,
-                    BegQuantity: inventoryReportCollections.items[i].BegQuantity,
-                    InQuantity: inventoryReportCollections.items[i].InQuantity,
-                    OutQuantity: inventoryReportCollections.items[i].OutQuantity,
-                    EndQuantity: inventoryReportCollections.items[i].EndQuantity,
-                    TotalAmount: inventoryReportCollections.items[i].TotalAmount,
-                    Count: inventoryReportCollections.items[i].Count,
-                    QuantityVariance: inventoryReportCollections.items[i].QuantityVariance,
-                    VarianceAmount: inventoryReportCollections.items[i].VarianceAmount,
-                });
+            inventoryReportCollections.moveToFirstPage();
+
+            for (var p = 1; p <= inventoryReportCollections.pageCount; p++) {
+                for (i = 0; i < inventoryReportCollections.items.length; i++) {
+                    inventoryReport.push({
+                        Branch: inventoryReportCollections.items[i].Branch,
+                        InventoryCode: inventoryReportCollections.items[i].InventoryCode,
+                        Article: inventoryReportCollections.items[i].ArticleForCSV,
+                        Unit: inventoryReportCollections.items[i].Unit,
+                        Cost: inventoryReportCollections.items[i].Cost,
+                        BegQuantity: inventoryReportCollections.items[i].BegQuantity,
+                        InQuantity: inventoryReportCollections.items[i].InQuantity,
+                        OutQuantity: inventoryReportCollections.items[i].OutQuantity,
+                        EndQuantity: inventoryReportCollections.items[i].EndQuantity,
+                        TotalAmount: inventoryReportCollections.items[i].TotalAmount,
+                        Count: inventoryReportCollections.items[i].Count,
+                        QuantityVariance: inventoryReportCollections.items[i].QuantityVariance,
+                        VarianceAmount: inventoryReportCollections.items[i].VarianceAmount,
+                    });
+                }
+
+                inventoryReportCollections.moveToNextPage();
+                if (p == inventoryReportCollections.pageCount) {
+                    inventoryReportCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
