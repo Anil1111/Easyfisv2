@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboAPStockTransferDetailReportShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnStockTransferDetailReportCSVOnclick()" id="btnStockTransferDetailReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnStockTransferDetailReportPrintPDFOnclick()" id="btnStockTransferDetailReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,22 +87,44 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="stockTransferDetailReportGrid"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="stockTransferDetailReportGrid"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Amount</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Amount</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -118,6 +147,13 @@
         var stockTransferDetailReportCollections;
         var stockTransferDetailReportGrid;
         var isAPStockTransferDetailReportCompanySelected = false;
+        var cboAPStockTransferDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPStockTransferDetailReportShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -272,14 +308,99 @@
                             }
                         });
 
-                        if (!isAPStockTransferDetailReportCompanySelected) {
-                            createStockTransferDetailReportFlexGrid();
-                        } else {
-                            refreshStockTransferDetailReportFlexGrid();
-                        }
+                        createCboShowRows();
                     }
                 });
             }
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboAPStockTransferDetailReportShowNumberOfRows.dispose();
+            cboAPStockTransferDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPStockTransferDetailReportShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboAPStockTransferDetailReportShowNumberOfRows.selectedValue;
+                        stockTransferDetailReportCollections.pageSize = parseInt(numberOfRows);
+                        stockTransferDetailReportCollections.refresh();
+                        stockTransferDetailReportGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isAPStockTransferDetailReportCompanySelected) {
+                createStockTransferDetailReportFlexGrid();
+            } else {
+                refreshStockTransferDetailReportFlexGrid();
+            }
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (stockTransferDetailReportCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (stockTransferDetailReportCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (stockTransferDetailReportCollections.pageIndex === (stockTransferDetailReportCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (stockTransferDetailReportCollections.pageIndex + 1) + ' / ' + stockTransferDetailReportCollections.pageCount;
         }
 
         // ==================================
@@ -366,6 +487,7 @@
         function refreshStockTransferDetailReportFlexGrid() {
             stockTransferDetailReportCollections = new wijmo.collections.CollectionView(getStockTransferDetailReport());
             stockTransferDetailReportCollections.canFilter = true;
+            stockTransferDetailReportCollections.pageSize = cboAPStockTransferDetailReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -385,11 +507,15 @@
             });
 
             stockTransferDetailReportCollections.filter = function (item) {
-                return !filterText || (item.OT.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.ST.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Item.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
+
+            stockTransferDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             stockTransferDetailReportGrid.itemsSource = stockTransferDetailReportCollections;
             stockTransferDetailReportGrid.trackChanges = true;
@@ -401,6 +527,7 @@
         function createStockTransferDetailReportFlexGrid() {
             stockTransferDetailReportCollections = new wijmo.collections.CollectionView(getStockTransferDetailReport());
             stockTransferDetailReportCollections.canFilter = true;
+            stockTransferDetailReportCollections.pageSize = cboAPStockTransferDetailReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -420,11 +547,15 @@
             });
 
             stockTransferDetailReportCollections.filter = function (item) {
-                return !filterText || (item.OT.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.ST.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Item.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
+
+            stockTransferDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             stockTransferDetailReportGrid = new wijmo.grid.FlexGrid('#stockTransferDetailReportGrid');
             stockTransferDetailReportGrid.initialize({
@@ -491,6 +622,32 @@
             });
 
             stockTransferDetailReportGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                stockTransferDetailReportCollections.moveToFirstPage();
+                currentPageIndex = stockTransferDetailReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                stockTransferDetailReportCollections.moveToPreviousPage();
+                currentPageIndex = stockTransferDetailReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                stockTransferDetailReportCollections.moveToNextPage();
+                currentPageIndex = stockTransferDetailReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                stockTransferDetailReportCollections.moveToLastPage();
+                currentPageIndex = stockTransferDetailReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -501,23 +658,32 @@
             var stockTransferDetailReport = [];
             var fileName = 'StockTransferDetailReport.CSV';
 
-            for (i = 0; i < stockTransferDetailReportCollections.items.length; i++) {
-                var IsClose = stockTransferDetailReportCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            stockTransferDetailReportCollections.moveToFirstPage();
+
+            for (var p = 1; p <= stockTransferDetailReportCollections.pageCount; p++) {
+                for (i = 0; i < stockTransferDetailReportCollections.items.length; i++) {
+                    var IsClose = stockTransferDetailReportCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    stockTransferDetailReport.push({
+                        STNumber: stockTransferDetailReportCollections.items[i].STForCSV,
+                        STDate: stockTransferDetailReportCollections.items[i].STDate,
+                        Branch: stockTransferDetailReportCollections.items[i].ToBranch,
+                        Item: stockTransferDetailReportCollections.items[i].Item,
+                        Quantity: stockTransferDetailReportCollections.items[i].Quantity,
+                        Unit: stockTransferDetailReportCollections.items[i].Unit,
+                        Cost: stockTransferDetailReportCollections.items[i].Cost,
+                        Amount: stockTransferDetailReportCollections.items[i].Amount,
+                    });
                 }
 
-                stockTransferDetailReport.push({
-                    STNumber: stockTransferDetailReportCollections.items[i].STForCSV,
-                    STDate: stockTransferDetailReportCollections.items[i].STDate,
-                    Branch: stockTransferDetailReportCollections.items[i].ToBranch,
-                    Item: stockTransferDetailReportCollections.items[i].Item,
-                    Quantity: stockTransferDetailReportCollections.items[i].Quantity,
-                    Unit: stockTransferDetailReportCollections.items[i].Unit,
-                    Cost: stockTransferDetailReportCollections.items[i].Cost,
-                    Amount: stockTransferDetailReportCollections.items[i].Amount,
-                });
+                stockTransferDetailReportCollections.moveToNextPage();
+                if (p == stockTransferDetailReportCollections.pageCount) {
+                    stockTransferDetailReportCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
