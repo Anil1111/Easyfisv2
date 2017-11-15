@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboARCollectionBookShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnCollectionBookCSVOnclick()" id="btnCollectionBookCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnCollectionBookPrintPDFOnclick()" id="btnCollectionBookPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,34 +87,56 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="collectionBookGrid" class="grid"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="collectionBookGrid" class="grid"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Debit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Total Credit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Balance</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Debit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Credit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Balance</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -130,6 +159,13 @@
         var collectionBookCollections;
         var collectionBookGrid;
         var isARCollectionBookCompanySelected = false;
+        var cboARCollectionBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARCollectionBookShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -284,13 +320,70 @@
                             }
                         });
 
-                        if (!isARCollectionBookCompanySelected) {
-                            createCollectionBookFlexGrid();
-                        } else {
-                            refreshCollectionBookFlexGrid();
-                        }
+                        createCboShowRows();
                     }
                 });
+            }
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboARCollectionBookShowNumberOfRows.dispose();
+            cboARCollectionBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARCollectionBookShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboARCollectionBookShowNumberOfRows.selectedValue;
+                        collectionBookCollections.pageSize = parseInt(numberOfRows);
+                        collectionBookCollections.refresh();
+                        collectionBookGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isARCollectionBookCompanySelected) {
+                createCollectionBookFlexGrid();
+            } else {
+                refreshCollectionBookFlexGrid();
             }
         }
 
@@ -359,12 +452,41 @@
             return collectionBooks;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (collectionBookCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (collectionBookCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (collectionBookCollections.pageIndex === (collectionBookCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (collectionBookCollections.pageIndex + 1) + ' / ' + collectionBookCollections.pageCount;
+        }
+
         // =================
         // Refresh Flex Grid
         // =================
         function refreshCollectionBookFlexGrid() {
             collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
             collectionBookCollections.canFilter = true;
+            collectionBookCollections.pageSize = cboARCollectionBookShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -398,6 +520,10 @@
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            collectionBookCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             collectionBookGrid.itemsSource = collectionBookCollections;
             collectionBookGrid.trackChanges = true;
@@ -409,6 +535,7 @@
         function createCollectionBookFlexGrid() {
             collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
             collectionBookCollections.canFilter = true;
+            collectionBookCollections.pageSize = cboARCollectionBookShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -442,6 +569,10 @@
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            collectionBookCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             collectionBookGrid = new wijmo.grid.FlexGrid('#collectionBookGrid');
             collectionBookGrid.initialize({
@@ -508,6 +639,32 @@
             });
 
             collectionBookGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                collectionBookCollections.moveToFirstPage();
+                currentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                collectionBookCollections.moveToPreviousPage();
+                currentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                collectionBookCollections.moveToNextPage();
+                currentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                collectionBookCollections.moveToLastPage();
+                currentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -518,23 +675,32 @@
             var collectionBook = [];
             var fileName = 'CollectionBook.CSV';
 
-            for (i = 0; i < collectionBookCollections.items.length; i++) {
-                var IsClose = collectionBookCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            collectionBookCollections.moveToFirstPage();
+
+            for (var p = 1; p <= collectionBookCollections.pageCount; p++) {
+                for (i = 0; i < collectionBookCollections.items.length; i++) {
+                    var IsClose = collectionBookCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    collectionBook.push({
+                        DocumentReference: collectionBookCollections.items[i].DocumentReference,
+                        ManualDocumentCode: collectionBookCollections.items[i].ManualDocumentCode,
+                        AccountCode: collectionBookCollections.items[i].AccountCode,
+                        Account: collectionBookCollections.items[i].Account,
+                        Article: collectionBookCollections.items[i].Article,
+                        DebitAmount: collectionBookCollections.items[i].DebitAmount,
+                        CreditAmount: collectionBookCollections.items[i].CreditAmount,
+                        Balance: collectionBookCollections.items[i].Balance,
+                    });
                 }
 
-                collectionBook.push({
-                    DocumentReference: collectionBookCollections.items[i].DocumentReference,
-                    ManualDocumentCode: collectionBookCollections.items[i].ManualDocumentCode,
-                    AccountCode: collectionBookCollections.items[i].AccountCode,
-                    Account: collectionBookCollections.items[i].Account,
-                    Article: collectionBookCollections.items[i].Article,
-                    DebitAmount: collectionBookCollections.items[i].DebitAmount,
-                    CreditAmount: collectionBookCollections.items[i].CreditAmount,
-                    Balance: collectionBookCollections.items[i].Balance,
-                });
+                collectionBookCollections.moveToNextPage();
+                if (p == collectionBookCollections.pageCount) {
+                    collectionBookCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];

@@ -32,14 +32,21 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 49%">
+                                <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 50%" align="right">
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboARSalesBookShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnSalesBookCSVOnclick()" id="btnSalesBookCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnSalesBookPrintPDFOnclick()" id="btnSalesBookPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -80,34 +87,56 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="salesBookGrid" class="grid"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="salesBookGrid" class="grid"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Debit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Total Credit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Balance</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Debit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Credit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Balance</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -130,6 +159,13 @@
         var salesBookCollections;
         var salesBookGrid;
         var isARSalesBookCompanySelected = false;
+        var cboARSalesBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARSalesBookShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -284,13 +320,70 @@
                             }
                         });
 
-                        if (!isARSalesBookCompanySelected) {
-                            createSalesBookFlexGrid();
-                        } else {
-                            refreshSalesBookFlexGrid();
-                        }
+                        createCboShowRows();
                     }
                 });
+            }
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboARSalesBookShowNumberOfRows.dispose();
+            cboARSalesBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARSalesBookShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboARSalesBookShowNumberOfRows.selectedValue;
+                        salesBookCollections.pageSize = parseInt(numberOfRows);
+                        salesBookCollections.refresh();
+                        salesBookGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isARSalesBookCompanySelected) {
+                createSalesBookFlexGrid();
+            } else {
+                refreshSalesBookFlexGrid();
             }
         }
 
@@ -359,12 +452,41 @@
             return salesBooks;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (salesBookCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (salesBookCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (salesBookCollections.pageIndex === (salesBookCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (salesBookCollections.pageIndex + 1) + ' / ' + salesBookCollections.pageCount;
+        }
+
         // =================
         // Refresh Flex Grid
         // =================
         function refreshSalesBookFlexGrid() {
             salesBookCollections = new wijmo.collections.CollectionView(getSalesBook());
             salesBookCollections.canFilter = true;
+            salesBookCollections.pageSize = cboARSalesBookShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -398,6 +520,10 @@
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            salesBookCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             salesBookGrid.itemsSource = salesBookCollections;
             salesBookGrid.trackChanges = true;
@@ -409,6 +535,7 @@
         function createSalesBookFlexGrid() {
             salesBookCollections = new wijmo.collections.CollectionView(getSalesBook());
             salesBookCollections.canFilter = true;
+            salesBookCollections.pageSize = cboARSalesBookShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -442,6 +569,10 @@
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            salesBookCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             salesBookGrid = new wijmo.grid.FlexGrid('#salesBookGrid');
             salesBookGrid.initialize({
@@ -508,6 +639,32 @@
             });
 
             salesBookGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                salesBookCollections.moveToFirstPage();
+                currentPageIndex = salesBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                salesBookCollections.moveToPreviousPage();
+                currentPageIndex = salesBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                salesBookCollections.moveToNextPage();
+                currentPageIndex = salesBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                salesBookCollections.moveToLastPage();
+                currentPageIndex = salesBookCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -518,23 +675,32 @@
             var salesBook = [];
             var fileName = 'SalesBook.CSV';
 
-            for (i = 0; i < salesBookCollections.items.length; i++) {
-                var IsClose = salesBookCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            salesBookCollections.moveToFirstPage();
+
+            for (var p = 1; p <= salesBookCollections.pageCount; p++) {
+                for (i = 0; i < salesBookCollections.items.length; i++) {
+                    var IsClose = salesBookCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    salesBook.push({
+                        DocumentReference: salesBookCollections.items[i].DocumentReference,
+                        ManualDocumentCode: salesBookCollections.items[i].ManualDocumentCode,
+                        AccountCode: salesBookCollections.items[i].AccountCode,
+                        Account: salesBookCollections.items[i].Account,
+                        Article: salesBookCollections.items[i].Article,
+                        DebitAmount: salesBookCollections.items[i].DebitAmount,
+                        CreditAmount: salesBookCollections.items[i].CreditAmount,
+                        Balance: salesBookCollections.items[i].Balance,
+                    });
                 }
 
-                salesBook.push({
-                    DocumentReference: salesBookCollections.items[i].DocumentReference,
-                    ManualDocumentCode: salesBookCollections.items[i].ManualDocumentCode,
-                    AccountCode: salesBookCollections.items[i].AccountCode,
-                    Account: salesBookCollections.items[i].Account,
-                    Article: salesBookCollections.items[i].Article,
-                    DebitAmount: salesBookCollections.items[i].DebitAmount,
-                    CreditAmount: salesBookCollections.items[i].CreditAmount,
-                    Balance: salesBookCollections.items[i].Balance,
-                });
+                salesBookCollections.moveToNextPage();
+                if (p == salesBookCollections.pageCount) {
+                    salesBookCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
