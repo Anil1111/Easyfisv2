@@ -38,7 +38,15 @@
                                         <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                     </div>
                                 </td>
-                                <td style="width: 50.5%" align="right">
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboARAccountLedgerReportShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
                                     <button onclick="btnAccountLedgerReportCSVOnclick()" id="btnAccountLedgerReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnAccountLedgerReportPrintPDFOnclick()" id="btnAccountLedgerReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
@@ -92,34 +100,56 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div id="accountLedgerReportGrid" class="grid"></div>
-                <br /><br />
-                <div class="row">
-                    <div class="col-md-6">
-
+                    <div class="panel-body">
+                        <div id="accountLedgerReportGrid" class="grid"></div>
                     </div>
-                    <div class="col-md-6">
-                        <dl class="dl-horizontal dl-custom">
-                            <dt>
-                                <b>Total Debit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Total Credit</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
-                            </dd>
-                            <dt>
-                                <b>Balance</b>
-                            </dt>
-                            <dd>
-                                <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
-                            </dd>
-                        </dl>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Debit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Credit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Balance</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -143,6 +173,13 @@
         var accountLedgerReportGrid;
         var isARAccountLedgerReportCompanySelected = false;
         var cboAccountLedgerAccount = new wijmo.input.ComboBox('#cboAccountLedgerAccount');
+        var cboARAccountLedgerReportShowNumberOfRows = new wijmo.input.ComboBox('#cboARAccountLedgerReportShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var currentPageIndex = 0;
 
         // ===================
         // Get Parameter Value
@@ -349,15 +386,72 @@
                         }
                     });
 
-                    if (!isARAccountLedgerReportCompanySelected) {
-                        createAccountLedgerReportFlexGrid();
-                    } else {
-                        refreshAccountLedgerReportFlexGrid();
-                    }
-
-                    NProgress.done();
+                    createCboShowRows();
                 }
             });
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboARAccountLedgerReportShowNumberOfRows.dispose();
+            cboARAccountLedgerReportShowNumberOfRows = new wijmo.input.ComboBox('#cboARAccountLedgerReportShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboARAccountLedgerReportShowNumberOfRows.selectedValue;
+                        accountLedgerReportCollections.pageSize = parseInt(numberOfRows);
+                        accountLedgerReportCollections.refresh();
+                        accountLedgerReportGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isARAccountLedgerReportCompanySelected) {
+                createAccountLedgerReportFlexGrid();
+            } else {
+                refreshAccountLedgerReportFlexGrid();
+            }
+
+            NProgress.done();
         }
 
         // ======================
@@ -471,12 +565,41 @@
             return accountLedgerReports;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (accountLedgerReportCollections.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (accountLedgerReportCollections.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (accountLedgerReportCollections.pageIndex === (accountLedgerReportCollections.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (accountLedgerReportCollections.pageIndex + 1) + ' / ' + accountLedgerReportCollections.pageCount;
+        }
+
         // =================
         // Refresh Flex Grid
         // =================
         function refreshAccountLedgerReportFlexGrid() {
             accountLedgerReportCollections = new wijmo.collections.CollectionView(getAccountLedgerReport());
             accountLedgerReportCollections.canFilter = true;
+            accountLedgerReportCollections.pageSize = cboARAccountLedgerReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -509,6 +632,10 @@
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
+
+            accountLedgerReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             accountLedgerReportGrid.itemsSource = accountLedgerReportCollections;
             accountLedgerReportGrid.trackChanges = true;
@@ -520,6 +647,7 @@
         function createAccountLedgerReportFlexGrid() {
             accountLedgerReportCollections = new wijmo.collections.CollectionView(getAccountLedgerReport());
             accountLedgerReportCollections.canFilter = true;
+            accountLedgerReportCollections.pageSize = cboARAccountLedgerReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#InputFilter').keyup(function () {
@@ -552,6 +680,10 @@
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
+
+            accountLedgerReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             accountLedgerReportGrid = new wijmo.grid.FlexGrid('#accountLedgerReportGrid');
             accountLedgerReportGrid.initialize({
@@ -613,6 +745,32 @@
             });
 
             accountLedgerReportGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                accountLedgerReportCollections.moveToFirstPage();
+                currentPageIndex = accountLedgerReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                accountLedgerReportCollections.moveToPreviousPage();
+                currentPageIndex = accountLedgerReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                accountLedgerReportCollections.moveToNextPage();
+                currentPageIndex = accountLedgerReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                accountLedgerReportCollections.moveToLastPage();
+                currentPageIndex = accountLedgerReportCollections.pageIndex + 1;
+                updateNavigateButtonsItems();
+            });
         }
 
         // ============
@@ -623,22 +781,31 @@
             var accountLedgerReport = [];
             var fileName = 'AccountLedgerReport.CSV';
 
-            for (i = 0; i < accountLedgerReportCollections.items.length; i++) {
-                var IsClose = accountLedgerReportCollections.items[i].IsClose;
-                var isPOClose = "Not Closed";
-                if (IsClose) {
-                    isPOClose = "Closed"
+            accountLedgerReportCollections.moveToFirstPage();
+
+            for (var p = 1; p <= accountLedgerReportCollections.pageCount; p++) {
+                for (i = 0; i < accountLedgerReportCollections.items.length; i++) {
+                    var IsClose = accountLedgerReportCollections.items[i].IsClose;
+                    var isPOClose = "Not Closed";
+                    if (IsClose) {
+                        isPOClose = "Closed"
+                    }
+
+                    accountLedgerReport.push({
+                        JournalDate: accountLedgerReportCollections.items[i].JournalDate,
+                        DocumentReference: accountLedgerReportCollections.items[i].DocumentReferenceForCSV,
+                        Article: accountLedgerReportCollections.items[i].Article,
+                        Particulars: accountLedgerReportCollections.items[i].Particulars,
+                        DebitAmount: accountLedgerReportCollections.items[i].DebitAmount,
+                        CreditAmount: accountLedgerReportCollections.items[i].CreditAmount,
+                        Balance: accountLedgerReportCollections.items[i].Balance
+                    });
                 }
 
-                accountLedgerReport.push({
-                    JournalDate: accountLedgerReportCollections.items[i].JournalDate,
-                    DocumentReference: accountLedgerReportCollections.items[i].DocumentReferenceForCSV,
-                    Article: accountLedgerReportCollections.items[i].Article,
-                    Particulars: accountLedgerReportCollections.items[i].Particulars,
-                    DebitAmount: accountLedgerReportCollections.items[i].DebitAmount,
-                    CreditAmount: accountLedgerReportCollections.items[i].CreditAmount,
-                    Balance: accountLedgerReportCollections.items[i].Balance
-                });
+                accountLedgerReportCollections.moveToNextPage();
+                if (p == accountLedgerReportCollections.pageCount) {
+                    accountLedgerReportCollections.moveToPage(currentPageIndex - 1);
+                }
             }
 
             var Headers = [];
