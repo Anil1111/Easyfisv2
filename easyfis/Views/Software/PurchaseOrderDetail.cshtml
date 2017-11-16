@@ -164,29 +164,59 @@
                 <br />
                 <div class="tab-content">
                     <div id="Item" class="tab-pane fade in active">
-                        @{
-                            if (canAdd)
-                            {
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <div class="row">
-                                            <div class="col-lg-12" align="right">
-                                                <button class="btn btn-primary" id="btnAddPOItem" onclick="btnAddPOItemOnclick()"><i class="fa fa-plus"></i> Add</button>
-                                                <button class="btn btn-primary" id="btnItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div id="POItemGrid"></div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboPurchaseOrderItemsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right">
+                                            @{
+                                                if (canAdd)
+                                                {
+                                                    <button class="btn btn-primary" id="btnAddPOItem" onclick="btnAddPOItemOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                                <div id="POItemGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
                                     </div>
                                 </div>
-                            }
-                            else
-                            {
-                                <div id="POItemGrid"></div>
-                                <br /><br />
-                            }
-                        }
+                            </div>
+                        </div>
                         <div class="panel panel-default">
                             <div class="panel-body" style="padding-bottom: 0px;">
                                 <div class="row">
@@ -283,8 +313,29 @@
                                     <input type="text" class="form-control " id="itemQueryFilter" placeholder="Search">
                                 </div>
                             </div>
+                            <div class="panel-body">
+                                <div id="itemQueryGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItemQuery"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="itemQueryGrid" style="max-height: 300px;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -335,6 +386,18 @@
         var purchaseOrderItemId = 0;
         var itemQueryItemsCollection;
         var itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
+        var cboPurchaseOrderItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseOrderItemsShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var btnMoveToFirstPageGridItemQuery = document.getElementById('btnMoveToFirstPageGridItemQuery');
+        var btnMoveToPreviousPageGridItemQuery = document.getElementById('btnMoveToPreviousPageGridItemQuery');
+        var btnMoveToNextPageGridItemQuery = document.getElementById('btnMoveToNextPageGridItemQuery');
+        var btnMoveToLastPageGridItemQuery = document.getElementById('btnMoveToLastPageGridItemQuery');
+        var btnCurrentPageGridItemQuery = document.getElementById('btnCurrentPageGridItemQuery');
+        var isItemQueryClicked = false;
 
         // =======================
         // Get URL Parameter Value
@@ -593,6 +656,7 @@
                                 $("#btnPrintPO").prop("disabled", true);
                             }
 
+                            createCboShowRows();
                             createPurchaseOrderItemFlexGrid();
                         } else {
                             alert("No Data");
@@ -804,11 +868,114 @@
             return purchaseOrderItemsObservableArray;
         }
 
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboPurchaseOrderItemsShowNumberOfRows.dispose();
+            cboPurchaseOrderItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseOrderItemsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
+                        purchaseOrderItemCollectionView.pageSize = parseInt(numberOfRows);
+                        purchaseOrderItemCollectionView.refresh();
+                        purchaseOrderItemFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (purchaseOrderItemCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (purchaseOrderItemCollectionView.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (purchaseOrderItemCollectionView.pageIndex === (purchaseOrderItemCollectionView.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (purchaseOrderItemCollectionView.pageIndex + 1) + ' / ' + purchaseOrderItemCollectionView.pageCount;
+        }
+
         // =====================================
         // Create Purchase Order Item - FlexGrid
         // =====================================
         function createPurchaseOrderItemFlexGrid() {
             purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
+            purchaseOrderItemCollectionView.canFilter = true;
+            purchaseOrderItemCollectionView.pageSize = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#InputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                purchaseOrderItemCollectionView.refresh();
+            });
+
+            purchaseOrderItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            purchaseOrderItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             purchaseOrderItemFlexGrid = new wijmo.grid.FlexGrid('#POItemGrid');
             purchaseOrderItemFlexGrid.initialize({
@@ -1086,6 +1253,28 @@
                     }
                 }
             }
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                purchaseOrderItemCollectionView.moveToFirstPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                purchaseOrderItemCollectionView.moveToPreviousPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                purchaseOrderItemCollectionView.moveToNextPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                purchaseOrderItemCollectionView.moveToLastPage();
+                updateNavigateButtonsItems();
+            });
         }
 
         // ========================
@@ -1228,6 +1417,36 @@
             document.getElementById('POLine_Amount').value = formatDecimalValues(purchaseOrderItem.Amount);
         }
 
+        // ================================
+        // Refresh Purchase Order Item Grid
+        // ================================
+        function refreshPurchaseOrderItemFlexGrid() {
+            purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
+            purchaseOrderItemCollectionView.canFilter = true;
+            purchaseOrderItemCollectionView.pageSize = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#InputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                purchaseOrderItemCollectionView.refresh();
+            });
+
+            purchaseOrderItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            purchaseOrderItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
+            purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
+            purchaseOrderItemFlexGrid.trackChanges = true;
+        }
+
         // ==========================
         // Delete Purchase Order Item
         // ==========================
@@ -1265,10 +1484,7 @@
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
 
                         $('#deletePOLinesConfirm').modal('hide');
-
-                        purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
-                        purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
-                        purchaseOrderItemFlexGrid.trackChanges = true;
+                        refreshPurchaseOrderItemFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
@@ -1346,9 +1562,7 @@
                                 $("#cmdSavePOLinesButton").prop("disabled", true);
                                 $("#cmdPOLinesDetailCloseButton").prop("disabled", true);
 
-                                purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
-                                purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
-                                purchaseOrderItemFlexGrid.trackChanges = true;
+                                refreshPurchaseOrderItemFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
@@ -1386,9 +1600,7 @@
                                 $("#cmdSavePOLinesButton").prop("disabled", true);
                                 $("#cmdPOLinesDetailCloseButton").prop("disabled", true);
 
-                                purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
-                                purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
-                                purchaseOrderItemFlexGrid.trackChanges = true;
+                                refreshPurchaseOrderItemFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
@@ -1531,12 +1743,41 @@
             return itemsObservableArray;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItemQuery() {
+            if (itemQueryItemsCollection.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridItemQuery').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridItemQuery').style.display = 'block';
+            if (itemQueryItemsCollection.pageIndex === 0) {
+                btnMoveToFirstPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
+            } else if (itemQueryItemsCollection.pageIndex === (itemQueryItemsCollection.pageCount - 1)) {
+                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToNextPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridItemQuery.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
+            }
+            btnCurrentPageGridItemQuery.innerHTML = (itemQueryItemsCollection.pageIndex + 1) + ' / ' + itemQueryItemsCollection.pageCount;
+        }
+
         // ==========================
         // Create Item Query Flexgrid
         // ==========================
         function createItemQueryFlexGrid() {
             itemQueryItemsCollection = new wijmo.collections.CollectionView(getArticleItemForItemQuery());
             itemQueryItemsCollection.canFilter = true;
+            itemQueryItemsCollection.pageSize = 10;
 
             var filterText = '';
             $('#itemQueryFilter').keyup(function () {
@@ -1548,6 +1789,10 @@
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItemQuery();
+            });
 
             itemQueryGrid.dispose();
             itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
@@ -1591,6 +1836,33 @@
             });
 
             itemQueryGrid.trackChanges = true;
+
+            if (!isItemQueryClicked) {
+                updateNavigateButtonsItemQuery();
+
+                btnMoveToFirstPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToFirstPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToPreviousPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToPreviousPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToNextPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToNextPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToLastPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToLastPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                isItemQueryClicked = true;
+            }
+
         }
 
         // ======================
