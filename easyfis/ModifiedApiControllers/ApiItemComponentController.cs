@@ -25,6 +25,7 @@ namespace easyfis.ModifiedApiControllers
             var itemComponentItem = from d in db.MstArticles.OrderBy(d => d.Article)
                                     where d.IsLocked == true
                                     && d.Id != Convert.ToInt32(itemId)
+                                    && d.ArticleTypeId == 1
                                     select new Entities.MstArticle
                                     {
                                         Id = d.Id,
