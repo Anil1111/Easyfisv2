@@ -19,6 +19,7 @@ namespace easyfis.Entities
         public String Particulars { get; set; }
         public Decimal DebitAmount { get; set; }
         public Decimal CreditAmount { get; set; }
+        public Decimal Balance { get; set; }
         public Int32 ORId { get; set; }
         public Int32 CVId { get; set; }
         public Int32 JVId { get; set; }

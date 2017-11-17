@@ -133,6 +133,305 @@ namespace easyfis.ModifiedApiControllers
             return receivingReceipts.ToList();
         }
 
+        // ======================================
+        // Pop-Up List - Receiving Receipt Status
+        // ======================================
+        [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/receivingReceiptStatus/{supplierId}")]
+        public List<Entities.TrnReceivingReceipt> PopUpListDisbursementLineListReceivingReceiptStatus(String supplierId)
+        {
+            var receivingReceipts = from d in db.TrnReceivingReceipts
+                                    where d.SupplierId == Convert.ToInt32(supplierId)
+                                    select new Entities.TrnReceivingReceipt
+                                    {
+                                        Id = d.Id,
+                                        RRNumber = d.RRNumber,
+                                        DocumentReference = d.DocumentReference,
+                                        RRDate = d.RRDate.ToShortDateString(),
+                                        Amount = d.Amount,
+                                        PaidAmount = d.PaidAmount,
+                                        AdjustmentAmount = d.AdjustmentAmount,
+                                        BalanceAmount = d.BalanceAmount
+                                    };
+
+            return receivingReceipts.ToList();
+        }
+
+        // =============================================================
+        // Apply (Download) Disbursement Line - Receiving Receipt Status
+        // =============================================================
+        [Authorize, HttpPost, Route("api/disbursementLine/popUp/apply/receivingReceiptStatus/{CVId}")]
+        public HttpResponseMessage ApplyReceivingReceiptStatusDisbursementLine(Entities.TrnDisbursementLine objDisbursementLine, String CVId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("DisbursementDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanAdd)
+                        {
+                            var disbursement = from d in db.TrnDisbursements
+                                               where d.Id == Convert.ToInt32(CVId)
+                                               select d;
+
+                            if (disbursement.Any())
+                            {
+                                if (!disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
+                                                   where d.Id == objDisbursementLine.AccountId
+                                                   && d.IsLocked == true
+                                                   select d;
+
+                                    if (accounts.Any())
+                                    {
+                                        var articles = from d in db.MstArticles
+                                                       where d.Id == objDisbursementLine.ArticleId
+                                                       && d.IsLocked == true
+                                                       select d;
+
+                                        if (articles.Any())
+                                        {
+                                            Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
+                                            {
+                                                CVId = Convert.ToInt32(CVId),
+                                                BranchId = objDisbursementLine.BranchId,
+                                                AccountId = objDisbursementLine.AccountId,
+                                                ArticleId = objDisbursementLine.ArticleId,
+                                                RRId = objDisbursementLine.RRId,
+                                                Particulars = objDisbursementLine.Particulars,
+                                                Amount = objDisbursementLine.Amount,
+                                            };
+
+                                            db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
+                                            db.SubmitChanges();
+
+                                            Decimal disbursementItemTotalAmount = 0;
+
+                                            if (disbursement.FirstOrDefault().TrnDisbursementLines.Any())
+                                            {
+                                                disbursementItemTotalAmount = disbursement.FirstOrDefault().TrnDisbursementLines.Sum(d => d.Amount);
+                                            }
+
+                                            var updateDisbursement = disbursement.FirstOrDefault();
+                                            updateDisbursement.Amount = disbursementItemTotalAmount;
+                                            db.SubmitChanges();
+
+                                            return Request.CreateResponse(HttpStatusCode.OK);
+                                        }
+                                        else
+                                        {
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot add new disbursement line if the current disbursement detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current disbursement details are not found in the server. Please add new disbursement first before proceeding.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new disbursement line in this disbursement detail page.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this disbursement detail page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===============================
+        // Pop-Up List - Supplier Advances
+        // ===============================
+        [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/supplierAdvances/{supplierId}")]
+        public List<Entities.TrnJournal> PopUpListDisbursementLineListSupplierAdvances(String supplierId)
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+            var supplierAdvancesAccountId = currentUser.FirstOrDefault().SupplierAdvancesAccountId;
+
+            var journals = from d in db.TrnJournals
+                           where d.ArticleId == Convert.ToInt32(supplierId)
+                           && d.AccountId == supplierAdvancesAccountId
+                           && d.BranchId == branchId
+                           group d by new
+                           {
+                               BranchId = d.BranchId,
+                               Branch = d.MstBranch.Branch,
+                               AccountId = d.AccountId,
+                               Account = d.MstAccount.Account,
+                               AccountCode = d.MstAccount.AccountCode,
+                               ArticleId = d.ArticleId,
+                               Article = d.MstArticle.Article
+                           } into g
+                           select new Entities.TrnJournal
+                           {
+                               BranchId = g.Key.BranchId,
+                               Branch = g.Key.Branch,
+                               AccountId = g.Key.AccountId,
+                               Account = g.Key.Account,
+                               AccountCode = g.Key.AccountCode,
+                               ArticleId = g.Key.ArticleId,
+                               Article = g.Key.Article,
+                               DebitAmount = g.Sum(d => d.DebitAmount),
+                               CreditAmount = g.Sum(d => d.CreditAmount),
+                               Balance = g.Sum(d => d.DebitAmount) - g.Sum(d => d.CreditAmount)
+                           };
+
+            return journals.Where(d => d.Balance != 0).ToList();
+        }
+
+        // ======================================================
+        // Apply (Download) Disbursement Line - Supplier Advances
+        // ======================================================
+        [Authorize, HttpPost, Route("api/disbursementLine/popUp/apply/supplierAdvances/{CVId}")]
+        public HttpResponseMessage ApplySupplierAdvancesDisbursementLine(Entities.TrnDisbursementLine objDisbursementLine, String CVId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("DisbursementDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanAdd)
+                        {
+                            var disbursement = from d in db.TrnDisbursements
+                                               where d.Id == Convert.ToInt32(CVId)
+                                               select d;
+
+                            if (disbursement.Any())
+                            {
+                                if (!disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
+                                                   where d.Id == objDisbursementLine.AccountId
+                                                   && d.IsLocked == true
+                                                   select d;
+
+                                    if (accounts.Any())
+                                    {
+                                        var articles = from d in db.MstArticles
+                                                       where d.Id == objDisbursementLine.ArticleId
+                                                       && d.IsLocked == true
+                                                       select d;
+
+                                        if (articles.Any())
+                                        {
+                                            Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
+                                            {
+                                                CVId = Convert.ToInt32(CVId),
+                                                BranchId = objDisbursementLine.BranchId,
+                                                AccountId = objDisbursementLine.AccountId,
+                                                ArticleId = objDisbursementLine.ArticleId,
+                                                RRId = objDisbursementLine.RRId,
+                                                Particulars = objDisbursementLine.Particulars,
+                                                Amount = objDisbursementLine.Amount,
+                                            };
+
+                                            db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
+                                            db.SubmitChanges();
+
+                                            Decimal disbursementItemTotalAmount = 0;
+
+                                            if (disbursement.FirstOrDefault().TrnDisbursementLines.Any())
+                                            {
+                                                disbursementItemTotalAmount = disbursement.FirstOrDefault().TrnDisbursementLines.Sum(d => d.Amount);
+                                            }
+
+                                            var updateDisbursement = disbursement.FirstOrDefault();
+                                            updateDisbursement.Amount = disbursementItemTotalAmount;
+                                            db.SubmitChanges();
+
+                                            return Request.CreateResponse(HttpStatusCode.OK);
+                                        }
+                                        else
+                                        {
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot add new disbursement line if the current disbursement detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current disbursement details are not found in the server. Please add new disbursement first before proceeding.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new disbursement line in this disbursement detail page.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this disbursement detail page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
         // =====================
         // Add Disbursement Line
         // =====================
