@@ -12,6 +12,7 @@ namespace easyfis.Entities
         public String CVNumber { get; set; }
         public String CVDate { get; set; }
         public Int32 SupplierId { get; set; }
+        public String Supplier { get; set; }
         public String Payee { get; set; }
         public Int32 PayTypeId { get; set; }
         public Int32 BankId { get; set; }
@@ -27,8 +28,10 @@ namespace easyfis.Entities
         public Int32 ApprovedById { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
+        public String CreatedBy { get; set; }
         public String CreatedDateTime { get; set; }
         public Int32 UpdatedById { get; set; }
+        public String UpdatedBy { get; set; }
         public String UpdatedDateTime { get; set; }
     }
 }
