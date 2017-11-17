@@ -339,5 +339,333 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
+        // =======================
+        // Update Accounts Payable
+        // =======================
+        public void UpdateAccountsPayable(Int32 CVId)
+        {
+            var disbursementLines = from d in db.TrnDisbursementLines
+                                    where d.CVId == CVId
+                                    && d.TrnDisbursement.IsLocked == true
+                                    select d;
+
+            if (disbursementLines.Any())
+            {
+                Decimal paidAmount = disbursementLines.Sum(d => d.Amount);
+
+                foreach (var disbursementLine in disbursementLines)
+                {
+                    if (disbursementLine.RRId != null)
+                    {
+                        Decimal adjustmentAmount = 0;
+
+                        var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                                  where d.APRRId == disbursementLine.RRId
+                                                  && d.TrnJournalVoucher.IsLocked == true
+                                                  select d;
+
+                        if (journalVoucherLines.Any())
+                        {
+                            Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
+                            Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
+
+                            adjustmentAmount = creditAmount - debitAmount;
+                        }
+
+                        var receivingReceipt = from d in db.TrnReceivingReceipts
+                                               where d.Id == disbursementLine.RRId
+                                               && d.IsLocked == true
+                                               select d;
+
+                        if (receivingReceipt.Any())
+                        {
+                            Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
+                            Decimal receivingReceiptWTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
+
+                            Decimal balanceAmount = (receivingReceiptAmount - receivingReceiptWTAXAmount - paidAmount) + adjustmentAmount;
+
+                            var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
+                            updateReceivingReceipt.PaidAmount = paidAmount;
+                            updateReceivingReceipt.AdjustmentAmount = adjustmentAmount;
+                            updateReceivingReceipt.BalanceAmount = balanceAmount;
+                            db.SubmitChanges();
+                        }
+                    }
+                }
+            }
+        }
+
+        // =======================
+        // Get Disbursement Amount
+        // =======================
+        public Decimal GetDisbursementAmount(Int32 CVId)
+        {
+            var disbursementLines = from d in db.TrnDisbursementLines
+                                    where d.CVId == CVId
+                                    select d;
+
+            if (disbursementLines.Any())
+            {
+                return disbursementLines.Sum(d => d.Amount);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        // =================
+        // Lock Disbursement
+        // =================
+        [Authorize, HttpPut, Route("api/disbursement/lock/{id}")]
+        public HttpResponseMessage LockDisbursement(Entities.TrnDisbursement objDisbursement, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("DisbursementDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanLock)
+                        {
+                            var disbursement = from d in db.TrnDisbursements
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
+
+                            if (disbursement.Any())
+                            {
+                                if (!disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    var lockDisbursement = disbursement.FirstOrDefault();
+                                    lockDisbursement.CVDate = Convert.ToDateTime(objDisbursement.CVDate);
+                                    lockDisbursement.SupplierId = objDisbursement.SupplierId;
+                                    lockDisbursement.ManualCVNumber = objDisbursement.ManualCVNumber;
+                                    lockDisbursement.Payee = objDisbursement.Payee;
+                                    lockDisbursement.PayTypeId = objDisbursement.PayTypeId;
+                                    lockDisbursement.Particulars = objDisbursement.Particulars;
+                                    lockDisbursement.BankId = objDisbursement.BankId;
+                                    lockDisbursement.CheckNumber = objDisbursement.CheckNumber;
+                                    lockDisbursement.CheckDate = Convert.ToDateTime(objDisbursement.CheckDate);
+                                    lockDisbursement.Amount = GetDisbursementAmount(Convert.ToInt32(id));
+                                    lockDisbursement.IsCrossCheck = objDisbursement.IsCrossCheck;
+                                    lockDisbursement.CheckedById = objDisbursement.CheckedById;
+                                    lockDisbursement.ApprovedById = objDisbursement.ApprovedById;
+                                    lockDisbursement.IsClear = objDisbursement.IsClear;
+                                    lockDisbursement.IsLocked = true;
+                                    lockDisbursement.UpdatedById = currentUserId;
+                                    lockDisbursement.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    // ============================
+                                    // Journal and Accounts Payable
+                                    // ============================
+                                    Business.Journal journal = new Business.Journal();
+
+                                    if (lockDisbursement.IsLocked)
+                                    {
+                                        journal.insertCVJournal(Convert.ToInt32(id));
+                                        UpdateAccountsPayable(Convert.ToInt32(id));
+                                    }
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These disbursement details are already locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These disbursement details are not found in the server.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock disbursement.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this disbursement page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===================
+        // Unlock Disbursement
+        // ===================
+        [Authorize, HttpPut, Route("api/disbursement/unlock/{id}")]
+        public HttpResponseMessage UnlockDisbursement(String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("DisbursementDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanUnlock)
+                        {
+                            var disbursement = from d in db.TrnDisbursements
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
+
+                            if (disbursement.Any())
+                            {
+                                if (disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    var unlockDisbursement = disbursement.FirstOrDefault();
+                                    unlockDisbursement.IsLocked = false;
+                                    unlockDisbursement.UpdatedById = currentUserId;
+                                    unlockDisbursement.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    // ============================
+                                    // Journal and Accounts Payable
+                                    // ============================
+                                    Business.Journal journal = new Business.Journal();
+
+                                    if (!unlockDisbursement.IsLocked)
+                                    {
+                                        journal.deleteCVJournal(Convert.ToInt32(id));
+                                        UpdateAccountsPayable(Convert.ToInt32(id));
+                                    }
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These disbursement details are already unlocked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These disbursement details are not found in the server.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to unlock disbursement.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this disbursement page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===================
+        // Delete Disbursement
+        // ===================
+        [Authorize, HttpDelete, Route("api/disbursement/delete/{id}")]
+        public HttpResponseMessage DeleteDisbursement(String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("DisbursementList")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanDelete)
+                        {
+                            var disbursement = from d in db.TrnDisbursements
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
+
+                            if (disbursement.Any())
+                            {
+                                if (!disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    db.TrnDisbursements.DeleteOnSubmit(disbursement.First());
+                                    db.SubmitChanges();
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Delete Error. You cannot delete disbursement if the current disbursement record is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These disbursement details are not found in the server.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete disbursement.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this disbursement page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
     }
 }

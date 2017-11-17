@@ -363,6 +363,7 @@ namespace easyfis.ModifiedApiControllers
                                 if (!receivingReceipt.FirstOrDefault().IsLocked)
                                 {
                                     Decimal paidAmount = 0;
+                                    Decimal adjustmentAmount = 0;
 
                                     var disbursementLines = from d in db.TrnDisbursementLines
                                                             where d.RRId == Convert.ToInt32(id)
@@ -372,6 +373,19 @@ namespace easyfis.ModifiedApiControllers
                                     if (disbursementLines.Any())
                                     {
                                         paidAmount = disbursementLines.Sum(d => d.Amount);
+                                    }
+
+                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                                              where d.APRRId == Convert.ToInt32(id)
+                                                              && d.TrnJournalVoucher.IsLocked == true
+                                                              select d;
+
+                                    if (journalVoucherLines.Any())
+                                    {
+                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
+                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
+
+                                        adjustmentAmount = creditAmount - debitAmount;
                                     }
 
                                     var lockReceivingReceipt = receivingReceipt.FirstOrDefault();
@@ -384,8 +398,8 @@ namespace easyfis.ModifiedApiControllers
                                     lockReceivingReceipt.Amount = GetReceivingReceiptAmount(Convert.ToInt32(id));
                                     lockReceivingReceipt.WTaxAmount = 0;
                                     lockReceivingReceipt.PaidAmount = paidAmount;
-                                    lockReceivingReceipt.AdjustmentAmount = 0;
-                                    lockReceivingReceipt.BalanceAmount = GetReceivingReceiptAmount(Convert.ToInt32(id)) - paidAmount;
+                                    lockReceivingReceipt.AdjustmentAmount = adjustmentAmount;
+                                    lockReceivingReceipt.BalanceAmount = (GetReceivingReceiptAmount(Convert.ToInt32(id)) - paidAmount) + adjustmentAmount;
                                     lockReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
                                     lockReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
                                     lockReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;
