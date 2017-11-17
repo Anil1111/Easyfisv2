@@ -1002,23 +1002,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult Disbursement()
         {
-            if (PageAccess("DisbursementList").Equals("DisbursementList"))
-            {
-                if (AccessToDetail("DisbursementDetail").Equals("DisbursementDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("DisbursementList");
         }
 
         // ===================
@@ -1027,14 +1011,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult DisbursementDetail()
         {
-            if (PageAccess("DisbursementDetail").Equals("DisbursementDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("DisbursementDetail");
         }
 
         // ==========

@@ -28,9 +28,13 @@ namespace easyfis.ModifiedApiControllers
                                     {
                                         Id = d.Id,
                                         CVId = d.CVId,
+                                        BranchId = d.BranchId,
                                         Branch = d.MstBranch.Branch,
+                                        AccountId = d.AccountId,
                                         Account = d.MstAccount.Account,
+                                        ArticleId = d.ArticleId,
                                         Article = d.MstArticle.Article,
+                                        RRId = d.RRId,
                                         RRNumber = d.RRId != null ? d.TrnReceivingReceipt.RRNumber : "",
                                         Particulars = d.Particulars,
                                         Amount = d.Amount
@@ -109,7 +113,7 @@ namespace easyfis.ModifiedApiControllers
                 }
             }
 
-            return listArticles;
+            return listArticles.OrderBy(d => d.Article).ToList();
         }
 
         // =========================================
@@ -118,7 +122,7 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/disbursementLine/dropdown/list/receivingReceipt/{supplierId}")]
         public List<Entities.TrnReceivingReceipt> DropdownListDisbursementLineReceivingReceipt(String supplierId)
         {
-            var receivingReceipts = from d in db.TrnReceivingReceipts
+            var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.SupplierId == Convert.ToInt32(supplierId)
                                     && d.BalanceAmount > 0
                                     && d.IsLocked == true
@@ -139,16 +143,20 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/receivingReceiptStatus/{supplierId}")]
         public List<Entities.TrnReceivingReceipt> PopUpListDisbursementLineListReceivingReceiptStatus(String supplierId)
         {
-            var receivingReceipts = from d in db.TrnReceivingReceipts
+            var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.SupplierId == Convert.ToInt32(supplierId)
                                     && d.BalanceAmount > 0
                                     && d.IsLocked == true
                                     select new Entities.TrnReceivingReceipt
                                     {
                                         Id = d.Id,
+                                        BranchId = d.BranchId,
                                         RRNumber = d.RRNumber,
-                                        DocumentReference = d.DocumentReference,
                                         RRDate = d.RRDate.ToShortDateString(),
+                                        DocumentReference = d.DocumentReference,
+                                        SupplierId = d.SupplierId,
+                                        SupplierAccountId = d.MstArticle.AccountId,
+                                        Remarks = d.Remarks,
                                         Amount = d.Amount,
                                         PaidAmount = d.PaidAmount,
                                         AdjustmentAmount = d.AdjustmentAmount,
@@ -162,7 +170,7 @@ namespace easyfis.ModifiedApiControllers
         // Apply (Download) Disbursement Line - Receiving Receipt Status
         // =============================================================
         [Authorize, HttpPost, Route("api/disbursementLine/popUp/apply/receivingReceiptStatus/{CVId}")]
-        public HttpResponseMessage ApplyReceivingReceiptStatusDisbursementLine(Entities.TrnDisbursementLine objDisbursementLine, String CVId)
+        public HttpResponseMessage ApplyReceivingReceiptStatusDisbursementLine(List<Entities.TrnDisbursementLine> objDisbursementLines, String CVId)
         {
             try
             {
@@ -191,55 +199,71 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
-                                    var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
-                                                   where d.Id == objDisbursementLine.AccountId
-                                                   && d.IsLocked == true
-                                                   select d;
+                                    Boolean accountExists = false;
+                                    Boolean articleExists = false;
 
-                                    if (accounts.Any())
+                                    foreach (var objDisbursementLine in objDisbursementLines)
                                     {
-                                        var articles = from d in db.MstArticles
-                                                       where d.Id == objDisbursementLine.ArticleId
+                                        var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
+                                                       where d.Id == objDisbursementLine.AccountId
                                                        && d.IsLocked == true
                                                        select d;
 
-                                        if (articles.Any())
+                                        if (accounts.Any())
                                         {
-                                            Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
+                                            accountExists = true;
+
+                                            var articles = from d in db.MstArticles
+                                                           where d.Id == objDisbursementLine.ArticleId
+                                                           && d.IsLocked == true
+                                                           select d;
+
+                                            if (articles.Any())
                                             {
-                                                CVId = Convert.ToInt32(CVId),
-                                                BranchId = objDisbursementLine.BranchId,
-                                                AccountId = objDisbursementLine.AccountId,
-                                                ArticleId = objDisbursementLine.ArticleId,
-                                                RRId = objDisbursementLine.RRId,
-                                                Particulars = objDisbursementLine.Particulars,
-                                                Amount = objDisbursementLine.Amount,
-                                            };
+                                                articleExists = true;
 
-                                            db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
-                                            db.SubmitChanges();
+                                                Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
+                                                {
+                                                    CVId = Convert.ToInt32(CVId),
+                                                    BranchId = objDisbursementLine.BranchId,
+                                                    AccountId = objDisbursementLine.AccountId,
+                                                    ArticleId = objDisbursementLine.ArticleId,
+                                                    RRId = objDisbursementLine.RRId,
+                                                    Particulars = objDisbursementLine.Particulars,
+                                                    Amount = objDisbursementLine.Amount,
+                                                };
 
-                                            Decimal disbursementItemTotalAmount = 0;
-
-                                            if (disbursement.FirstOrDefault().TrnDisbursementLines.Any())
-                                            {
-                                                disbursementItemTotalAmount = disbursement.FirstOrDefault().TrnDisbursementLines.Sum(d => d.Amount);
+                                                db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
+                                                db.SubmitChanges();
                                             }
+                                        }
+                                    }
 
-                                            var updateDisbursement = disbursement.FirstOrDefault();
-                                            updateDisbursement.Amount = disbursementItemTotalAmount;
-                                            db.SubmitChanges();
+                                    Decimal disbursementItemTotalAmount = 0;
 
+                                    if (disbursement.FirstOrDefault().TrnDisbursementLines.Any())
+                                    {
+                                        disbursementItemTotalAmount = disbursement.FirstOrDefault().TrnDisbursementLines.Sum(d => d.Amount);
+                                    }
+
+                                    var updateDisbursement = disbursement.FirstOrDefault();
+                                    updateDisbursement.Amount = disbursementItemTotalAmount;
+                                    db.SubmitChanges();
+
+                                    if (accountExists)
+                                    {
+                                        if (articleExists)
+                                        {
                                             return Request.CreateResponse(HttpStatusCode.OK);
                                         }
                                         else
                                         {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Some receiving receipts dont have accounts.");
                                         }
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Some receiving receipts dont have articles.");
                                     }
                                 }
                                 else
@@ -394,12 +418,12 @@ namespace easyfis.ModifiedApiControllers
                                         }
                                         else
                                         {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No Article.");
                                         }
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No Account.");
                                     }
                                 }
                                 else
@@ -510,12 +534,12 @@ namespace easyfis.ModifiedApiControllers
                                         }
                                         else
                                         {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No Article.");
                                         }
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No Account.");
                                     }
                                 }
                                 else
@@ -604,7 +628,7 @@ namespace easyfis.ModifiedApiControllers
                                             if (articles.Any())
                                             {
                                                 var updateDisbursementLine = disbursementLine.FirstOrDefault();
-                                                updateDisbursementLine.CVId = objDisbursementLine.CVId;
+                                                updateDisbursementLine.CVId = Convert.ToInt32(CVId);
                                                 updateDisbursementLine.BranchId = objDisbursementLine.BranchId;
                                                 updateDisbursementLine.AccountId = objDisbursementLine.AccountId;
                                                 updateDisbursementLine.ArticleId = objDisbursementLine.ArticleId;

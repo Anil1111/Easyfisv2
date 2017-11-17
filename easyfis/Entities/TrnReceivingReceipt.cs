@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public String RRDate { get; set; }
         public Int32 SupplierId { get; set; }
         public String Supplier { get; set; }
+        public Int32 SupplierAccountId { get; set; }
         public Int32 TermId { get; set; }
         public String DocumentReference { get; set; }
         public String ManualRRNumber { get; set; }

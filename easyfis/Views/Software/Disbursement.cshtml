@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -40,7 +52,12 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary" id="btnAddDisbursement" onclick="btnAddDisbursement_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddDisbursement" onclick="btnAddDisbursement_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
                                     <button class="btn btn-danger" id="btnCloseDisbursement" onclick="btnCloseDisbursement_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
@@ -171,64 +188,32 @@
 
             var disbursementsObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listDisbursementFilterByCVDate/' + startDate + '/' + endDate,
+                url: '/api/disbursement/list/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
-                            var CVDateResult = new Date(Results[i]["CVDate"])
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            var CVDateResult = new Date(results[i]["CVDate"])
                             var CVDate = ('0' + (CVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CVDateResult.getDate()).slice(-2) + '-' + CVDateResult.getFullYear();
 
                             disbursementsObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='disbursementEditButton' onclick='cmdDisbursementEditButton_OnClick()' " + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdDisbursementDeleteButton_OnClick()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
-                                Id: Results[i]["Id"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
-                                CVNumber: Results[i]["CVNumber"],
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='disbursementEditButton' onclick='cmdDisbursementEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdDisbursementDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                Id: results[i]["Id"],
+                                CVNumber: results[i]["CVNumber"],
                                 CVDate: CVDate,
-                                SupplierId: Results[i]["SupplierId"],
-                                Supplier: Results[i]["Supplier"],
-                                Payee: Results[i]["Payee"],
-                                PayTypeId: Results[i]["PayTypeId"],
-                                PayType: Results[i]["PayType"],
-                                BankId: Results[i]["BankId"],
-                                Bank: Results[i]["Bank"],
-                                ManualCVNumber: Results[i]["ManualCVNumber"],
-                                Particulars: Results[i]["Particulars"],
-                                CheckNumber: Results[i]["CheckNumber"],
-                                CheckDate: Results[i]["CheckDate"],
-                                Amount: Results[i]["Amount"],
-                                AmountDisplay: parseFloat(Results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsCrossCheck: Results[i]["IsCrossCheck"],
-                                IsClear: Results[i]["IsClear"],
-                                PreparedById: Results[i]["PreparedById"],
-                                PreparedBy: Results[i]["PreparedBy"],
-                                CheckedById: Results[i]["CheckedById"],
-                                CheckedBy: Results[i]["CheckedBy"],
-                                ApprovedById: Results[i]["ApprovedById"],
-                                ApprovedBy: Results[i]["ApprovedBy"],
-                                IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
-                                CreatedBy: Results[i]["CreatedBy"],
-                                CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
-                                UpdatedBy: Results[i]["UpdatedBy"],
-                                UpdatedDateTime: Results[i]["UpdatedDateTime"]
+                                Supplier: results[i]["Supplier"],
+                                Particulars: results[i]["Particulars"],
+                                CheckNumber: results[i]["CheckNumber"],
+                                Amount: results[i]["Amount"],
+                                AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -248,28 +233,34 @@
             $('#btnAddDisbursement').prop('disabled', true);
             $('#btnCloseDisbursement').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/addDisbursement',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/DisbursementDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddDisbursement').prop('disabled', false);
-                            $('#btnCloseDisbursement').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/disbursement/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/DisbursementDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddDisbursement').prop('disabled', false);
+                        $('#btnCloseDisbursement').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddDisbursement').prop('disabled', false);
+                        $('#btnCloseDisbursement').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddDisbursement').prop('disabled', false);
+                        $('#btnCloseDisbursement').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         // =========================
@@ -317,8 +308,9 @@
 
             disbursements.editItem(disbursements.currentItem);
             var id = disbursements.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteDisbursement/' + id,
+                url: '/api/disbursement/delete/' + id,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -328,14 +320,20 @@
                         $('#deleteDisbursementConfirm').modal('hide');
                         refreshDisbursementFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
+                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
@@ -449,24 +447,36 @@
             disbursementGrid = new wijmo.grid.FlexGrid('#DisbursementGrid');
             disbursementGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "EditId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "DeleteId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "CV Number",
                                 "binding": "CVNumber",
@@ -548,11 +558,6 @@
                 disbursements.moveToLastPage();
                 updateNavigateButtonsDisbursement();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddDisbursement").prop("disabled", true);
-            }
         }
 
         // ===========
@@ -581,12 +586,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesResults) {
-                    if (userBranchesResults.length > 0) {
-                        for (i = 0; i < userBranchesResults.length; i++) {
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesResults[i]["BranchId"],
-                                Branch: userBranchesResults[i]["Branch"]
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
                             });
                         }
                     }
