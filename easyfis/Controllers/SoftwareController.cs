@@ -1020,23 +1020,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult Collection()
         {
-            if (PageAccess("CollectionList").Equals("CollectionList"))
-            {
-                if (AccessToDetail("CollectionDetail").Equals("CollectionDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("CollectionList");
         }
 
         // =================
@@ -1045,14 +1029,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CollectionDetail()
         {
-            if (PageAccess("CollectionDetail").Equals("CollectionDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("CollectionDetail");
         }
 
         // ==============

@@ -368,14 +368,12 @@ namespace easyfis.ModifiedApiControllers
                                                        BranchId = d.BranchId,
                                                        AccountId = d.AccountId,
                                                        ArticleId = d.ArticleId,
-                                                       RRId = d.RRId,
                                                    } into g
                                                    select new
                                                    {
                                                        BranchId = g.Key.BranchId,
                                                        AccountId = g.Key.AccountId,
                                                        ArticleId = g.Key.ArticleId,
-                                                       RRId = g.Key.RRId,
                                                        DebitAmount = g.Sum(d => d.DebitAmount),
                                                        CreditAmount = g.Sum(d => d.CreditAmount),
                                                        BalanceAmount = g.Sum(d => d.DebitAmount) - g.Sum(d => d.CreditAmount)
@@ -384,15 +382,11 @@ namespace easyfis.ModifiedApiControllers
                                     if (journals.Any())
                                     {
                                         var advances = from d in journals.ToList()
-                                                       where d.ArticleId == objDisbursementLine.ArticleId
-                                                       && d.AccountId == objDisbursementLine.AccountId
-                                                       && d.BranchId == currentBranchId
                                                        select new
                                                        {
                                                            BranchId = d.BranchId,
                                                            AccountId = d.AccountId,
                                                            ArticleId = d.ArticleId,
-                                                           RRId = d.RRId,
                                                            DebitAmount = d.DebitAmount,
                                                            CreditAmount = d.CreditAmount,
                                                            BalanceAmount = d.BalanceAmount
@@ -406,7 +400,7 @@ namespace easyfis.ModifiedApiControllers
                                                 BranchId = advances.FirstOrDefault().BranchId,
                                                 AccountId = advances.FirstOrDefault().AccountId,
                                                 ArticleId = advances.FirstOrDefault().ArticleId,
-                                                RRId = advances.FirstOrDefault().RRId,
+                                                RRId = null,
                                                 Particulars = "Supplier Advances",
                                                 Amount = advances.FirstOrDefault().BalanceAmount * -1,
                                             };

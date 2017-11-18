@@ -353,12 +353,22 @@ namespace easyfis.ModifiedApiControllers
 
             if (disbursementLines.Any())
             {
-                Decimal paidAmount = disbursementLines.Sum(d => d.Amount);
-
                 foreach (var disbursementLine in disbursementLines)
                 {
                     if (disbursementLine.RRId != null)
                     {
+                        Decimal paidAmount = 0;
+
+                        var disbursementLinesAmount = from d in db.TrnDisbursementLines
+                                                      where d.RRId == disbursementLine.RRId
+                                                      && d.TrnDisbursement.IsLocked == true
+                                                      select d;
+
+                        if (disbursementLinesAmount.Any())
+                        {
+                            paidAmount = disbursementLinesAmount.Sum(d => d.Amount);
+                        }
+
                         Decimal adjustmentAmount = 0;
 
                         var journalVoucherLines = from d in db.TrnJournalVoucherLines
@@ -383,7 +393,6 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
                             Decimal receivingReceiptWTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
-
                             Decimal balanceAmount = (receivingReceiptAmount - receivingReceiptWTAXAmount - paidAmount) + adjustmentAmount;
 
                             var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
