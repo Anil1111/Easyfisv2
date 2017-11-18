@@ -57,5 +57,27 @@ namespace easyfis.ModifiedApiControllers
 
             return journals.ToList();
         }
+
+        // ===========================
+        // List Journal - Disbursement
+        // ===========================
+        [Authorize, HttpGet, Route("api/jounal/disbursement/list/{CVId}")]
+        public List<Entities.TrnJournal> ListJournalDisbursement(String CVId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.CVId == Convert.ToInt32(CVId)
+                           select new Entities.TrnJournal
+                           {
+                               Branch = d.MstBranch.Branch,
+                               JournalDate = d.JournalDate.ToShortDateString(),
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               Article = d.MstArticle.Article,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
     }
 }

@@ -1855,7 +1855,7 @@
                             },
                             {
                                 "header": "Quantity",
-                                "binding": "BalanceDisplay",
+                                "binding": "Balance",
                                 "allowSorting": true,
                                 "width": "1*",
                                 "align": "right",
@@ -1973,73 +1973,67 @@
             $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", true);
             $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", true);
 
-            var RRId = getParam('id');
-            var BranchId = cboRRbranch.selectedValue;
-            var POId = cboPONumberPOStatus.selectedValue;
+            var purchaseOrderArrays = new Array();
 
             for (var i = 0; i < purchaseOrderStatusCollectionView.items.length; i++) {
                 var item = purchaseOrderStatusCollectionView.items[i];
                 if (item.Balance > 0) {
-                    var POItemObject = new Object();
-                    POItemObject.POId = item.POId;
-                    POItemObject.ItemId = item.ItemId;
-                    POItemObject.Particulars = item.Particulars;
-                    POItemObject.UnitId = item.BaseUnitId;
-                    POItemObject.Quantity = item.Balance;
-                    POItemObject.Cost = item.BaseCost;
-                    POItemObject.BranchId = BranchId;
-                    var POItemObjectData = JSON.stringify(POItemObject);
-
-                    $.ajax({
-                        url: '/api/receivingReceiptItem/popUp/apply/purchaseOrderStatus/' + RRId,
-                        type: "POST",
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        data: POItemObjectData,
-                        statusCode: {
-                            200: function () {
-                                toastr.success("Apply Successful");
-                                $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", true);
-                                $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", true);
-
-                                $('#applyAllConfirmPOStatus').modal('hide');
-                                $('#POStatus').modal('hide');
-
-                                refreshReceivingReceiptFlexGrid();
-                            },
-                            404: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#applyAllConfirmPOStatus').modal('hide');
-                                $('#POStatus').modal('hide');
-                                document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
-                                $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
-                                $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
-                            },
-                            400: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#applyAllConfirmPOStatus').modal('hide');
-                                $('#POStatus').modal('hide');
-                                document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
-                                $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
-                                $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
-                            },
-                            500: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#applyAllConfirmPOStatus').modal('hide');
-                                $('#POStatus').modal('hide');
-                                document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
-                                $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
-                                $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
-                            }
-                        }
+                    purchaseOrderArrays.push({
+                        POId: item.POId,
+                        ItemId: item.ItemId,
+                        Quantity: item.Balance,
                     });
-                } else {
-                    $('#POStatus').modal('hide');
-                    document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
-                    $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
-                    $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
                 }
             }
+
+            var POItemObject = new Object();
+            var POItemObjectData = JSON.stringify(purchaseOrderArrays);
+
+            var RRId = getParam('id');
+
+            $.ajax({
+                url: '/api/receivingReceiptItem/popUp/apply/purchaseOrderStatus/' + RRId,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: POItemObjectData,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Apply Successful");
+                        $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", true);
+                        $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", true);
+
+                        $('#applyAllConfirmPOStatus').modal('hide');
+                        $('#POStatus').modal('hide');
+
+                        refreshReceivingReceiptFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#applyAllConfirmPOStatus').modal('hide');
+                        $('#POStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#applyAllConfirmPOStatus').modal('hide');
+                        $('#POStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#applyAllConfirmPOStatus').modal('hide');
+                        $('#POStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllPOStatusPOItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllPOStatusPOItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllPOStatusPOItems").prop("disabled", false);
+                    }
+                }
+            });
         }
 
         // ========================

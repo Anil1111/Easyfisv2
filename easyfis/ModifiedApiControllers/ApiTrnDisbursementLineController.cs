@@ -122,8 +122,15 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/disbursementLine/dropdown/list/receivingReceipt/{supplierId}")]
         public List<Entities.TrnReceivingReceipt> DropdownListDisbursementLineReceivingReceipt(String supplierId)
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.SupplierId == Convert.ToInt32(supplierId)
+                                    && d.BranchId == branchId
                                     && d.BalanceAmount > 0
                                     && d.IsLocked == true
                                     select new Entities.TrnReceivingReceipt
@@ -143,20 +150,23 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/receivingReceiptStatus/{supplierId}")]
         public List<Entities.TrnReceivingReceipt> PopUpListDisbursementLineListReceivingReceiptStatus(String supplierId)
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.SupplierId == Convert.ToInt32(supplierId)
+                                    && d.BranchId == branchId
                                     && d.BalanceAmount > 0
                                     && d.IsLocked == true
                                     select new Entities.TrnReceivingReceipt
                                     {
                                         Id = d.Id,
-                                        BranchId = d.BranchId,
                                         RRNumber = d.RRNumber,
                                         RRDate = d.RRDate.ToShortDateString(),
                                         DocumentReference = d.DocumentReference,
-                                        SupplierId = d.SupplierId,
-                                        SupplierAccountId = d.MstArticle.AccountId,
-                                        Remarks = d.Remarks,
                                         Amount = d.Amount,
                                         PaidAmount = d.PaidAmount,
                                         AdjustmentAmount = d.AdjustmentAmount,
@@ -181,6 +191,7 @@ namespace easyfis.ModifiedApiControllers
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
+                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
@@ -199,43 +210,29 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
-                                    Boolean accountExists = false;
-                                    Boolean articleExists = false;
-
                                     foreach (var objDisbursementLine in objDisbursementLines)
                                     {
-                                        var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
-                                                       where d.Id == objDisbursementLine.AccountId
-                                                       && d.IsLocked == true
-                                                       select d;
+                                        var receivingReceipt = from d in db.TrnReceivingReceipts
+                                                               where d.Id == objDisbursementLine.RRId
+                                                               && d.BranchId == currentBranchId
+                                                               && d.IsLocked == true
+                                                               select d;
 
-                                        if (accounts.Any())
+                                        if (receivingReceipt.Any())
                                         {
-                                            accountExists = true;
-
-                                            var articles = from d in db.MstArticles
-                                                           where d.Id == objDisbursementLine.ArticleId
-                                                           && d.IsLocked == true
-                                                           select d;
-
-                                            if (articles.Any())
+                                            Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
                                             {
-                                                articleExists = true;
+                                                CVId = Convert.ToInt32(CVId),
+                                                BranchId = receivingReceipt.FirstOrDefault().BranchId,
+                                                AccountId = receivingReceipt.FirstOrDefault().MstArticle.AccountId,
+                                                ArticleId = receivingReceipt.FirstOrDefault().SupplierId,
+                                                RRId = receivingReceipt.FirstOrDefault().Id,
+                                                Particulars = receivingReceipt.FirstOrDefault().Remarks,
+                                                Amount = objDisbursementLine.Amount,
+                                            };
 
-                                                Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
-                                                {
-                                                    CVId = Convert.ToInt32(CVId),
-                                                    BranchId = objDisbursementLine.BranchId,
-                                                    AccountId = objDisbursementLine.AccountId,
-                                                    ArticleId = objDisbursementLine.ArticleId,
-                                                    RRId = objDisbursementLine.RRId,
-                                                    Particulars = objDisbursementLine.Particulars,
-                                                    Amount = objDisbursementLine.Amount,
-                                                };
-
-                                                db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
-                                                db.SubmitChanges();
-                                            }
+                                            db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
+                                            db.SubmitChanges();
                                         }
                                     }
 
@@ -250,21 +247,7 @@ namespace easyfis.ModifiedApiControllers
                                     updateDisbursement.Amount = disbursementItemTotalAmount;
                                     db.SubmitChanges();
 
-                                    if (accountExists)
-                                    {
-                                        if (articleExists)
-                                        {
-                                            return Request.CreateResponse(HttpStatusCode.OK);
-                                        }
-                                        else
-                                        {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Some receiving receipts dont have accounts.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Some receiving receipts dont have articles.");
-                                    }
+                                    return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
                                 {
@@ -357,6 +340,7 @@ namespace easyfis.ModifiedApiControllers
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
+                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
@@ -375,29 +359,56 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
-                                    var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
-                                                   where d.Id == objDisbursementLine.AccountId
-                                                   && d.IsLocked == true
-                                                   select d;
+                                    var journals = from d in db.TrnJournals
+                                                   where d.ArticleId == objDisbursementLine.ArticleId
+                                                   && d.AccountId == objDisbursementLine.AccountId
+                                                   && d.BranchId == currentBranchId
+                                                   group d by new
+                                                   {
+                                                       BranchId = d.BranchId,
+                                                       AccountId = d.AccountId,
+                                                       ArticleId = d.ArticleId,
+                                                       RRId = d.RRId,
+                                                   } into g
+                                                   select new
+                                                   {
+                                                       BranchId = g.Key.BranchId,
+                                                       AccountId = g.Key.AccountId,
+                                                       ArticleId = g.Key.ArticleId,
+                                                       RRId = g.Key.RRId,
+                                                       DebitAmount = g.Sum(d => d.DebitAmount),
+                                                       CreditAmount = g.Sum(d => d.CreditAmount),
+                                                       BalanceAmount = g.Sum(d => d.DebitAmount) - g.Sum(d => d.CreditAmount)
+                                                   };
 
-                                    if (accounts.Any())
+                                    if (journals.Any())
                                     {
-                                        var articles = from d in db.MstArticles
-                                                       where d.Id == objDisbursementLine.ArticleId
-                                                       && d.IsLocked == true
-                                                       select d;
+                                        var advances = from d in journals.ToList()
+                                                       where d.ArticleId == objDisbursementLine.ArticleId
+                                                       && d.AccountId == objDisbursementLine.AccountId
+                                                       && d.BranchId == currentBranchId
+                                                       select new
+                                                       {
+                                                           BranchId = d.BranchId,
+                                                           AccountId = d.AccountId,
+                                                           ArticleId = d.ArticleId,
+                                                           RRId = d.RRId,
+                                                           DebitAmount = d.DebitAmount,
+                                                           CreditAmount = d.CreditAmount,
+                                                           BalanceAmount = d.BalanceAmount
+                                                       };
 
-                                        if (articles.Any())
+                                        if (advances.Any())
                                         {
                                             Data.TrnDisbursementLine newDisbursementLine = new Data.TrnDisbursementLine
                                             {
                                                 CVId = Convert.ToInt32(CVId),
-                                                BranchId = objDisbursementLine.BranchId,
-                                                AccountId = objDisbursementLine.AccountId,
-                                                ArticleId = objDisbursementLine.ArticleId,
-                                                RRId = objDisbursementLine.RRId,
-                                                Particulars = objDisbursementLine.Particulars,
-                                                Amount = objDisbursementLine.Amount,
+                                                BranchId = advances.FirstOrDefault().BranchId,
+                                                AccountId = advances.FirstOrDefault().AccountId,
+                                                ArticleId = advances.FirstOrDefault().ArticleId,
+                                                RRId = advances.FirstOrDefault().RRId,
+                                                Particulars = "Supplier Advances",
+                                                Amount = advances.FirstOrDefault().BalanceAmount * -1,
                                             };
 
                                             db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
@@ -418,12 +429,12 @@ namespace easyfis.ModifiedApiControllers
                                         }
                                         else
                                         {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No Article.");
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No advances found.");
                                         }
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No Account.");
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No journal data found.");
                                     }
                                 }
                                 else

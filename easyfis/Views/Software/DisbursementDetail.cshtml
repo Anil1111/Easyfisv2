@@ -399,7 +399,7 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                <div id="receivingStatusGrid" style="max-height: 300px"></div>
+                                <div id="receivingStatusGrid"></div>
                             </div>
                             <div class="panel-footer">
                                 <div class="row">
@@ -443,7 +443,36 @@
                         <span id="loadingRRAdvances"></span>
                     </center>
                     <div id="AdvancesGrid">
-                        <div id="RRAdvancesGrid" style="max-height: 300px"></div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="input-group  ">
+                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    <input type="text" class="form-control" id="RRAdvancesFilter" placeholder="Search">
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="RRAdvancesGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridRRAdvances">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridRRAdvances">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridRRAdvances">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridRRAdvances"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridRRAdvances">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridRRAdvances">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -530,6 +559,11 @@
         var btnNextPageGridRRStatus = document.getElementById('btnMoveToNextPageGridRRStatus');
         var btnLastPageGridRRStatus = document.getElementById('btnMoveToLastPageGridRRStatus');
         var btnCurrentPageGridRRStatus = document.getElementById('btnCurrentPageGridRRStatus');
+        var btnFirstPageGridRRAdvances = document.getElementById('btnMoveToFirstPageGridRRAdvances');
+        var btnPreviousPageGridRRAdvances = document.getElementById('btnMoveToPreviousPageGridRRAdvances');
+        var btnNextPageGridRRAdvances = document.getElementById('btnMoveToNextPageGridRRAdvances');
+        var btnLastPageGridRRAdvances = document.getElementById('btnMoveToLastPageGridRRAdvances');
+        var btnCurrentPageGridRRAdvances = document.getElementById('btnCurrentPageGridRRAdvances');
 
         // =======================
         // Get URL Parameter Value
@@ -1734,9 +1768,9 @@
         // ===========
         function getJournalListForRR() {
             var journalsObservableArray = new wijmo.collections.ObservableArray;
-            var id = getParam('id');
+            var CVId = getParam('id');
             $.ajax({
-                url: '/api/listJournalByCVId/' + id,
+                url: '/api/jounal/disbursement/list/' + CVId,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
@@ -1744,30 +1778,18 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
+
+                            var journalDateResult = new Date(results[i]["JournalDate"])
+                            var journalDate = ('0' + (journalDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + journalDateResult.getDate()).slice(-2) + '-' + journalDateResult.getFullYear();
+
                             journalsObservableArray.push({
-                                Id: results[i]["Id"],
-                                JournalDate: (results[i]["JournalDate"]).replace(/\//g, '-'),
-                                BranchId: results[i]["BranchId"],
                                 Branch: results[i]["Branch"],
-                                AccountId: results[i]["AccountId"],
+                                JournalDate: journalDate,
                                 AccountCode: results[i]["AccountCode"],
                                 Account: results[i]["Account"],
-                                ArticleId: results[i]["ArticleId"],
                                 Article: results[i]["Article"],
-                                Particulars: results[i]["Particulars"],
                                 DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                ORId: results[i]["ORId"],
-                                CVId: results[i]["CVId"],
-                                JVId: results[i]["JVId"],
-                                RRId: results[i]["RRId"],
-                                SIId: results[i]["SIId"],
-                                INId: results[i]["INId"],
-                                OTId: results[i]["OTId"],
-                                STId: results[i]["STId"],
-                                DocumentReference: results[i]["DocumentReference"],
-                                APRRId: results[i]["APRRId"],
-                                ARSIId: results[i]["ARSIId"]
+                                CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
                             var debitAmountTotal = 0;
@@ -1915,17 +1937,11 @@
 
                             receivingReceiptsObservableArray.push({
                                 Id: results[i]["Id"],
-                                BranchId: results[i]["BranchId"],
                                 RRNumber: results[i]["RRNumber"],
                                 RRDate: RRDate,
                                 DocumentReference: results[i]["DocumentReference"],
-                                SupplierId: results[i]["SupplierId"],
-                                SupplierAccountId: results[i]["SupplierAccountId"],
-                                Remarks: results[i]["Remarks"],
                                 Amount: results[i]["Amount"],
                                 AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                WTaxAmount: results[i]["WTaxAmount"],
-                                WTaxAmountDisplay: parseFloat(results[i]["WTaxAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 PaidAmount: results[i]["PaidAmount"],
                                 PaidAmountDisplay: parseFloat(results[i]["PaidAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 AdjustmentAmount: results[i]["AdjustmentAmount"],
@@ -1998,14 +2014,10 @@
                 var item = receivingReceipts.items[i];
                 if (item.Balance > 0) {
                     receivingReceiptArrays.push({
-                        BranchId: item.BranchId,
-                        AccountId: item.SupplierAccountId,
-                        ArticleId: item.SupplierId,
                         RRId: item.Id,
-                        Particulars: item.Remarks,
                         Amount: item.Balance,
                     });
-                } 
+                }
             }
 
             var receivingReceitItemObject = new Object();
@@ -2058,7 +2070,7 @@
         // Update Navigation Buttons
         // =========================
         function updateNavigateButtonsRRStatus() {
-            if (disbursementLines.pageSize <= 0) {
+            if (receivingReceipts.pageSize <= 0) {
                 document.getElementById('naviagtionPageGrid').style.display = 'none';
                 return;
             }
@@ -2246,26 +2258,27 @@
         function getJournalByArticleId() {
             var RRAdvancesObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listJournalBySupplierAdvancesAccountIdByArticleId/' + cboCVSupplier.selectedValue,
+                url: '/api/disbursementLine/popUp/list/supplierAdvances/' + cboCVSupplier.selectedValue,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (journalresults) {
-                    if (journalresults.length > 0) {
-                        for (i = 0; i < journalresults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             RRAdvancesObservableArray.push({
-                                BranchId: journalresults[i]["BranchId"],
-                                Branch: journalresults[i]["Branch"],
-                                AccountId: journalresults[i]["AccountId"],
-                                Account: journalresults[i]["Account"],
-                                AccountCode: journalresults[i]["AccountCode"],
-                                ArticleId: journalresults[i]["ArticleId"],
-                                Article: journalresults[i]["Article"],
-                                DebitAmount: journalresults[i]["DebitAmount"],
-                                CreditAmount: journalresults[i]["CreditAmount"],
-                                DebitAmountDisplay: parseFloat(journalresults[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                CreditAmountDisplay: parseFloat(journalresults[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Balance: journalresults[i]["Balance"],
+                                BranchId: results[i]["BranchId"],
+                                Branch: results[i]["Branch"],
+                                AccountId: results[i]["AccountId"],
+                                Account: results[i]["Account"],
+                                AccountCode: results[i]["AccountCode"],
+                                ArticleId: results[i]["ArticleId"],
+                                Article: results[i]["Article"],
+                                DebitAmount: results[i]["DebitAmount"],
+                                DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                CreditAmount: results[i]["CreditAmount"],
+                                CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                Balance: results[i]["Balance"],
+                                BalanceDisplay: parseFloat(results[i]["Balance"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Pick: "<button class='btn btn-primary btn-xs' onclick='btnApplyAdvancesOnclick()'><i class='fa fa-check'></i> Apply </button>"
                             });
                         }
@@ -2297,11 +2310,59 @@
             }, 500);
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsRRAdvances() {
+            if (RRAdvances.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (RRAdvances.pageIndex === 0) {
+                btnFirstPageGridRRAdvances.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridRRAdvances.setAttribute('disabled', 'disabled');
+                btnNextPageGridRRAdvances.removeAttribute('disabled');
+                btnLastPageGridRRAdvances.removeAttribute('disabled');
+            } else if (RRAdvances.pageIndex === (RRAdvances.pageCount - 1)) {
+                btnFirstPageGridRRAdvances.removeAttribute('disabled');
+                btnPreviousPageGridRRAdvances.removeAttribute('disabled');
+                btnNextPageGridRRAdvances.setAttribute('disabled', 'disabled');
+                btnLastPageGridRRAdvances.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGridRRAdvances.removeAttribute('disabled');
+                btnPreviousPageGridRRAdvances.removeAttribute('disabled');
+                btnNextPageGridRRAdvances.removeAttribute('disabled');
+                btnLastPageGridRRAdvances.removeAttribute('disabled');
+            }
+            btnCurrentPageGridRRAdvances.innerHTML = (RRAdvances.pageIndex + 1) + ' / ' + RRAdvances.pageCount;
+        }
+
+        var isAdvancesClicked = false;
+
         // ===============================
         // Receiving Receipt Advances Grid
         // ===============================
         function createRRAdvancesFlexGrid() {
             RRAdvances = new wijmo.collections.CollectionView(getJournalByArticleId());
+            RRAdvances.canFilter = true;
+            RRAdvances.pageSize = 10;
+
+            var filterText = '';
+            $('#RRAdvancesFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                RRAdvances.refresh();
+            });
+
+            RRAdvances.filter = function (item) {
+                return !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            RRAdvances.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsRRAdvances();
+            });
 
             RRAdvancesGrid.dispose();
             RRAdvancesGrid = new wijmo.grid.FlexGrid('#RRAdvancesGrid');
@@ -2341,8 +2402,9 @@
                     },
                     {
                         "header": "Balance",
-                        "binding": "Balance",
+                        "binding": "BalanceDisplay",
                         "allowSorting": true,
+                        "align": "right",
                         "width": "2*"
                     },
                     {
@@ -2365,6 +2427,32 @@
             });
 
             RRAdvancesGrid.trackChanges = true;
+
+            if (!isAdvancesClicked) {
+                updateNavigateButtonsRRAdvances();
+
+                btnFirstPageGridRRAdvances.addEventListener('click', function () {
+                    RRAdvances.moveToFirstPage();
+                    updateNavigateButtonsItems();
+                });
+
+                btnPreviousPageGridRRAdvances.addEventListener('click', function () {
+                    RRAdvances.moveToPreviousPage();
+                    updateNavigateButtonsRRAdvances();
+                });
+
+                btnNextPageGridRRAdvances.addEventListener('click', function () {
+                    RRAdvances.moveToNextPage();
+                    updateNavigateButtonsRRAdvances();
+                });
+
+                btnLastPageGridRRAdvances.addEventListener('click', function () {
+                    RRAdvances.moveToLastPage();
+                    updateNavigateButtonsRRAdvances();
+                });
+
+                isAdvancesClicked = true;
+            }
         }
 
         function btnApplyAdvancesOnclick() {
@@ -2384,28 +2472,43 @@
             $("#cmdCloseButtonApplyAdvances").prop("disabled", true);
 
             RRAdvances.editItem(RRAdvances.currentItem);
-            var ArticleId = RRAdvances.currentEditItem.ArticleId;
+            var RRAdvancesItem = RRAdvances.currentEditItem;
+
+            var CVId = getParam("id");
+
+            var receivingReceiptAdvancesObject = new Object();
+            receivingReceiptAdvancesObject.AccountId = RRAdvancesItem.AccountId;
+            receivingReceiptAdvancesObject.ArticleId = RRAdvancesItem.ArticleId;
+            var receivingReceiptAdvancesData = JSON.stringify(receivingReceiptAdvancesObject);
 
             $.ajax({
+                url: '/api/disbursementLine/popUp/apply/supplierAdvances/' + CVId,
                 type: "POST",
-                url: '/api/disbursementLine/applyAdvances/ByArticleId/' + ArticleId + '/' + getParam("id"),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
+                data: receivingReceiptAdvancesData,
                 statusCode: {
                     200: function () {
                         toastr.success("Apply Successful");
                         $('#applyConfirm').modal('hide');
                         refreshDisbursementLineFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#applyConfirm').modal('hide');
                         document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
                         $("#cmdConfirmApplyAdvances").prop("disabled", false);
                         $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#applyConfirm').modal('hide');
+                        document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAdvances").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#applyConfirm').modal('hide');
                         document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
                         $("#cmdConfirmApplyAdvances").prop("disabled", false);
