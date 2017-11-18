@@ -145,7 +145,7 @@ namespace easyfis.ModifiedApiControllers
                                     Id = d.Id,
                                     SINumber = d.SINumber,
                                     SIDate = d.SIDate.ToShortDateString(),
-                                    Amount = d.Amount
+                                    BalanceAmount = d.BalanceAmount
                                 };
 
             return salesInvoices.ToList();
@@ -371,7 +371,7 @@ namespace easyfis.ModifiedApiControllers
                                Article = g.Key.Article,
                                DebitAmount = g.Sum(d => d.DebitAmount),
                                CreditAmount = g.Sum(d => d.CreditAmount),
-                               Balance = g.Sum(d => d.DebitAmount) - g.Sum(d => d.CreditAmount)
+                               Balance = g.Sum(d => d.CreditAmount) - g.Sum(d => d.DebitAmount)
                            };
 
             return journals.Where(d => d.Balance != 0).ToList();
@@ -428,7 +428,7 @@ namespace easyfis.ModifiedApiControllers
                                                        ArticleId = g.Key.ArticleId,
                                                        DebitAmount = g.Sum(d => d.DebitAmount),
                                                        CreditAmount = g.Sum(d => d.CreditAmount),
-                                                       BalanceAmount = g.Sum(d => d.DebitAmount) - g.Sum(d => d.CreditAmount)
+                                                       BalanceAmount = g.Sum(d => d.CreditAmount) - g.Sum(d => d.DebitAmount)
                                                    };
 
                                     if (journals.Any())
@@ -467,7 +467,7 @@ namespace easyfis.ModifiedApiControllers
                                                         ArticleId = advances.FirstOrDefault().ArticleId,
                                                         SIId = null,
                                                         Particulars = "Customer Advances",
-                                                        Amount = objCollectionLine.Amount,
+                                                        Amount = advances.FirstOrDefault().BalanceAmount * -1,
                                                         PayTypeId = payTypes.FirstOrDefault().Id,
                                                         CheckNumber = "NA",
                                                         CheckDate = DateTime.Now,

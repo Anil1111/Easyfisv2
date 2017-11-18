@@ -138,7 +138,7 @@ namespace easyfis.ModifiedApiControllers
                                         Id = d.Id,
                                         RRNumber = d.RRNumber,
                                         RRDate = d.RRDate.ToShortDateString(),
-                                        Amount = d.Amount
+                                        BalanceAmount = d.BalanceAmount
                                     };
 
             return receivingReceipts.ToList();
