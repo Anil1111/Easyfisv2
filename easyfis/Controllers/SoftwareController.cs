@@ -375,23 +375,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult JournalVoucher()
         {
-            if (PageAccess("JournalVoucherList").Equals("JournalVoucherList"))
-            {
-                if (AccessToDetail("JournalVoucherDetail").Equals("JournalVoucherDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("JournalVoucherList");
         }
 
         // ======================
@@ -400,14 +384,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult JournalVoucherDetail()
         {
-            if (PageAccess("JournalVoucherDetail").Equals("JournalVoucherDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("JournalVoucherDetail");
         }
 
         // =======
