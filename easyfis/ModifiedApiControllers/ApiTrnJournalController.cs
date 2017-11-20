@@ -101,5 +101,49 @@ namespace easyfis.ModifiedApiControllers
 
             return journals.ToList();
         }
+
+        // ==============================
+        // List Journal - Journal Voucher
+        // ==============================
+        [Authorize, HttpGet, Route("api/jounal/journalVoucher/list/{JVId}")]
+        public List<Entities.TrnJournal> ListJournalJournalVoucher(String JVId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.JVId == Convert.ToInt32(JVId)
+                           select new Entities.TrnJournal
+                           {
+                               Branch = d.MstBranch.Branch,
+                               JournalDate = d.JournalDate.ToShortDateString(),
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               Article = d.MstArticle.Article,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
+
+        // =======================
+        // List Journal - Stock In
+        // =======================
+        [Authorize, HttpGet, Route("api/jounal/stockIn/list/{INId}")]
+        public List<Entities.TrnJournal> ListJournalStockIn(String INId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.INId == Convert.ToInt32(INId)
+                           select new Entities.TrnJournal
+                           {
+                               Branch = d.MstBranch.Branch,
+                               JournalDate = d.JournalDate.ToShortDateString(),
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               Article = d.MstArticle.Article,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
     }
 }

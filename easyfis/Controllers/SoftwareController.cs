@@ -293,23 +293,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockIn()
         {
-            if (PageAccess("StockInList").Equals("StockInList"))
-            {
-                if (AccessToDetail("StockInDetail").Equals("StockInDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("StockInList");
         }
 
         // ===============
@@ -318,14 +302,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockInDetail()
         {
-            if (PageAccess("StockInDetail").Equals("StockInDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("StockInDetail");
         }
 
         // =========

@@ -59,5 +59,28 @@ namespace easyfis.ModifiedApiControllers
 
             return inventories.ToList();
         }
+
+        // =========================
+        // List Inventory - Stock In
+        // =========================
+        [Authorize, HttpGet, Route("api/inventory/stockIn/list/{INId}")]
+        public List<Entities.TrnInventory> ListInventoryStockIn(String INId)
+        {
+            var inventories = from d in db.TrnInventories
+                              where d.INId == Convert.ToUInt32(INId)
+                              select new Entities.TrnInventory
+                              {
+                                  InventoryDate = d.InventoryDate.ToShortDateString(),
+                                  Branch = d.MstBranch.Branch,
+                                  Article = d.MstArticle.Article,
+                                  Particulars = d.Particulars,
+                                  ArticleInventoryCode = d.MstArticleInventory.InventoryCode,
+                                  Quantity = d.Quantity,
+                                  ArticleUnit = d.MstArticle.MstUnit.Unit,
+                                  Amount = d.Amount
+                              };
+
+            return inventories.ToList();
+        }
     }
 }
