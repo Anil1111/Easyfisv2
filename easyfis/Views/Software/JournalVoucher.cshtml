@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -40,8 +52,13 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary " id="btnAddJournalVoucher" onclick="btnAddJournalVoucher_OnClick()"><i class="fa fa-plus"></i> Add</button>
-                                    <button class="btn btn-danger " id="btnCloseJournalVoucher" onclick="btnCloseJournalVoucher_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddJournalVoucher" onclick="btnAddJournalVoucher_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
+                                    <button class="btn btn-danger" id="btnCloseJournalVoucher" onclick="btnCloseJournalVoucher_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
@@ -171,51 +188,28 @@
 
             var journalVouchers = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listJournalVoucherByJVDate/' + startDate + '/' + endDate,
+                url: '/api/journalVoucher/list/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
-                            var JVDateResult = new Date(Results[i]["JVDate"])
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            var JVDateResult = new Date(results[i]["JVDate"])
                             var JVDate = ('0' + (JVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + JVDateResult.getDate()).slice(-2) + '-' + JVDateResult.getFullYear();
 
                             journalVouchers.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='cmdJournalVoucherEditButton_OnClick()'" + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdJournalVoucherDeleteButton_OnClick()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
-                                Id: Results[i]["Id"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
-                                JVNumber: Results[i]["JVNumber"],
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='cmdJournalVoucherEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdJournalVoucherDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                Id: results[i]["Id"],
+                                JVNumber: results[i]["JVNumber"],
                                 JVDate: JVDate,
-                                Particulars: Results[i]["Particulars"],
-                                ManualJVNumber: Results[i]["ManualJVNumber"],
-                                PreparedById: Results[i]["PreparedById"],
-                                PreparedBy: Results[i]["PreparedBy"],
-                                CheckedById: Results[i]["CheckedById"],
-                                CheckedBy: Results[i]["CheckedBy"],
-                                ApprovedById: Results[i]["ApprovedById"],
-                                ApprovedBy: Results[i]["ApprovedBy"],
-                                IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
-                                CreatedBy: Results[i]["CreatedBy"],
-                                CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
-                                UpdatedBy: Results[i]["UpdatedBy"],
-                                UpdatedDateTime: Results[i]["UpdatedDateTime"]
+                                Particulars: results[i]["Particulars"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -235,28 +229,34 @@
             $('#btnAddJournalVoucher').prop('disabled', true);
             $('#btnCloseJournalVoucher').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/addJournalVoucher',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/JournalVoucherDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddJournalVoucher').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddJournalVoucher').prop('disabled', false);
-                            $('#btnCloseJournalVoucher').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/journalVoucher/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/JournalVoucherDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddJournalVoucher').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddJournalVoucher').prop('disabled', false);
+                        $('#btnCloseJournalVoucher').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddJournalVoucher').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddJournalVoucher').prop('disabled', false);
+                        $('#btnCloseJournalVoucher').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddJournalVoucher').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddJournalVoucher').prop('disabled', false);
+                        $('#btnCloseJournalVoucher').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         // ============================
@@ -304,8 +304,9 @@
 
             journalVouchers.editItem(journalVouchers.currentItem);
             var id = journalVouchers.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteJournalVoucher/' + id,
+                url: '/api/journalVoucher/delete/' + id,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -315,15 +316,22 @@
                         $('#deleteJournalVoucherConfirm').modal('hide');
                         refreshJournalVoucherFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteJournalVoucherConfirm').modal('hide');
                         document.getElementById('cmdJournalVoucherDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdJournalVoucherDeleteCompany").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButtonJournalVoucher").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteJournalVoucherConfirm').modal('hide');
+                        document.getElementById('cmdJournalVoucherDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdJournalVoucherDeleteCompany").prop("disabled", false);
+                        $("#cmdConfirmDeleteCloseButtonJournalVoucher").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteJournalVoucherConfirm').modal('hide');
                         document.getElementById('cmdJournalVoucherDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdJournalVoucherDeleteCompany").prop("disabled", false);
@@ -430,24 +438,36 @@
             journalVoucherGrid = new wijmo.grid.FlexGrid('#JournalVoucherGrid');
             journalVoucherGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "EditId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "DeleteId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "JV Number",
                                 "binding": "JVNumber",
@@ -510,11 +530,6 @@
                 journalVouchers.moveToLastPage();
                 updateNavigateButtonsJournalVoucher();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddJournalVoucher").prop("disabled", true);
-            }
         }
 
         // ============
@@ -543,12 +558,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesResults) {
-                    if (userBranchesResults.length > 0) {
-                        for (i = 0; i < userBranchesResults.length; i++) {
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesResults[i]["BranchId"],
-                                Branch: userBranchesResults[i]["Branch"]
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
                             });
                         }
                     }

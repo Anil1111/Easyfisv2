@@ -93,6 +93,22 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
+        // ==============================
+        // Dropdown List - Branch (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/journalVoucher/dropdown/list/branch")]
+        public List<Entities.MstBranch> DropdownListJournalVoucherBranch()
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
         // ============================
         // Dropdown List - User (Field)
         // ============================
@@ -255,7 +271,7 @@ namespace easyfis.ModifiedApiControllers
                                     Decimal totalJournalVoucherLineCreditAmount = journalVoucher.FirstOrDefault().TrnJournalVoucherLines.Sum(d => d.CreditAmount);
                                     Decimal variance = totalJournalVoucherLineDebitAmount - totalJournalVoucherLineCreditAmount;
 
-                                    if (variance != 0)
+                                    if (variance == 0)
                                     {
                                         var lockJournalVoucher = journalVoucher.FirstOrDefault();
                                         lockJournalVoucher.JVDate = Convert.ToDateTime(objJournalVoucher.JVDate);
@@ -420,7 +436,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("JournalVoucherDetail")
+                                    && d.SysForm.FormName.Equals("JournalVoucherList")
                                     select d;
 
                     if (userForms.Any())

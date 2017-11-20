@@ -101,40 +101,40 @@ namespace easyfis.Controllers
             return (Models.TrnJournalVoucher)journalVouchers.FirstOrDefault();
         }
 
-        // get journal voucher by Id
-        [Authorize]
-        [HttpGet]
-        [Route("api/journalVoucher/{Id}")]
-        public Models.TrnJournalVoucher getJournalVoucherById(String Id)
-        {
-            var journalVouchers = from d in db.TrnJournalVouchers
-                                  where d.Id == Convert.ToInt32(Id)
-                                  select new Models.TrnJournalVoucher
-                                  {
-                                      Id = d.Id,
-                                      BranchId = d.BranchId,
-                                      Branch = d.MstBranch.Branch,
-                                      JVNumber = d.JVNumber,
-                                      JVDate = d.JVDate.ToShortDateString(),
-                                      Particulars = d.Particulars,
-                                      ManualJVNumber = d.ManualJVNumber,
-                                      PreparedById = d.PreparedById,
-                                      PreparedBy = d.MstUser.FullName,
-                                      CheckedById = d.CheckedById,
-                                      CheckedBy = d.MstUser1.FullName,
-                                      ApprovedById = d.ApprovedById,
-                                      ApprovedBy = d.MstUser2.FullName,
-                                      IsLocked = d.IsLocked,
-                                      CreatedById = d.CreatedById,
-                                      CreatedBy = d.MstUser3.FullName,
-                                      CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                      UpdatedById = d.UpdatedById,
-                                      UpdatedBy = d.MstUser4.FullName,
-                                      UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                                  };
+        //// get journal voucher by Id
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/journalVoucher/{Id}")]
+        //public Models.TrnJournalVoucher getJournalVoucherById(String Id)
+        //{
+        //    var journalVouchers = from d in db.TrnJournalVouchers
+        //                          where d.Id == Convert.ToInt32(Id)
+        //                          select new Models.TrnJournalVoucher
+        //                          {
+        //                              Id = d.Id,
+        //                              BranchId = d.BranchId,
+        //                              Branch = d.MstBranch.Branch,
+        //                              JVNumber = d.JVNumber,
+        //                              JVDate = d.JVDate.ToShortDateString(),
+        //                              Particulars = d.Particulars,
+        //                              ManualJVNumber = d.ManualJVNumber,
+        //                              PreparedById = d.PreparedById,
+        //                              PreparedBy = d.MstUser.FullName,
+        //                              CheckedById = d.CheckedById,
+        //                              CheckedBy = d.MstUser1.FullName,
+        //                              ApprovedById = d.ApprovedById,
+        //                              ApprovedBy = d.MstUser2.FullName,
+        //                              IsLocked = d.IsLocked,
+        //                              CreatedById = d.CreatedById,
+        //                              CreatedBy = d.MstUser3.FullName,
+        //                              CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                              UpdatedById = d.UpdatedById,
+        //                              UpdatedBy = d.MstUser4.FullName,
+        //                              UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                          };
 
-            return (Models.TrnJournalVoucher)journalVouchers.FirstOrDefault();
-        }
+        //    return (Models.TrnJournalVoucher)journalVouchers.FirstOrDefault();
+        //}
 
         // list journal voucher by JVDate
         [Authorize]
