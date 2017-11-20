@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
+using System.Diagnostics;
 
 namespace easyfis.Controllers
 {
@@ -311,6 +312,121 @@ namespace easyfis.Controllers
             catch
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+        }
+
+        // ================
+        // Post Stock Count
+        // ================
+        [Authorize]
+        [HttpPost]
+        [Route("api/postStockCount/{SCId}")]
+        public Int32 postStockCout(String SCId)
+        {
+            try
+            {
+                var lastOTNumber = from d in db.TrnStockOuts.OrderByDescending(d => d.Id)
+                                   where d.BranchId == currentBranchId()
+                                   select d;
+
+                var OTNumberResult = "0000000001";
+
+                if (lastOTNumber.Any())
+                {
+                    var OTNumber = Convert.ToInt32(lastOTNumber.FirstOrDefault().OTNumber) + 0000000001;
+                    OTNumberResult = zeroFill(OTNumber, 10);
+                }
+
+                var users = (from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d).FirstOrDefault();
+
+                Data.TrnStockOut newStockOut = new Data.TrnStockOut();
+
+                var stockCount = from d in db.TrnStockCounts
+                                 where d.Id == Convert.ToInt32(SCId)
+                                 && d.IsLocked == true
+                                 select d;
+
+                if (stockCount.Any())
+                {
+                    newStockOut.BranchId = currentBranchId();
+                    newStockOut.OTNumber = OTNumberResult;
+                    newStockOut.OTDate = DateTime.Today;
+                    newStockOut.AccountId = users.IncomeAccountId;
+                    newStockOut.ArticleId = (from d in db.MstArticles where d.ArticleTypeId == 6 select d.Id).FirstOrDefault();
+                    newStockOut.Particulars = stockCount.FirstOrDefault().Particulars;
+                    newStockOut.ManualOTNumber = "SC-" + stockCount.FirstOrDefault().SCNumber;
+                    newStockOut.PreparedById = users.Id;
+                    newStockOut.CheckedById = users.Id;
+                    newStockOut.ApprovedById = users.Id;
+                    newStockOut.IsLocked = false;
+                    newStockOut.CreatedById = users.Id;
+                    newStockOut.CreatedDateTime = DateTime.Now;
+                    newStockOut.UpdatedById = users.Id;
+                    newStockOut.UpdatedDateTime = DateTime.Now;
+
+                    db.TrnStockOuts.InsertOnSubmit(newStockOut);
+                    db.SubmitChanges();
+
+                    if (stockCount.FirstOrDefault().TrnStockCountItems.Any())
+                    {
+                        foreach (var stockCountItem in stockCount.FirstOrDefault().TrnStockCountItems)
+                        {
+                            var item = from d in db.MstArticles
+                                       where d.Id == stockCountItem.ItemId
+                                       && d.IsLocked == true
+                                       select d;
+
+                            var articleInventory = from d in db.MstArticleInventories
+                                                   where d.ArticleId == stockCountItem.ItemId
+                                                   && d.BranchId == currentBranchId()
+                                                   select d;
+
+                            Data.TrnStockOutItem newStockOutItems = new Data.TrnStockOutItem();
+                            newStockOutItems.OTId = newStockOut.Id;
+                            newStockOutItems.ExpenseAccountId = item.FirstOrDefault().ExpenseAccountId;
+                            newStockOutItems.ItemId = stockCountItem.ItemId;
+                            newStockOutItems.ItemInventoryId = articleInventory.FirstOrDefault().Id;
+                            newStockOutItems.Particulars = stockCountItem.Particulars;
+                            newStockOutItems.UnitId = item.FirstOrDefault().UnitId;
+                            newStockOutItems.Quantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
+                            newStockOutItems.Cost = articleInventory.FirstOrDefault().Cost;
+                            newStockOutItems.Amount = (articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity) * articleInventory.FirstOrDefault().Cost;
+                            newStockOutItems.BaseUnitId = item.First().UnitId;
+
+                            var quantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
+                            var amount = (articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity) * articleInventory.FirstOrDefault().Cost;
+
+                            var conversionUnit = from d in db.MstArticleUnits where d.ArticleId == stockCountItem.ItemId && d.UnitId == item.First().UnitId select d;
+                            if (conversionUnit.First().Multiplier > 0)
+                            {
+                                newStockOutItems.BaseQuantity = quantity * (1 / conversionUnit.First().Multiplier);
+                            }
+                            else
+                            {
+                                newStockOutItems.BaseQuantity = quantity * 1;
+                            }
+
+                            var baseQuantity = quantity * (1 / conversionUnit.First().Multiplier);
+                            if (baseQuantity > 0)
+                            {
+                                newStockOutItems.BaseCost = amount / baseQuantity;
+                            }
+                            else
+                            {
+                                newStockOutItems.BaseCost = amount;
+                            }
+
+                            db.TrnStockOutItems.InsertOnSubmit(newStockOutItems);
+                            db.SubmitChanges();
+                        }
+                    }
+                }
+
+                return newStockOut.Id;
+            }
+            catch
+            {
+                return 0;
             }
         }
     }

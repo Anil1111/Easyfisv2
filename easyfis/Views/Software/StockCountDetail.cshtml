@@ -32,6 +32,7 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
+                                <button class="btn btn-primary " id="btnIdStockCountDetailPost" onclick="btnPostStockCountOnclick()"><i class=" fa fa-thumb-tack"></i> Post</button>
                                 <button class="btn btn-primary " id="btnIdStockCountDetailLock" onclick="btnOnclickStockCountDetailLock()"><i class=" fa fa-lock"></i> Lock</button>
                                 <button class="btn btn-primary " id="btnIdStockCountDetailUnlock" onclick="btnOnclickStockCountDetailUnlock()"><i class=" fa fa-unlock"></i> Unlock</button>
                                 <button class="btn btn-primary " id="btnIdStockCountDetailPrint" onclick="btnOnclickStockCountDetailPrint()"><i class="fa fa-print"></i> Print</button>
@@ -369,7 +370,7 @@
                                 cboSCPreparedBy.disabled = true;
                                 cboSCCheckedBy.disabled = true;
                                 cboSCApprovedBy.disabled = true;
-
+                                
                                 $("#btnIdStockCountDetailLock").prop("disabled", true);
                                 $("#btnIdStockCountItemAdd").prop("disabled", true);
                                 $("#btnIdStockCountItemQuery").prop("disabled", true);
@@ -386,6 +387,7 @@
 
                                 isLocked = true;
                             } else {
+                                $("#btnIdStockCountDetailPost").prop("disabled", true);
                                 $("#btnIdStockCountDetailUnlock").prop("disabled", true);
                                 $("#btnIdStockCountDetailPrint").prop("disabled", true);
 
@@ -444,6 +446,42 @@
                 }
             });
             return isValid;
+        }
+
+        // ================
+        // Post Stock Count
+        // ================
+        function btnPostStockCountOnclick() {
+            if (stockCountValidation()) {
+                document.getElementById("btnIdStockCountDetailPost").innerHTML = "<i class='fa fa-spinner fa-spin'></i> Posting";
+                $("#btnIdStockCountDetailPost").prop("disabled", true);
+                $("#btnIdStockCountDetailLock").prop("disabled", true);
+                $("#btnIdStockCountDetailUnlock").prop("disabled", true);
+                $("#btnIdStockCountDetailPrint").prop("disabled", true);
+                $("#btnIdStockCountDetailClose").prop("disabled", true);
+
+                $.ajax({
+                    type: "POST",
+                    url: '/api/postStockCount/' + getParameterValue("id"),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: stockCountData(),
+                    success: function (id) {
+                        if(id > 0) {
+                            window.location = '/Software/StockOutDetail?id=' + id;
+                        } else {
+                            toastr.error("Somethings went wrong from the server.");
+                            document.getElementById("btnIdStockCountDetailPost").innerHTML = "<i class='fa fa-thum-tack'></i> Post";
+                            $("#btnIdStockCountDetailPost").prop("disabled", false);
+                            $("#btnIdStockCountDetailUnlock").prop("disabled", false);
+                            $("#btnIdStockCountDetailPrint").prop("disabled", false);
+                            $("#btnIdStockCountDetailClose").prop("disabled", false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
         }
 
         // ================

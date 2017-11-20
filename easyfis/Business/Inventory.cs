@@ -308,8 +308,18 @@ namespace easyfis.Business
                             newStockOutInventory.ArticleId = stockOutItem.ItemId;
                             newStockOutInventory.ArticleInventoryId = stockOutItem.ItemInventoryId;
                             newStockOutInventory.OTId = OTId;
-                            newStockOutInventory.QuantityIn = 0;
-                            newStockOutInventory.QuantityOut = stockOutItem.BaseQuantity;
+
+                            if (stockOutItem.BaseQuantity < 0)
+                            {
+                                newStockOutInventory.QuantityIn = stockOutItem.BaseQuantity * -1;
+                                newStockOutInventory.QuantityOut = 0;
+                            }
+                            else
+                            {
+                                newStockOutInventory.QuantityIn = 0;
+                                newStockOutInventory.QuantityOut = stockOutItem.BaseQuantity;
+                            }
+
                             newStockOutInventory.Quantity = stockOutItem.BaseQuantity * -1;
                             newStockOutInventory.Amount = stockOutItem.Amount * -1;
                             newStockOutInventory.Particulars = stockOutHeaders.FirstOrDefault().Particulars;
