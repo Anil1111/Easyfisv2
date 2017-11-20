@@ -30,6 +30,8 @@ namespace easyfis.ModifiedApiControllers
                                           JVId = d.JVId,
                                           BranchId = d.BranchId,
                                           Branch = d.MstBranch.Branch,
+                                          AccountId = d.AccountId,
+                                          Account = d.MstAccount.Account,
                                           ArticleId = d.ArticleId,
                                           Article = d.MstArticle.Article,
                                           Particulars = d.Particulars,

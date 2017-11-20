@@ -130,19 +130,54 @@
                     <div id="JournalVoucherLineList" class="tab-pane fade in active">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-lg-12" align="right">
-                                        @{
-                                            if (canAdd)
-                                            {                                        
-                                                <button class="btn btn-primary" id="cmdJournalVoucherLineAddJournalVoucherLineButton" onclick="cmdJournalVoucherLineAddJournalVoucherLineButton_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="JournalVoucherLineInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboJournalVoucherLineShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right">
+                                            @{
+                                                if (canAdd)
+                                                {
+                                                    <button class="btn btn-primary" id="cmdJournalVoucherLineAddJournalVoucherLineButton" onclick="cmdJournalVoucherLineAddJournalVoucherLineButton_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                }
                                             }
-                                        }
-                                    </div>
-                                </div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                             <div class="panel-body">
                                 <div id="JournalVoucherLineGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="panel panel-default">
@@ -329,6 +364,12 @@
         var cboJVLineSI = new wijmo.input.ComboBox('#cboJVLineSI');
         var journalCollectionView;
         var journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
+        var cboJournalVoucherLineShowNumberOfRows = new wijmo.input.ComboBox('#cboJournalVoucherLineShowNumberOfRows');
+        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
+        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
 
         // =======================
         // Get URL Parameter Value
@@ -488,6 +529,7 @@
                                 $("#cmdEditJournalVoucher").prop("disabled", true);
                             }
 
+                            createCboShowRows();
                             createJournalVoucherLinesFlexGrid();
                         }
                     }
@@ -701,11 +743,116 @@
             return journalVoucherLines;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (journalVoucherLines.pageSize <= 0) {
+                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            if (journalVoucherLines.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (journalVoucherLines.pageIndex === (journalVoucherLines.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnCurrentPageGrid.innerHTML = (journalVoucherLines.pageIndex + 1) + ' / ' + journalVoucherLines.pageCount;
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboJournalVoucherLineShowNumberOfRows.dispose();
+            cboJournalVoucherLineShowNumberOfRows = new wijmo.input.ComboBox('#cboJournalVoucherLineShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboJournalVoucherLineShowNumberOfRows.selectedValue;
+                        journalVoucherLines.pageSize = parseInt(numberOfRows);
+                        journalVoucherLines.refresh();
+                        journalVoucherLineGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
         // ================================
         // Refresh Journal Voucher FlexGrid
         // ================================
         function refreshJournalVoucherFlexGrid() {
             journalVoucherLines = new wijmo.collections.CollectionView(getJournalVoucherLineByJVId());
+            journalVoucherLines.canFilter = true;
+            journalVoucherLines.pageSize = cboJournalVoucherLineShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#JournalVoucherLineInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                journalVoucherLines.refresh();
+            });
+
+            journalVoucherLines.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.APRRNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ARSINumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            journalVoucherLines.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
             journalVoucherLineGrid.itemsSource = journalVoucherLines;
             journalVoucherLineGrid.trackChanges = true;
         }
@@ -715,6 +862,27 @@
         // ========================
         function createJournalVoucherLinesFlexGrid() {
             journalVoucherLines = new wijmo.collections.CollectionView(getJournalVoucherLineByJVId());
+            journalVoucherLines.canFilter = true;
+            journalVoucherLines.pageSize = cboJournalVoucherLineShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#JournalVoucherLineInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                journalVoucherLines.refresh();
+            });
+
+            journalVoucherLines.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.APRRNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ARSINumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            journalVoucherLines.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
 
             // Flex Grid
             journalVoucherLineGrid = new wijmo.grid.FlexGrid('#JournalVoucherLineGrid');
@@ -817,6 +985,28 @@
             });
 
             journalVoucherLineGrid.trackChanges = true;
+
+            updateNavigateButtonsItems();
+
+            btnFirstPageGrid.addEventListener('click', function () {
+                journalVoucherLines.moveToFirstPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnPreviousPageGrid.addEventListener('click', function () {
+                journalVoucherLines.moveToPreviousPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnNextPageGrid.addEventListener('click', function () {
+                journalVoucherLines.moveToNextPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnLastPageGrid.addEventListener('click', function () {
+                journalVoucherLines.moveToLastPage();
+                updateNavigateButtonsItems();
+            });
         }
 
         // ================================================
