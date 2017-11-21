@@ -485,6 +485,23 @@
         var journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
         var itemQueryItemsCollection;
         var itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
+        var cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows');
+        var btnMoveToFirstPageGridItem = document.getElementById('btnMoveToFirstPageGridItem');
+        var btnMoveToPreviousPageGridItem = document.getElementById('btnMoveToPreviousPageGridItem');
+        var btnMoveToNextPageGridItem = document.getElementById('btnMoveToNextPageGridItem');
+        var btnMoveToLastPageGridItem = document.getElementById('btnMoveToLastPageGridItem');
+        var btnCurrentPageGridItem = document.getElementById('btnCurrentPageGridItem');
+        var btnMoveToFirstPageGridItemQuery = document.getElementById('btnMoveToFirstPageGridItemQuery');
+        var btnMoveToPreviousPageGridItemQuery = document.getElementById('btnMoveToPreviousPageGridItemQuery');
+        var btnMoveToNextPageGridItemQuery = document.getElementById('btnMoveToNextPageGridItemQuery');
+        var btnMoveToLastPageGridItemQuery = document.getElementById('btnMoveToLastPageGridItemQuery');
+        var btnCurrentPageGridItemQuery = document.getElementById('btnCurrentPageGridItemQuery');
+        var cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows');
+        var btnMoveToFirstPageGridInventoryEntry = document.getElementById('btnMoveToFirstPageGridInventoryEntry');
+        var btnMoveToPreviousPageGridInventoryEntry = document.getElementById('btnMoveToPreviousPageGridInventoryEntry');
+        var btnMoveToNextPageGridInventoryEntry = document.getElementById('btnMoveToNextPageGridInventoryEntry');
+        var btnMoveToLastPageGridInventoryEntry = document.getElementById('btnMoveToLastPageGridInventoryEntry');
+        var isItemQueryClicked = false;
 
         // =======================
         // Get URL Parameter Value
@@ -767,6 +784,7 @@
                                 $("#cmdStockInPrint").prop("disabled", true);
                             }
 
+                            createCboShowRows();
                             createStockInItemsFlexGrid();
                             createInventoryFlexGrid();
                         } else {
@@ -1002,6 +1020,110 @@
             return itemsObservableArray;
         }
 
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboStockInItemsShowNumberOfRows.dispose();
+            cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboStockInItemsShowNumberOfRows.selectedValue;
+                        items.pageSize = parseInt(numberOfRows);
+                        items.refresh();
+                        itemGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            cboInventoryEntryShowNumberOfRows.dispose();
+            cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboInventoryEntryShowNumberOfRows.selectedValue;
+                        inventoryCollectionView.pageSize = parseInt(numberOfRows);
+                        inventoryCollectionView.refresh();
+                        inventoryFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (items.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridItem').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridItem').style.display = 'block';
+            if (items.pageIndex === 0) {
+                btnMoveToFirstPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridItem.removeAttribute('disabled');
+                btnMoveToLastPageGridItem.removeAttribute('disabled');
+            } else if (items.pageIndex === (items.pageCount - 1)) {
+                btnMoveToFirstPageGridItem.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
+                btnMoveToNextPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridItem.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridItem.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
+                btnMoveToNextPageGridItem.removeAttribute('disabled');
+                btnMoveToLastPageGridItem.removeAttribute('disabled');
+            }
+            btnCurrentPageGridItem.innerHTML = (items.pageIndex + 1) + ' / ' + items.pageCount;
+        }
+
         // =============
         // Refresh Items
         // =============
@@ -1016,6 +1138,27 @@
         // ======
         function createStockInItemsFlexGrid() {
             items = new wijmo.collections.CollectionView(getItem());
+            items.canFilter = true;
+            items.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#StockInInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                items.refresh();
+            });
+
+            items.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            items.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
 
             itemGrid = new wijmo.grid.FlexGrid('#ItemGrid');
             itemGrid.initialize({
@@ -1291,6 +1434,28 @@
                     }
                 }
             }
+
+            updateNavigateButtonsItems();
+
+            btnMoveToFirstPageGridItem.addEventListener('click', function () {
+                items.moveToFirstPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToPreviousPageGridItem.addEventListener('click', function () {
+                items.moveToPreviousPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToNextPageGridItem.addEventListener('click', function () {
+                items.moveToNextPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToLastPageGridItem.addEventListener('click', function () {
+                items.moveToLastPage();
+                updateNavigateButtonsItems();
+            });
         }
 
         // ======================================
@@ -1708,11 +1873,60 @@
             return inventoryObservableArray;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsInventoryEntry() {
+            if (inventoryCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'block';
+            if (inventoryCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
+            } else if (inventoryCollectionView.pageIndex === (inventoryCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToNextPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
+            }
+            btnCurrentPageGridInventoryEntry.innerHTML = (inventoryCollectionView.pageIndex + 1) + ' / ' + inventoryCollectionView.pageCount;
+        }
+
         // ===========================
         // Refresh Inventory Flex Grid
         // ===========================
         function refreshInventoryFlexGrid() {
             inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntries());
+            inventoryCollectionView.canFilter = true;
+            inventoryCollectionView.pageSize = cboInventoryEntryShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#InventoryEntryInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                inventoryCollectionView.refresh();
+            });
+
+            inventoryCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            inventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsInventoryEntry();
+            });
+
             inventoryFlexGrid.itemsSource = inventoryCollectionView;
             inventoryFlexGrid.trackChanges = true;
         }
@@ -1722,6 +1936,26 @@
         // ================================
         function createInventoryFlexGrid() {
             inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntries());
+            inventoryCollectionView.canFilter = true;
+            inventoryCollectionView.pageSize = cboInventoryEntryShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#InventoryEntryInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                inventoryCollectionView.refresh();
+            });
+
+            inventoryCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            inventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsInventoryEntry();
+            });
 
             inventoryFlexGrid = new wijmo.grid.FlexGrid('#InventoryEntryGrid');
             inventoryFlexGrid.initialize({
@@ -1788,6 +2022,28 @@
             });
 
             inventoryFlexGrid.trackChanges = true;
+
+            updateNavigateButtonsInventoryEntry();
+
+            btnMoveToFirstPageGridInventoryEntry.addEventListener('click', function () {
+                inventoryCollectionView.moveToFirstPage();
+                updateNavigateButtonsInventoryEntry();
+            });
+
+            btnMoveToPreviousPageGridInventoryEntry.addEventListener('click', function () {
+                inventoryCollectionView.moveToPreviousPage();
+                updateNavigateButtonsInventoryEntry();
+            });
+
+            btnMoveToNextPageGridInventoryEntry.addEventListener('click', function () {
+                inventoryCollectionView.moveToNextPage();
+                updateNavigateButtonsInventoryEntry();
+            });
+
+            btnMoveToLastPageGridInventoryEntry.addEventListener('click', function () {
+                inventoryCollectionView.moveToLastPage();
+                updateNavigateButtonsInventoryEntry();
+            });
         }
 
         // ===========
@@ -1974,9 +2230,38 @@
             }, 500)
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItemQuery() {
+            if (itemQueryItemsCollection.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridItemQuery').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridItemQuery').style.display = 'block';
+            if (itemQueryItemsCollection.pageIndex === 0) {
+                btnMoveToFirstPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
+            } else if (itemQueryItemsCollection.pageIndex === (itemQueryItemsCollection.pageCount - 1)) {
+                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToNextPageGridItemQuery.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridItemQuery.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
+                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
+            }
+            btnCurrentPageGridItemQuery.innerHTML = (itemQueryItemsCollection.pageIndex + 1) + ' / ' + itemQueryItemsCollection.pageCount;
+        }
+
         function createItemQueryFlexGrid() {
             itemQueryItemsCollection = new wijmo.collections.CollectionView(getArticleItemForItemQuery());
             itemQueryItemsCollection.canFilter = true;
+            itemQueryItemsCollection.pageSize = 10;
 
             var filterText = '';
             $('#itemQueryFilter').keyup(function () {
@@ -1988,6 +2273,10 @@
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                 || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
+
+            itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItemQuery();
+            });
 
             // Flex Grid for Purchase Order Line
             itemQueryGrid.dispose();
@@ -2032,6 +2321,33 @@
             });
 
             itemQueryGrid.trackChanges = true;
+
+            if (!isItemQueryClicked) {
+                updateNavigateButtonsItemQuery();
+
+                btnMoveToFirstPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToFirstPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToPreviousPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToPreviousPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToNextPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToNextPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                btnMoveToLastPageGridItemQuery.addEventListener('click', function () {
+                    itemQueryItemsCollection.moveToLastPage();
+                    updateNavigateButtonsItemQuery();
+                });
+
+                isItemQueryClicked = true;
+            }
+
         }
 
         function pickToApplyOnClick() {
