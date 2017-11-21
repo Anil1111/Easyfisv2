@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -33,10 +45,21 @@
                         <div class="row">
                             <div class="col-md-12" align="right">
                                 <button class="btn btn-primary " id="cmdStockInJournal" onclick="stockInJournal_OnClick()"><i class="fa fa-book"></i> Journal</button>
-                                <button class="btn btn-primary " id="cmdStockInSaveLock" onclick="btnStockInSaveLock_OnClick()"><i class=" fa fa-lock"></i> Lock</button>
-                                <button class="btn btn-primary " id="cmdStockInEdit" onclick="btnStockInEdit_OnClick()"><i class=" fa fa-unlock"></i> Unlock</button>
-                                <button class="btn btn-primary " id="cmdStockInPrint" onclick="btnStockInPrint_OnClick()"><i class="fa fa-print"></i> Print</button>
-                                <button onclick="window.location.href = '@Url.Action("StockIn", "Software")'" class="btn btn-danger " id="cmdStockInClose"><i class=" fa fa-times"></i> Close</button>
+                                @{
+                                    if (canLock)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockInSaveLock" onclick="btnStockInSaveLock_OnClick()"><i class=" fa fa-lock"></i> Lock</button>
+                                    }
+                                    if (canUnlock)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockInEdit" onclick="btnStockInEdit_OnClick()"><i class=" fa fa-unlock"></i> Unlock</button>
+                                    }
+                                    if (canPrint)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockInPrint" onclick="btnStockInPrint_OnClick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                }
+                                <button onclick="window.location.href = '/Software/StockIn'" class="btn btn-danger " id="cmdStockInClose"><i class=" fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
@@ -134,18 +157,58 @@
                 </ul>
                 <br />
                 <div class="tab-content">
-                    <div id="Items" class="tab-pane fade in active">
+                    <div id="Items" class="tab-pane active">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-lg-12" align="right">
-                                        <button class="btn btn-primary " id="btnAddStockInItem" onclick="cmdAddStockInItem_OnClick()"><i class="fa fa-plus"></i> Add</button>
-                                        <button class="btn btn-primary " id="cmdINLineItemQueryButton" onclick="cmdINLineItemQueryButton_OnClick()"><i class="fa fa-search-plus"></i> Item Query</button>
-                                    </div>
-                                </div>
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="StockInInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboStockInItemsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right">
+                                            @{
+                                                if (canAdd)
+                                                {
+                                                    <button class="btn btn-primary " id="btnAddStockInItem" onclick="cmdAddStockInItem_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary " id="cmdINLineItemQueryButton" onclick="cmdINLineItemQueryButton_OnClick()"><i class="fa fa-search-plus"></i> Item Query</button>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                             <div class="panel-body">
                                 <div id="ItemGrid" class="grid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItem">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItem">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItem"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItem">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItem">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="panel panel-default">
@@ -168,22 +231,50 @@
                             </div>
                         </div>
                     </div>
-                    <div id="InventoryEntries" class="tab-pane fade in" style="margin-bottom: 15px;">
-                        <div id="InventoryEntryGrid" class="grid"></div>
-                        <br /><br />
-                        <div class="row">
-                            <div class="col-md-7">
-
+                    <div id="InventoryEntries" class="tab-pane" style="margin-bottom: 15px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="InventoryEntryInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboInventoryEntryShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right"></td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="col-md-5">
-                                <dl class="dl-horizontal">
-                                    <dt>
-                                        <b>Total Amount</b>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField" id="totalInventoryAmount" placeholder="0.00" disabled />
-                                    </dd>
-                                </dl>
+                            <div class="panel-body">
+                                <div id="InventoryEntryGrid" class="grid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridInventoryEntry">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridInventoryEntry"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -334,8 +425,29 @@
                                     <input type="text" class="form-control" id="itemQueryFilter" placeholder="Search">
                                 </div>
                             </div>
+                            <div class="panel-body">
+                                <div id="itemQueryGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItemQuery"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItemQuery">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="itemQueryGrid" style="max-height: 300px;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -398,16 +510,16 @@
             NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listBranch',
+                url: '/api/stockIn/dropdown/list/branch',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (branchListResults) {
-                    if (branchListResults.length > 0) {
-                        for (i = 0; i < branchListResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             branchesObservableArray.push({
-                                Id: branchListResults[i]["Id"],
-                                Branch: branchListResults[i]["Branch"]
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
                             });
                         }
                     }
@@ -433,17 +545,17 @@
         function getAccountForComboBox() {
             var accountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/stockIn/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (accountListResults) {
-                    if (accountListResults.length > 0) {
-                        for (i = 0; i < accountListResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             accountsObservableArray.push({
-                                Id: accountListResults[i]["Id"],
-                                AccountCode: accountListResults[i]["AccountCode"],
-                                Account: accountListResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
@@ -487,23 +599,23 @@
             var articlesObservableArray = new wijmo.collections.ObservableArray();
             if (cboINAccount.selectedValue != null) {
                 $.ajax({
-                    url: '/api/listArticle/byAccount/' + cboINAccount.selectedValue,
+                    url: '/api/stockIn/dropdown/list/article/' + cboINAccount.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (articlesListResults) {
-                        if (articlesListResults.length > 0) {
-                            for (i = 0; i < articlesListResults.length; i++) {
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
                                 articlesObservableArray.push({
-                                    Id: articlesListResults[i]["Id"],
-                                    Article: articlesListResults[i]["Article"]
+                                    Id: results[i]["Id"],
+                                    Article: results[i]["Article"]
                                 });
                             }
                         }
 
                         var disabled = true;
                         if (!isLocked) {
-                            if (articlesListResults.length > 0) {
+                            if (results.length > 0) {
                                 disabled = false;
                             } else {
                                 $("#cmdStockInSaveLock").prop("disabled", true);
@@ -548,16 +660,16 @@
         function getUsersForComboBox() {
             var usersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listUser',
+                url: '/api/stockIn/dropdown/list/users',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userListResults) {
-                    if (userListResults.length > 0) {
-                        for (i = 0; i < userListResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             usersObservableArray.push({
-                                Id: userListResults[i]["Id"],
-                                FullName: userListResults[i]["FullName"]
+                                Id: results[i]["Id"],
+                                FullName: results[i]["FullName"]
                             });
                         }
                     }
@@ -602,36 +714,36 @@
             if (document.location.search.length > 0) {
                 var stockInId = getParam("id");
                 $.ajax({
-                    url: '/api/stockIn/' + stockInId,
+                    url: '/api/stockIn/detail/' + stockInId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (Results) {
-                        if (Results != null) {
-                            cboINBranch.selectedValue = Results.BranchId;
-                            document.getElementById('StockIn_INnumber').value = Results.INNumber;
+                    success: function (results) {
+                        if (results != null) {
+                            cboINBranch.selectedValue = results.BranchId;
+                            document.getElementById('StockIn_INnumber').value = results.INNumber;
                             INDate.dispose();
                             INDate = new wijmo.input.InputDate('#INDate', {
                                 format: 'MM-dd-yyyy',
-                                value: new Date(Results.INDate),
+                                value: new Date(results.INDate),
                             });
-                            cboINAccountCode.selectedValue = Results.AccountId;
-                            cboINAccount.selectedValue = Results.AccountId;
-                            cboINArticle.selectedValue = Results.ArticleId;
-                            articleIdSelectedId = Results.ArticleId;
-                            document.getElementById('StockIn_Particulars').value = Results.Particulars;
-                            document.getElementById('StockIn_ManualINNumber').value = Results.ManualINNumber
-                            document.getElementById('StockIn_Produce').checked = Results.IsProduced;
-                            cboINPreparedBy.selectedValue = Results.PreparedById;
-                            cboINCheckedBy.selectedValue = Results.CheckedById;
-                            cboINApprovedBy.selectedValue = Results.ApprovedById;
+                            cboINAccountCode.selectedValue = results.AccountId;
+                            cboINAccount.selectedValue = results.AccountId;
+                            cboINArticle.selectedValue = results.ArticleId;
+                            articleIdSelectedId = results.ArticleId;
+                            document.getElementById('StockIn_Particulars').value = results.Particulars;
+                            document.getElementById('StockIn_ManualINNumber').value = results.ManualINNumber
+                            document.getElementById('StockIn_Produce').checked = results.IsProduced;
+                            cboINPreparedBy.selectedValue = results.PreparedById;
+                            cboINCheckedBy.selectedValue = results.CheckedById;
+                            cboINApprovedBy.selectedValue = results.ApprovedById;
 
-                            document.getElementById('createdBy').innerHTML = Results.CreatedBy;
-                            document.getElementById('createdDate').innerHTML = Results.CreatedDateTime;
-                            document.getElementById('updatedBy').innerHTML = Results.UpdatedBy;
-                            document.getElementById('updatedDate').innerHTML = Results.UpdatedDateTime;
+                            document.getElementById('createdBy').innerHTML = results.CreatedBy;
+                            document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
+                            document.getElementById('updatedBy').innerHTML = results.UpdatedBy;
+                            document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
-                            if (Results.IsLocked) {
+                            if (results.IsLocked) {
                                 cboINBranch.disabled = true;
                                 INDate.disabled = true;
                                 cboINAccountCode.disabled = true;
@@ -648,36 +760,18 @@
                                 $("#btnAddStockInItem").prop("disabled", true);
                                 $("#cmdINLineItemQueryButton").prop("disabled", true);
 
-                                var canUnLock = "@ViewData["CanUnlock"]";
-                                if (canUnLock == "False") {
-                                    $("#cmdStockInEdit").prop("disabled", true);
-                                }
-
-                                var canPrint = "@ViewData["CanPrint"]";
-                                if (canPrint == "False") {
-                                    $("#cmdStockInPrint").prop("disabled", true);
-                                }
-
                                 isLocked = true;
                             } else {
                                 $("#cmdStockInJournal").prop("disabled", true);
                                 $("#cmdStockInEdit").prop("disabled", true);
                                 $("#cmdStockInPrint").prop("disabled", true);
-
-                                var canLock = "@ViewData["CanLock"]";
-                                if (canLock == "False") {
-                                    $("#cmdStockInSaveLock").prop("disabled", true);
-                                }
-
-                                var canAdd = "@ViewData["CanAdd"]";
-                                if (canAdd == "False") {
-                                    $("#btnAddStockInItem").prop("disabled", true)
-                                    $("#cmdINLineItemQueryButton").prop("disabled", true)
-                                }
                             }
 
                             createStockInItemsFlexGrid();
                             createInventoryFlexGrid();
+                        } else {
+                            alert("No Data");
+                            window.location = "/Software/StockIn";
                         }
                     }
                 });
@@ -692,7 +786,6 @@
         // ====================
         function btnStockInSaveLock_OnClick() {
             var stockInObject = new Object();
-            var stockInId = getParam("id");
             stockInObject.BranchId = cboINBranch.selectedValue;
             stockInObject.INNumber = document.getElementById('StockIn_INnumber').value;
             stockInObject.INDate = INDate.value.toLocaleDateString();
@@ -721,6 +814,9 @@
             });
 
             if (isValid) {
+
+                var id = getParam("id");
+
                 document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
                 $("#cmdStockInJournal").prop("disabled", true);
                 $("#cmdStockInSaveLock").prop("disabled", true);
@@ -730,7 +826,7 @@
 
                 $.ajax({
                     type: "PUT",
-                    url: '/api/updateStockIn/' + stockInId,
+                    url: '/api/stockIn/lock/' + id,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: data,
@@ -741,19 +837,25 @@
                                 location.reload()
                             }, 1000);
                         },
-                        404: function () {
-                            toastr.error("Not Found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
                             $("#cmdStockInSaveLock").prop("disabled", false);
                             $("#cmdStockInClose").prop("disabled", false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockInSaveLock").prop("disabled", false);
+                            $("#cmdStockInClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
                             $("#cmdStockInSaveLock").prop("disabled", false);
                             $("#cmdStockInClose").prop("disabled", false);
                         }
-                    }
+                    },
                 });
             } else {
                 toastr.error("Invalid Entry");
@@ -771,10 +873,11 @@
             $("#cmdStockInPrint").prop("disabled", true);
             $("#cmdStockInClose").prop("disabled", true);
 
-            var stockInId = getParam("id");
+            var id = getParam("id");
+
             $.ajax({
                 type: "PUT",
-                url: '/api/updateStockInIsLocked/' + stockInId,
+                url: '/api/stockIn/unlock/' + id,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
@@ -784,17 +887,24 @@
                             location.reload()
                         }, 1000);
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#cmdStockInJournal").prop("disabled", false);
                         $("#cmdStockInEdit").prop("disabled", false);
                         $("#cmdStockInPrint").prop("disabled", false);
                         $("#cmdStockInClose").prop("disabled", false);
-
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#cmdStockInJournal").prop("disabled", false);
+                        $("#cmdStockInEdit").prop("disabled", false);
+                        $("#cmdStockInPrint").prop("disabled", false);
+                        $("#cmdStockInClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#cmdStockInJournal").prop("disabled", false);
                         $("#cmdStockInEdit").prop("disabled", false);
@@ -835,63 +945,50 @@
         function getItem() {
             var itemsObservableArray = new wijmo.collections.ObservableArray;
             if (document.location.search.length > 0) {
-                var stockInId = getParam("id");
+                var INId = getParam("id");
                 NProgress.start();
                 $.ajax({
-                    url: '/api/listStockInItemByINId/' + stockInId,
+                    url: '/api/stockInItem/list/' + INId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (Results) {
+                    success: function (results) {
                         var totalAmount = 0;
-                        if (Results.length > 0) {
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockInItem_Onclick()' " + editDisabled + "><i class='fa fa-edit'></i> Edit</button>";
-                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockInItem_Onclick()'" + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>";
+                        if (results.length > 0) {
+                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockInItem_Onclick()'><i class='fa fa-edit'></i> Edit</button>";
+                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockInItem_Onclick()'><i class='fa fa-trash'></i> Delete</button>";
                             if (isLocked) {
                                 btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockInItem_Onclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
                                 btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockInItem_Onclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
                             }
 
-                            for (i = 0; i < Results.length; i++) {
+                            for (i = 0; i < results.length; i++) {
                                 itemsObservableArray.push({
                                     EditId: btnEditId,
                                     DeleteId: btnDeleteId,
-                                    Id: Results[i]["Id"],
-                                    INId: Results[i]["INId"],
-                                    IN: Results[i]["IN"],
-                                    ItemId: Results[i]["ItemId"],
-                                    ItemCode: Results[i]["ItemCode"],
-                                    Item: Results[i]["Item"],
-                                    Particulars: Results[i]["Particulars"],
-                                    UnitId: Results[i]["UnitId"],
-                                    Unit: Results[i]["Unit"],
-                                    Quantity: Results[i]["Quantity"],
-                                    QuantityDisplay: parseFloat(Results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Cost: Results[i]["Cost"],
-                                    CostDisplay: parseFloat(Results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Amount: Results[i]["Amount"],
-                                    AmountDisplay: parseFloat(Results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    BaseUnitId: Results[i]["BaseUnitId"],
-                                    BaseUnit: Results[i]["BaseUnit"],
-                                    BaseQuantity: Results[i]["BaseQuantity"],
-                                    BaseQuantityDisplay: parseFloat(Results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    BaseCost: Results[i]["BaseCost"],
-                                    BaseCostDisplay: parseFloat(Results[i]["BaseCost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Id: results[i]["Id"],
+                                    INId: results[i]["INId"],
+                                    ItemId: results[i]["ItemId"],
+                                    ItemCode: results[i]["ItemCode"],
+                                    ItemDescription: results[i]["ItemDescription"],
+                                    Particulars: results[i]["Particulars"],
+                                    UnitId: results[i]["UnitId"],
+                                    Unit: results[i]["Unit"],
+                                    Quantity: results[i]["Quantity"],
+                                    QuantityDisplay: parseFloat(results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Cost: results[i]["Cost"],
+                                    CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    BaseUnitId: results[i]["BaseUnitId"],
+                                    BaseUnit: results[i]["BaseUnit"],
+                                    BaseQuantity: results[i]["BaseQuantity"],
+                                    BaseQuantityDisplay: parseFloat(results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    BaseCost: results[i]["BaseCost"],
+                                    BaseCostDisplay: parseFloat(results[i]["BaseCost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 });
 
-                                totalAmount += Results[i]["Amount"];
+                                totalAmount += results[i]["Amount"];
                             }
                         }
 
@@ -923,24 +1020,36 @@
             itemGrid = new wijmo.grid.FlexGrid('#ItemGrid');
             itemGrid.initialize({
                 columns: [
-                    {
-                        "header": "Edit",
-                        "binding": "EditId",
-                        "width": 70,
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
-                    {
-                        "header": "Delete",
-                        "binding": "DeleteId",
-                        "width": 70,
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
+                    @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
                     {
                         "header": "Code",
                         "binding": "ItemCode",
@@ -948,8 +1057,8 @@
                         "width": 150
                     },
                     {
-                        "header": "Item",
-                        "binding": "Item",
+                        "header": "Description",
+                        "binding": "ItemDescription",
                         "allowSorting": true,
                         "width": 180
                     },
@@ -1010,7 +1119,38 @@
                 autoGenerateColumns: false,
                 itemsSource: items,
                 isReadOnly: true,
-                frozenColumns: 2,
+                @{
+                    if (canEdit)
+                    {
+                        if (canDelete)
+                        {
+                            <text>
+                                frozenColumns: 2,
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                frozenColumns: 1,
+                            </text>
+                        }
+                    }
+                    else
+                    {
+                        if (canDelete)
+                        {
+                            <text>
+                                frozenColumns: 1,
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                frozenColumns: 0,
+                            </text>
+                        }
+                    }
+                }
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
@@ -1023,35 +1163,133 @@
             itemGrid.columnHeaders.rows.push(hr);
             itemGrid.columnHeaders.rows[0].allowMerging = true;
 
-            itemGrid.columnHeaders.columns[0].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 0, 'Edit');
+            @{
+                if (canEdit)
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 11; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Delete";
+                                } else if (i == 2) {
+                                    columnName = "Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Quantity";
+                                } else if (i == 6) {
+                                    columnName = "Unit";
+                                } else if (i == 7) {
+                                    columnName = "Cost";
+                                } else if (i == 8) {
+                                    columnName = "Amount";
+                                } else {
+                                    columnName = "Basic Unit Conversion";
+                                }
 
-            itemGrid.columnHeaders.columns[1].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 1, 'Delete');
+                                itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 10; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Code";
+                                } else if (i == 2) {
+                                    columnName = "Description";
+                                } else if (i == 3) {
+                                    columnName = "Particulars";
+                                } else if (i == 4) {
+                                    columnName = "Quantity";
+                                } else if (i == 5) {
+                                    columnName = "Unit";
+                                } else if (i == 6) {
+                                    columnName = "Cost";
+                                } else if (i == 7) {
+                                    columnName = "Amount";
+                                } else {
+                                    columnName = "Basic Unit Conversion";
+                                }
 
-            itemGrid.columnHeaders.columns[2].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 2, 'Code');
+                                itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 10; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "Code";
+                                } else if (i == 2) {
+                                    columnName = "Description";
+                                } else if (i == 3) {
+                                    columnName = "Particulars";
+                                } else if (i == 4) {
+                                    columnName = "Quantity";
+                                } else if (i == 5) {
+                                    columnName = "Unit";
+                                } else if (i == 6) {
+                                    columnName = "Cost";
+                                } else if (i == 7) {
+                                    columnName = "Amount";
+                                } else {
+                                    columnName = "Basic Unit Conversion";
+                                }
 
-            itemGrid.columnHeaders.columns[3].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 3, 'Item');
+                                itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 9; i++) {
+                                if (i == 0) {
+                                    columnName = "Code";
+                                } else if (i == 1) {
+                                    columnName = "Description";
+                                } else if (i == 2) {
+                                    columnName = "Particulars";
+                                } else if (i == 3) {
+                                    columnName = "Quantity";
+                                } else if (i == 4) {
+                                    columnName = "Unit";
+                                } else if (i == 5) {
+                                    columnName = "Cost";
+                                } else if (i == 6) {
+                                    columnName = "Amount";
+                                } else {
+                                    columnName = "Basic Unit Conversion";
+                                }
 
-            itemGrid.columnHeaders.columns[4].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 4, 'Particulars');
-
-            itemGrid.columnHeaders.columns[5].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 5, 'Quantity');
-
-            itemGrid.columnHeaders.columns[6].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 6, 'Unit');
-
-            itemGrid.columnHeaders.columns[7].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 7, 'Cost');
-
-            itemGrid.columnHeaders.columns[8].allowMerging = true;
-            itemGrid.columnHeaders.setCellData(0, 8, 'Amount');
-
-            for (var columnBasicUnitConversion = 9; columnBasicUnitConversion <= 11; columnBasicUnitConversion++) {
-                itemGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Basic Unit Conversion');
+                                itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                            }
+                        </text>
+                    }
+                }
             }
         }
 
@@ -1059,10 +1297,9 @@
         // GET Item Id, Manual Code and Component
         // ======================================
         function getArticleItemForManualCodeAndComponent(itemId, unitId) {
-            var branchId = cboINBranch.selectedValue;
             var articleItemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listArticleByArticleTypeIdByInventory/1/' + branchId,
+                url: '/api/stockInItem/dropdown/list/item',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
@@ -1073,9 +1310,6 @@
                                 Id: results[i]["Id"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
                                 ItemDescription: results[i]["Article"],
-                                UnitId: results[i]["UnitId"],
-                                Unit: results[i]["Unit"],
-                                Particulars: results[i]["Particulars"],
                                 Cost: results[i]["Cost"]
                             });
                         }
@@ -1149,7 +1383,7 @@
             var stockInUnits = new wijmo.collections.ObservableArray();
             if (cboINItemDescription.selectedValue != null) {
                 $.ajax({
-                    url: '/api/listArticleUnitByArticleId/' + cboINItemDescription.selectedValue,
+                    url: '/api/stockInItem/dropdown/list/itemUnit/' + cboINItemDescription.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -1232,8 +1466,6 @@
         // ==================
         function cmdStockInItemSaveButton_OnClick() {
             var stockInItmeObject = new Object();
-            var stockInId = getParam("id");
-            stockInItmeObject.INId = stockInId;
             stockInItmeObject.ItemId = cboINItemDescription.selectedValue;
             stockInItmeObject.Particulars = document.getElementById('stockInItem_Particulars').value;
             stockInItmeObject.UnitId = cboINItemUnit.selectedValue;
@@ -1261,20 +1493,35 @@
                 $("#cmdSaveStockInItemButton").prop("disabled", true);
                 $("#cmdStockInItemDetailCloseButton").prop("disabled", true);
 
+                var INId = getParam("id");
+
                 if (stockInItemId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/addStockInItem',
+                        url: '/api/stockInItem/add/' + INId,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: stockInItemData,
-                        success: function (id) {
-                            if (id > 0) {
+                        statusCode: {
+                            200: function () {
                                 toastr.success("Save Successful");
                                 $('#stockInItemsEdit').modal('hide');
                                 refreshStockInItemsFlexGrid();
-                            } else {
-                                toastr.error("Internal Server Error");
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockInItemButton").prop("disabled", false);
+                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockInItemButton").prop("disabled", false);
+                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#cmdSaveStockInItemButton").prop("disabled", false);
                                 $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
@@ -1284,7 +1531,7 @@
                 } else {
                     $.ajax({
                         type: "PUT",
-                        url: '/api/updateStockInItem/' + stockInItemId,
+                        url: '/api/stockInItem/update/' + stockInItemId + '/' + INId,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: stockInItemData,
@@ -1294,15 +1541,22 @@
                                 $('#stockInItemsEdit').modal('hide');
                                 refreshStockInItemsFlexGrid();
                             },
-                            404: function () {
-                                toastr.error("Not Found");
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                                 $('#stockInItemsEdit').modal('hide');
                                 document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#cmdSaveStockInItemButton").prop("disabled", false);
                                 $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
                             },
-                            400: function () {
-                                toastr.error("Bad Request");
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#stockInItemsEdit').modal('hide');
+                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockInItemButton").prop("disabled", false);
+                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 $('#stockInItemsEdit').modal('hide');
                                 document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#cmdSaveStockInItemButton").prop("disabled", false);
@@ -1371,9 +1625,11 @@
             $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", true);
 
             items.editItem(items.currentItem);
-            var item = items.currentEditItem.Id;
+            var id = items.currentEditItem.Id;
+            var INId = getParam("id");
+
             $.ajax({
-                url: '/api/deleteStockInItem/' + item,
+                url: '/api/stockInItem/delete/' + id + '/' + INId,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -1383,15 +1639,22 @@
                         $('#deletStockInItemsConfirm').modal('hide');
                         refreshStockInItemsFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deletStockInItemsConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
                         $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deletStockInItemsConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
+                        $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deletStockInItemsConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
@@ -1405,54 +1668,42 @@
         // GET Inventory Entries
         // =====================
         function getInventoryEntries() {
-            var id = getParam('id');
+            var INId = getParam('id');
             var inventoryObservableArray = new wijmo.collections.ObservableArray;
+
             $.ajax({
-                url: '/api/listInventoryByINId/' + id,
+                url: '/api/inventory/stockIn/list/' + INId,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (Results) {
-                    var totalInventoryAmount = 0;
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
 
-                            var InventoryDateResult = new Date(Results[i]["InventoryDate"])
+                            var InventoryDateResult = new Date(results[i]["InventoryDate"])
                             var InventoryDate = ('0' + (InventoryDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + InventoryDateResult.getDate()).slice(-2) + '-' + InventoryDateResult.getFullYear();
 
                             inventoryObservableArray.push({
-                                Id: Results[i]["Id"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
+                                Id: results[i]["Id"],
                                 InventoryDate: InventoryDate,
-                                ArticleId: Results[i]["ArticleId"],
-                                Article: Results[i]["Article"],
-                                ArticleInventoryId: Results[i]["ArticleInventoryId"],
-                                RRId: Results[i]["RRId"],
-                                SIId: Results[i]["SIId"],
-                                INId: Results[i]["INId"],
-                                OTId: Results[i]["OTId"],
-                                STId: Results[i]["STId"],
-                                QuantityIn: Results[i]["QuantityIn"],
-                                Quantity: Results[i]["Quantity"],
-                                QuantityDisplay: parseFloat(Results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                QuantityOut: Results[i]["QuantityOut"],
-                                Amount: Results[i]["Amount"],
-                                AmountDisplay: parseFloat(Results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Particulars: Results[i]["Particulars"],
-                                Code: Results[i]["Code"],
-                                Unit: Results[i]["Unit"]
+                                Branch: results[i]["Branch"],
+                                Article: results[i]["Article"],
+                                Particulars: results[i]["Particulars"],
+                                ArticleInventoryCode: results[i]["ArticleInventoryCode"],
+                                Quantity: results[i]["Quantity"],
+                                QuantityDisplay: parseFloat(results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                ArticleUnit: results[i]["ArticleUnit"],
+                                Amount: results[i]["Amount"],
+                                AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                             });
-
-                            totalInventoryAmount += Results[i]["Amount"];
                         }
                     }
 
-                    document.getElementById('totalInventoryAmount').value = parseFloat(totalInventoryAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             });
+
 
             return inventoryObservableArray;
         }
@@ -1503,7 +1754,7 @@
                     },
                     {
                         "header": "Inventory Code",
-                        "binding": "Code",
+                        "binding": "ArticleInventoryCode",
                         "allowSorting": true,
                         "width": "1.3*",
                     },
@@ -1544,49 +1795,37 @@
         // ===========
         function getJournalListForRR() {
             var journalsObservableArray = new wijmo.collections.ObservableArray;
-            var id = getParam('id');
+            var INId = getParam('id');
             $.ajax({
-                url: '/api/listJournalByINId/' + id,
+                url: '/api/jounal/stockIn/list/' + INId,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+
+                            var journalDateResult = new Date(results[i]["JournalDate"])
+                            var journalDate = ('0' + (journalDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + journalDateResult.getDate()).slice(-2) + '-' + journalDateResult.getFullYear();
+
                             journalsObservableArray.push({
-                                Id: Results[i]["Id"],
-                                JournalDate: (Results[i]["JournalDate"]).replace(/\//g, '-'),
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
-                                AccountId: Results[i]["AccountId"],
-                                AccountCode: Results[i]["AccountCode"],
-                                Account: Results[i]["Account"],
-                                ArticleId: Results[i]["ArticleId"],
-                                Article: Results[i]["Article"],
-                                Particulars: Results[i]["Particulars"],
-                                DebitAmountDisplay: parseFloat(Results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                CreditAmountDisplay: parseFloat(Results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                ORId: Results[i]["ORId"],
-                                CVId: Results[i]["CVId"],
-                                JVId: Results[i]["JVId"],
-                                RRId: Results[i]["RRId"],
-                                SIId: Results[i]["SIId"],
-                                INId: Results[i]["INId"],
-                                OTId: Results[i]["OTId"],
-                                STId: Results[i]["STId"],
-                                DocumentReference: Results[i]["DocumentReference"],
-                                APRRId: Results[i]["APRRId"],
-                                ARSIId: Results[i]["ARSIId"]
+                                Branch: results[i]["Branch"],
+                                JournalDate: journalDate,
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"],
+                                Article: results[i]["Article"],
+                                DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
                             var debitAmountTotal = 0;
                             var creditAmountTotal = 0;
 
                             var a = 0;
-                            while (a < Results.length) {
-                                debitAmountTotal += Results[a]["DebitAmount"];
-                                creditAmountTotal += Results[a]["CreditAmount"];
+                            while (a < results.length) {
+                                debitAmountTotal += results[a]["DebitAmount"];
+                                creditAmountTotal += results[a]["CreditAmount"];
                                 a++;
                             }
                         }
@@ -1691,65 +1930,22 @@
             var branchId = cboINBranch.selectedValue;
             var items = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listArticleByArticleTypeIdByInventory/1/' + branchId,
+                url: '/api/stockInItem/popUp/list/itemQuery',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleItemsResult) {
-                    if (articleItemsResult.length > 0) {
-                        for (i = 0; i < articleItemsResult.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             items.push({
-                                Id: articleItemsResult[i]["Id"],
-                                ArticleCode: articleItemsResult[i]["ArticleCode"],
-                                ManualArticleCode: articleItemsResult[i]["ManualArticleCode"],
-                                Article: articleItemsResult[i]["Article"],
-                                Category: articleItemsResult[i]["Category"],
-                                ArticleTypeId: articleItemsResult[i]["ArticleTypeId"],
-                                ArticleType: articleItemsResult[i]["ArticleType"],
-                                ArticleGroupId: articleItemsResult[i]["ArticleGroupId"],
-                                ArticleGroup: articleItemsResult[i]["ArticleGroup"],
-                                AccountId: articleItemsResult[i]["AccountId"],
-                                AccountCode: articleItemsResult[i]["AccountCode"],
-                                Account: articleItemsResult[i]["Account"],
-                                SalesAccountId: articleItemsResult[i]["SalesAccountId"],
-                                SalesAccount: articleItemsResult[i]["SalesAccount"],
-                                CostAccountId: articleItemsResult[i]["CostAccountId"],
-                                CostAccount: articleItemsResult[i]["CostAccount"],
-                                AssetAccountId: articleItemsResult[i]["AssetAccountId"],
-                                AssetAccount: articleItemsResult[i]["AssetAccount"],
-                                ExpenseAccountId: articleItemsResult[i]["ExpenseAccountId"],
-                                ExpenseAccount: articleItemsResult[i]["ExpenseAccount"],
-                                UnitId: articleItemsResult[i]["UnitId"],
-                                Unit: articleItemsResult[i]["Unit"],
-                                InputTaxId: articleItemsResult[i]["InputTaxId"],
-                                InputTax: articleItemsResult[i]["InputTax"],
-                                OutputTaxId: articleItemsResult[i]["OutputTaxId"],
-                                OutputTax: articleItemsResult[i]["OutputTax"],
-                                WTaxTypeId: articleItemsResult[i]["WTaxTypeId"],
-                                WTaxType: articleItemsResult[i]["WTaxType"],
-                                Price: articleItemsResult[i]["Price"],
-                                PriceDisplay: parseFloat(articleItemsResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Cost: articleItemsResult[i]["Cost"],
-                                IsInventory: articleItemsResult[i]["IsInventory"],
-                                Particulars: articleItemsResult[i]["Particulars"],
-                                Address: articleItemsResult[i]["Address"],
-                                TermId: articleItemsResult[i]["TermId"],
-                                Term: articleItemsResult[i]["Term"],
-                                ContactNumber: articleItemsResult[i]["ContactNumber"],
-                                ContactPerson: articleItemsResult[i]["ContactPerson"],
-                                TaxNumber: articleItemsResult[i]["TaxNumber"],
-                                CreditLimit: articleItemsResult[i]["CreditLimit"],
-                                DateAcquired: articleItemsResult[i]["DateAcquired"],
-                                UsefulLife: articleItemsResult[i]["UsefulLife"],
-                                SalvageValue: articleItemsResult[i]["SalvageValue"],
-                                ManualArticleOldCode: articleItemsResult[i]["ManualArticleOldCode"],
-                                IsLocked: articleItemsResult[i]["IsLocked"],
-                                CreatedById: articleItemsResult[i]["CreatedById"],
-                                CreatedBy: articleItemsResult[i]["CreatedBy"],
-                                CreatedDateTime: articleItemsResult[i]["CreatedDateTime"],
-                                UpdatedById: articleItemsResult[i]["UpdatedById"],
-                                UpdatedBy: articleItemsResult[i]["UpdatedBy"],
-                                UpdatedDateTime: articleItemsResult[i]["UpdatedDateTime"],
+                                Id: results[i]["Id"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
+                                Article: results[i]["Article"],
+                                Particulars: results[i]["Particulars"],
+                                Price: results[i]["Price"],
+                                PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                Cost: results[i]["Cost"],
+                                CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyOnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
                             });
                         }
@@ -1792,7 +1988,7 @@
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                 || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
-            
+
             // Flex Grid for Purchase Order Line
             itemQueryGrid.dispose();
             itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
@@ -1861,11 +2057,17 @@
             itemQueryItemsCollection.editItem(itemQueryItemsCollection.currentItem);
             var item = itemQueryItemsCollection.currentEditItem;
             stockInItemId = 0;
-            getArticleItemForManualCodeAndComponent(item.Id, item.UnitId);
+            getArticleItemForManualCodeAndComponent(item.Id, 0);
             document.getElementById('stockInItem_Particulars').value = "NA";
             document.getElementById('stockInItem_Quantity').value = formatDecimalValues(1);
-            document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
-            document.getElementById('stockInItem_Amount').value = formatDecimalValues(0);
+
+            if (document.getElementById("StockIn_Produce").checked) {
+                document.getElementById('stockInItem_Cost').value = formatDecimalValues(item.Cost);
+                computeAmount();
+            } else {
+                document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
+                computeAmount();
+            }
         }
 
         // ====
@@ -1921,12 +2123,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesResults) {
-                    if (userBranchesResults.length > 0) {
-                        for (i = 0; i < userBranchesResults.length; i++) {
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesResults[i]["BranchId"],
-                                Branch: userBranchesResults[i]["Branch"]
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
                             });
                         }
                     }

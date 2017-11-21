@@ -170,6 +170,23 @@ namespace easyfis.ModifiedApiControllers
             return listArticles.OrderBy(d => d.Article).ToList();
         }
 
+        // ============================
+        // Dropdown List - User (Field)
+        // ============================
+        [Authorize, HttpGet, Route("api/stockIn/dropdown/list/users")]
+        public List<Entities.MstUser> DropdownListStockInUsers()
+        {
+            var users = from d in db.MstUsers.OrderBy(d => d.FullName)
+                        where d.IsLocked == true
+                        select new Entities.MstUser
+                        {
+                            Id = d.Id,
+                            FullName = d.FullName
+                        };
+
+            return users.ToList();
+        }
+
         // ===================
         // Fill Leading Zeroes
         // ===================

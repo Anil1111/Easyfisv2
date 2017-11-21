@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -40,7 +52,12 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary" id="btnAddStockIn" onclick="btnAddStockIn_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddStockIn" onclick="btnAddStockIn_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
                                     <button class="btn btn-danger" id="btnCloseStockIn" onclick="btnCloseStockIn_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
@@ -178,47 +195,22 @@
                 success: function (Results) {
                     if (Results.length > 0) {
                         for (i = 0; i < Results.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
                             var INDateResult = new Date(Results[i]["INDate"])
                             var INDate = ('0' + (INDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + INDateResult.getDate()).slice(-2) + '-' + INDateResult.getFullYear();
 
                             stockIns.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='stockInEditButton' onclick='cmdStockInEditButton_OnClick()'" + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdStockInDeleteButton_OnClick()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='stockInEditButton' onclick='cmdStockInEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdStockInDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: Results[i]["Id"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
                                 INNumber: Results[i]["INNumber"],
                                 INDate: INDate,
-                                AccountId: Results[i]["AccountId"],
                                 Account: Results[i]["Account"],
-                                ArticleId: Results[i]["ArticleId"],
                                 Article: Results[i]["Article"],
                                 Particulars: Results[i]["Particulars"],
-                                ManualINNumber: Results[i]["ManualINNumber"],
                                 IsProduced: Results[i]["IsProduced"],
-                                PreparedById: Results[i]["PreparedById"],
-                                PreparedBy: Results[i]["PreparedBy"],
-                                CheckedById: Results[i]["CheckedById"],
-                                CheckedBy: Results[i]["CheckedBy"],
-                                ApprovedById: Results[i]["ApprovedById"],
-                                ApprovedBy: Results[i]["ApprovedBy"],
                                 IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
                                 CreatedBy: Results[i]["CreatedBy"],
                                 CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
                                 UpdatedBy: Results[i]["UpdatedBy"],
                                 UpdatedDateTime: Results[i]["UpdatedDateTime"]
                             });
@@ -240,28 +232,34 @@
             $('#btnAddStockIn').prop('disabled', true);
             $('#btnCloseStockIn').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/addStockIn',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/StockInDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddStockIn').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddStockIn').prop('disabled', false);
-                            $('#btnCloseStockIn').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/stockIn/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/StockInDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddStockIn').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockIn').prop('disabled', false);
+                        $('#btnCloseStockIn').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddStockIn').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockIn').prop('disabled', false);
+                        $('#btnCloseStockIn').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddStockIn').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockIn').prop('disabled', false);
+                        $('#btnCloseStockIn').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         // ====================
@@ -309,8 +307,9 @@
 
             stockIns.editItem(stockIns.currentItem);
             var id = stockIns.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteStockIn/' + id,
+                url: '/api/stockIn/delete/' + id,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -320,15 +319,22 @@
                         $('#deleteStockInConfirm').modal('hide');
                         refreshStockInFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteStockInConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockIn').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockIn").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteStockInConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockIn').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockIn").prop("disabled", false);
+                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteStockInConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockIn').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockIn").prop("disabled", false);
@@ -394,6 +400,7 @@
             stockIns.filter = function (item) {
                 return !filterText || (item.INNumber.toLowerCase().indexOf(filterText) > -1)
                     || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -427,8 +434,9 @@
 
             stockIns.filter = function (item) {
                 return !filterText || (item.INNumber.toLowerCase().indexOf(filterText) > -1)
-                                   || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                                   || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
 
             stockIns.collectionChanged.addHandler(function (sender, args) {
@@ -443,24 +451,36 @@
             stockInGrid = new wijmo.grid.FlexGrid('#StockInGrid');
             stockInGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "EditId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "DeleteId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "IN Number",
                                 "binding": "INNumber",
@@ -541,11 +561,6 @@
                 stockIns.moveToLastPage();
                 updateNavigateButtonsStockIn();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddStockIn").prop("disabled", true);
-            }
         }
 
         // ===========

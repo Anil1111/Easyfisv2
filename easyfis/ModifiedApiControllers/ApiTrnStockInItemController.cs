@@ -46,6 +46,46 @@ namespace easyfis.ModifiedApiControllers
             return stockInItems.ToList();
         }
 
+        // =======================
+        // Get Item Inventory Cost
+        // =======================
+        public Decimal GetItemInventoryCost(Int32 itemId)
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
+            var itemComponents = from d in db.MstArticleComponents
+                                 where d.ArticleId == itemId
+                                 select d;
+
+            if (itemComponents.Any())
+            {
+                Decimal cost = 0;
+
+                foreach (var itemComponent in itemComponents)
+                {
+                    var itemInventories = from d in db.MstArticleInventories.OrderByDescending(c => c.Cost)
+                                          where d.ArticleId == itemComponent.ComponentArticleId
+                                          && d.BranchId == branchId
+                                          select d;
+
+                    if (itemInventories.Any())
+                    {
+                        cost += itemInventories.FirstOrDefault().Cost * itemComponent.Quantity;
+                    }
+                }
+
+                return cost;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         // ============================
         // Dropdown List - Item (Field)
         // ============================
@@ -54,12 +94,15 @@ namespace easyfis.ModifiedApiControllers
         {
             var items = from d in db.MstArticles.OrderBy(d => d.Article)
                         where d.ArticleTypeId == 1
+                        && d.IsInventory == true
+                        && d.Kitting != 2
                         && d.IsLocked == true
                         select new Entities.MstArticle
                         {
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
-                            Article = d.Article
+                            Article = d.Article,
+                            Cost = GetItemInventoryCost(d.Id)
                         };
 
             return items.ToList();
@@ -100,7 +143,8 @@ namespace easyfis.ModifiedApiControllers
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
                             Particulars = d.Particulars,
-                            Price = d.Price
+                            Price = d.Price,
+                            Cost = GetItemInventoryCost(d.Id)
                         };
 
             return items.ToList();
