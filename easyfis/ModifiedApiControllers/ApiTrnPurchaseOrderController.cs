@@ -147,7 +147,8 @@ namespace easyfis.ModifiedApiControllers
                             select new Entities.MstArticle
                             {
                                 Id = d.Id,
-                                Article = d.Article
+                                Article = d.Article,
+                                TermId = d.TermId
                             };
 
             return suppliers.ToList();

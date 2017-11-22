@@ -99,7 +99,7 @@ namespace easyfis.Reports
             {
                 String supplier = purchaseOrders.FirstOrDefault().MstArticle.Article;
                 String PONumber = purchaseOrders.FirstOrDefault().PONumber;
-                String term = purchaseOrders.FirstOrDefault().MstArticle.MstTerm.Term;
+                String term = purchaseOrders.FirstOrDefault().MstTerm.Term;
                 String PODate = purchaseOrders.FirstOrDefault().PODate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
                 String dateNeeded = purchaseOrders.FirstOrDefault().DateNeeded.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
                 String requestNo = purchaseOrders.FirstOrDefault().ManualRequestNumber;

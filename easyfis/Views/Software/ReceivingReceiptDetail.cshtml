@@ -573,6 +573,7 @@
         var btnMoveToLastPageGridPOStatus = document.getElementById('btnMoveToLastPageGridPOStatus');
         var btnCurrentPageGridPOStatus = document.getElementById('btnCurrentPageGridPOStatus');
         var isPOStatusClicked = false;
+        var currentPOStatusPageIndex = 0;
 
         // =======================
         // Get URL Parameter Value
@@ -1902,21 +1903,25 @@
 
                 btnMoveToFirstPageGridPOStatus.addEventListener('click', function () {
                     purchaseOrderStatusCollectionView.moveToFirstPage();
+                    currentPOStatusPageIndex = purchaseOrderStatusCollectionView.pageIndex + 1;
                     updateNavigateButtonsPOStatus();
                 });
 
                 btnMoveToPreviousPageGridPOStatus.addEventListener('click', function () {
                     purchaseOrderStatusCollectionView.moveToPreviousPage();
+                    currentPOStatusPageIndex = purchaseOrderStatusCollectionView.pageIndex + 1;
                     updateNavigateButtonsPOStatus();
                 });
 
                 btnMoveToNextPageGridPOStatus.addEventListener('click', function () {
                     purchaseOrderStatusCollectionView.moveToNextPage();
+                    currentPOStatusPageIndex = purchaseOrderStatusCollectionView.pageIndex + 1;
                     updateNavigateButtonsPOStatus();
                 });
 
                 btnMoveToLastPageGridPOStatus.addEventListener('click', function () {
                     purchaseOrderStatusCollectionView.moveToLastPage();
+                    currentPOStatusPageIndex = purchaseOrderStatusCollectionView.pageIndex + 1;
                     updateNavigateButtonsPOStatus();
                 });
 
@@ -1975,14 +1980,22 @@
 
             var purchaseOrderArrays = new Array();
 
-            for (var i = 0; i < purchaseOrderStatusCollectionView.items.length; i++) {
-                var item = purchaseOrderStatusCollectionView.items[i];
-                if (item.Balance > 0) {
-                    purchaseOrderArrays.push({
-                        POId: item.POId,
-                        ItemId: item.ItemId,
-                        Quantity: item.Balance,
-                    });
+
+            for (var p = 1; p <= purchaseOrderStatusCollectionView.pageCount; p++) {
+                for (var i = 0; i < purchaseOrderStatusCollectionView.items.length; i++) {
+                    var item = purchaseOrderStatusCollectionView.items[i];
+                    if (item.Balance > 0) {
+                        purchaseOrderArrays.push({
+                            POId: item.POId,
+                            ItemId: item.ItemId,
+                            Quantity: item.Balance,
+                        });
+                    }
+                }
+
+                purchaseOrderStatusCollectionView.moveToNextPage();
+                if (p == purchaseOrderStatusCollectionView.pageCount) {
+                    purchaseOrderStatusCollectionView.moveToPage(currentPOStatusPageIndex - 1);
                 }
             }
 

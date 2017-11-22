@@ -340,7 +340,8 @@ namespace easyfis.ModifiedApiControllers
                                                                         {
                                                                             PurchaseOrder = d.TrnPurchaseOrder,
                                                                             ItemId = d.ItemId,
-                                                                            BaseUnitId = d.BaseUnitId
+                                                                            BaseUnitId = d.BaseUnitId,
+                                                                            BaseCost = d.BaseCost
                                                                         } into g
                                                                         select new
                                                                         {
@@ -351,7 +352,7 @@ namespace easyfis.ModifiedApiControllers
                                                                             Amount = g.Sum(d => d.Amount),
                                                                             BaseUnitId = g.Key.BaseUnitId,
                                                                             BaseQuantity = g.Sum(d => d.BaseQuantity),
-                                                                            BaseCost = g.Sum(d => d.BaseCost)
+                                                                            BaseCost = g.Key.BaseCost
                                                                         };
 
                                         if (groupedPurchaseOrderItems.Any())

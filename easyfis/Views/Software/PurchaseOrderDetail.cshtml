@@ -469,7 +469,8 @@
                         for (i = 0; i < results.length; i++) {
                             suppliersObservableArray.push({
                                 Id: results[i]["Id"],
-                                Supplier: results[i]["Article"]
+                                Supplier: results[i]["Article"],
+                                TermId: results[i]["TermId"],
                             });
                         }
                     }
@@ -480,7 +481,12 @@
                         placeholder: "Select Supplier",
                         itemsSource: suppliersObservableArray,
                         displayMemberPath: "Supplier",
-                        selectedValuePath: "Id"
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            if (cboPOTerm.selectedValue != null) {
+                                cboPOTerm.selectedValue = cboPOSupplier.selectedItem["TermId"];
+                            }
+                        }
                     });
 
                     getTermForComboBox();
