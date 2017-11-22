@@ -202,6 +202,7 @@ namespace easyfis.ModifiedApiControllers
                                                 ItemDescription = d.MstArticle.Article,
                                                 BaseUnitId = d.BaseUnitId,
                                                 BaseUnit = d.MstUnit1.Unit,
+                                                BaseCost = d.BaseCost
                                             } into g
                                             select new
                                             {
@@ -214,7 +215,7 @@ namespace easyfis.ModifiedApiControllers
                                                 BaseUnitId = g.Key.BaseUnitId,
                                                 BaseUnit = g.Key.BaseUnit,
                                                 BaseQuantity = g.Sum(d => d.BaseQuantity),
-                                                BaseCost = g.Sum(d => d.BaseCost)
+                                                BaseCost = g.Key.BaseCost
                                             };
 
             if (groupedPurchaseOrderItems.Any())
@@ -358,7 +359,8 @@ namespace easyfis.ModifiedApiControllers
                                         if (groupedPurchaseOrderItems.Any())
                                         {
                                             var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList()
-                                                                     where d.ItemId == Convert.ToInt32(objReceivingReceiptItem.ItemId)
+                                                                     where d.ItemId == objReceivingReceiptItem.ItemId
+                                                                     && d.BaseCost == objReceivingReceiptItem.BaseCost
                                                                      select new
                                                                      {
                                                                          BranchId = d.BranchId,
