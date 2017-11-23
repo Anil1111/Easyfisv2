@@ -114,44 +114,44 @@ namespace easyfis.Controllers
             return stockOuts.ToList();
         }
 
-        // get stock out by Id
-        [Authorize]
-        [HttpGet]
-        [Route("api/stockOut/{id}")]
-        public Models.TrnStockOut getStockOutById(String id)
-        {
-            var stockOuts = from d in db.TrnStockOuts
-                            where d.Id == Convert.ToInt32(id)
-                            select new Models.TrnStockOut
-                            {
-                                Id = d.Id,
-                                BranchId = d.BranchId,
-                                Branch = d.MstBranch.Branch,
-                                OTNumber = d.OTNumber,
-                                OTDate = d.OTDate.ToShortDateString(),
-                                AccountId = d.AccountId,
-                                Account = d.MstAccount.Account,
-                                ArticleId = d.ArticleId,
-                                Article = d.MstArticle.Article,
-                                Particulars = d.Particulars,
-                                ManualOTNumber = d.ManualOTNumber,
-                                PreparedById = d.PreparedById,
-                                PreparedBy = d.MstUser3.FullName,
-                                CheckedById = d.CheckedById,
-                                CheckedBy = d.MstUser1.FullName,
-                                ApprovedById = d.ApprovedById,
-                                ApprovedBy = d.MstUser.FullName,
-                                IsLocked = d.IsLocked,
-                                CreatedById = d.CreatedById,
-                                CreatedBy = d.MstUser2.FullName,
-                                CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                UpdatedById = d.UpdatedById,
-                                UpdatedBy = d.MstUser4.FullName,
-                                UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                            };
+        //// get stock out by Id
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/stockOut/{id}")]
+        //public Models.TrnStockOut getStockOutById(String id)
+        //{
+        //    var stockOuts = from d in db.TrnStockOuts
+        //                    where d.Id == Convert.ToInt32(id)
+        //                    select new Models.TrnStockOut
+        //                    {
+        //                        Id = d.Id,
+        //                        BranchId = d.BranchId,
+        //                        Branch = d.MstBranch.Branch,
+        //                        OTNumber = d.OTNumber,
+        //                        OTDate = d.OTDate.ToShortDateString(),
+        //                        AccountId = d.AccountId,
+        //                        Account = d.MstAccount.Account,
+        //                        ArticleId = d.ArticleId,
+        //                        Article = d.MstArticle.Article,
+        //                        Particulars = d.Particulars,
+        //                        ManualOTNumber = d.ManualOTNumber,
+        //                        PreparedById = d.PreparedById,
+        //                        PreparedBy = d.MstUser3.FullName,
+        //                        CheckedById = d.CheckedById,
+        //                        CheckedBy = d.MstUser1.FullName,
+        //                        ApprovedById = d.ApprovedById,
+        //                        ApprovedBy = d.MstUser.FullName,
+        //                        IsLocked = d.IsLocked,
+        //                        CreatedById = d.CreatedById,
+        //                        CreatedBy = d.MstUser2.FullName,
+        //                        CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                        UpdatedById = d.UpdatedById,
+        //                        UpdatedBy = d.MstUser4.FullName,
+        //                        UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                    };
 
-            return (Models.TrnStockOut)stockOuts.FirstOrDefault();
-        }
+        //    return (Models.TrnStockOut)stockOuts.FirstOrDefault();
+        //}
 
         // get stock out last OTNumber
         [Authorize]

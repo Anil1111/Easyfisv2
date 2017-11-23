@@ -53,23 +53,30 @@ namespace easyfis.ModifiedApiControllers
         // ============================
         // Dropdown List - Item (Field)
         // ============================
-        [Authorize, HttpGet, Route("api/stockOutItem/dropdown/list/item")]
-        public List<Entities.MstArticle> DropdownListStockOutItemListItem()
+        [Authorize, HttpGet, Route("api/stockOutItem/dropdown/list/itemInventory/item")]
+        public List<Entities.MstArticleInventory> DropdownListStockOutItemListItem()
         {
-            var items = from d in db.MstArticles.OrderBy(d => d.Article)
-                        where d.ArticleTypeId == 1
-                        && d.IsInventory == true
-                        && d.Kitting != 2
-                        && d.IsLocked == true
-                        select new Entities.MstArticle
-                        {
-                            Id = d.Id,
-                            ManualArticleCode = d.ManualArticleCode,
-                            Article = d.Article,
-                            ExpenseAccountId = d.ExpenseAccountId
-                        };
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
 
-            return items.ToList();
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
+            var itemInventories = from d in db.MstArticleInventories
+                                  where d.BranchId == branchId
+                                  && d.Quantity > 0
+                                  && d.MstArticle.IsInventory == true
+                                  && d.MstArticle.IsLocked == true
+                                  select new Entities.MstArticleInventory
+                                  {
+                                      Id = d.Id,
+                                      ArticleId = d.ArticleId,
+                                      ManualArticleCode = d.MstArticle.ManualArticleCode,
+                                      Article = d.MstArticle.Article,
+                                      ExpenseAccountId = d.MstArticle.ExpenseAccountId
+                                  };
+
+            return itemInventories.ToList();
         }
 
         // ===========================================
@@ -130,6 +137,7 @@ namespace easyfis.ModifiedApiControllers
                                   select new Entities.MstAccount
                                   {
                                       Id = d.Id,
+                                      AccountCode = d.AccountCode,
                                       Account = d.Account
                                   };
 
@@ -159,10 +167,13 @@ namespace easyfis.ModifiedApiControllers
                                       ArticleId = d.ArticleId,
                                       ManualArticleCode = d.MstArticle.ManualArticleCode,
                                       Article = d.MstArticle.Article,
+                                      UnitId = d.MstArticle.UnitId,
+                                      Unit = d.MstArticle.MstUnit.Unit,
                                       InventoryCode = d.InventoryCode,
                                       Price = d.MstArticle.Price,
                                       Quantity = d.Quantity,
-                                      Cost = d.Cost
+                                      Cost = d.Cost,
+                                      Amount = d.Amount
                                   };
 
             return itemInventories.ToList();
@@ -171,8 +182,8 @@ namespace easyfis.ModifiedApiControllers
         // ==================
         // Add Stock Out Item
         // ==================
-        [Authorize, HttpPost, Route("api/stockOutItem/add/{INId}")]
-        public HttpResponseMessage AddStockOutItem(Entities.TrnStockOutItem objStockOutItem, String INId)
+        [Authorize, HttpPost, Route("api/stockOutItem/add/{OTId}")]
+        public HttpResponseMessage AddStockOutItem(Entities.TrnStockOutItem objStockOutItem, String OTId)
         {
             try
             {
@@ -195,7 +206,7 @@ namespace easyfis.ModifiedApiControllers
                         if (userForms.FirstOrDefault().CanAdd)
                         {
                             var stockOut = from d in db.TrnStockOuts
-                                           where d.Id == Convert.ToInt32(INId)
+                                           where d.Id == Convert.ToInt32(OTId)
                                            select d;
 
                             if (stockOut.Any())
@@ -250,7 +261,7 @@ namespace easyfis.ModifiedApiControllers
 
                                                     Data.TrnStockOutItem newStockOutItem = new Data.TrnStockOutItem
                                                     {
-                                                        OTId = Convert.ToInt32(INId),
+                                                        OTId = Convert.ToInt32(OTId),
                                                         ItemId = objStockOutItem.ItemId,
                                                         ItemInventoryId = objStockOutItem.ItemInventoryId,
                                                         Particulars = objStockOutItem.Particulars,
@@ -324,8 +335,8 @@ namespace easyfis.ModifiedApiControllers
         // =====================
         // Update Stock Out Item
         // =====================
-        [Authorize, HttpPut, Route("api/stockOutItem/update/{id}/{INId}")]
-        public HttpResponseMessage UpdateStockOutItem(Entities.TrnStockOutItem objStockOutItem, String id, String INId)
+        [Authorize, HttpPut, Route("api/stockOutItem/update/{id}/{OTId}")]
+        public HttpResponseMessage UpdateStockOutItem(Entities.TrnStockOutItem objStockOutItem, String id, String OTId)
         {
             try
             {
@@ -348,7 +359,7 @@ namespace easyfis.ModifiedApiControllers
                         if (userForms.FirstOrDefault().CanEdit)
                         {
                             var stockOut = from d in db.TrnStockOuts
-                                           where d.Id == Convert.ToInt32(INId)
+                                           where d.Id == Convert.ToInt32(OTId)
                                            select d;
 
                             if (stockOut.Any())
@@ -407,7 +418,7 @@ namespace easyfis.ModifiedApiControllers
                                                         }
 
                                                         var updateStockOutItem = stockOutItem.FirstOrDefault();
-                                                        updateStockOutItem.OTId = Convert.ToInt32(INId);
+                                                        updateStockOutItem.OTId = Convert.ToInt32(OTId);
                                                         updateStockOutItem.ItemId = objStockOutItem.ItemId;
                                                         updateStockOutItem.ItemInventoryId = objStockOutItem.ItemInventoryId;
                                                         updateStockOutItem.Particulars = objStockOutItem.Particulars;
@@ -484,8 +495,8 @@ namespace easyfis.ModifiedApiControllers
         // =====================
         // Delete Stock Out Item
         // =====================
-        [Authorize, HttpDelete, Route("api/stockOutItem/delete/{id}/{INId}")]
-        public HttpResponseMessage DeleteStockOutItem(String id, String INId)
+        [Authorize, HttpDelete, Route("api/stockOutItem/delete/{id}/{OTId}")]
+        public HttpResponseMessage DeleteStockOutItem(String id, String OTId)
         {
             try
             {
@@ -507,7 +518,7 @@ namespace easyfis.ModifiedApiControllers
                         if (userForms.FirstOrDefault().CanDelete)
                         {
                             var stockOut = from d in db.TrnStockOuts
-                                           where d.Id == Convert.ToInt32(INId)
+                                           where d.Id == Convert.ToInt32(OTId)
                                            select d;
 
                             if (stockOut.Any())

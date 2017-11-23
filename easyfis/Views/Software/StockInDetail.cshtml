@@ -231,7 +231,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="InventoryEntries" class="tab-pane" style="margin-bottom: 15px;">
+                    <div id="InventoryEntries" class="tab-pane">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
@@ -1129,6 +1129,27 @@
         // =============
         function refreshStockInItemsFlexGrid() {
             items = new wijmo.collections.CollectionView(getItem());
+            items.canFilter = true;
+            items.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#StockInInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                items.refresh();
+            });
+
+            items.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            items.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
             itemGrid.itemsSource = items;
             itemGrid.trackChanges = true;
         }
@@ -1158,7 +1179,6 @@
             items.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsItems();
             });
-
 
             itemGrid = new wijmo.grid.FlexGrid('#ItemGrid');
             itemGrid.initialize({
@@ -1868,7 +1888,6 @@
                     NProgress.done();
                 }
             });
-
 
             return inventoryObservableArray;
         }

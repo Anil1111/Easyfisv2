@@ -145,5 +145,27 @@ namespace easyfis.ModifiedApiControllers
 
             return journals.ToList();
         }
+
+        // ========================
+        // List Journal - Stock Out
+        // ========================
+        [Authorize, HttpGet, Route("api/jounal/stockOut/list/{OTId}")]
+        public List<Entities.TrnJournal> ListJournalStockOut(String OTId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.OTId == Convert.ToInt32(OTId)
+                           select new Entities.TrnJournal
+                           {
+                               Branch = d.MstBranch.Branch,
+                               JournalDate = d.JournalDate.ToShortDateString(),
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               Article = d.MstArticle.Article,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
     }
 }

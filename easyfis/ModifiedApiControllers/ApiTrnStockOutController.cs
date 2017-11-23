@@ -329,7 +329,7 @@ namespace easyfis.ModifiedApiControllers
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add stockOut.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add stock out.");
                         }
                     }
                     else
@@ -422,7 +422,7 @@ namespace easyfis.ModifiedApiControllers
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock stockOut.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock stock out.");
                         }
                     }
                     else
