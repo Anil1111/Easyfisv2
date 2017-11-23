@@ -12,7 +12,9 @@ namespace easyfis.Entities
         public String OTNumber { get; set; }
         public String OTDate { get; set; }
         public Int32 AccountId { get; set; }
+        public String Account { get; set; }
         public Int32 ArticleId { get; set; }
+        public String Article { get; set; }
         public String Particulars { get; set; }
         public String ManualOTNumber { get; set; }
         public Int32 PreparedById { get; set; }
@@ -20,8 +22,10 @@ namespace easyfis.Entities
         public Int32 ApprovedById { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
+        public String CreatedBy { get; set; }
         public String CreatedDateTime { get; set; }
         public Int32 UpdatedById { get; set; }
+        public String UpdatedBy { get; set; }
         public String UpdatedDateTime { get; set; }
     }
 }

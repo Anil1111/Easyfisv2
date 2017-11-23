@@ -20,7 +20,7 @@ namespace easyfis.ModifiedApiControllers
         // List Stock In Item
         // ==================
         [Authorize, HttpGet, Route("api/stockInItem/list/{INId}")]
-        public List<Entities.TrnStockInItem> ListDisbursementLine(String INId)
+        public List<Entities.TrnStockInItem> ListStockInItem(String INId)
         {
             var stockInItems = from d in db.TrnStockInItems
                                where d.INId == Convert.ToInt32(INId)
