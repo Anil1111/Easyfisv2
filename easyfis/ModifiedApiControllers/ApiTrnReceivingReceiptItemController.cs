@@ -190,10 +190,10 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/receivingReceiptItem/popUp/list/purchaseOrderStatus/{POId}")]
         public List<Entities.TrnPurchaseOrderItem> PopUpListReceivingReceiptItemListPurchaseOrderStatus(String POId)
         {
-            var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems.OrderBy(d => d.MstArticle.Article)
+            var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems
                                             where d.POId == Convert.ToInt32(POId)
-                                            && d.TrnPurchaseOrder.IsLocked == true
                                             && d.BaseQuantity > 0
+                                            && d.TrnPurchaseOrder.IsLocked == true
                                             group d by new
                                             {
                                                 PurchaseOrder = d.TrnPurchaseOrder,
@@ -220,22 +220,24 @@ namespace easyfis.ModifiedApiControllers
 
             if (groupedPurchaseOrderItems.Any())
             {
-                return (from d in groupedPurchaseOrderItems.ToList()
-                        select new Entities.TrnPurchaseOrderItem
-                        {
-                            POId = d.POId,
-                            ItemId = d.ItemId,
-                            ItemCode = d.ItemCode,
-                            ItemDescription = d.ItemDescription,
-                            Particulars = d.Particulars,
-                            Amount = d.Amount,
-                            BaseUnitId = d.BaseUnitId,
-                            BaseUnit = d.BaseUnit,
-                            BaseQuantity = d.BaseQuantity,
-                            BaseCost = d.BaseCost,
-                            ReceivedQuantity = GetReceivedQuantity(d.POId, d.ItemId),
-                            BalanceQuantity = d.BaseQuantity - GetReceivedQuantity(d.POId, d.ItemId)
-                        }).ToList();
+                var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList().OrderBy(d => d.ItemDescription)
+                                         select new Entities.TrnPurchaseOrderItem
+                                         {
+                                             POId = d.POId,
+                                             ItemId = d.ItemId,
+                                             ItemCode = d.ItemCode,
+                                             ItemDescription = d.ItemDescription,
+                                             Particulars = d.Particulars,
+                                             Amount = d.Amount,
+                                             BaseUnitId = d.BaseUnitId,
+                                             BaseUnit = d.BaseUnit,
+                                             BaseQuantity = d.BaseQuantity,
+                                             BaseCost = d.BaseCost,
+                                             ReceivedQuantity = GetReceivedQuantity(d.POId, d.ItemId),
+                                             BalanceQuantity = d.BaseQuantity - GetReceivedQuantity(d.POId, d.ItemId)
+                                         };
+
+                return purchaseOrderItems.ToList();
             }
             else
             {
@@ -333,14 +335,15 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     foreach (var objReceivingReceiptItem in objReceivingReceiptItems)
                                     {
-                                        var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems.OrderBy(d => d.MstArticle.Article)
+                                        var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems
                                                                         where d.POId == Convert.ToInt32(objReceivingReceiptItem.POId)
-                                                                        && d.TrnPurchaseOrder.IsLocked == true
                                                                         && d.BaseQuantity > 0
+                                                                        && d.TrnPurchaseOrder.IsLocked == true
                                                                         group d by new
                                                                         {
                                                                             PurchaseOrder = d.TrnPurchaseOrder,
                                                                             ItemId = d.ItemId,
+                                                                            ItemDescription = d.MstArticle.Article,
                                                                             BaseUnitId = d.BaseUnitId,
                                                                             BaseCost = d.BaseCost
                                                                         } into g
@@ -349,6 +352,7 @@ namespace easyfis.ModifiedApiControllers
                                                                             BranchId = g.Key.PurchaseOrder.BranchId,
                                                                             POId = g.Key.PurchaseOrder.Id,
                                                                             ItemId = g.Key.ItemId,
+                                                                            ItemDescription = g.Key.ItemDescription,
                                                                             Particulars = g.Key.PurchaseOrder.Remarks,
                                                                             Amount = g.Sum(d => d.Amount),
                                                                             BaseUnitId = g.Key.BaseUnitId,
@@ -358,7 +362,7 @@ namespace easyfis.ModifiedApiControllers
 
                                         if (groupedPurchaseOrderItems.Any())
                                         {
-                                            var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList()
+                                            var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList().OrderBy(d => d.ItemDescription)
                                                                      where d.ItemId == objReceivingReceiptItem.ItemId
                                                                      && d.BaseCost == objReceivingReceiptItem.BaseCost
                                                                      select new
