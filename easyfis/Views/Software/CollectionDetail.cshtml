@@ -350,36 +350,63 @@
                     <h4 class="modal-title" id="">Sales Invoice Status</h4>
                 </div>
                 <div class="modal-body">
-                    <center>
-                        <span id="loadingSIStatus"></span>
-                    </center>
-                    <div id="statusGrid">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control " id="SIStatusFilter" placeholder="Search">
-                                </div>
-                            </div>
-                            <div class="panel-body">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <table style="width: 100%" border="0">
+                                <tr>
+                                    <td style="width: 40%">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                            <input type="text" class="form-control " id="SIStatusFilter" placeholder="Search">
+                                        </div>
+                                    </td>
+                                    <td style="width: 1%"></td>
+                                    <td style="width: 29%">
+                                        <div class="input-group ">
+                                            <span class="input-group-addon"><b>Start Date</b></span>
+                                            <div id="cboStartDateSIFilter"></div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 1%"></td>
+                                    <td style="width: 29%">
+                                        <div class="input-group ">
+                                            <span class="input-group-addon"><b>End Date</b></span>
+                                            <div id="cboEndDateSIFilter"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="panel-body">
+                            <center>
+                                <span id="loadingSIStatus"></span>
+                            </center>
+                            <div id="statusGrid">
                                 <div id="salesInvoiceStatusGrid"></div>
                             </div>
-                            <div class="panel-footer">
-                                <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridSIStatus">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridSIStatus">
-                                            <span class="glyphicon glyphicon-fast-backward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridSIStatus">
-                                            <span class="glyphicon glyphicon-step-backward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridSIStatus"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridSIStatus">
-                                            <span class="glyphicon glyphicon-step-forward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridSIStatus">
-                                            <span class="glyphicon glyphicon-fast-forward"></span>
-                                        </button>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="btn-group col-md-7" id="naviagtionPageGridSIStatus">
+                                    <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridSIStatus">
+                                        <span class="glyphicon glyphicon-fast-backward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridSIStatus">
+                                        <span class="glyphicon glyphicon-step-backward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridSIStatus"></button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridSIStatus">
+                                        <span class="glyphicon glyphicon-step-forward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridSIStatus">
+                                        <span class="glyphicon glyphicon-fast-forward"></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Total Amount</b></span>
+                                        <input type="text" class="form-control numberField" id="totalSIAmount" placeholder="0.00" disabled>
                                     </div>
                                 </div>
                             </div>
@@ -525,6 +552,11 @@
         var btnNextPageGridSIAdvances = document.getElementById('btnMoveToNextPageGridSIAdvances');
         var btnLastPageGridSIAdvances = document.getElementById('btnMoveToLastPageGridSIAdvances');
         var btnCurrentPageGridSIAdvances = document.getElementById('btnCurrentPageGridSIAdvances');
+        var cboStartDateSIFilter = new wijmo.input.InputDate('#cboStartDateSIFilter');
+        var cboEndDateSIFilter = new wijmo.input.InputDate('#cboEndDateSIFilter');
+        var isStartDateSIFirstSelect = true;
+        var isEndDateSIFirstSelect = true;
+        var currentSIStatusPageIndex = 0;
 
         // =======================
         // Get URL Parameter Value
@@ -1919,10 +1951,57 @@
             journalFlexGrid.trackChanges = true;
         }
 
+        // ===========
+        // Date Filter
+        // ===========
+        function cboDateSIFilters() {
+            cboStartDateSIFilter.dispose();
+            cboStartDateSIFilter = new wijmo.input.InputDate('#cboStartDateSIFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isStartDateSIFirstSelect) {
+                        $('#loadingSIStatus').show();
+                        document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                        $('#statusGrid').hide();
+                        $('#btnIdApplyAllSI').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createSalesInvoiceStatusFlexGrid();
+                        }, 500);
+                    } else {
+                        isStartDateSIFirstSelect = false;
+                    }
+                }
+            });
+
+            cboEndDateSIFilter.dispose();
+            cboEndDateSIFilter = new wijmo.input.InputDate('#cboEndDateSIFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isEndDateSIFirstSelect) {
+                        $('#loadingSIStatus').show();
+                        document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                        $('#statusGrid').hide();
+                        $('#btnIdApplyAllSI').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createSalesInvoiceStatusFlexGrid();
+                        }, 500);
+                    } else {
+                        isEndDateSIFirstSelect = false;
+                    }
+                }
+            });
+        }
+
         // ==========
         // AR Onclick
         // ==========
         function collectionAR_OnClick() {
+            cboDateSIFilters();
+
             $('#SalesStatus').modal({
                 show: true,
                 backdrop: 'static'
@@ -1940,13 +2019,18 @@
 
         function getSalesInvoiceByCustomerByBalance() {
             var saleInvoiceStatus = new wijmo.collections.ObservableArray;
+
+            var startDate = cboStartDateSIFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboEndDateSIFilter.value.toLocaleDateString().replace(/\//g, '-');
+
             $.ajax({
-                url: '/api/collectionLine/popUp/list/salesInvoiceStatus/' + cboORCustomer.selectedValue,
+                url: '/api/collectionLine/popUp/list/salesInvoiceStatus/' + cboORCustomer.selectedValue + '/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
                     $('#btnIdApplyAllSI').prop("disabled", false);
+                    var totalSIAmount = 0;
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -1972,10 +2056,14 @@
                                 BalanceDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Pick: results[i]["BalanceAmount"] == 0 ? "<button class='btn btn-primary btn-xs' onclick='btnPickAmount()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='btnUnpickAmountReverse()'><i class='fa fa-arrow-left'></i></button>",
                             });
+
+                            totalSIAmount += results[i]["BalanceAmount"];
                         }
                     } else {
                         $('#btnIdApplyAllSI').prop("disabled", true);
                     }
+
+                    document.getElementById("totalSIAmount").value = parseFloat(totalSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                     $('#loadingSIStatus').hide();
                     $('#statusGrid').show();
@@ -2179,26 +2267,30 @@
 
                 btnFirstPageGridSIStatus.addEventListener('click', function () {
                     saleInvoiceStatus.moveToFirstPage();
+                    currentSIStatusPageIndex = saleInvoiceStatus.pageIndex + 1;
                     updateNavigateButtonsSIStatus();
                 });
 
                 btnPreviousPageGridSIStatus.addEventListener('click', function () {
                     saleInvoiceStatus.moveToPreviousPage();
+                    currentSIStatusPageIndex = saleInvoiceStatus.pageIndex + 1;
                     updateNavigateButtonsSIStatus();
                 });
 
                 btnNextPageGridSIStatus.addEventListener('click', function () {
                     saleInvoiceStatus.moveToNextPage();
+                    currentSIStatusPageIndex = saleInvoiceStatus.pageIndex + 1;
                     updateNavigateButtonsSIStatus();
                 });
 
                 btnLastPageGridSIStatus.addEventListener('click', function () {
                     saleInvoiceStatus.moveToLastPage();
+                    currentSIStatusPageIndex = saleInvoiceStatus.pageIndex + 1;
                     updateNavigateButtonsSIStatus();
                 });
 
                 isARClicked = true;
-            }
+            } 
         }
 
         function btnOnclickApplyAllSI() {
@@ -2219,13 +2311,22 @@
 
             var saleInvoiceArrays = new Array();
 
-            for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
-                var item = saleInvoiceStatus.items[i];
-                if (item.Balance > 0) {
-                    saleInvoiceArrays.push({
-                        SIId: item.Id,
-                        Amount: item.Balance,
-                    });
+            saleInvoiceStatus.moveToFirstPage();
+
+            for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                    var item = saleInvoiceStatus.items[i];
+                    if (item.Balance > 0) {
+                        saleInvoiceArrays.push({
+                            SIId: item.Id,
+                            Amount: item.Balance,
+                        });
+                    }
+                }
+
+                saleInvoiceStatus.moveToNextPage();
+                if (p == saleInvoiceStatus.pageCount) {
+                    saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
                 }
             }
 

@@ -189,8 +189,8 @@ namespace easyfis.ModifiedApiControllers
         // ==================================
         // Pop-Up List - Sales Invoice Status
         // ==================================
-        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/{customerId}")]
-        public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatus(String customerId)
+        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/{customerId}/{startDate}/{endDate}")]
+        public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatus(String customerId, String startDate, String endDate)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -200,6 +200,8 @@ namespace easyfis.ModifiedApiControllers
 
             var salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.Id)
                                 where d.CustomerId == Convert.ToInt32(customerId)
+                                && d.SIDate >= Convert.ToDateTime(startDate)
+                                && d.SIDate <= Convert.ToDateTime(endDate)
                                 && d.BranchId == branchId
                                 && d.BalanceAmount > 0
                                 && d.IsLocked == true
