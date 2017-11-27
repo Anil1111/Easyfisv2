@@ -47,8 +47,17 @@ namespace easyfis.Business
                         var updateArticleInventory = updateArticleInventories.FirstOrDefault();
 
                         updateArticleInventory.Quantity = inventories.FirstOrDefault().Quantity;
-                        updateArticleInventory.Cost = inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity;
-                        updateArticleInventory.Amount = (inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity) * inventories.FirstOrDefault().Quantity;
+
+                        if (inventories.FirstOrDefault().PositiveQuantity == 0)
+                        {
+                            updateArticleInventory.Cost = 0;
+                            updateArticleInventory.Amount = 0;
+                        }
+                        else
+                        {
+                            updateArticleInventory.Cost = inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity;
+                            updateArticleInventory.Amount = (inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity) * inventories.FirstOrDefault().Quantity;
+                        }
 
                         db.SubmitChanges();
                     }
@@ -282,52 +291,56 @@ namespace easyfis.Business
         {
             try
             {
-                // stock headers
-                var stockOutHeaders = from d in db.TrnStockOuts
-                                      where d.Id == OTId
-                                      && d.IsLocked == true
-                                      select d;
+                var stockOut = from d in db.TrnStockOuts
+                               where d.Id == OTId
+                               && d.IsLocked == true
+                               select d;
 
-                if (stockOutHeaders.Any())
+                if (stockOut.Any())
                 {
-                    // stock out items
                     var stockOutItems = from d in db.TrnStockOutItems
                                         where d.OTId == OTId
                                         select d;
 
                     if (stockOutItems.Any())
                     {
+                        Debug.WriteLine(stockOutItems.Count());
+
+                        var countItemSaved = 0;
+
                         foreach (var stockOutItem in stockOutItems)
                         {
-                            // ===================
-                            // Stock out Inventory
-                            // ===================
-                            Data.TrnInventory newStockOutInventory = new Data.TrnInventory();
-                            newStockOutInventory.BranchId = stockOutHeaders.FirstOrDefault().BranchId;
-                            newStockOutInventory.InventoryDate = Convert.ToDateTime(stockOutHeaders.FirstOrDefault().OTDate);
-                            newStockOutInventory.ArticleId = stockOutItem.ItemId;
-                            newStockOutInventory.ArticleInventoryId = stockOutItem.ItemInventoryId;
-                            newStockOutInventory.OTId = OTId;
+                            Decimal quantityIn = 0;
+                            Decimal quantityOut = stockOutItem.BaseQuantity;
+                            Decimal quantity = quantityIn - quantityOut;
+                            Decimal amount = stockOutItem.Amount * -1;
 
                             if (stockOutItem.BaseQuantity < 0)
                             {
-                                newStockOutInventory.QuantityIn = stockOutItem.BaseQuantity * -1;
-                                newStockOutInventory.QuantityOut = 0;
-                            }
-                            else
-                            {
-                                newStockOutInventory.QuantityIn = 0;
-                                newStockOutInventory.QuantityOut = stockOutItem.BaseQuantity;
+                                quantityIn = stockOutItem.BaseQuantity * -1;
+                                quantityOut = 0;
+                                amount = stockOutItem.Amount;
                             }
 
-                            newStockOutInventory.Quantity = stockOutItem.BaseQuantity * -1;
-                            newStockOutInventory.Amount = stockOutItem.Amount * -1;
-                            newStockOutInventory.Particulars = stockOutHeaders.FirstOrDefault().Particulars;
-                            db.TrnInventories.InsertOnSubmit(newStockOutInventory);
+                            Data.TrnInventory newInventory = new Data.TrnInventory();
+                            newInventory.BranchId = stockOut.FirstOrDefault().BranchId;
+                            newInventory.InventoryDate = Convert.ToDateTime(stockOut.FirstOrDefault().OTDate);
+                            newInventory.ArticleId = stockOutItem.ItemId;
+                            newInventory.ArticleInventoryId = stockOutItem.ItemInventoryId;
+                            newInventory.OTId = OTId;
+                            newInventory.QuantityIn = quantityIn;
+                            newInventory.QuantityOut = quantityOut;
+                            newInventory.Quantity = quantity;
+                            newInventory.Amount = amount;
+                            newInventory.Particulars = stockOut.FirstOrDefault().Particulars;
+                            db.TrnInventories.InsertOnSubmit(newInventory);
                             db.SubmitChanges();
 
-                            UpdateArticleInventory(stockOutItem.ItemInventoryId, stockOutHeaders.FirstOrDefault().MstUser4.InventoryType);
+                            UpdateArticleInventory(stockOutItem.ItemInventoryId, stockOut.FirstOrDefault().MstUser4.InventoryType);
+                            countItemSaved += 1;
                         }
+
+                        Debug.WriteLine(countItemSaved);
                     }
                 }
             }

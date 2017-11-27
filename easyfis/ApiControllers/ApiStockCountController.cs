@@ -371,54 +371,31 @@ namespace easyfis.Controllers
                     {
                         foreach (var stockCountItem in stockCount.FirstOrDefault().TrnStockCountItems)
                         {
-                            var item = from d in db.MstArticles
-                                       where d.Id == stockCountItem.ItemId
-                                       && d.IsLocked == true
-                                       select d;
-
                             var articleInventory = from d in db.MstArticleInventories
                                                    where d.ArticleId == stockCountItem.ItemId
                                                    && d.BranchId == currentBranchId()
                                                    select d;
-
-                            Data.TrnStockOutItem newStockOutItems = new Data.TrnStockOutItem();
-                            newStockOutItems.OTId = newStockOut.Id;
-                            newStockOutItems.ExpenseAccountId = item.FirstOrDefault().ExpenseAccountId;
-                            newStockOutItems.ItemId = stockCountItem.ItemId;
-                            newStockOutItems.ItemInventoryId = articleInventory.FirstOrDefault().Id;
-                            newStockOutItems.Particulars = stockCountItem.Particulars;
-                            newStockOutItems.UnitId = item.FirstOrDefault().UnitId;
-                            newStockOutItems.Quantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
-                            newStockOutItems.Cost = articleInventory.FirstOrDefault().Cost;
-                            newStockOutItems.Amount = (articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity) * articleInventory.FirstOrDefault().Cost;
-                            newStockOutItems.BaseUnitId = item.First().UnitId;
-
-                            var quantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
-                            var amount = (articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity) * articleInventory.FirstOrDefault().Cost;
-
-                            var conversionUnit = from d in db.MstArticleUnits where d.ArticleId == stockCountItem.ItemId && d.UnitId == item.First().UnitId select d;
-                            if (conversionUnit.First().Multiplier > 0)
+                            if (articleInventory.Any())
                             {
-                                newStockOutItems.BaseQuantity = quantity * (1 / conversionUnit.First().Multiplier);
-                            }
-                            else
-                            {
-                                newStockOutItems.BaseQuantity = quantity * 1;
-                            }
+                                Data.TrnStockOutItem newStockOutItems = new Data.TrnStockOutItem();
 
-                            var baseQuantity = quantity * (1 / conversionUnit.First().Multiplier);
-                            if (baseQuantity > 0)
-                            {
-                                newStockOutItems.BaseCost = amount / baseQuantity;
-                            }
-                            else
-                            {
-                                newStockOutItems.BaseCost = amount;
-                            }
+                                newStockOutItems.OTId = newStockOut.Id;
+                                newStockOutItems.ExpenseAccountId = articleInventory.FirstOrDefault().MstArticle.ExpenseAccountId;
+                                newStockOutItems.ItemId = stockCountItem.ItemId;
+                                newStockOutItems.ItemInventoryId = articleInventory.FirstOrDefault().Id;
+                                newStockOutItems.Particulars = stockCountItem.Particulars;
+                                newStockOutItems.UnitId = articleInventory.FirstOrDefault().MstArticle.UnitId;
+                                newStockOutItems.Quantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
+                                newStockOutItems.Cost = articleInventory.FirstOrDefault().Cost;
+                                newStockOutItems.Amount = (articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity) * articleInventory.FirstOrDefault().Cost;
+                                newStockOutItems.BaseUnitId = articleInventory.FirstOrDefault().MstArticle.UnitId;
+                                newStockOutItems.BaseQuantity = articleInventory.FirstOrDefault().Quantity - stockCountItem.Quantity;
+                                newStockOutItems.BaseCost = articleInventory.FirstOrDefault().Cost;
 
-                            db.TrnStockOutItems.InsertOnSubmit(newStockOutItems);
-                            db.SubmitChanges();
+                                db.TrnStockOutItems.InsertOnSubmit(newStockOutItems);
+                            }
                         }
+                        db.SubmitChanges();
                     }
                 }
 
