@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -19,7 +31,7 @@
             <section class="content-header">
                 <div class="container">
                     <h3>
-                        Stock Count 
+                        Stock Count
                     </h3>
                     <p>
                         <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
@@ -40,7 +52,12 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary" id="btnAddStockCount" onclick="btnAddStockCount_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddStockCount" onclick="btnAddStockCount_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
                                     <button class="btn btn-danger" id="btnCloseStockCount" onclick="btnCloseStockCount_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
@@ -123,7 +140,6 @@
         var btnStockCountNextPageGrid;
         var btnStockCountLastPageGrid;
         var btnStockCountCurrentPageGrid;
-
         var cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter');
         var cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter');
         var isStartDateFirstSelect = true;
@@ -168,50 +184,28 @@
 
             var stockCounts = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/stockCount/listBySCDateByBranchId/' + startDate + '/' + endDate,
+                url: '/api/stockCount/list/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (stockCountResults) {
-                    if (stockCountResults.length > 0) {
-                        for (i = 0; i < stockCountResults.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
-                            var SCDateResult = new Date(stockCountResults[i]["SCDate"])
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            var SCDateResult = new Date(results[i]["SCDate"])
                             var SCDate = ('0' + (SCDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + SCDateResult.getDate()).slice(-2) + '-' + SCDateResult.getFullYear();
 
                             stockCounts.push({
-                                Edit: "<button class='btn btn-primary btn-xs btn-block' id='btnStockCountEdit' onclick='btnOnclickStockCountEdit()'" + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                Delete: "<button class='btn btn-danger btn-xs btn-block' onclick='btnOnclickStockCountDelete()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
-                                Id: stockCountResults[i]["Id"],
-                                BranchId: stockCountResults[i]["BranchId"],
-                                Branch: stockCountResults[i]["Branch"],
-                                SCNumber: stockCountResults[i]["SCNumber"],
+                                Edit: "<button class='btn btn-primary btn-xs btn-block' id='btnStockCountEdit' onclick='btnOnclickStockCountEdit()'><i class='fa fa-edit'></i> Edit</button>",
+                                Delete: "<button class='btn btn-danger btn-xs btn-block' onclick='btnOnclickStockCountDelete()'><i class='fa fa-trash'></i> Delete</button>",
+                                Id: results[i]["Id"],
+                                SCNumber: results[i]["SCNumber"],
                                 SCDate: SCDate,
-                                Particulars: stockCountResults[i]["Particulars"],
-                                PreparedById: stockCountResults[i]["PreparedById"],
-                                PreparedBy: stockCountResults[i]["PreparedBy"],
-                                CheckedById: stockCountResults[i]["CheckedById"],
-                                CheckedBy: stockCountResults[i]["CheckedBy"],
-                                ApprovedById: stockCountResults[i]["ApprovedById"],
-                                ApprovedBy: stockCountResults[i]["ApprovedBy"],
-                                IsLocked: stockCountResults[i]["IsLocked"],
-                                CreatedById: stockCountResults[i]["CreatedById"],
-                                CreatedBy: stockCountResults[i]["CreatedBy"],
-                                CreatedDateTime: stockCountResults[i]["CreatedDateTime"],
-                                UpdatedById: stockCountResults[i]["UpdatedById"],
-                                UpdatedBy: stockCountResults[i]["UpdatedBy"],
-                                UpdatedDateTime: stockCountResults[i]["UpdatedDateTime"]
+                                Particulars: results[i]["Particulars"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -228,28 +222,34 @@
             $('#btnAddStockCount').prop('disabled', true);
             $('#btnCloseStockCount').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/stockCount/save',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/StockCountDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddStockCount').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddStockCount').prop('disabled', false);
-                            $('#btnCloseStockCount').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/stockCount/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/StockCountDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddStockCount').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockCount').prop('disabled', false);
+                        $('#btnCloseStockCount').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddStockCount').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockCount').prop('disabled', false);
+                        $('#btnCloseStockCount').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddStockCount').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockCount').prop('disabled', false);
+                        $('#btnCloseStockCount').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         function btnCloseStockCount_OnClick() {
@@ -290,6 +290,7 @@
 
             stockCounts.editItem(stockCounts.currentItem);
             var id = stockCounts.currentEditItem.Id;
+
             $.ajax({
                 url: '/api/stockCount/delete/' + id,
                 type: "DELETE",
@@ -299,17 +300,24 @@
                     200: function () {
                         toastr.success("Delete Successful");
                         $('#divIdStockCountConfirmDeleteModal').modal('hide');
-                        refreshStockCountFlexGrid(stockCountSCDateValue);
+                        refreshStockCountFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#divIdStockCountConfirmDeleteModal').modal('hide');
                         document.getElementById("btnIdStockCountConfirmDeleteModalDelete").innerHTML = "<i class='fa fa-spinner fa-trash'></i> Delete";
                         $("#btnIdStockCountConfirmDeleteModalDelete").prop("disabled", false);
                         $("#btnIdConfirmDeleteModalClose").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#divIdStockCountConfirmDeleteModal').modal('hide');
+                        document.getElementById("btnIdStockCountConfirmDeleteModalDelete").innerHTML = "<i class='fa fa-spinner fa-trash'></i> Delete";
+                        $("#btnIdStockCountConfirmDeleteModalDelete").prop("disabled", false);
+                        $("#btnIdConfirmDeleteModalClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#divIdStockCountConfirmDeleteModal').modal('hide');
                         document.getElementById("btnIdStockCountConfirmDeleteModalDelete").innerHTML = "<i class='fa fa-spinner fa-trash'></i> Delete";
                         $("#btnIdStockCountConfirmDeleteModalDelete").prop("disabled", false);
@@ -436,24 +444,36 @@
             stockCountGrid = new wijmo.grid.FlexGrid('#divIdStockCountGrid');
             stockCountGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "Edit",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "Delete",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                           @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "Edit",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "Delete",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "SC Number",
                                 "binding": "SCNumber",
@@ -517,11 +537,6 @@
                 stockCounts.moveToLastPage();
                 updateNavigateButtonsStockCount();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddStockCount").prop("disabled", true);
-            }
         }
 
         // On load page

@@ -323,6 +323,24 @@ namespace easyfis.Controllers
             return UserRights("StockOutDetail");
         }
 
+        // ===========
+        // Stock Count
+        // ===========
+        [Authorize]
+        public ActionResult StockCount()
+        {
+            return UserRights("StockCountList");
+        }
+
+        // ==================
+        // Stock Count Detail
+        // ==================
+        [Authorize]
+        public ActionResult StockCountDetail()
+        {
+            return UserRights("StockCountDetail");
+        }
+
         // ===============
         // Journal Voucher
         // ===============
@@ -1059,47 +1077,6 @@ namespace easyfis.Controllers
         public ActionResult BankReconciliation()
         {
             if (PageAccess("BankReconciliation").Equals("BankReconciliation"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-
-        // ===========
-        // Stock Count
-        // ===========
-        [Authorize]
-        public ActionResult StockCount()
-        {
-            if (PageAccess("StockCountList").Equals("StockCountList"))
-            {
-                if (AccessToDetail("StockCountDetail").Equals("StockCountDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-
-        // ==================
-        // Stock Count Detail
-        // ==================
-        [Authorize]
-        public ActionResult StockCountDetail()
-        {
-            if (PageAccess("StockCountDetail").Equals("StockCountDetail"))
             {
                 return View();
             }
