@@ -105,5 +105,28 @@ namespace easyfis.ModifiedApiControllers
 
             return inventories.ToList();
         }
+
+        // ===============================
+        // List Inventory - Stock Transfer
+        // ===============================
+        [Authorize, HttpGet, Route("api/inventory/stockTransfer/list/{STId}")]
+        public List<Entities.TrnInventory> ListInventoryStockTransfer(String STId)
+        {
+            var inventories = from d in db.TrnInventories
+                              where d.STId == Convert.ToUInt32(STId)
+                              select new Entities.TrnInventory
+                              {
+                                  InventoryDate = d.InventoryDate.ToShortDateString(),
+                                  Branch = d.MstBranch.Branch,
+                                  Article = d.MstArticle.Article,
+                                  Particulars = d.Particulars,
+                                  ArticleInventoryCode = d.MstArticleInventory.InventoryCode,
+                                  Quantity = d.Quantity,
+                                  ArticleUnit = d.MstArticle.MstUnit.Unit,
+                                  Amount = d.Amount
+                              };
+
+            return inventories.ToList();
+        }
     }
 }
