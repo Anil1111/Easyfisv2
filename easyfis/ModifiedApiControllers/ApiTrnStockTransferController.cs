@@ -264,12 +264,12 @@ namespace easyfis.ModifiedApiControllers
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add stock out.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add stock transfer.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock out page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock transfer page.");
                     }
                 }
                 else
@@ -346,22 +346,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These stock out details are already locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These stock transfer details are already locked.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock out details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock transfer details are not found in the server.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock stock out.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock stock transfer.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock out page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock transfer page.");
                     }
                 }
                 else
@@ -432,22 +432,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These stock out details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These stock transfer details are already unlocked.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock out details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock transfer details are not found in the server.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to unlock stock out.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to unlock stock transfer.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock out page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock transfer page.");
                     }
                 }
                 else
@@ -502,22 +502,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Delete Error. You cannot delete stock out if the current stock out record is locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Delete Error. You cannot delete stock transfer if the current stock transfer record is locked.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock out details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock transfer details are not found in the server.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete stock out.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete stock transfer.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock out page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this stock transfer page.");
                     }
                 }
                 else
