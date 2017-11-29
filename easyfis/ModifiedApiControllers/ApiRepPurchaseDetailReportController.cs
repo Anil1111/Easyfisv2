@@ -37,7 +37,7 @@ namespace easyfis.ApiControllers
                                          PODate = d.TrnPurchaseOrder.PODate.ToShortDateString(),
                                          Supplier = d.TrnPurchaseOrder.MstArticle.Article,
                                          Item = d.MstArticle.Article,
-                                         Price = d.MstArticle.Price,
+                                         Cost = d.Cost,
                                          Unit = d.MstUnit.Unit,
                                          Quantity = d.Quantity,
                                          Amount = d.Amount
