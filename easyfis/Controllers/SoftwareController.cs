@@ -314,13 +314,31 @@ namespace easyfis.Controllers
             return UserRights("StockOutList");
         }
 
-        // =================
-        // Stock Out  Detail
-        // =================
+        // ================
+        // Stock Out Detail
+        // ================
         [Authorize]
         public ActionResult StockOutDetail()
         {
             return UserRights("StockOutDetail");
+        }
+
+        // ==============
+        // Stock Transfer
+        // ==============
+        [Authorize]
+        public ActionResult StockTransfer()
+        {
+            return UserRights("StockTransferList");
+        }
+
+        // =====================
+        // Stock Transfer Detail
+        // =====================
+        [Authorize]
+        public ActionResult StockTransferDetail()
+        {
+            return UserRights("StockTransferDetail");
         }
 
         // ===========
@@ -979,47 +997,6 @@ namespace easyfis.Controllers
         public ActionResult CollectionDetail()
         {
             return UserRights("CollectionDetail");
-        }
-
-        // ==============
-        // Stock Transfer
-        // ==============
-        [Authorize]
-        public ActionResult StockTransfer()
-        {
-            if (PageAccess("StockTransferList").Equals("StockTransferList"))
-            {
-                if (AccessToDetail("StockTransferDetail").Equals("StockTransferDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-
-        // =====================
-        // Stock Transfer Detail
-        // =====================
-        [Authorize]
-        public ActionResult StockTransferDetail()
-        {
-            if (PageAccess("StockTransferDetail").Equals("StockTransferDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
         }
 
         // =====

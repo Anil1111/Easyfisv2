@@ -74,42 +74,42 @@ namespace easyfis.Controllers
         }
 
         // get stock transfer by Id
-        [Authorize]
-        [HttpGet]
-        [Route("api/stockTransfer/{id}")]
-        public Models.TrnStockTransfer getStockTransferById(String id)
-        {
-            var stockTransfer = from d in db.TrnStockTransfers
-                                where d.Id == Convert.ToInt32(id)
-                                select new Models.TrnStockTransfer
-                                {
-                                    Id = d.Id,
-                                    BranchId = d.BranchId,
-                                    Branch = d.MstBranch.Branch,
-                                    STNumber = d.STNumber,
-                                    STDate = d.STDate.ToShortDateString(),
-                                    ToBranchId = d.ToBranchId,
-                                    ToBranch = d.MstBranch1.Branch,
-                                    ArticleId = d.ArticleId,
-                                    Particulars = d.Particulars,
-                                    ManualSTNumber = d.ManualSTNumber,
-                                    PreparedById = d.PreparedById,
-                                    PreparedBy = d.MstUser3.FullName,
-                                    CheckedById = d.CheckedById,
-                                    CheckedBy = d.MstUser1.FullName,
-                                    ApprovedById = d.ApprovedById,
-                                    ApprovedBy = d.MstUser.FullName,
-                                    IsLocked = d.IsLocked,
-                                    CreatedById = d.CreatedById,
-                                    CreatedBy = d.MstUser2.FullName,
-                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                    UpdatedById = d.UpdatedById,
-                                    UpdatedBy = d.MstUser4.FullName,
-                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                                };
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/stockTransfer/{id}")]
+        //public Models.TrnStockTransfer getStockTransferById(String id)
+        //{
+        //    var stockTransfer = from d in db.TrnStockTransfers
+        //                        where d.Id == Convert.ToInt32(id)
+        //                        select new Models.TrnStockTransfer
+        //                        {
+        //                            Id = d.Id,
+        //                            BranchId = d.BranchId,
+        //                            Branch = d.MstBranch.Branch,
+        //                            STNumber = d.STNumber,
+        //                            STDate = d.STDate.ToShortDateString(),
+        //                            ToBranchId = d.ToBranchId,
+        //                            ToBranch = d.MstBranch1.Branch,
+        //                            ArticleId = d.ArticleId,
+        //                            Particulars = d.Particulars,
+        //                            ManualSTNumber = d.ManualSTNumber,
+        //                            PreparedById = d.PreparedById,
+        //                            PreparedBy = d.MstUser3.FullName,
+        //                            CheckedById = d.CheckedById,
+        //                            CheckedBy = d.MstUser1.FullName,
+        //                            ApprovedById = d.ApprovedById,
+        //                            ApprovedBy = d.MstUser.FullName,
+        //                            IsLocked = d.IsLocked,
+        //                            CreatedById = d.CreatedById,
+        //                            CreatedBy = d.MstUser2.FullName,
+        //                            CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                            UpdatedById = d.UpdatedById,
+        //                            UpdatedBy = d.MstUser4.FullName,
+        //                            UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                        };
 
-            return (Models.TrnStockTransfer)stockTransfer.FirstOrDefault();
-        }
+        //    return (Models.TrnStockTransfer)stockTransfer.FirstOrDefault();
+        //}
 
         // list stock transfer by STDate
         [Authorize]

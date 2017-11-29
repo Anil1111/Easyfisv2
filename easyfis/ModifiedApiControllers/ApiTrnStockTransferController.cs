@@ -216,50 +216,62 @@ namespace easyfis.ModifiedApiControllers
                                 defaultSTNumber = FillLeadingZeroes(STNumber, 10);
                             }
 
-                            var articles = from d in db.MstArticles
-                                           where d.ArticleTypeId == 6
-                                           && d.IsLocked == true
-                                           select d;
+                            var toBranches = from d in db.MstBranches
+                                             where d.Id != currentBranchId
+                                             select d;
 
-                            if (articles.Any())
+                            if (toBranches.Any())
                             {
-                                var users = from d in db.MstUsers.OrderBy(d => d.FullName)
-                                            where d.IsLocked == true
-                                            select d;
+                                var articles = from d in db.MstArticles
+                                               where d.ArticleTypeId == 6
+                                               && d.IsLocked == true
+                                               select d;
 
-                                if (users.Any())
+                                if (articles.Any())
                                 {
-                                    Data.TrnStockTransfer newStockTransfer = new Data.TrnStockTransfer
+                                    var users = from d in db.MstUsers.OrderBy(d => d.FullName)
+                                                where d.IsLocked == true
+                                                select d;
+
+                                    if (users.Any())
                                     {
-                                        BranchId = currentBranchId,
-                                        STNumber = defaultSTNumber,
-                                        STDate = DateTime.Today,
-                                        ArticleId = articles.FirstOrDefault().Id,
-                                        Particulars = "NA",
-                                        ManualSTNumber = "NA",
-                                        PreparedById = currentUserId,
-                                        CheckedById = currentUserId,
-                                        ApprovedById = currentUserId,
-                                        IsLocked = false,
-                                        CreatedById = currentUserId,
-                                        CreatedDateTime = DateTime.Now,
-                                        UpdatedById = currentUserId,
-                                        UpdatedDateTime = DateTime.Now
-                                    };
+                                        Data.TrnStockTransfer newStockTransfer = new Data.TrnStockTransfer
+                                        {
+                                            BranchId = currentBranchId,
+                                            STNumber = defaultSTNumber,
+                                            STDate = DateTime.Today,
+                                            ToBranchId = toBranches.FirstOrDefault().Id,
+                                            ArticleId = articles.FirstOrDefault().Id,
+                                            Particulars = "NA",
+                                            ManualSTNumber = "NA",
+                                            PreparedById = currentUserId,
+                                            CheckedById = currentUserId,
+                                            ApprovedById = currentUserId,
+                                            IsLocked = false,
+                                            CreatedById = currentUserId,
+                                            CreatedDateTime = DateTime.Now,
+                                            UpdatedById = currentUserId,
+                                            UpdatedDateTime = DateTime.Now
+                                        };
 
-                                    db.TrnStockTransfers.InsertOnSubmit(newStockTransfer);
-                                    db.SubmitChanges();
+                                        db.TrnStockTransfers.InsertOnSubmit(newStockTransfer);
+                                        db.SubmitChanges();
 
-                                    return Request.CreateResponse(HttpStatusCode.OK, newStockTransfer.Id);
+                                        return Request.CreateResponse(HttpStatusCode.OK, newStockTransfer.Id);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "No user found. Please setup more users for all transactions.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No user found. Please setup more users for all transactions.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No article found. Please setup more articles for all transactions.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No article found. Please setup more articles for all transactions.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "No branch found. Please setup more branches for all transactions.");
                             }
                         }
                         else
@@ -319,6 +331,7 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     var lockStockTransfer = stockTransfer.FirstOrDefault();
                                     lockStockTransfer.STDate = Convert.ToDateTime(objStockTransfer.STDate);
+                                    lockStockTransfer.ToBranchId = objStockTransfer.ToBranchId;
                                     lockStockTransfer.ArticleId = objStockTransfer.ArticleId;
                                     lockStockTransfer.Particulars = objStockTransfer.Particulars;
                                     lockStockTransfer.ManualSTNumber = objStockTransfer.ManualSTNumber;

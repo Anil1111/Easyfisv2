@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -40,7 +52,12 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary" id="btnAddStockTransfer" onclick="btnAddStockTransfer_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddStockTransfer" onclick="btnAddStockTransfer_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
                                     <button class="btn btn-danger" id="btnCloseStockTransfer" onclick="btnCloseStockTransfer_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
@@ -171,54 +188,31 @@
 
             var stockTransfers = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listStockTransferFilterBySTDate/' + startDate + '/' + endDate,
+                url: '/api/stockTransfer/list/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
-                            var STDateResult = new Date(Results[i]["STDate"])
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            var STDateResult = new Date(results[i]["STDate"])
                             var STDate = ('0' + (STDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + STDateResult.getDate()).slice(-2) + '-' + STDateResult.getFullYear();
 
                             stockTransfers.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='StockTransferEditButton' onclick='cmdStockTransferEditButton_OnClick()'" + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdStockTransferDeleteButton_OnClick()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
-                                Id: Results[i]["Id"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
-                                STNumber: Results[i]["STNumber"],
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='StockTransferEditButton' onclick='cmdStockTransferEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdStockTransferDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"],
+                                STNumber: results[i]["STNumber"],
                                 STDate: STDate,
-                                ToBranchId: Results[i]["ToBranchId"],
-                                ToBranch: Results[i]["ToBranch"],
-                                Particulars: Results[i]["Particulars"],
-                                ManualSTNumber: Results[i]["ManualSTNumber"],
-                                PreparedById: Results[i]["PreparedById"],
-                                PreparedBy: Results[i]["PreparedBy"],
-                                CheckedById: Results[i]["CheckedById"],
-                                CheckedBy: Results[i]["CheckedBy"],
-                                ApprovedById: Results[i]["ApprovedById"],
-                                ApprovedBy: Results[i]["ApprovedBy"],
-                                IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
-                                CreatedBy: Results[i]["CreatedBy"],
-                                CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
-                                UpdatedBy: Results[i]["UpdatedBy"],
-                                UpdatedDateTime: Results[i]["UpdatedDateTime"]
+                                ToBranch: results[i]["ToBranch"],
+                                Particulars: results[i]["Particulars"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -238,28 +232,34 @@
             $('#btnAddStockTransfer').prop('disabled', true);
             $('#btnCloseStockTransfer').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/addStockTransfer',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/StockTransferDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddStockTransfer').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddStockTransfer').prop('disabled', false);
-                            $('#btnCloseStockTransfer').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/stockTransfer/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/StockTransferDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddStockTransfer').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockTransfer').prop('disabled', false);
+                        $('#btnCloseStockTransfer').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddStockTransfer').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockTransfer').prop('disabled', false);
+                        $('#btnCloseStockTransfer').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddStockTransfer').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddStockTransfer').prop('disabled', false);
+                        $('#btnCloseStockTransfer').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         // ===========================
@@ -307,8 +307,9 @@
 
             stockTransfers.editItem(stockTransfers.currentItem);
             var id = stockTransfers.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteStockTransfer/' + id,
+                url: '/api/stockTransfer/delete/' + id,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -318,15 +319,22 @@
                         $('#deleteStockTransferConfirm').modal('hide');
                         refreshStockTransferFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteStockTransferConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockTransfer').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockTransfer").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteStockTransferConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockTransfer').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockTransfer").prop("disabled", false);
+                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteStockTransferConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteStockTransfer').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteStockTransfer").prop("disabled", false);
@@ -434,24 +442,36 @@
             stockTransferGrid = new wijmo.grid.FlexGrid('#StockTransferGrid');
             stockTransferGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "EditId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "DeleteId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "ST Number",
                                 "binding": "STNumber",
@@ -475,6 +495,12 @@
                                 "binding": "ToBranch",
                                 "allowSorting": true,
                                 "width": "3*"
+                            },
+                            {
+                                "header": "Particulars",
+                                "binding": "Particulars",
+                                "allowSorting": true,
+                                "width": "4*"
                             },
                             {
                                 "header": "L",
@@ -520,11 +546,6 @@
                 stockTransfers.moveToLastPage();
                 updateNavigateButtonsStockTransfer();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddStockTransfer").prop("disabled", true)
-            }
         }
 
         // ===========
@@ -553,12 +574,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesResults) {
-                    if (userBranchesResults.length > 0) {
-                        for (i = 0; i < userBranchesResults.length; i++) {
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesResults[i]["BranchId"],
-                                Branch: userBranchesResults[i]["Branch"]
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
                             });
                         }
                     }
