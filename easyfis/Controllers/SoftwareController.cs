@@ -377,6 +377,15 @@ namespace easyfis.Controllers
             return UserRights("JournalVoucherDetail");
         }
 
+        // ====
+        // Bank
+        // ====
+        [Authorize]
+        public ActionResult Bank()
+        {
+            return UserRights("BankList");
+        }
+
         // =======
         // Company
         // =======
@@ -1031,21 +1040,6 @@ namespace easyfis.Controllers
             }
         }
 
-        // ====
-        // Bank
-        // ====
-        [Authorize]
-        public ActionResult Bank()
-        {
-            if (PageAccess("BankList").Equals("BankList"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
 
         // ===================
         // Bank Reconciliation
