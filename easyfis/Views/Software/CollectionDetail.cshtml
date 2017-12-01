@@ -509,6 +509,29 @@
         </div>
     </div>
 
+    <!-- RR Picked Amount -->
+    <div class="modal fade" id="pickBalanceAmountModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Amount</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="collectionLineDetailForm">
+                        <dl class="dl-horizontal">
+                            <dt>Amount</dt>
+                            <dd><input class="form-control  numberField  requiredPickedAmount" id="pickAmount" placeholder="0.00" /></dd>
+                        </dl>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="savePickAmount" class="btn btn-primary" onclick="btnSavePickAmountOnclick()"><i class="fa fa-check"></i> Ok</button>
+                    <button id="closePickAmountModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ================
@@ -2055,7 +2078,8 @@
                                 BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Balance: results[i]["BalanceAmount"],
                                 BalanceDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Pick: results[i]["BalanceAmount"] == 0 ? "<button class='btn btn-primary btn-xs' onclick='btnPickAmount()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='btnUnpickAmountReverse()'><i class='fa fa-arrow-left'></i></button>",
+                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPickAmount()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                Unpick: "<button class='btn btn-danger btn-xs btn-block' onclick='btnUnpickAmountReverse()'><i class='fa fa-hand-o-left'></i> Unpick</button>"
                             });
 
                             totalSIAmount += results[i]["BalanceAmount"];
@@ -2078,14 +2102,57 @@
         // PICK quantity
         // =============
         function btnPickAmount() {
+            $('#pickBalanceAmountModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#savePickAmount").prop("disabled", false);
+            $("#closePickAmountModal").prop("disabled", false);
+
             saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
             var saleInvoice = saleInvoiceStatus.currentEditItem;
             var balance = saleInvoice.Amount - saleInvoice.PaidAmount;
-            if (balance > 0) {
-                saleInvoice.Balance = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                saleInvoice.Pick = "<button class='btn btn-warning btn-xs' onclick='btnUnpickAmountReverse()'><i class='fa fa-arrow-left'></i></button>";
-                saleInvoiceStatus.refresh();
-                SIStatusGrid.refresh();
+            document.getElementById("pickAmount").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function btnSavePickAmountOnclick() {
+            $("#savePickAmount").prop("disabled", true);
+            $("#closePickAmountModal").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmount').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
+                var saleInvoice = saleInvoiceStatus.currentEditItem;
+                var balance = document.getElementById("pickAmount").value.split(",").join("");
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#savePickAmount").prop("disabled", false);
+                    $("#closePickAmountModal").prop("disabled", false);
+                } else {
+                    saleInvoice.Balance = balance;
+                    saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    saleInvoiceStatus.refresh();
+                    SIStatusGrid.refresh();
+
+                    $('#pickBalanceAmountModal').modal('hide');
+                }
+            } else {
+                toastr.error("Invalid Entry");
             }
         }
 
@@ -2095,8 +2162,7 @@
         function btnUnpickAmountReverse() {
             saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
             var saleInvoice = saleInvoiceStatus.currentEditItem;
-            saleInvoice.Balance = formatDecimalValues(0);
-            saleInvoice.Pick = "<button class='btn btn-primary btn-xs' onclick='btnPickAmount()'><i class='fa fa-arrow-right'></i></button>";
+            saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             saleInvoiceStatus.refresh();
             SIStatusGrid.refresh();
         }
@@ -2216,17 +2282,29 @@
                         "binding": "Pick",
                         "allowSorting": true,
                         "isReadOnly": true,
-                        "width": 50,
+                        "width": 60,
                         "align": "center",
                         "allowResizing": false,
                         "allowSorting": false,
                         "isContentHtml": true
                     },
                     {
-                        "header": "Balance",
-                        "binding": "Balance",
+                        "header": "Unpick",
+                        "binding": "Unpick",
                         "allowSorting": true,
-                        "isReadOnly": false,
+                        "isReadOnly": true,
+                        "width": 75,
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "BalanceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
                         "width": "2*"
                     },
                 ],
@@ -2261,7 +2339,10 @@
             SIStatusGrid.columnHeaders.setCellData(0, 7, 'Pick');
 
             SIStatusGrid.columnHeaders.columns[8].allowMerging = true;
-            SIStatusGrid.columnHeaders.setCellData(0, 8, 'Balance');
+            SIStatusGrid.columnHeaders.setCellData(0, 8, 'Unpick');
+
+            SIStatusGrid.columnHeaders.columns[9].allowMerging = true;
+            SIStatusGrid.columnHeaders.setCellData(0, 9, 'Amount');
 
             if (!isARClicked) {
                 updateNavigateButtonsSIStatus();
