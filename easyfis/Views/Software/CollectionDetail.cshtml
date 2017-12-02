@@ -357,7 +357,6 @@
                     <br />
                     <div class="tab-content">
                         <div id="SIStatussalesInvoice" class="tab-pane active">
-
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <table style="width: 100%" border="0">
@@ -423,7 +422,29 @@
                             </div>
                         </div>
                         <div id="SIStatuspayType" class="tab-pane">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form id="collectionLineDetailForm">
+                                        <dl class="dl-horizontal">
+                                            <dt>Pay Type</dt>
+                                            <dd><div class="comboBox-wide" id="cboSIStatusPayType"></div></dd>
+                                            <dt>Check No.</dt>
+                                            <dd><input type="text" class="form-control requiredSIStatus" id="SIStatus_checkNo" /></dd>
+                                            <dt>Check Date</dt>
+                                            <dd><div class="" id="cboSIStatusCheckDate"></div></dd>
+                                            <dt>Check Bank</dt>
+                                            <dd><input type="text" class="form-control  requiredSIStatus" id="SIStatus_checkBank" placeholder="Check Bank" /></dd>
+                                            <dt>Depository Bank</dt>
+                                            <dd><div class="comboBox-wide" id="cboSIStatusDepositoryBank"></div></dd>
+                                            <dt>Is Clear</dt>
+                                            <dd><input type="checkbox" id="SIStatus_Clear" /></dd>
+                                        </dl>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
 
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -594,6 +615,10 @@
         var isStartDateSIFirstSelect = true;
         var isEndDateSIFirstSelect = true;
         var currentSIStatusPageIndex = 0;
+        var cboSIStatusPayType = new wijmo.input.ComboBox('#cboSIStatusPayType');
+        var cboSIStatusCheckDate = new wijmo.input.InputDate('#cboSIStatusCheckDate');
+        var cboSIStatusDepositoryBank = new wijmo.input.ComboBox('#cboSIStatusDepositoryBank');
+        var isARPayTypeClicked = false;
 
         // =======================
         // Get URL Parameter Value
@@ -1547,15 +1572,28 @@
                         $("#cmdSaveCollectionLineButton").prop("disabled", true);
                     }
 
-                    cboCollectionLinePayType.dispose();
-                    cboCollectionLinePayType = new wijmo.input.ComboBox('#cboCollectionLinePayType', {
-                        disabled: disabled,
-                        isEditable: false,
-                        itemsSource: collectionLinePayTypesObservableArray,
-                        displayMemberPath: "PayType",
-                        selectedValuePath: "Id",
-                        selectedValue: payTypeId
-                    });
+                    if (!isARPayTypeClicked) {
+                        cboCollectionLinePayType.dispose();
+                        cboCollectionLinePayType = new wijmo.input.ComboBox('#cboCollectionLinePayType', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: collectionLinePayTypesObservableArray,
+                            displayMemberPath: "PayType",
+                            selectedValuePath: "Id",
+                            selectedValue: payTypeId
+                        });
+                    }
+
+                    if (isARPayTypeClicked) {
+                        cboSIStatusPayType.dispose();
+                        cboSIStatusPayType = new wijmo.input.ComboBox('#cboSIStatusPayType', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: collectionLinePayTypesObservableArray,
+                            displayMemberPath: "PayType",
+                            selectedValuePath: "Id"
+                        });
+                    }
 
                     getCheckDate(checkDate, depositoryBankId);
                 }
@@ -1570,6 +1608,12 @@
             cboCheckDate = new wijmo.input.InputDate('#cboCheckDate', {
                 format: 'MM-dd-yyyy',
                 value: checkDate,
+            });
+
+            cboSIStatusCheckDate.dispose();
+            cboSIStatusCheckDate = new wijmo.input.InputDate('#cboSIStatusCheckDate', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
             });
 
             getCollectionArticleBankForComboBox(depositoryBankId);
@@ -1602,15 +1646,28 @@
                         $("#cmdSaveCollectionLineButton").prop("disabled", true);
                     }
 
-                    cboCollectionLineDepositoryBank.dispose();
-                    cboCollectionLineDepositoryBank = new wijmo.input.ComboBox('#cboCollectionLineDepositoryBank', {
-                        disabled: disabled,
-                        isEditable: false,
-                        itemsSource: collectionArticleBanksObservableArray,
-                        displayMemberPath: "Article",
-                        selectedValuePath: "Id",
-                        selectedValue: depositoryBankId
-                    });
+                    if (!isARPayTypeClicked) {
+                        cboCollectionLineDepositoryBank.dispose();
+                        cboCollectionLineDepositoryBank = new wijmo.input.ComboBox('#cboCollectionLineDepositoryBank', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: collectionArticleBanksObservableArray,
+                            displayMemberPath: "Article",
+                            selectedValuePath: "Id",
+                            selectedValue: depositoryBankId
+                        });
+                    }
+
+                    if (isARPayTypeClicked) {
+                        cboSIStatusDepositoryBank.dispose();
+                        cboSIStatusDepositoryBank = new wijmo.input.ComboBox('#cboSIStatusDepositoryBank', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: collectionArticleBanksObservableArray,
+                            displayMemberPath: "Article",
+                            selectedValuePath: "Id"
+                        });
+                    }
                 }
             });
         }
@@ -1619,6 +1676,8 @@
         // ADD Collection Line
         // ===================
         function cmdAddCollectionLineButton_OnClick() {
+            isARPayTypeClicked = false;
+
             $('#collectionLineEdit').modal({
                 show: true,
                 backdrop: 'static'
@@ -1647,6 +1706,8 @@
         // Edit Collection Line
         // ====================
         function btnEditCollectionLine_OnClick() {
+            isARPayTypeClicked = false;
+
             $('#collectionLineEdit').modal({
                 show: true,
                 backdrop: 'static'
@@ -2038,6 +2099,7 @@
         // ==========
         function collectionAR_OnClick() {
             cboDateSIFilters();
+            isARPayTypeClicked = true;
 
             $('#SalesStatus').modal({
                 show: true,
@@ -2051,7 +2113,12 @@
 
             setTimeout(function () {
                 createSalesInvoiceStatusFlexGrid();
+                getCollectionPayTypeForComboBox(0, new Date(), 0);
             }, 500);
+
+            document.getElementById("SIStatus_checkNo").value = "NA";
+            document.getElementById("SIStatus_checkBank").value = "NA";
+            document.getElementById("SIStatus_Clear").checked = false;
         }
 
         function getSalesInvoiceByCustomerByBalance() {
@@ -2159,10 +2226,29 @@
                 } else {
                     saleInvoice.Balance = balance;
                     saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    
+                    setTimeout(function () {
+                        var totalALLSIAmount = 0
+                        saleInvoiceStatus.moveToFirstPage();
+                        for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                            var totalCurrentPageSIAmount = 0
+                            for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                                totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
+                            }
+
+                            totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                            saleInvoiceStatus.moveToNextPage();
+                            if (p == saleInvoiceStatus.pageCount) {
+                                saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                            }
+                        }
+
+                        document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        $('#pickBalanceAmountModal').modal('hide');
+                    }, 100);
+
                     saleInvoiceStatus.refresh();
                     SIStatusGrid.refresh();
-
-                    $('#pickBalanceAmountModal').modal('hide');
                 }
             } else {
                 toastr.error("Invalid Entry");
@@ -2177,6 +2263,27 @@
             var saleInvoice = saleInvoiceStatus.currentEditItem;
             saleInvoice.Balance = 0;
             saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            setTimeout(function () {
+                var totalALLSIAmount = 0
+                saleInvoiceStatus.moveToFirstPage();
+                for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                    var totalCurrentPageSIAmount = 0
+                    for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                        totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
+                    }
+
+                    totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                    saleInvoiceStatus.moveToNextPage();
+                    if (p == saleInvoiceStatus.pageCount) {
+                        saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                    }
+                }
+
+                document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                $('#pickBalanceAmountModal').modal('hide');
+            }, 100);
+
             saleInvoiceStatus.refresh();
             SIStatusGrid.refresh();
         }
@@ -2222,6 +2329,27 @@
             var filterText = '';
             $('#SIStatusFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
+
+                setTimeout(function () {
+                    var totalALLSIAmount = 0
+                    saleInvoiceStatus.moveToFirstPage();
+                    for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                        var totalCurrentPageSIAmount = 0
+                        for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                            totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
+                        }
+
+                        totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                        saleInvoiceStatus.moveToNextPage();
+                        if (p == saleInvoiceStatus.pageCount) {
+                            saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                        }
+                    }
+
+                    document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    $('#pickBalanceAmountModal').modal('hide');
+                }, 300);
+
                 saleInvoiceStatus.refresh();
             });
 
@@ -2416,6 +2544,12 @@
                         saleInvoiceArrays.push({
                             SIId: item.Id,
                             Amount: item.Balance,
+                            PayTypeId: cboSIStatusPayType.selectedValue,
+                            CheckNumber: document.getElementById("SIStatus_checkNo").value,
+                            CheckDate: cboSIStatusCheckDate.value,
+                            CheckBank: document.getElementById("SIStatus_checkBank").value,
+                            DepositoryBankId: cboSIStatusDepositoryBank.selectedValue,
+                            IsClear: document.getElementById("SIStatus_Clear").checked
                         });
                     }
                 }

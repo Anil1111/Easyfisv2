@@ -266,6 +266,7 @@ namespace easyfis.ModifiedApiControllers
                                         {
                                             var payTypes = from d in db.MstPayTypes
                                                            where d.IsLocked == true
+                                                           && d.Id == objCollectionLine.PayTypeId
                                                            select d;
 
                                             if (payTypes.Any())
@@ -273,6 +274,7 @@ namespace easyfis.ModifiedApiControllers
                                                 var depositoryBanks = from d in db.MstArticles
                                                                       where d.ArticleTypeId == 5
                                                                       && d.IsLocked == true
+                                                                      && d.Id == objCollectionLine.DepositoryBankId
                                                                       select d;
 
                                                 if (depositoryBanks.Any())
@@ -287,11 +289,11 @@ namespace easyfis.ModifiedApiControllers
                                                         Particulars = salesInvoice.FirstOrDefault().Remarks,
                                                         Amount = objCollectionLine.Amount,
                                                         PayTypeId = payTypes.FirstOrDefault().Id,
-                                                        CheckNumber = "NA",
-                                                        CheckDate = DateTime.Now,
-                                                        CheckBank = "NA",
+                                                        CheckNumber = objCollectionLine.CheckNumber,
+                                                        CheckDate = Convert.ToDateTime(objCollectionLine.CheckDate),
+                                                        CheckBank = objCollectionLine.CheckBank,
                                                         DepositoryBankId = depositoryBanks.FirstOrDefault().Id,
-                                                        IsClear = false,
+                                                        IsClear = objCollectionLine.IsClear
                                                     };
 
                                                     db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
