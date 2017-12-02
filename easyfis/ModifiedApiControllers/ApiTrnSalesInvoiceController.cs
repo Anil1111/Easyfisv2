@@ -358,6 +358,7 @@ namespace easyfis.ModifiedApiControllers
                                 if (!salesInvoice.FirstOrDefault().IsLocked)
                                 {
                                     Decimal paidAmount = 0;
+                                    Decimal adjustmentAmount = 0;
 
                                     var collectionLines = from d in db.TrnCollectionLines
                                                           where d.SIId == Convert.ToInt32(id)
@@ -369,6 +370,19 @@ namespace easyfis.ModifiedApiControllers
                                         paidAmount = collectionLines.Sum(d => d.Amount);
                                     }
 
+                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                                              where d.ARSIId == Convert.ToInt32(id)
+                                                              && d.TrnJournalVoucher.IsLocked == true
+                                                              select d;
+
+                                    if (journalVoucherLines.Any())
+                                    {
+                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
+                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
+
+                                        adjustmentAmount = debitAmount - creditAmount;
+                                    }
+
                                     var lockSalesInvoice = salesInvoice.FirstOrDefault();
                                     lockSalesInvoice.SIDate = Convert.ToDateTime(objSalesInvoice.SIDate);
                                     lockSalesInvoice.CustomerId = objSalesInvoice.CustomerId;
@@ -378,8 +392,8 @@ namespace easyfis.ModifiedApiControllers
                                     lockSalesInvoice.Remarks = objSalesInvoice.Remarks;
                                     lockSalesInvoice.Amount = GetSalesInvoiceAmount(Convert.ToInt32(id));
                                     lockSalesInvoice.PaidAmount = paidAmount;
-                                    lockSalesInvoice.AdjustmentAmount = 0;
-                                    lockSalesInvoice.BalanceAmount = GetSalesInvoiceAmount(Convert.ToInt32(id)) - paidAmount;
+                                    lockSalesInvoice.AdjustmentAmount = adjustmentAmount;
+                                    lockSalesInvoice.BalanceAmount = (GetSalesInvoiceAmount(Convert.ToInt32(id)) - paidAmount) + adjustmentAmount;
                                     lockSalesInvoice.SoldById = objSalesInvoice.SoldById;
                                     lockSalesInvoice.CheckedById = objSalesInvoice.CheckedById;
                                     lockSalesInvoice.ApprovedById = objSalesInvoice.ApprovedById;

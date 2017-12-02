@@ -294,7 +294,6 @@ namespace easyfis.ModifiedApiControllers
         {
             var collectionLines = from d in db.TrnCollectionLines
                                   where d.ORId == ORId
-                                  && d.TrnCollection.IsLocked == true
                                   select d;
 
             if (collectionLines.Any())

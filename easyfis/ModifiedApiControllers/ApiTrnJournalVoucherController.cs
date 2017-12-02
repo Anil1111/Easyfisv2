@@ -234,6 +234,117 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
+        // =========================
+        // Update AP and AR Balances
+        // =========================
+        public void UpdateBalances(Int32 JVId)
+        {
+            var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                      where d.JVId == JVId
+                                      select d;
+
+            if (journalVoucherLines.Any())
+            {
+                foreach (var journalVoucherLine in journalVoucherLines)
+                {
+                    if (journalVoucherLine.APRRId != null)
+                    {
+                        Decimal paidAmount = 0;
+
+                        var disbursementLines = from d in db.TrnDisbursementLines
+                                                where d.RRId == journalVoucherLine.APRRId
+                                                && d.TrnDisbursement.IsLocked == true
+                                                select d;
+
+                        if (disbursementLines.Any())
+                        {
+                            paidAmount = disbursementLines.Sum(d => d.Amount);
+                        }
+
+                        Decimal adjustmentAmount = 0;
+
+                        var journalVoucherLinesAPAdjustments = from d in db.TrnJournalVoucherLines
+                                                               where d.APRRId == journalVoucherLine.APRRId
+                                                               && d.TrnJournalVoucher.IsLocked == true
+                                                               select d;
+
+                        if (journalVoucherLinesAPAdjustments.Any())
+                        {
+                            Decimal debitAmount = journalVoucherLinesAPAdjustments.Sum(d => d.DebitAmount);
+                            Decimal creditAmount = journalVoucherLinesAPAdjustments.Sum(d => d.CreditAmount);
+
+                            adjustmentAmount = creditAmount - debitAmount;
+                        }
+
+                        var receivingReceipt = from d in db.TrnReceivingReceipts
+                                               where d.Id == journalVoucherLine.APRRId
+                                               && d.IsLocked == true
+                                               select d;
+
+                        if (receivingReceipt.Any())
+                        {
+                            Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
+                            Decimal receivingReceiptWTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
+                            Decimal balanceAmount = (receivingReceiptAmount - receivingReceiptWTAXAmount - paidAmount) + adjustmentAmount;
+
+                            var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
+                            updateReceivingReceipt.PaidAmount = paidAmount;
+                            updateReceivingReceipt.AdjustmentAmount = adjustmentAmount;
+                            updateReceivingReceipt.BalanceAmount = balanceAmount;
+                            db.SubmitChanges();
+                        }
+                    }
+
+                    if (journalVoucherLine.ARSIId != null)
+                    {
+                        Decimal paidAmount = 0;
+
+                        var collectionLines = from d in db.TrnCollectionLines
+                                              where d.SIId == journalVoucherLine.ARSIId
+                                              && d.TrnCollection.IsLocked == true
+                                              select d;
+
+                        if (collectionLines.Any())
+                        {
+                            paidAmount = collectionLines.Sum(d => d.Amount);
+                        }
+
+                        Decimal adjustmentAmount = 0;
+
+                        var journalVoucherLinesARAdjustments = from d in db.TrnJournalVoucherLines
+                                                               where d.ARSIId == journalVoucherLine.ARSIId
+                                                               && d.TrnJournalVoucher.IsLocked == true
+                                                               select d;
+
+                        if (journalVoucherLinesARAdjustments.Any())
+                        {
+                            Decimal debitAmount = journalVoucherLinesARAdjustments.Sum(d => d.DebitAmount);
+                            Decimal creditAmount = journalVoucherLinesARAdjustments.Sum(d => d.CreditAmount);
+
+                            adjustmentAmount = debitAmount - creditAmount;
+                        }
+
+                        var salesInvoice = from d in db.TrnSalesInvoices
+                                           where d.Id == journalVoucherLine.ARSIId
+                                           && d.IsLocked == true
+                                           select d;
+
+                        if (salesInvoice.Any())
+                        {
+                            Decimal salesInvoiceAmount = salesInvoice.FirstOrDefault().Amount;
+                            Decimal balanceAmount = (salesInvoiceAmount - paidAmount) + adjustmentAmount;
+
+                            var updateSalesInvoice = salesInvoice.FirstOrDefault();
+                            updateSalesInvoice.PaidAmount = paidAmount;
+                            updateSalesInvoice.AdjustmentAmount = adjustmentAmount;
+                            updateSalesInvoice.BalanceAmount = balanceAmount;
+                            db.SubmitChanges();
+                        }
+                    }
+                }
+            }
+        }
+
         // ====================
         // Lock Journal Voucher
         // ====================
@@ -293,6 +404,7 @@ namespace easyfis.ModifiedApiControllers
                                         if (lockJournalVoucher.IsLocked)
                                         {
                                             journal.insertJVJournal(Convert.ToInt32(id));
+                                            UpdateBalances(Convert.ToInt32(id));
                                         }
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -382,6 +494,7 @@ namespace easyfis.ModifiedApiControllers
                                     if (!unlockJournalVoucher.IsLocked)
                                     {
                                         journal.deleteJVJournal(Convert.ToInt32(id));
+                                        UpdateBalances(Convert.ToInt32(id));
                                     }
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

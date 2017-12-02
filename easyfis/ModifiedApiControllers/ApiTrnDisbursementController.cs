@@ -348,7 +348,6 @@ namespace easyfis.ModifiedApiControllers
         {
             var disbursementLines = from d in db.TrnDisbursementLines
                                     where d.CVId == CVId
-                                    && d.TrnDisbursement.IsLocked == true
                                     select d;
 
             if (disbursementLines.Any())
