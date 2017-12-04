@@ -40,26 +40,45 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/bankReconciliation/collectionLine/list/{depositoryBankId}/{startDate}/{endDate}")]
         public List<Entities.TrnCollectionLine> ListBankReconciliationCollectionLine(String depositoryBankId, String startDate, String endDate)
         {
-            var collectionLines = from d in db.TrnCollectionLines
-                                  where d.DepositoryBankId == Convert.ToInt32(depositoryBankId)
-                                  && d.TrnCollection.ORDate >= Convert.ToDateTime(startDate)
-                                  && d.TrnCollection.ORDate <= Convert.ToDateTime(endDate)
-                                  && d.Amount > 0
-                                  && d.TrnCollection.IsLocked == true
-                                  select new Entities.TrnCollectionLine
-                                  {
-                                      Id = d.Id,
-                                      ORNumber = d.TrnCollection.ORNumber,
-                                      ORDate = d.TrnCollection.ORDate.ToShortDateString(),
-                                      Customer = d.TrnCollection.MstArticle.Article,
-                                      PayType = d.MstPayType.PayType,
-                                      CheckNumber = d.CheckNumber,
-                                      CheckDate = d.CheckDate.ToShortDateString(),
-                                      Amount = d.Amount,
-                                      IsClear = d.IsClear
-                                  };
+            var previousUnclearedCollectionLines = from d in db.TrnCollectionLines.OrderBy(d => d.TrnCollection.ORDate)
+                                                   where d.DepositoryBankId == Convert.ToInt32(depositoryBankId)
+                                                   && d.TrnCollection.ORDate < Convert.ToDateTime(startDate)
+                                                   && d.Amount > 0
+                                                   && d.IsClear == false
+                                                   && d.TrnCollection.IsLocked == true
+                                                   select new Entities.TrnCollectionLine
+                                                   {
+                                                       Id = d.Id,
+                                                       ORNumber = d.TrnCollection.ORNumber,
+                                                       ORDate = d.TrnCollection.ORDate.ToShortDateString(),
+                                                       Customer = d.TrnCollection.MstArticle.Article,
+                                                       PayType = d.MstPayType.PayType,
+                                                       CheckNumber = d.CheckNumber,
+                                                       CheckDate = d.CheckDate.ToShortDateString(),
+                                                       Amount = d.Amount,
+                                                       IsClear = d.IsClear
+                                                   };
 
-            return collectionLines.ToList();
+            var currentCollectionLines = from d in db.TrnCollectionLines.OrderBy(d => d.TrnCollection.ORDate)
+                                         where d.DepositoryBankId == Convert.ToInt32(depositoryBankId)
+                                         && d.TrnCollection.ORDate >= Convert.ToDateTime(startDate)
+                                         && d.TrnCollection.ORDate <= Convert.ToDateTime(endDate)
+                                         && d.Amount > 0
+                                         && d.TrnCollection.IsLocked == true
+                                         select new Entities.TrnCollectionLine
+                                         {
+                                             Id = d.Id,
+                                             ORNumber = d.TrnCollection.ORNumber,
+                                             ORDate = d.TrnCollection.ORDate.ToShortDateString(),
+                                             Customer = d.TrnCollection.MstArticle.Article,
+                                             PayType = d.MstPayType.PayType,
+                                             CheckNumber = d.CheckNumber,
+                                             CheckDate = d.CheckDate.ToShortDateString(),
+                                             Amount = d.Amount,
+                                             IsClear = d.IsClear
+                                         };
+
+            return previousUnclearedCollectionLines.Union(currentCollectionLines).ToList();
         }
 
         // =======================================
@@ -68,26 +87,45 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/bankReconciliation/disbursement/list/{bankId}/{startDate}/{endDate}")]
         public List<Entities.TrnDisbursement> ListBankReconciliationDisbursement(String bankId, String startDate, String endDate)
         {
-            var disbursements = from d in db.TrnDisbursements.OrderByDescending(d => d.Id)
-                                where d.BankId == Convert.ToInt32(bankId)
-                                && d.CVDate >= Convert.ToDateTime(startDate)
-                                && d.CVDate <= Convert.ToDateTime(endDate)
-                                && d.Amount > 0
-                                && d.IsLocked == true
-                                select new Entities.TrnDisbursement
-                                {
-                                    Id = d.Id,
-                                    CVNumber = d.CVNumber,
-                                    CVDate = d.CVDate.ToShortDateString(),
-                                    Payee = d.Payee,
-                                    PayType = d.MstPayType.PayType,
-                                    CheckNumber = d.CheckNumber,
-                                    CheckDate = d.CheckDate.ToShortDateString(),
-                                    Amount = d.Amount,
-                                    IsClear = d.IsClear
-                                };
+            var previousUnclearedDisbursements = from d in db.TrnDisbursements.OrderBy(d => d.CVDate)
+                                                 where d.BankId == Convert.ToInt32(bankId)
+                                                 && d.CVDate < Convert.ToDateTime(startDate)
+                                                 && d.Amount > 0
+                                                 && d.IsClear == false
+                                                 && d.IsLocked == true
+                                                 select new Entities.TrnDisbursement
+                                                 {
+                                                     Id = d.Id,
+                                                     CVNumber = d.CVNumber,
+                                                     CVDate = d.CVDate.ToShortDateString(),
+                                                     Payee = d.Payee,
+                                                     PayType = d.MstPayType.PayType,
+                                                     CheckNumber = d.CheckNumber,
+                                                     CheckDate = d.CheckDate.ToShortDateString(),
+                                                     Amount = d.Amount,
+                                                     IsClear = d.IsClear
+                                                 };
 
-            return disbursements.ToList();
+            var currentDisbursements = from d in db.TrnDisbursements.OrderBy(d => d.CVDate)
+                                       where d.BankId == Convert.ToInt32(bankId)
+                                       && d.CVDate >= Convert.ToDateTime(startDate)
+                                       && d.CVDate <= Convert.ToDateTime(endDate)
+                                       && d.Amount > 0
+                                       && d.IsLocked == true
+                                       select new Entities.TrnDisbursement
+                                       {
+                                           Id = d.Id,
+                                           CVNumber = d.CVNumber,
+                                           CVDate = d.CVDate.ToShortDateString(),
+                                           Payee = d.Payee,
+                                           PayType = d.MstPayType.PayType,
+                                           CheckNumber = d.CheckNumber,
+                                           CheckDate = d.CheckDate.ToShortDateString(),
+                                           Amount = d.Amount,
+                                           IsClear = d.IsClear
+                                       };
+
+            return previousUnclearedDisbursements.Union(currentDisbursements).ToList();
         }
 
         // ===============================================
@@ -96,25 +134,43 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/bankReconciliation/journalVoucherLine/list/{articleId}/{startDate}/{endDate}")]
         public List<Entities.TrnJournalVoucherLine> ListBankReconciliationJournalVoucherLine(String articleId, String startDate, String endDate)
         {
-            var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                      where d.ArticleId == Convert.ToInt32(articleId)
-                                      && d.TrnJournalVoucher.JVDate >= Convert.ToDateTime(startDate)
-                                      && d.TrnJournalVoucher.JVDate <= Convert.ToDateTime(endDate)
-                                      && d.DebitAmount - d.CreditAmount != 0
-                                      && d.TrnJournalVoucher.IsLocked == true
-                                      select new Entities.TrnJournalVoucherLine
-                                      {
-                                          Id = d.Id,
-                                          JVNumber = d.TrnJournalVoucher.JVNumber,
-                                          JVDate = d.TrnJournalVoucher.JVDate.ToShortDateString(),
-                                          Particulars = d.Particulars,
-                                          DebitAmount = d.DebitAmount,
-                                          CreditAmount = d.CreditAmount,
-                                          BalanceAmount = d.DebitAmount - d.CreditAmount,
-                                          IsClear = d.IsClear
-                                      };
+            var previousJournalVoucherLines = from d in db.TrnJournalVoucherLines
+                                              where d.ArticleId == Convert.ToInt32(articleId)
+                                              && d.TrnJournalVoucher.JVDate < Convert.ToDateTime(startDate)
+                                              && d.DebitAmount - d.CreditAmount != 0
+                                              && d.IsClear == false
+                                              && d.TrnJournalVoucher.IsLocked == true
+                                              select new Entities.TrnJournalVoucherLine
+                                              {
+                                                  Id = d.Id,
+                                                  JVNumber = d.TrnJournalVoucher.JVNumber,
+                                                  JVDate = d.TrnJournalVoucher.JVDate.ToShortDateString(),
+                                                  Particulars = d.Particulars,
+                                                  DebitAmount = d.DebitAmount,
+                                                  CreditAmount = d.CreditAmount,
+                                                  BalanceAmount = d.DebitAmount - d.CreditAmount,
+                                                  IsClear = d.IsClear
+                                              };
 
-            return journalVoucherLines.ToList();
+            var currentJournalVoucherLines = from d in db.TrnJournalVoucherLines
+                                             where d.ArticleId == Convert.ToInt32(articleId)
+                                             && d.TrnJournalVoucher.JVDate >= Convert.ToDateTime(startDate)
+                                             && d.TrnJournalVoucher.JVDate <= Convert.ToDateTime(endDate)
+                                             && d.DebitAmount - d.CreditAmount != 0
+                                             && d.TrnJournalVoucher.IsLocked == true
+                                             select new Entities.TrnJournalVoucherLine
+                                             {
+                                                 Id = d.Id,
+                                                 JVNumber = d.TrnJournalVoucher.JVNumber,
+                                                 JVDate = d.TrnJournalVoucher.JVDate.ToShortDateString(),
+                                                 Particulars = d.Particulars,
+                                                 DebitAmount = d.DebitAmount,
+                                                 CreditAmount = d.CreditAmount,
+                                                 BalanceAmount = d.DebitAmount - d.CreditAmount,
+                                                 IsClear = d.IsClear
+                                             };
+
+            return previousJournalVoucherLines.Union(currentJournalVoucherLines).ToList();
         }
 
         // ===========================================================
@@ -149,11 +205,13 @@ namespace easyfis.ModifiedApiControllers
 
                             if (collectionLines.Any())
                             {
+                                var isClear = false;
                                 var updateCollectionLine = collectionLines.FirstOrDefault();
 
                                 if (!collectionLines.FirstOrDefault().IsClear)
                                 {
                                     updateCollectionLine.IsClear = true;
+                                    isClear = true;
                                 }
                                 else
                                 {
@@ -162,7 +220,7 @@ namespace easyfis.ModifiedApiControllers
 
                                 db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                return Request.CreateResponse(HttpStatusCode.OK, isClear);
                             }
                             else
                             {
@@ -223,11 +281,13 @@ namespace easyfis.ModifiedApiControllers
 
                             if (disbursements.Any())
                             {
+                                var isClear = false;
                                 var updateDisbursement = disbursements.FirstOrDefault();
 
                                 if (!disbursements.FirstOrDefault().IsClear)
                                 {
                                     updateDisbursement.IsClear = true;
+                                    isClear = true;
                                 }
                                 else
                                 {
@@ -236,7 +296,7 @@ namespace easyfis.ModifiedApiControllers
 
                                 db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                return Request.CreateResponse(HttpStatusCode.OK, isClear);
                             }
                             else
                             {
@@ -297,11 +357,13 @@ namespace easyfis.ModifiedApiControllers
 
                             if (journalVoucherLines.Any())
                             {
+                                var isClear = false;
                                 var updateJournalVoucherLine = journalVoucherLines.FirstOrDefault();
 
                                 if (!journalVoucherLines.FirstOrDefault().IsClear)
                                 {
                                     updateJournalVoucherLine.IsClear = true;
+                                    isClear = true;
                                 }
                                 else
                                 {
@@ -310,7 +372,7 @@ namespace easyfis.ModifiedApiControllers
 
                                 db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                return Request.CreateResponse(HttpStatusCode.OK, isClear);
                             }
                             else
                             {

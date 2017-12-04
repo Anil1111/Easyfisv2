@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -191,54 +203,16 @@
         function getBank() {
             var banksObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listArticleByArticleTypeId/5',
+                url: '/api/bankReconciliation/dropdown/list/bank',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             banksObservableArray.push({
-                                Id: Results[i]["Id"],
-                                ArticleCode: Results[i]["ArticleCode"],
-                                ManualArticleCode: Results[i]["ManualArticleCode"],
-                                Article: Results[i]["Article"],
-                                Category: Results[i]["Category"],
-                                ArticleTypeId: Results[i]["ArticleTypeId"],
-                                ArticleType: Results[i]["ArticleType"],
-                                ArticleGroupId: Results[i]["ArticleGroupId"],
-                                ArticleGroup: Results[i]["ArticleGroup"],
-                                AccountId: Results[i]["AccountId"],
-                                Account: Results[i]["Account"],
-                                SalesAccountId: Results[i]["SalesAccountId"],
-                                CostAccountId: Results[i]["CostAccountId"],
-                                AssetAccountId: Results[i]["AssetAccountId"],
-                                ExpenseAccountId: Results[i]["ExpenseAccountId"],
-                                UnitId: Results[i]["UnitId"],
-                                OutputTaxId: Results[i]["OutputTaxId"],
-                                InputTaxId: Results[i]["InputTaxId"],
-                                WTaxTypeId: Results[i]["WTaxTypeId"],
-                                Price: Results[i]["Price"],
-                                Cost: Results[i]["Cost"],
-                                IsInventory: Results[i]["IsInventory"],
-                                Particulars: Results[i]["Particulars"],
-                                Address: Results[i]["Address"],
-                                TermId: Results[i]["TermId"],
-                                ContactNumber: Results[i]["ContactNumber"],
-                                ContactPerson: Results[i]["ContactPerson"],
-                                TaxNumber: Results[i]["TaxNumber"],
-                                CreditLimit: Results[i]["CreditLimit"],
-                                DateAcquired: Results[i]["DateAcquired"],
-                                UsefulLife: Results[i]["UsefulLife"],
-                                SalvageValue: Results[i]["SalvageValue"],
-                                ManualArticleOldCode: Results[i]["ManualArticleOldCode"],
-                                IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
-                                CreatedBy: Results[i]["CreatedBy"],
-                                CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
-                                UpdatedBy: Results[i]["UpdatedBy"],
-                                UpdatedDateTime: Results[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Article: results[i]["Article"]
                             });
                         }
                     }
@@ -297,71 +271,63 @@
         // ========================
         function getCollectionLines() {
             NProgress.start();
+            var collectionLinesObservableArray = new wijmo.collections.ObservableArray;
+
             var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
             var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
 
-            var collectionLinesObservableArray = new wijmo.collections.ObservableArray;
-            $.ajax({
-                url: '/api/listCollectionLineByDepositoryBankIdByORDate/' + cboBank.selectedValue + "/" + startDate + "/" + endDate,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (collectionLineResults) {
-                    var totalInTransitAmount = 0;
-                    if (collectionLineResults.length > 0) {
-                        for (i = 0; i < collectionLineResults.length; i++) {
-                            var inTransitAmount = collectionLineResults[i]["Amount"];
-                            if (collectionLineResults[i]["IsClear"]) {
-                                inTransitAmount = 0;
+            if (cboBank.selectedValue != null) {
+                var depositoryBankId = cboBank.selectedValue;
+
+                $.ajax({
+                    url: '/api/bankReconciliation/collectionLine/list/' + depositoryBankId + "/" + startDate + "/" + endDate,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var totalInTransitAmount = 0;
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var inTransitAmount = results[i]["Amount"];
+
+                                if (results[i]["IsClear"]) {
+                                    inTransitAmount = 0;
+                                }
+
+                                totalInTransitAmount += inTransitAmount;
+
+                                var ORDateResult = new Date(results[i]["ORDate"])
+                                var ORDate = ('0' + (ORDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + ORDateResult.getDate()).slice(-2) + '-' + ORDateResult.getFullYear();
+
+                                var CheckDateResult = new Date(results[i]["CheckDate"])
+                                var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
+
+                                collectionLinesObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    ORNumber: results[i]["ORNumber"],
+                                    ORDate: ORDate,
+                                    Customer: results[i]["Customer"],
+                                    PayType: results[i]["PayType"],
+                                    CheckNumber: results[i]["CheckNumber"],
+                                    CheckDate: CheckDate,
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsClear: results[i]["IsClear"],
+                                    InTransit: inTransitAmount,
+                                    InTransitDisplay: parseFloat(inTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsClearHtml: results[i]["IsClear"] == true ? "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i> Unclear</button>" : "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i> Clear</button>"
+                                });
                             }
-
-                            totalInTransitAmount += inTransitAmount;
-
-                            var ORDateResult = new Date(collectionLineResults[i]["ORDate"])
-                            var ORDate = ('0' + (ORDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + ORDateResult.getDate()).slice(-2) + '-' + ORDateResult.getFullYear();
-
-                            var CheckDateResult = new Date(collectionLineResults[i]["CheckDate"])
-                            var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
-
-                            collectionLinesObservableArray.push({
-                                Id: collectionLineResults[i]["Id"],
-                                ORId: collectionLineResults[i]["ORId"],
-                                OR: collectionLineResults[i]["OR"],
-                                ORDate: ORDate,
-                                Customer: collectionLineResults[i]["Customer"],
-                                BranchId: collectionLineResults[i]["BranchId"],
-                                Branch: collectionLineResults[i]["Branch"],
-                                AccountId: collectionLineResults[i]["AccountId"],
-                                Account: collectionLineResults[i]["Account"],
-                                ArticleId: collectionLineResults[i]["ArticleId"],
-                                Article: collectionLineResults[i]["Article"],
-                                SIId: collectionLineResults[i]["SIId"],
-                                SI: collectionLineResults[i]["SI"],
-                                Particulars: collectionLineResults[i]["Particulars"],
-                                Amount: collectionLineResults[i]["Amount"],
-                                AmountDisplay: parseFloat(collectionLineResults[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                PayTypeId: collectionLineResults[i]["PayTypeId"],
-                                PayType: collectionLineResults[i]["PayType"],
-                                CheckNumber: collectionLineResults[i]["CheckNumber"],
-                                CheckDate: CheckDate,
-                                CheckBank: collectionLineResults[i]["CheckBank"],
-                                DepositoryBankId: collectionLineResults[i]["DepositoryBankId"],
-                                DepositoryBank: collectionLineResults[i]["DepositoryBank"],
-                                IsClear: collectionLineResults[i]["IsClear"],
-                                InTransit: inTransitAmount,
-                                InTransitDisplay: parseFloat(inTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsClearHtml: collectionLineResults[i]["IsClear"] == true ? "<button class='btn btn-success btn-xs' onclick='unclearAmountIntransit()'><i class='fa fa-check'></i></button>" : "<button class='btn btn-default btn-xs' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i></button>"
-                            });
                         }
-                    } 
 
-                    document.getElementById("totalInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("bankReconciliationTotalDepositInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    NProgress.done();
+                        document.getElementById("totalInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("bankReconciliationTotalDepositInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        NProgress.done();
 
-                    createDisbursementFlexGrid();
-                }
-            });
+                        createDisbursementFlexGrid();
+                    }
+                });
+            }
 
             return collectionLinesObservableArray;
         }
@@ -378,7 +344,7 @@
                     columns: [
                         {
                             "header": "OR Number",
-                            "binding": "OR",
+                            "binding": "ORNumber",
                             "allowSorting": true,
                             "isReadOnly": true,
                             "width": 100
@@ -427,13 +393,13 @@
                             "width": "2*"
                         },
                         {
-                            "header": "C",
+                            "header": "Clear",
                             "binding": "IsClearHtml",
                             "allowSorting": true,
                             "isReadOnly": true,
                             "isContentHtml": true,
                             "align": "center",
-                            "width": 50
+                            "width": 80
                         },
                         {
                             "header": "In Transit",
@@ -442,6 +408,13 @@
                             "align": "right",
                             "isReadOnly": true,
                             "width": "2*"
+                        },
+                        {
+                            "header": "C",
+                            "binding": "IsClear",
+                            "allowSorting": true,
+                            "isReadOnly": true,
+                            "width": 45
                         },
                     ],
                 autoGenerateColumns: false,
@@ -461,16 +434,28 @@
             collectionLines.editItem(collectionLines.currentItem);
             var collectionLineItem = collectionLines.currentEditItem;
             $.ajax({
-                url: '/api/bankReconciliation/updateCollectionLines/' + collectionLineItem.Id + '/' + true,
+                url: '/api/bankReconciliation/collectionLine/update/isClearField/' + collectionLineItem.Id,
                 type: "PUT",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
-                    200: function () {
-                        toastr.success("Clear Successful");
-                        collectionLineItem.InTransit = 0;
-                        collectionLineItem.InTransitDisplay = formatDecimalValues(0);
-                        collectionLineItem.IsClearHtml = "<button class='btn btn-success btn-xs' onclick='unclearAmountIntransit()'><i class='fa fa-check'></i></button>";
+                    200: function (isClear) {
+                        if (isClear) {
+                            toastr.success("Clear Successful");
+
+                            collectionLineItem.InTransit = 0;
+                            collectionLineItem.InTransitDisplay = formatDecimalValues(0);
+                            collectionLineItem.IsClearHtml = "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i> Unclear</button>";
+                            collectionLineItem.IsClear = true;
+                        } else {
+                            toastr.success("Unclear Successful");
+
+                            collectionLineItem.InTransit = collectionLineItem.Amount;
+                            collectionLineItem.InTransitDisplay = parseFloat(collectionLineItem.Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            collectionLineItem.IsClearHtml = "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i> Clear</button>";
+                            collectionLineItem.IsClear = false;
+                        }
+
                         collectionLines.refresh();
                         collectionLineGrid.refresh();
 
@@ -484,51 +469,14 @@
 
                         computeEndingBalancePerBank();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
-                    }
-                }
-            });
-        }
-
-        // ==========================
-        // Unclear Amount - Intransit
-        // ==========================
-        function unclearAmountIntransit() {
-            collectionLines.editItem(collectionLines.currentItem);
-            var collectionLineItem = collectionLines.currentEditItem;
-            $.ajax({
-                url: '/api/bankReconciliation/updateCollectionLines/' + collectionLineItem.Id + '/' + false,
-                type: "PUT",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Unclear Successful");
-                        collectionLineItem.InTransit = collectionLineItem.Amount;
-                        collectionLineItem.InTransitDisplay = parseFloat(collectionLineItem.Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        collectionLineItem.IsClearHtml = "<button class='btn btn-default btn-xs' onclick='clearAmountIntransit()'><i class='fa fa-eraser'></i></button>";
-                        collectionLines.refresh();
-                        collectionLineGrid.refresh();
-
-                        var totalInTransitValue = 0;
-                        for (i = 0; i < collectionLines.items.length; i++) {
-                            totalInTransitValue += collectionLines.items[i]["InTransit"];
-                        }
-
-                        document.getElementById("totalInTransit").value = parseFloat(totalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalDepositInTransit").value = parseFloat(totalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-                        computeEndingBalancePerBank();
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                     },
-                    404: function () {
-                        toastr.error("Not Found");
-                    },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                     }
                 }
             });
@@ -539,81 +487,63 @@
         // ================
         function getDisbursement() {
             NProgress.start();
+            var disbursementsObservableArray = new wijmo.collections.ObservableArray;
+
             var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
             var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
 
-            var disbursementsObservableArray = new wijmo.collections.ObservableArray;
-            $.ajax({
-                url: '/api/listDisbursementByBankIdByCVDate/' + cboBank.selectedValue + '/' + startDate + '/' + endDate,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (disbursementResults) {
-                    var totalOutStanding = 0;
-                    if (disbursementResults.length > 0) {
-                        var totalOutStandingAmount = 0;
-                        for (i = 0; i < disbursementResults.length; i++) {
-                            var outstandingAmount = disbursementResults[i]["Amount"];
-                            if (disbursementResults[i]["IsClear"]) {
-                                outstandingAmount = 0;
+            if (cboBank.selectedValue != null) {
+                var bankId = cboBank.selectedValue;
+
+                $.ajax({
+                    url: '/api/bankReconciliation/disbursement/list/' + bankId + '/' + startDate + '/' + endDate,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var totalOutStanding = 0;
+                        if (results.length > 0) {
+                            var totalOutStandingAmount = 0;
+                            for (i = 0; i < results.length; i++) {
+                                var outstandingAmount = results[i]["Amount"];
+                                if (results[i]["IsClear"]) {
+                                    outstandingAmount = 0;
+                                }
+
+                                totalOutStanding += outstandingAmount;
+
+                                var CVDateResult = new Date(results[i]["CVDate"])
+                                var CVDate = ('0' + (CVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CVDateResult.getDate()).slice(-2) + '-' + CVDateResult.getFullYear();
+
+                                var CheckDateResult = new Date(results[i]["CheckDate"])
+                                var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
+
+                                disbursementsObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    CVNumber: results[i]["CVNumber"],
+                                    CVDate: CVDate,
+                                    Payee: results[i]["Payee"],
+                                    PayType: results[i]["PayType"],
+                                    CheckNumber: results[i]["CheckNumber"],
+                                    CheckDate: CheckDate,
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsClear: results[i]["IsClear"],
+                                    IsClearHtml: results[i]["IsClear"] == true ? "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i> Unclear</button>" : "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i> Clear</button>",
+                                    OutstandingAmount: outstandingAmount,
+                                    OutstandingAmountDisplay: parseFloat(outstandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                });
                             }
-
-                            totalOutStanding += outstandingAmount;
-
-                            var CVDateResult = new Date(disbursementResults[i]["CVDate"])
-                            var CVDate = ('0' + (CVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CVDateResult.getDate()).slice(-2) + '-' + CVDateResult.getFullYear();
-
-                            var CheckDateResult = new Date(disbursementResults[i]["CheckDate"])
-                            var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
-
-                            disbursementsObservableArray.push({
-                                Id: disbursementResults[i]["Id"],
-                                BranchId: disbursementResults[i]["BranchId"],
-                                Branch: disbursementResults[i]["Branch"],
-                                CVNumber: disbursementResults[i]["CVNumber"],
-                                CVDate: CVDate,
-                                SupplierId: disbursementResults[i]["SupplierId"],
-                                Supplier: disbursementResults[i]["Supplier"],
-                                Payee: disbursementResults[i]["Payee"],
-                                PayTypeId: disbursementResults[i]["PayTypeId"],
-                                PayType: disbursementResults[i]["PayType"],
-                                BankId: disbursementResults[i]["BankId"],
-                                Bank: disbursementResults[i]["Bank"],
-                                ManualCVNumber: disbursementResults[i]["ManualCVNumber"],
-                                Particulars: disbursementResults[i]["Particulars"],
-                                CheckNumber: disbursementResults[i]["CheckNumber"],
-                                CheckDate: CheckDate,
-                                Amount: disbursementResults[i]["Amount"],
-                                AmountDisplay: parseFloat(disbursementResults[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsCrossCheck: disbursementResults[i]["IsCrossCheck"],
-                                IsClear: disbursementResults[i]["IsClear"],
-                                PreparedById: disbursementResults[i]["PreparedById"],
-                                PreparedBy: disbursementResults[i]["PreparedBy"],
-                                CheckedById: disbursementResults[i]["CheckedById"],
-                                CheckedBy: disbursementResults[i]["CheckedBy"],
-                                ApprovedById: disbursementResults[i]["ApprovedById"],
-                                ApprovedBy: disbursementResults[i]["ApprovedBy"],
-                                IsLocked: disbursementResults[i]["IsLocked"],
-                                CreatedById: disbursementResults[i]["CreatedById"],
-                                CreatedBy: disbursementResults[i]["CreatedBy"],
-                                CreatedDateTime: disbursementResults[i]["CreatedDateTime"],
-                                UpdatedById: disbursementResults[i]["UpdatedById"],
-                                UpdatedBy: disbursementResults[i]["UpdatedBy"],
-                                UpdatedDateTime: disbursementResults[i]["UpdatedDateTime"],
-                                IsClearHtml: disbursementResults[i]["IsClear"] == true ? "<button class='btn btn-success btn-xs' onclick='unclearAmountOutstanding()'><i class='fa fa-check'></i></button>" : "<button class='btn btn-default btn-xs' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i></button>",
-                                OutstandingAmount: outstandingAmount,
-                                OutstandingAmountDisplay: parseFloat(outstandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                            });
                         }
+
+                        document.getElementById("totalOutstanding").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        NProgress.done();
+
+                        createJournalVoucherFlexGrid();
                     }
-
-                    document.getElementById("totalOutstanding").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    NProgress.done();
-
-                    createJournalVoucherFlexGrid();
-                }
-            });
+                });
+            }
 
             return disbursementsObservableArray;
         }
@@ -678,13 +608,13 @@
                             "width": "2*"
                         },
                         {
-                            "header": "C",
+                            "header": "Clear",
                             "binding": "IsClearHtml",
                             "allowSorting": true,
                             "isReadOnly": true,
                             "isContentHtml": true,
                             "align": "center",
-                            "width": 50
+                            "width": 80
                         },
                         {
                             "header": "Outstanding",
@@ -693,6 +623,13 @@
                             "align": "right",
                             "isReadOnly": true,
                             "width": "2*"
+                        },
+                        {
+                            "header": "C",
+                            "binding": "IsClear",
+                            "allowSorting": true,
+                            "isReadOnly": true,
+                            "width": 45
                         },
                     ],
                 autoGenerateColumns: false,
@@ -712,16 +649,28 @@
             disbursements.editItem(disbursements.currentItem);
             var disbursementItem = disbursements.currentEditItem;
             $.ajax({
-                url: '/api/bankReconciliation/updateDisbursement/' + disbursementItem.Id + '/' + true,
+                url: '/api/bankReconciliation/disbursement/update/isClearField/' + disbursementItem.Id,
                 type: "PUT",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
-                    200: function () {
-                        toastr.success("Clear Successful");
-                        disbursementItem.OutstandingAmount = 0;
-                        disbursementItem.OutstandingAmountDisplay = formatDecimalValues(0);
-                        disbursementItem.IsClearHtml = "<button class='btn btn-success btn-xs' onclick='unclearAmountOutstanding()'><i class='fa fa-check'></i></button>";
+                    200: function (isClear) {
+                        if (isClear) {
+                            toastr.success("Clear Successful");
+
+                            disbursementItem.OutstandingAmount = 0;
+                            disbursementItem.OutstandingAmountDisplay = formatDecimalValues(0);
+                            disbursementItem.IsClearHtml = "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i> Unclear</button>";
+                            disbursementItem.IsClear = true;
+                        } else {
+                            toastr.success("Unclear Successful");
+
+                            disbursementItem.OutstandingAmount = disbursementItem.Amount;
+                            disbursementItem.OutstandingAmountDisplay = parseFloat(disbursementItem.Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            disbursementItem.IsClearHtml = "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i> Clear</button>";
+                            disbursementItem.IsClear = false;
+                        }
+
                         disbursements.refresh();
                         disbursementGrid.refresh();
 
@@ -735,53 +684,14 @@
 
                         computeEndingBalancePerBank();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
-                    }
-                }
-            });
-        }
-
-        // ==========================
-        // Unclear Outstanding Amount 
-        // ==========================
-        function unclearAmountOutstanding() {
-            disbursements.editItem(disbursements.currentItem);
-            var disbursementItem = disbursements.currentEditItem;
-            disbursements.editItem(disbursements.currentItem);
-            var disbursementItem = disbursements.currentEditItem;
-            $.ajax({
-                url: '/api/bankReconciliation/updateDisbursement/' + disbursementItem.Id + '/' + false,
-                type: "PUT",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Unclear Successful");
-                        disbursementItem.OutstandingAmount = disbursementItem.Amount;
-                        disbursementItem.OutstandingAmountDisplay = parseFloat(disbursementItem.Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        disbursementItem.IsClearHtml = "<button class='btn btn-default btn-xs' onclick='clearAmountOutstanding()'><i class='fa fa-eraser'></i></button>";
-                        disbursements.refresh();
-                        disbursementGrid.refresh();
-
-                        var totalOutStandingAmount = 0;
-                        for (i = 0; i < disbursements.items.length; i++) {
-                            totalOutStandingAmount += disbursements.items[i]["OutstandingAmount"];
-                        }
-
-                        document.getElementById("totalOutstanding").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-                        computeEndingBalancePerBank();
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                     },
-                    404: function () {
-                        toastr.error("Not Found");
-                    },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                     }
                 }
             });
@@ -792,69 +702,61 @@
         // ========================
         function getJournalVoucherLine() {
             NProgress.start();
+            var journalVoucherLinesObservableArray = new wijmo.collections.ObservableArray;
+
             var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
             var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
 
-            var journalVoucherLinesObservableArray = new wijmo.collections.ObservableArray;
-            $.ajax({
-                url: '/api/listJournalVoucherLineByJVDate/' + cboBank.selectedValue + '/' + startDate + '/' + endDate,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (Results) {
-                    var totalAdjustmentsAmount = 0;
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
-                            var balance = Results[i]["DebitAmount"] - Results[i]["CreditAmount"]
-                            var adjusmentAmount = balance;
-                            if (Results[i]["IsClear"] == true) {
-                                adjusmentAmount = 0;
+            if (cboBank.selectedValue != null) {
+                var articleId = cboBank.selectedValue;
+
+                $.ajax({
+                    url: '/api/bankReconciliation/journalVoucherLine/list/' + articleId + '/' + startDate + '/' + endDate,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var totalAdjustmentsAmount = 0;
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var balance = results[i]["DebitAmount"] - results[i]["CreditAmount"]
+                                var adjusmentAmount = balance;
+                                if (results[i]["IsClear"] == true) {
+                                    adjusmentAmount = 0;
+                                }
+
+                                totalAdjustmentsAmount += adjusmentAmount;
+
+                                var JVDateResult = new Date(results[i]["JVDate"])
+                                var JVDate = ('0' + (JVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + JVDateResult.getDate()).slice(-2) + '-' + JVDateResult.getFullYear();
+
+                                journalVoucherLinesObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    JVNumber: results[i]["JVNumber"],
+                                    JVDate: JVDate,
+                                    Particulars: results[i]["Particulars"],
+                                    DebitAmount: results[i]["DebitAmount"],
+                                    DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    CreditAmount: results[i]["CreditAmount"],
+                                    CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    BalanceAmount: results[i]["BalanceAmount"],
+                                    BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsClear: results[i]["IsClear"],
+                                    IsClearHtml: results[i]["IsClear"] == true ? "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i> Unclear</button>" : "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i> Clear</button>",
+                                    Adjustments: adjusmentAmount,
+                                    AdjustmentsDisplay: parseFloat(adjusmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                });
                             }
-
-                            totalAdjustmentsAmount += adjusmentAmount;
-
-                            var JVDateResult = new Date(Results[i]["JVDate"])
-                            var JVDate = ('0' + (JVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + JVDateResult.getDate()).slice(-2) + '-' + JVDateResult.getFullYear();
-
-                            journalVoucherLinesObservableArray.push({
-                                Id: Results[i]["Id"],
-                                JVId: Results[i]["JVId"],
-                                JVNumber: Results[i]["JVNumber"],
-                                JVDate: JVDate,
-                                JVParticulars: Results[i]["JVParticulars"],
-                                BranchId: Results[i]["BranchId"],
-                                Branch: Results[i]["Branch"],
-                                AccountId: Results[i]["AccountId"],
-                                Account: Results[i]["Account"],
-                                ArticleId: Results[i]["ArticleId"],
-                                Article: Results[i]["Article"],
-                                Particulars: Results[i]["Particulars"],
-                                DebitAmount: Results[i]["DebitAmount"],
-                                DebitAmountDisplay: parseFloat(Results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                CreditAmount: Results[i]["CreditAmount"],
-                                CreditAmountDisplay: parseFloat(Results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Balance: balance,
-                                BalanceDisplay: parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                APRRId: Results[i]["APRRId"],
-                                APRR: Results[i]["APRR"],
-                                APRRBranch: Results[i]["APRRBranch"],
-                                ARSIId: Results[i]["ARSIId"],
-                                ARSI: Results[i]["ARSI"],
-                                ARSIBranch: Results[i]["ARSIBranch"],
-                                IsClear: Results[i]["IsClear"],
-                                IsClearHtml: Results[i]["IsClear"] == true ? "<button class='btn btn-success btn-xs' onclick='unclearAmountBalance()'><i class='fa fa-check'></i></button>" : "<button class='btn btn-default btn-xs' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i></button>",
-                                Adjustments: adjusmentAmount,
-                                AdjustmentsDisplay: parseFloat(adjusmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                            });
                         }
-                    }
 
-                    document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    computeEndingBalancePerBank();
-                    NProgress.done();
-                }
-            });
+                        document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        computeEndingBalancePerBank();
+                        NProgress.done();
+                    }
+                });
+
+            }
 
             return journalVoucherLinesObservableArray;
         }
@@ -884,7 +786,7 @@
                     },
                     {
                         "header": "Particulars",
-                        "binding": "JVParticulars",
+                        "binding": "Particulars",
                         "allowSorting": true,
                         "isReadOnly": true,
                         "width": "3*"
@@ -907,20 +809,20 @@
                     },
                     {
                         "header": "Balance",
-                        "binding": "BalanceDisplay",
+                        "binding": "BalanceAmountDisplay",
                         "allowSorting": true,
                         "align": "right",
                         "isReadOnly": true,
                         "width": "2*"
                     },
                     {
-                        "header": "C",
+                        "header": "Clear",
                         "binding": "IsClearHtml",
                         "allowSorting": true,
                         "isReadOnly": true,
                         "isContentHtml": true,
                         "align": "center",
-                        "width": 50
+                        "width": 80
                     },
                     {
                         "header": "Adjustments",
@@ -929,6 +831,13 @@
                         "align": "right",
                         "isReadOnly": true,
                         "width": "2*"
+                    },
+                    {
+                        "header": "C",
+                        "binding": "IsClear",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": 45
                     },
                 ],
                 autoGenerateColumns: false,
@@ -948,16 +857,28 @@
             journalVoucherLines.editItem(journalVoucherLines.currentItem);
             var journalVoucherLineItem = journalVoucherLines.currentEditItem;
             $.ajax({
-                url: '/api/bankReconciliation/updateJournalVoucherLines/' + journalVoucherLineItem.Id + '/' + true,
+                url: '/api/bankReconciliation/journalVoucherLine/update/isClearField/' + journalVoucherLineItem.Id,
                 type: "PUT",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
-                    200: function () {
-                        toastr.success("Clear Successful");
-                        journalVoucherLineItem.Adjustments = 0;
-                        journalVoucherLineItem.AdjustmentsDisplay = formatDecimalValues(0);
-                        journalVoucherLineItem.IsClearHtml = "<button class='btn btn-success btn-xs' onclick='unclearAmountBalance()'><i class='fa fa-check'></i></button>";
+                    200: function (isClear) {
+                        if (isClear) {
+                            toastr.success("Clear Successful");
+
+                            journalVoucherLineItem.Adjustments = 0;
+                            journalVoucherLineItem.AdjustmentsDisplay = formatDecimalValues(0);
+                            journalVoucherLineItem.IsClearHtml = "<button class='btn btn-default btn-xs btn-block' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i> Unclear</button>";
+                            journalVoucherLineItem.IsClear = true;
+                        } else {
+                            toastr.success("Unclear Successful");
+
+                            journalVoucherLineItem.Adjustments = journalVoucherLineItem.BalanceAmount;
+                            journalVoucherLineItem.AdjustmentsDisplay = parseFloat(journalVoucherLineItem.BalanceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            journalVoucherLineItem.IsClearHtml = "<button class='btn btn-primary btn-xs btn-block' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i> Clear</button>";
+                            journalVoucherLineItem.IsClear = false;
+                        }
+
                         journalVoucherLines.refresh();
                         journalVoucherLineGrid.refresh();
 
@@ -968,57 +889,22 @@
 
                         document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
                         computeEndingBalancePerBank();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                     }
                 }
             });
         }
-
-        // ======================
-        // Unclear Balance Amount
-        // ======================
-        function unclearAmountBalance() {
-            journalVoucherLines.editItem(journalVoucherLines.currentItem);
-            var journalVoucherLineItem = journalVoucherLines.currentEditItem;
-            $.ajax({
-                url: '/api/bankReconciliation/updateJournalVoucherLines/' + journalVoucherLineItem.Id + '/' + false,
-                type: "PUT",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Unclear Successful");
-                        journalVoucherLineItem.Adjustments = journalVoucherLineItem.Balance;
-                        journalVoucherLineItem.AdjustmentsDisplay = parseFloat(journalVoucherLineItem.Balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        journalVoucherLineItem.IsClearHtml = "<button class='btn btn-default btn-xs' onclick='clearAmountBalance()'><i class='fa fa-eraser'></i></button>";
-                        journalVoucherLines.refresh();
-                        journalVoucherLineGrid.refresh();
-
-                        var totalAdjustmentAmount = 0;
-                        for (i = 0; i < journalVoucherLines.items.length; i++) {
-                            totalAdjustmentAmount += journalVoucherLines.items[i]["Adjustments"];
-                        }
-
-                        document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        computeEndingBalancePerBank();
-                    },
-                    404: function () {
-                        toastr.error("Not Found");
-                    },
-                    400: function () {
-                        toastr.error("Bad Request");
-                    }
-                }
-            });
-        }
-
+        
         // ===============================
         // Compute Ending Balance Per Bank
         // ===============================
@@ -1105,12 +991,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesResults) {
-                    if (userBranchesResults.length > 0) {
-                        for (i = 0; i < userBranchesResults.length; i++) {
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesResults[i]["BranchId"],
-                                Branch: userBranchesResults[i]["Branch"]
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
                             });
                         }
                     }
