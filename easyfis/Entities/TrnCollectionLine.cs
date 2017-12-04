@@ -9,6 +9,9 @@ namespace easyfis.Entities
     {
         public Int32 Id { get; set; }
         public Int32 ORId { get; set; }
+        public String ORNumber { get; set; }
+        public String ORDate { get; set; }
+        public String Customer { get; set; }
         public Int32 BranchId { get; set; }
         public String Branch { get; set; }
         public Int32 AccountId { get; set; }

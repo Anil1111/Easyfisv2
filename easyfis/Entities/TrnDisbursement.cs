@@ -15,6 +15,7 @@ namespace easyfis.Entities
         public String Supplier { get; set; }
         public String Payee { get; set; }
         public Int32 PayTypeId { get; set; }
+        public String PayType { get; set; }
         public Int32 BankId { get; set; }
         public String ManualCVNumber { get; set; }
         public String Particulars { get; set; }

@@ -386,6 +386,15 @@ namespace easyfis.Controllers
             return UserRights("BankList");
         }
 
+        // ===================
+        // Bank Reconciliation
+        // ===================
+        [Authorize]
+        public ActionResult BankReconciliation()
+        {
+            return UserRights("BankReconciliation");
+        }
+
         // =======
         // Company
         // =======
@@ -1031,23 +1040,6 @@ namespace easyfis.Controllers
         public ActionResult UsersDetail()
         {
             if (PageAccess("UserDetail").Equals("UserDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-
-
-        // ===================
-        // Bank Reconciliation
-        // ===================
-        [Authorize]
-        public ActionResult BankReconciliation()
-        {
-            if (PageAccess("BankReconciliation").Equals("BankReconciliation"))
             {
                 return View();
             }
