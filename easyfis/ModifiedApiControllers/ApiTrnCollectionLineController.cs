@@ -45,6 +45,7 @@ namespace easyfis.ModifiedApiControllers
                                       CheckBank = d.CheckBank,
                                       DepositoryBankId = d.DepositoryBankId,
                                       DepositoryBank = d.MstArticle1.Article,
+                                      IsClear = d.IsClear
                                   };
 
             return collectionLines.ToList();

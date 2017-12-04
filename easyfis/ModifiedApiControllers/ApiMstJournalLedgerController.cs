@@ -27,6 +27,14 @@ namespace easyfis.ModifiedApiControllers
                                          select new Entities.TrnJournal
                                          {
                                              DocumentReference = d.DocumentReference,
+                                             ORId = d.ORId,
+                                             CVId = d.CVId,
+                                             JVId = d.JVId,
+                                             RRId = d.RRId,
+                                             SIId = d.SIId,
+                                             INId = d.INId,
+                                             OTId = d.OTId,
+                                             STId = d.STId,
                                              JournalDate = d.JournalDate.ToShortDateString(),
                                              Particulars = d.Particulars,
                                              DebitAmount = d.DebitAmount,
@@ -49,6 +57,14 @@ namespace easyfis.ModifiedApiControllers
                                          select new Entities.TrnJournal
                                          {
                                              DocumentReference = d.DocumentReference,
+                                             ORId = d.ORId,
+                                             CVId = d.CVId,
+                                             JVId = d.JVId,
+                                             RRId = d.RRId,
+                                             SIId = d.SIId,
+                                             INId = d.INId,
+                                             OTId = d.OTId,
+                                             STId = d.STId,
                                              JournalDate = d.JournalDate.ToShortDateString(),
                                              Particulars = d.Particulars,
                                              DebitAmount = d.DebitAmount,

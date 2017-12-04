@@ -750,8 +750,37 @@
                             var JournalDateResult = new Date(results[i]["JournalDate"])
                             var JournalDate = ('0' + (JournalDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + JournalDateResult.getDate()).slice(-2) + '-' + JournalDateResult.getFullYear();
 
+                            var drillDownTransactionLink = "";
+
+                            if (results[i]["ORId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/CollectionDetail?id=" + results[i]["ORId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["CVId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/DisbursementDetail?id=" + results[i]["CVId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["JVId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/JournalVoucherDetail?id=" + results[i]["JVId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["RRId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/ReceivingReceiptDetail?id=" + results[i]["RRId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["SIId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/SalesDetail?id=" + results[i]["SIId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["INId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/StockInDetail?id=" + results[i]["INId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["OTId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/StockOutDetail?id=" + results[i]["OTId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            } else if (results[i]["STId"] != null) {
+                                drillDownTransactionLink = "<a href='/Software/StockTransferDetail?id=" + results[i]["STId"] + "' target='_blank' class='btn btn-primary btn-xs'> <i class='fa fa-edit'> Detail</i></a>";
+                            }
+
                             journalLedgersObservableArray.push({
                                 DocumentReference: results[i]["DocumentReference"],
+                                TransactionLink: drillDownTransactionLink,
+                                ORId: results[i]["ORId"],
+                                CVId: results[i]["CVId"],
+                                JVId: results[i]["JVId"],
+                                RRId: results[i]["RRId"],
+                                SIId: results[i]["SIId"],
+                                INId: results[i]["INId"],
+                                OTId: results[i]["OTId"],
+                                STId: results[i]["STId"],
                                 JournalDate: JournalDate,
                                 Particulars: results[i]["Particulars"],
                                 DebitAmount: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -906,6 +935,15 @@
             journalLedgerGrid = new wijmo.grid.FlexGrid('#JournalLedgerGrid');
             journalLedgerGrid.initialize({
                 columns: [
+                    {
+                        "header": "Detail",
+                        "binding": "TransactionLink",
+                        "width": 70,
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
                     {
                         "header": "Document Reference",
                         "binding": "DocumentReference",
