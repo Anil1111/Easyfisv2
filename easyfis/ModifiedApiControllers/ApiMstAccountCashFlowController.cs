@@ -69,7 +69,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 AccountCashFlowCode = objAccountCashFlow.AccountCashFlowCode,
                                 AccountCashFlow = objAccountCashFlow.AccountCashFlow,
-                                IsLocked = objAccountCashFlow.IsLocked,
+                                IsLocked = true,
                                 CreatedById = currentUserId,
                                 CreatedDateTime = DateTime.Now,
                                 UpdatedById = currentUserId,
@@ -138,7 +138,7 @@ namespace easyfis.ModifiedApiControllers
 
                                 updateAccountCashFlow.AccountCashFlowCode = objAccountCashFlow.AccountCashFlowCode;
                                 updateAccountCashFlow.AccountCashFlow = objAccountCashFlow.AccountCashFlow;
-                                updateAccountCashFlow.IsLocked = objAccountCashFlow.IsLocked;
+                                updateAccountCashFlow.IsLocked = true;
                                 updateAccountCashFlow.UpdatedById = currentUserId;
                                 updateAccountCashFlow.UpdatedDateTime = DateTime.Now;
 

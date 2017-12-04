@@ -254,12 +254,12 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="accountModalLabel">Account <span id="accountLockAndUnLock"></span> </h4>
+                    <h4 class="modal-title" id="accountModalLabel">Account</h4>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
                         <li role="presentation" class="active"><a data-toggle="tab" href="#accountDetailAccount" id="accountDetailAccountTab">Account</a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#accountDetailArticleType" id="accountDetailArticleTypeTab">Article Type</a></li>
+                        <li role="presentation"><a data-toggle="tab" href="#accountDetailArticleType" id="accountDetailArticleTypeTab">Account Article Type</a></li>
                     </ul>
                     <br />
                     <div class="tab-content">
@@ -269,16 +269,14 @@
                             </center>
                             <div id="AccountDetailForm">
                                 <dl class="dl-horizontal">
-                                    <dt>Account Code</dt>
+                                    <dt>Code</dt>
                                     <dd><input type="text" class="form-control requiredAccount" maxlength="4" id="account_code" placeholder="Code" /></dd>
                                     <dt>Account</dt>
                                     <dd><input type="text" class="form-control requiredAccount" id="account_account" placeholder="Account" /></dd>
                                     <dt>Account Type</dt>
                                     <dd><div id="cboAccountType" class="comboBox-wide"></div></dd>
-                                    <dt>Cash Flow</dt>
+                                    <dt>Account Cash Flow</dt>
                                     <dd><div id="cboAccountCashFlow" class="comboBox-wide"></div></dd>
-                                    <dt>Lock</dt>
-                                    <dd><input type="checkbox" id="accountEdit_IsLocked" /></dd>
                                 </dl>
                             </div>
                         </div>
@@ -398,7 +396,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="accountTypeModalLabel">Account Type <span id="accountTypeLockAndUnLock"></span> </h4>
+                    <h4 class="modal-title" id="accountTypeModalLabel">Account Type</h4>
                 </div>
                 <div class="modal-body">
                     <center>
@@ -406,16 +404,14 @@
                     </center>
                     <div id="AccountTypeDetailForm">
                         <dl class="dl-horizontal">
-                            <dt>Account Type Code</dt>
+                            <dt>Code</dt>
                             <dd><input type="text" class="form-control  requiredAccountType" id="accountType_code" placeholder="Code" /></dd>
                             <dt>Account Type</dt>
                             <dd><input type="text" class="form-control  requiredAccountType" id="accountType_accountType" placeholder="Account Type" /></dd>
-                            <dt>Category</dt>
+                            <dt>Account Category</dt>
                             <dd><div id="cboAccountCategory" class="comboBox-wide"></div></dd>
                             <dt>Category Description</dt>
                             <dd><input type="text" class="form-control  requiredAccountType" id="accountType_SubCategoryDescription" placeholder="Sub-Category Description" /></dd>
-                            <dt>Lock </dt>
-                            <dd><input type="checkbox" id="accountTypeEdit_IsLocked" /></dd>
                         </dl>
                     </div>
                 </div>
@@ -454,7 +450,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="accountCashFlowModalLabel">Account Cash Flow <span id="accountCashFlowLockAndUnLock"></span></h4>
+                    <h4 class="modal-title" id="accountCashFlowModalLabel">Account Cash Flow</h4>
                 </div>
                 <div class="modal-body">
                     <center>
@@ -462,12 +458,10 @@
                     </center>
                     <div id="AccountCashFlowDetailForm">
                         <dl class="dl-horizontal">
-                            <dt>Cash Flow Code</dt>
+                            <dt>Code</dt>
                             <dd><input type="text" class="form-control  requiredAccountCashFlow" id="accountCashFlow_Code" placeholder="Code" /></dd>
-                            <dt>Cash Flow</dt>
+                            <dt>Account Cash Flow</dt>
                             <dd><input type="text" class="form-control  requiredAccountCashFlow" id="accountCashFlow_CashFlow" placeholder="Cash FLow" /></dd>
-                            <dt>Lock </dt>
-                            <dd><input type="checkbox" id="accountCashFlowEdit_IsLocked" /></dd>
                         </dl>
                     </div>
                 </div>
@@ -506,7 +500,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="accountCategoryModalLabel">Account Category <span id="accountCategoryLockAndUnLock"></span></h4>
+                    <h4 class="modal-title" id="accountCategoryModalLabel">Account Category</h4>
                 </div>
                 <div class="modal-body">
                     <center>
@@ -515,12 +509,10 @@
                     <div id="AccountCategoryDetailForm">
                         <input type="hidden" id="accountCategory_Id" />
                         <dl class="dl-horizontal">
-                            <dt>Category Code</dt>
+                            <dt>Code</dt>
                             <dd><input type="text" class="form-control  requiredAccountCategory" id="accountCategory_Code" placeholder="Code" /></dd>
-                            <dt>Category</dt>
+                            <dt>Account Category</dt>
                             <dd><input type="text" class="form-control  requiredAccountCategory" id="accountCategory_Category" placeholder="Category" /></dd>
-                            <dt>Lock </dt>
-                            <dd><input type="checkbox" id="accountCategoryEdit_IsLocked" /></dd>
                         </dl>
                     </div>
                 </div>
@@ -572,12 +564,11 @@
         var accountArticleTypeId = 0;
         var articleTypes;
         var cboForArticleType = new wijmo.input.ComboBox('#cboArticleType');
-        var Islocked = false;
 
         // ==============================
         // GET Account Type for Combo Box
         // ==============================
-        function getAccountTypeForComboBox(accountTypeId, accountCashFlowId, accountIsLocked) {
+        function getAccountTypeForComboBox(accountTypeId, accountCashFlowId) {
             var accountTypesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/chartOfAccounts/account/dropdown/list/accountType',
@@ -596,9 +587,7 @@
 
                     var disabled = true;
                     if (results.length > 0) {
-                        if (!accountIsLocked) {
-                            disabled = false;
-                        }
+                        disabled = false;
                     }
 
                     cboAccountType.dispose();
@@ -611,7 +600,7 @@
                         selectedValue: accountTypeId
                     });
 
-                    getAccountCashFlowForComboBox(accountCashFlowId, accountIsLocked);
+                    getAccountCashFlowForComboBox(accountCashFlowId);
                 }
             });
         }
@@ -619,7 +608,7 @@
         // ===================================
         // GET Account Cash Flow for Combo Box
         // ===================================
-        function getAccountCashFlowForComboBox(accountCashFlowId, accountIsLocked) {
+        function getAccountCashFlowForComboBox(accountCashFlowId) {
             var accountCashFlowsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/chartOfAccounts/account/dropdown/list/accountCashFlow',
@@ -638,9 +627,7 @@
 
                     var disabled = true;
                     if (results.length > 0) {
-                        if (!accountIsLocked) {
-                            disabled = false;
-                        }
+                        disabled = false;
                     }
 
                     cboAccountCashFlow.dispose();
@@ -745,7 +732,6 @@
             document.getElementById("loadingModalAccount").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
             $("#AccountDetailForm").hide();
 
-            document.getElementById("accountLockAndUnLock").innerHTML = '<i class="fa fa-unlock"></i>';
             document.getElementById('cmdSaveAccountButton').innerHTML = "<i class='fa fa-save'></i> Save";
             $("#cmdSaveAccountButton").prop("disabled", true);
             $("#cmdAccountDetailCloseButton").prop("disabled", false);
@@ -756,8 +742,7 @@
             accountId = 0;
             document.getElementById('account_code').value = "NA";
             document.getElementById('account_account').value = "NA";
-            getAccountTypeForComboBox(0, 0, false);
-            document.getElementById('accountEdit_IsLocked').checked = false;
+            getAccountTypeForComboBox(0, 0);
 
             $("#loadingAccountArtitleType").hide();
             $("#accountArticleTypeDiv").hide();
@@ -792,22 +777,11 @@
             accountId = account.Id;
             document.getElementById('account_code').value = account.AccountCode;
             document.getElementById('account_account').value = account.Account;
-            getAccountTypeForComboBox(account.AccountTypeId, account.AccountCashFlowId, account.IsLocked);
-            document.getElementById('accountEdit_IsLocked').checked = account.IsLocked;
+            getAccountTypeForComboBox(account.AccountTypeId, account.AccountCashFlowId);
 
-            if (account.IsLocked) {
-                Islocked = true;
-                document.getElementById('account_code').disabled = true;
-                document.getElementById('account_account').disabled = true;
-                document.getElementById("accountLockAndUnLock").innerHTML = '<i class="fa fa-lock"></i>';
-                $('#btnAddACcountArticleType').prop('disabled', true);
-            } else {
-                Islocked = false;
-                document.getElementById('account_code').disabled = false;
-                document.getElementById('account_account').disabled = false;
-                document.getElementById("accountLockAndUnLock").innerHTML = '<i class="fa fa-unlock"></i>';
-                $('#btnAddACcountArticleType').prop('disabled', false);
-            }
+            document.getElementById('account_code').disabled = false;
+            document.getElementById('account_account').disabled = false;
+            $('#btnAddACcountArticleType').prop('disabled', false);
 
             $("#loadingAccountArtitleType").show();
             document.getElementById("loadingAccountArtitleType").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -827,7 +801,6 @@
             accountObject.Account = document.getElementById('account_account').value;
             accountObject.AccountTypeId = cboAccountType.selectedValue;
             accountObject.AccountCashFlowId = cboAccountCashFlow.selectedValue;
-            accountObject.IsLocked = document.getElementById('accountEdit_IsLocked').checked;
             var data = JSON.stringify(accountObject);
 
             if (accountEntryValidation()) {
@@ -918,18 +891,15 @@
         function cmdAccountDeleteButton_OnClick() {
             accounts.editItem(accounts.currentItem);
             var account = accounts.currentEditItem;
-            if (account.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteAccountConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById('cmdConfirmDeleteAccount').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteAccount").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButtonAccount").prop("disabled", false);
-            }
+            $('#deleteAccountConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteAccount').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteAccount").prop("disabled", false);
+            $("#cmdConfirmDeleteCloseButtonAccount").prop("disabled", false);
         }
 
         // Account Confirm Delete Button
@@ -1037,10 +1007,6 @@
                         for (i = 0; i < results.length; i++) {
                             var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditAccountArticleType_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
                             var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteAccountArticleType_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
-                            if (document.getElementById('accountEdit_IsLocked').checked) {
-                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditAccountArticleType_OnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
-                                btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteAccountArticleType_OnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
-                            }
 
                             accountArticleTypesObservableArray.push({
                                 EditId: btnEditId,
@@ -1419,12 +1385,6 @@
                                 "binding": "AccountType",
                                 "allowSorting": true,
                                 "width": "3*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
                             }
                 ],
                 autoGenerateColumns: false,
@@ -1530,47 +1490,6 @@
             accountArticleTypeGrid.trackChanges = true;
         }
 
-        // Account Lock - IsLocked
-        $("#accountEdit_IsLocked").click(function () {
-            if ($(this).is(':checked')) {
-                Islocked = true;
-                document.getElementById('account_code').disabled = true;
-                document.getElementById('account_account').disabled = true;
-                cboAccountType.disabled = true;
-                cboAccountCashFlow.disabled = true;
-                document.getElementById("accountLockAndUnLock").innerHTML = '<i class="fa fa-lock"></i>';
-                $('#btnAddACcountArticleType').prop('disabled', true);
-
-                if (accountId != 0) {
-                    $("#loadingAccountArtitleType").show();
-                    document.getElementById("loadingAccountArtitleType").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                    $("#accountArticleTypeDiv").hide();
-
-                    setTimeout(function () {
-                        createAccountArticleTypeGrid();
-                    }, 500);
-                }
-            } else {
-                Islocked = false;
-                document.getElementById('account_code').disabled = false;
-                document.getElementById('account_account').disabled = false;
-                cboAccountType.disabled = false;
-                cboAccountCashFlow.disabled = false;
-                document.getElementById("accountLockAndUnLock").innerHTML = '<i class="fa fa-unlock"></i>';
-                $('#btnAddACcountArticleType').prop('disabled', false);
-
-                if (accountId != 0) {
-                    $("#loadingAccountArtitleType").show();
-                    document.getElementById("loadingAccountArtitleType").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                    $("#accountArticleTypeDiv").hide();
-
-                    setTimeout(function () {
-                        createAccountArticleTypeGrid();
-                    }, 500);
-                }
-            }
-        });
-
         $('#accountTabId').click(function () {
             $('#Account').show();
             $('#AccountType').hide();
@@ -1630,7 +1549,7 @@
         // ====================
         // GET Account Category
         // ====================
-        function getAccountCategoryForComboBox(accountCategoryId, accountTypeIsLocked) {
+        function getAccountCategoryForComboBox(accountCategoryId) {
             var accountCategoriesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/chartOfAccounts/accountType/dropdown/list/accountCategory',
@@ -1650,9 +1569,7 @@
 
                     var disabled = true;
                     if (results.length > 0) {
-                        if (!accountTypeIsLocked) {
-                            disabled = false;
-                        }
+                        disabled = false;
                     }
 
                     cboAccountCategory.dispose();
@@ -1762,13 +1679,11 @@
             document.getElementById('accountType_code').value = "NA";
             document.getElementById('accountType_accountType').value = "NA";
             document.getElementById('accountType_SubCategoryDescription').value = "NA";
-            getAccountCategoryForComboBox(0, false);
-            document.getElementById('accountTypeEdit_IsLocked').checked = false;
+            getAccountCategoryForComboBox(0);
 
             document.getElementById('accountType_code').disabled = false;
             document.getElementById('accountType_accountType').disabled = false;
             document.getElementById('accountType_SubCategoryDescription').disabled = false;
-            document.getElementById('accountTypeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
         }
 
         // ========================
@@ -1800,21 +1715,12 @@
             accountTypeId = accountType.Id;
             document.getElementById('accountType_code').value = accountType.AccountTypeCode;
             document.getElementById('accountType_accountType').value = accountType.AccountType;
-            getAccountCategoryForComboBox(accountType.AccountCategoryId, accountType.IsLocked);
+            getAccountCategoryForComboBox(accountType.AccountCategoryId);
             document.getElementById('accountType_SubCategoryDescription').value = accountType.SubCategoryDescription;
-            document.getElementById('accountTypeEdit_IsLocked').checked = accountType.IsLocked;
 
-            if (accountType.IsLocked) {
-                document.getElementById('accountType_code').disabled = true;
-                document.getElementById('accountType_accountType').disabled = true;
-                document.getElementById('accountType_SubCategoryDescription').disabled = true;
-                document.getElementById('accountTypeLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('accountType_code').disabled = false;
-                document.getElementById('accountType_accountType').disabled = false;
-                document.getElementById('accountType_SubCategoryDescription').disabled = false;
-                document.getElementById('accountTypeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
+            document.getElementById('accountType_code').disabled = false;
+            document.getElementById('accountType_accountType').disabled = false;
+            document.getElementById('accountType_SubCategoryDescription').disabled = false;
         }
 
         // ========================
@@ -1826,7 +1732,6 @@
             accountTypeObject.AccountType = document.getElementById('accountType_accountType').value;
             accountTypeObject.AccountCategoryId = cboAccountCategory.selectedValue;
             accountTypeObject.SubCategoryDescription = document.getElementById('accountType_SubCategoryDescription').value;
-            accountTypeObject.IsLocked = document.getElementById('accountTypeEdit_IsLocked').checked;
             var data = JSON.stringify(accountTypeObject);
 
             if (accountTypeEntryValidation()) {
@@ -1925,18 +1830,15 @@
         function cmdAccountTypeDeleteButton_OnClick() {
             accountTypes.editItem(accountTypes.currentItem);
             var accountType = accountTypes.currentEditItem;
-            if (accountType.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteAccountTypeConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById('cmdConfirmDeleteAccountType').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteAccountType").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButtonAccountType").prop("disabled", false);
-            }
+            $('#deleteAccountTypeConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteAccountType').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteAccountType").prop("disabled", false);
+            $("#cmdConfirmDeleteCloseButtonAccountType").prop("disabled", false);
         }
 
         // Account Type Confirm Delete Button
@@ -2134,12 +2036,6 @@
                                 "binding": "SubCategoryDescription",
                                 "allowSorting": true,
                                 "width": "3*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
                             }
                 ],
                 autoGenerateColumns: false,
@@ -2195,25 +2091,6 @@
             }
 
             refreshAccountType();
-        });
-
-        // Account Type Lock - IsLocked
-        $("#accountTypeEdit_IsLocked").click(function () {
-            if ($(this).is(':checked')) {
-                Islocked = true;
-                document.getElementById('accountType_code').disabled = true;
-                document.getElementById('accountType_accountType').disabled = true;
-                document.getElementById('accountType_SubCategoryDescription').disabled = true;
-                document.getElementById('accountTypeLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-                cboAccountCategory.disabled = true;
-            } else {
-                Islocked = false;
-                document.getElementById('accountType_code').disabled = false;
-                document.getElementById('accountType_accountType').disabled = false;
-                document.getElementById('accountType_SubCategoryDescription').disabled = false;
-                document.getElementById('accountTypeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-                cboAccountCategory.disabled = false;
-            }
         });
     </script>
 
@@ -2318,11 +2195,9 @@
             accountCashFlowId = 0;
             document.getElementById('accountCashFlow_Code').value = "NA";
             document.getElementById('accountCashFlow_CashFlow').value = "NA";
-            document.getElementById('accountCashFlowEdit_IsLocked').checked = false;
 
             document.getElementById('accountCashFlow_Code').disabled = false;
             document.getElementById('accountCashFlow_CashFlow').disabled = false;
-            document.getElementById('accountCashFlowLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
 
             setTimeout(function () {
                 $("#loadingModalAccountCashFlow").hide();
@@ -2358,17 +2233,9 @@
             accountCashFlowId = accountCashFlow.Id;
             document.getElementById('accountCashFlow_Code').value = accountCashFlow.AccountCashFlowCode;
             document.getElementById('accountCashFlow_CashFlow').value = accountCashFlow.AccountCashFlow;
-            document.getElementById('accountCashFlowEdit_IsLocked').checked = accountCashFlow.IsLocked;
 
-            if (accountCashFlow.IsLocked) {
-                document.getElementById('accountCashFlow_Code').disabled = true;
-                document.getElementById('accountCashFlow_CashFlow').disabled = true;
-                document.getElementById('accountCashFlowLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('accountCashFlow_Code').disabled = false;
-                document.getElementById('accountCashFlow_CashFlow').disabled = false;
-                document.getElementById('accountCashFlowLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
+            document.getElementById('accountCashFlow_Code').disabled = false;
+            document.getElementById('accountCashFlow_CashFlow').disabled = false;
 
             setTimeout(function () {
                 $("#loadingModalAccountCashFlow").hide();
@@ -2383,7 +2250,6 @@
             var accountCashFlowObject = new Object();
             accountCashFlowObject.AccountCashFlowCode = document.getElementById('accountCashFlow_Code').value;
             accountCashFlowObject.AccountCashFlow = document.getElementById('accountCashFlow_CashFlow').value;
-            accountCashFlowObject.IsLocked = document.getElementById('accountCashFlowEdit_IsLocked').checked;
             var data = JSON.stringify(accountCashFlowObject);
 
             if (accountCashFlowEntryValidation()) {
@@ -2482,18 +2348,15 @@
         function cmdAccountCashFlowDeleteButton_OnClick() {
             accountCashFlows.editItem(accountCashFlows.currentItem);
             var accountCashFlow = accountCashFlows.currentEditItem;
-            if (accountCashFlow.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteAccountCashFlowConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById('cmdConfirmDeleteAccountCashFlow').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteAccountCashFlow").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButtonAccountCashFlow").prop("disabled", false);
-            }
+            $('#deleteAccountCashFlowConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteAccountCashFlow').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteAccountCashFlow").prop("disabled", false);
+            $("#cmdConfirmDeleteCloseButtonAccountCashFlow").prop("disabled", false);
         }
 
         // Account Cash Flow Confirm Delete Button
@@ -2675,12 +2538,6 @@
                                 "binding": "AccountCashFlow",
                                 "allowSorting": true,
                                 "width": "5*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
                             }
                 ],
                 autoGenerateColumns: false,
@@ -2735,19 +2592,6 @@
                 return true;
             }
             refreshCashFlowFlexGrid();
-        });
-
-        // Account Cash Flow Lock - IsLocked
-        $("#accountCashFlowEdit_IsLocked").click(function () {
-            if ($(this).is(':checked')) {
-                document.getElementById('accountCashFlow_Code').disabled = true;
-                document.getElementById('accountCashFlow_CashFlow').disabled = true;
-                document.getElementById('accountCashFlowLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('accountCashFlow_Code').disabled = false;
-                document.getElementById('accountCashFlow_CashFlow').disabled = false;
-                document.getElementById('accountCashFlowLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
         });
     </script>
 
@@ -2853,11 +2697,9 @@
             accountCategoryId = 0;
             document.getElementById('accountCategory_Code').value = "NA";
             document.getElementById('accountCategory_Category').value = "NA";
-            document.getElementById('accountCategoryEdit_IsLocked').checked = false;
 
             document.getElementById('accountCategory_Code').disabled = false;
             document.getElementById('accountCategory_Category').disabled = false;
-            document.getElementById('accountCategoryLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
 
             setTimeout(function () {
                 $("#loadingModalAccountCategory").hide();
@@ -2893,17 +2735,9 @@
             accountCategoryId = accountCategory.Id;
             document.getElementById('accountCategory_Code').value = accountCategory.AccountCategoryCode;
             document.getElementById('accountCategory_Category').value = accountCategory.AccountCategory;
-            document.getElementById('accountCategoryEdit_IsLocked').checked = accountCategory.IsLocked;
 
-            if (accountCategory.IsLocked == true) {
-                document.getElementById('accountCategory_Code').disabled = true;
-                document.getElementById('accountCategory_Category').disabled = true;
-                document.getElementById('accountCategoryLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('accountCategory_Code').disabled = false;
-                document.getElementById('accountCategory_Category').disabled = false;
-                document.getElementById('accountCategoryLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
+            document.getElementById('accountCategory_Code').disabled = false;
+            document.getElementById('accountCategory_Category').disabled = false;
 
             setTimeout(function () {
                 $("#loadingModalAccountCategory").hide();
@@ -2918,7 +2752,6 @@
             var accountCategoryObject = new Object();
             accountCategoryObject.AccountCategoryCode = document.getElementById('accountCategory_Code').value;
             accountCategoryObject.AccountCategory = document.getElementById('accountCategory_Category').value;
-            accountCategoryObject.IsLocked = document.getElementById('accountCategoryEdit_IsLocked').checked;
             var data = JSON.stringify(accountCategoryObject);
 
             if (accountCategoryEntryValidation()) {
@@ -3017,18 +2850,15 @@
         function cmdAccountCategoryDeleteButton_OnClick() {
             accountCategories.editItem(accountCategories.currentItem);
             var accountCategory = accountCategories.currentEditItem;
-            if (accountCategory.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteAccountCategoryConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById('cmdConfirmDeleteAccountCategory').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteAccountCategory").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButtonAccountCategory").prop("disabled", false);
-            }
+            $('#deleteAccountCategoryConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteAccountCategory').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteAccountCategory").prop("disabled", false);
+            $("#cmdConfirmDeleteCloseButtonAccountCategory").prop("disabled", false);
         }
 
         // Account Category Confirm Delete Button
@@ -3210,12 +3040,6 @@
                                 "binding": "AccountCategory",
                                 "allowSorting": true,
                                 "width": "5*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
                             }
                 ],
                 autoGenerateColumns: false,
@@ -3269,19 +3093,6 @@
                 return true;
             }
             refreshAccountCategory();
-        });
-
-        // Account Category Lock - IsLocked
-        $("#accountCategoryEdit_IsLocked").click(function () {
-            if ($(this).is(':checked')) {
-                document.getElementById('accountCategory_Code').disabled = true;
-                document.getElementById('accountCategory_Category').disabled = true;
-                document.getElementById('accountCategoryLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('accountCategory_Code').disabled = false;
-                document.getElementById('accountCategory_Category').disabled = false;
-                document.getElementById('accountCategoryLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
         });
 
         $(document).ready(function () {

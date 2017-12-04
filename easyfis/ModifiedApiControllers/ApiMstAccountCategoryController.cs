@@ -69,7 +69,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 AccountCategoryCode = objAccountCategory.AccountCategoryCode,
                                 AccountCategory = objAccountCategory.AccountCategory,
-                                IsLocked = objAccountCategory.IsLocked,
+                                IsLocked = true,
                                 CreatedById = currentUserId,
                                 CreatedDateTime = DateTime.Now,
                                 UpdatedById = currentUserId,
@@ -138,7 +138,7 @@ namespace easyfis.ModifiedApiControllers
 
                                 updateAccountCategory.AccountCategoryCode = objAccountCategory.AccountCategoryCode;
                                 updateAccountCategory.AccountCategory = objAccountCategory.AccountCategory;
-                                updateAccountCategory.IsLocked = objAccountCategory.IsLocked;
+                                updateAccountCategory.IsLocked = true;
                                 updateAccountCategory.UpdatedById = currentUserId;
                                 updateAccountCategory.UpdatedDateTime = DateTime.Now;
 

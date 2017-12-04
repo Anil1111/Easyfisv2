@@ -120,7 +120,7 @@ namespace easyfis.ModifiedApiControllers
                                         Account = objAccount.Account,
                                         AccountTypeId = objAccount.AccountTypeId,
                                         AccountCashFlowId = objAccount.AccountCashFlowId,
-                                        IsLocked = objAccount.IsLocked,
+                                        IsLocked = true,
                                         CreatedById = currentUserId,
                                         CreatedDateTime = DateTime.Now,
                                         UpdatedById = currentUserId,
@@ -212,7 +212,7 @@ namespace easyfis.ModifiedApiControllers
                                         updateAccount.Account = objAccount.Account;
                                         updateAccount.AccountTypeId = objAccount.AccountTypeId;
                                         updateAccount.AccountCashFlowId = objAccount.AccountCashFlowId;
-                                        updateAccount.IsLocked = objAccount.IsLocked;
+                                        updateAccount.IsLocked = true;
                                         updateAccount.UpdatedById = currentUserId;
                                         updateAccount.UpdatedDateTime = DateTime.Now;
 
@@ -288,17 +288,10 @@ namespace easyfis.ModifiedApiControllers
 
                             if (account.Any())
                             {
-                                if (!account.FirstOrDefault().IsLocked)
-                                {
-                                    db.MstAccounts.DeleteOnSubmit(account.First());
-                                    db.SubmitChanges();
+                                db.MstAccounts.DeleteOnSubmit(account.First());
+                                db.SubmitChanges();
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Delete is not allowed if the selected account is locked.");
-                                }
+                                return Request.CreateResponse(HttpStatusCode.OK);
                             }
                             else
                             {
