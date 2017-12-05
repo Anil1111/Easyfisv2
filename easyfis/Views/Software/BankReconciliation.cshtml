@@ -31,7 +31,7 @@
             <section class="content-header">
                 <div class="container">
                     <h3>
-                        Bank Reconciliation 
+                        Bank Reconciliation
                     </h3>
                     <p>
                         <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
@@ -44,8 +44,8 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                @*<button class="btn btn-primary " id="" onclick="btnBankReconciliationPrint_OnClick()"><i class="fa fa-print"></i> Print</button>*@
-                                <button class="btn btn-danger " id="" onclick="btnBankReconciliationClose_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                <button class="btn btn-success" id="" onclick="btnDownloadCSVFile()"><i class="fa fa-file-excel-o"></i> CSV</button>
+                                <button class="btn btn-danger" id="" onclick="btnBankReconciliationClose_OnClick()"><i class=" fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Total Outstanding Withdrawals</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationTotalOutstandingWithdrawals"disabled />
+                                            <input type="text" class="form-control  numberField " id="bankReconciliationTotalOutstandingWithdrawals" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -116,60 +116,195 @@
                 </ul>
                 <br />
                 <div class="tab-content">
-                    <div id="deposits" class="tab-pane active" style="margin-bottom: 15px;">
-                        <div id="collectionLineGrid"></div>
-                        <br /><br />
-                        <div class="row">
-                            <div class="col-md-6">
-
+                    <div id="deposits" class="tab-pane active">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="DepositsInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboDepositsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right"></td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>
-                                        <b>Total</b>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField" id="totalInTransit" placeholder="0.00" disabled />
-                                    </dd>
-                                </dl>
+                            <div class="panel-body">
+                                <div id="collectionLineGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridDeposits">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridDeposits">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridDeposits">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridDeposits"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridDeposits">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridDeposits">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body" style="padding-bottom: 0px;">
+                                <div class="row">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6">
+                                        <dl class="dl-horizontal">
+                                            <dt>
+                                                <b>Total</b>
+                                            </dt>
+                                            <dd>
+                                                <input type="text" class="form-control numberField" id="totalInTransit" placeholder="0.00" disabled />
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div id="withdrwals" class="tab-pane"  style="margin-bottom: 15px;">
-                        <div id="disbursementGrid"></div>
-                        <br /><br />
-                        <div class="row">
-                            <div class="col-md-6">
-
+                    <div id="withdrwals" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="WithdrawalsInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboWithdrawalsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right"></td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>
-                                        <b>Total</b>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField" id="totalOutstanding" placeholder="0.00" disabled />
-                                    </dd>
-                                </dl>
+                            <div class="panel-body">
+                                <div id="disbursementGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridWithdrawals">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridWithdrawals">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridWithdrawals">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridWithdrawals"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridWithdrawals">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridWithdrawals">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body" style="padding-bottom: 0px;">
+                                <div class="row">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6">
+                                        <dl class="dl-horizontal">
+                                            <dt>
+                                                <b>Total</b>
+                                            </dt>
+                                            <dd>
+                                                <input type="text" class="form-control numberField" id="totalOutstanding" placeholder="0.00" disabled />
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div id="adjustments" class="tab-pane">
-                        <div id="adjustmentGrid"></div>
-                        <br /><br />
-                        <div class="row">
-                            <div class="col-md-6">
-
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="AdjustmentsInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboAdjustmentsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right"></td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="col-md-6">
-                                <dl class="dl-horizontal">
-                                    <dt>
-                                        <b>Total</b>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField" id="totalAdjustments" placeholder="0.00" disabled />
-                                    </dd>
-                                </dl>
+                            <div class="panel-body">
+                                <div id="adjustmentGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridAdjustments">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridAdjustments">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridAdjustments">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridAdjustments"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridAdjustments">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridAdjustments">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body" style="padding-bottom: 0px;">
+                                <div class="row">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-6">
+                                        <dl class="dl-horizontal">
+                                            <dt>
+                                                <b>Total</b>
+                                            </dt>
+                                            <dd>
+                                                <input type="text" class="form-control numberField" id="totalAdjustments" placeholder="0.00" disabled />
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,6 +331,27 @@
         var journalVoucherLineGrid = new wijmo.grid.FlexGrid('#adjustmentGrid');
         var isStartDateSelected = false;
         var isEndDateSelected = false;
+        var cboDepositsShowNumberOfRows = new wijmo.input.ComboBox('#cboDepositsShowNumberOfRows');
+        var btnFirstPageGridDeposits = document.getElementById('btnMoveToFirstPageGridDeposits');
+        var btnPreviousPageGridDeposits = document.getElementById('btnMoveToPreviousPageGridDeposits');
+        var btnNextPageGridDeposits = document.getElementById('btnMoveToNextPageGridDeposits');
+        var btnLastPageGridDeposits = document.getElementById('btnMoveToLastPageGridDeposits');
+        var btnCurrentPageGridDeposits = document.getElementById('btnCurrentPageGridDeposits');
+        var cboWithdrawalsShowNumberOfRows = new wijmo.input.ComboBox('#cboWithdrawalsShowNumberOfRows');
+        var btnFirstPageGridWithdrawals = document.getElementById('btnMoveToFirstPageGridWithdrawals');
+        var btnPreviousPageGridWithdrawals = document.getElementById('btnMoveToPreviousPageGridWithdrawals');
+        var btnNextPageGridWithdrawals = document.getElementById('btnMoveToNextPageGridWithdrawals');
+        var btnLastPageGridWithdrawals = document.getElementById('btnMoveToLastPageGridWithdrawals');
+        var btnCurrentPageGridWithdrawals = document.getElementById('btnCurrentPageGridWithdrawals');
+        var cboAdjustmentsShowNumberOfRows = new wijmo.input.ComboBox('#cboAdjustmentsShowNumberOfRows');
+        var btnFirstPageGridAdjustments = document.getElementById('btnMoveToFirstPageGridAdjustments');
+        var btnPreviousPageGridAdjustments = document.getElementById('btnMoveToPreviousPageGridAdjustments');
+        var btnNextPageGridAdjustments = document.getElementById('btnMoveToNextPageGridAdjustments');
+        var btnLastPageGridAdjustments = document.getElementById('btnMoveToLastPageGridAdjustments');
+        var btnCurrentPageGridAdjustments = document.getElementById('btnCurrentPageGridAdjustments');
+        var isDepositsTabClicked = false;
+        var isWithdrawalsTabClicked = false;
+        var isAdjustmentsTabClicked = false;
 
         // ========
         // Get Bank
@@ -260,6 +416,105 @@
                     } else {
                         isEndDateSelected = true;
                     }
+                }
+            });
+
+            createCboShowRows();
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboDepositsShowNumberOfRows.dispose();
+            cboDepositsShowNumberOfRows = new wijmo.input.ComboBox('#cboDepositsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboDepositsShowNumberOfRows.selectedValue;
+                        collectionLines.pageSize = parseInt(numberOfRows);
+                        collectionLines.refresh();
+                        collectionLineGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            cboWithdrawalsShowNumberOfRows.dispose();
+            cboWithdrawalsShowNumberOfRows = new wijmo.input.ComboBox('#cboWithdrawalsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboWithdrawalsShowNumberOfRows.selectedValue;
+                        disbursements.pageSize = parseInt(numberOfRows);
+                        disbursements.refresh();
+                        disbursementGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            cboAdjustmentsShowNumberOfRows.dispose();
+            cboAdjustmentsShowNumberOfRows = new wijmo.input.ComboBox('#cboAdjustmentsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboAdjustmentsShowNumberOfRows.selectedValue;
+                        journalVoucherLines.pageSize = parseInt(numberOfRows);
+                        journalVoucherLines.refresh();
+                        journalVoucherLineGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
                 }
             });
 
@@ -333,10 +588,57 @@
         }
 
         // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsDeposits() {
+            if (collectionLines.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridDeposits').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridDeposits').style.display = 'block';
+            if (collectionLines.pageIndex === 0) {
+                btnFirstPageGridDeposits.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridDeposits.setAttribute('disabled', 'disabled');
+                btnNextPageGridDeposits.removeAttribute('disabled');
+                btnLastPageGridDeposits.removeAttribute('disabled');
+            } else if (collectionLines.pageIndex === (collectionLines.pageCount - 1)) {
+                btnFirstPageGridDeposits.removeAttribute('disabled');
+                btnPreviousPageGridDeposits.removeAttribute('disabled');
+                btnLastPageGridDeposits.setAttribute('disabled', 'disabled');
+                btnNextPageGridDeposits.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGridDeposits.removeAttribute('disabled');
+                btnPreviousPageGridDeposits.removeAttribute('disabled');
+                btnNextPageGridDeposits.removeAttribute('disabled');
+                btnLastPageGridDeposits.removeAttribute('disabled');
+            }
+            btnCurrentPageGridDeposits.innerHTML = (collectionLines.pageIndex + 1) + ' / ' + collectionLines.pageCount;
+        }
+
+        // =========================
         // collection line flex Grid
         // =========================
         function createCollectionLineFlexGrid() {
             collectionLines = new wijmo.collections.CollectionView(getCollectionLines());
+            collectionLines.canFilter = true;
+            collectionLines.pageSize = cboDepositsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#DepositsInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                collectionLines.refresh();
+            });
+
+            collectionLines.filter = function (item) {
+                return !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            collectionLines.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsDeposits();
+            });
 
             collectionLineGrid.dispose();
             collectionLineGrid = new wijmo.grid.FlexGrid('#collectionLineGrid');
@@ -432,6 +734,32 @@
             });
 
             collectionLineGrid.trackChanges = true;
+
+            if (!isDepositsTabClicked) {
+                updateNavigateButtonsDeposits();
+
+                btnFirstPageGridDeposits.addEventListener('click', function () {
+                    collectionLines.moveToFirstPage();
+                    updateNavigateButtonsDeposits();
+                });
+
+                btnPreviousPageGridDeposits.addEventListener('click', function () {
+                    collectionLines.moveToPreviousPage();
+                    updateNavigateButtonsDeposits();
+                });
+
+                btnNextPageGridDeposits.addEventListener('click', function () {
+                    collectionLines.moveToNextPage();
+                    updateNavigateButtonsDeposits();
+                });
+
+                btnLastPageGridDeposits.addEventListener('click', function () {
+                    collectionLines.moveToLastPage();
+                    updateNavigateButtonsDeposits();
+                });
+
+                isDepositsTabClicked = true
+            }
         }
 
         // ========================
@@ -555,11 +883,59 @@
             return disbursementsObservableArray;
         }
 
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsWithdrawals() {
+            if (disbursements.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridWithdrawals').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridWithdrawals').style.display = 'block';
+            if (disbursements.pageIndex === 0) {
+                btnFirstPageGridWithdrawals.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridWithdrawals.setAttribute('disabled', 'disabled');
+                btnNextPageGridWithdrawals.removeAttribute('disabled');
+                btnLastPageGridWithdrawals.removeAttribute('disabled');
+            } else if (disbursements.pageIndex === (disbursements.pageCount - 1)) {
+                btnFirstPageGridWithdrawals.removeAttribute('disabled');
+                btnPreviousPageGridWithdrawals.removeAttribute('disabled');
+                btnLastPageGridWithdrawals.setAttribute('disabled', 'disabled');
+                btnNextPageGridWithdrawals.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGridWithdrawals.removeAttribute('disabled');
+                btnPreviousPageGridWithdrawals.removeAttribute('disabled');
+                btnNextPageGridWithdrawals.removeAttribute('disabled');
+                btnLastPageGridWithdrawals.removeAttribute('disabled');
+            }
+            btnCurrentPageGridWithdrawals.innerHTML = (disbursements.pageIndex + 1) + ' / ' + disbursements.pageCount;
+        }
+
         // ======================
         // Disbursement flex grid
         // ======================
         function createDisbursementFlexGrid() {
             disbursements = new wijmo.collections.CollectionView(getDisbursement());
+            disbursements.canFilter = true;
+            disbursements.pageSize = cboWithdrawalsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#WithdrawalsInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                disbursements.refresh();
+            });
+
+            disbursements.filter = function (item) {
+                return !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            disbursements.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsWithdrawals();
+            });
+
             disbursementGrid.dispose();
             disbursementGrid = new wijmo.grid.FlexGrid('#disbursementGrid');
             disbursementGrid.initialize({
@@ -654,6 +1030,32 @@
             });
 
             disbursementGrid.trackChanges = true;
+
+            if (!isWithdrawalsTabClicked) {
+                updateNavigateButtonsWithdrawals();
+
+                btnFirstPageGridWithdrawals.addEventListener('click', function () {
+                    disbursements.moveToFirstPage();
+                    updateNavigateButtonsWithdrawals();
+                });
+
+                btnPreviousPageGridWithdrawals.addEventListener('click', function () {
+                    disbursements.moveToPreviousPage();
+                    updateNavigateButtonsWithdrawals();
+                });
+
+                btnNextPageGridWithdrawals.addEventListener('click', function () {
+                    disbursements.moveToNextPage();
+                    updateNavigateButtonsWithdrawals();
+                });
+
+                btnLastPageGridWithdrawals.addEventListener('click', function () {
+                    disbursements.moveToLastPage();
+                    updateNavigateButtonsWithdrawals();
+                });
+
+                isWithdrawalsTabClicked = true
+            }
         }
 
         // ========================
@@ -776,10 +1178,56 @@
         }
 
         // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsAdjustments() {
+            if (journalVoucherLines.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridAdjustments').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridAdjustments').style.display = 'block';
+            if (journalVoucherLines.pageIndex === 0) {
+                btnFirstPageGridAdjustments.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridAdjustments.setAttribute('disabled', 'disabled');
+                btnNextPageGridAdjustments.removeAttribute('disabled');
+                btnLastPageGridAdjustments.removeAttribute('disabled');
+            } else if (journalVoucherLines.pageIndex === (journalVoucherLines.pageCount - 1)) {
+                btnFirstPageGridAdjustments.removeAttribute('disabled');
+                btnPreviousPageGridAdjustments.removeAttribute('disabled');
+                btnLastPageGridAdjustments.setAttribute('disabled', 'disabled');
+                btnNextPageGridAdjustments.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGridAdjustments.removeAttribute('disabled');
+                btnPreviousPageGridAdjustments.removeAttribute('disabled');
+                btnNextPageGridAdjustments.removeAttribute('disabled');
+                btnLastPageGridAdjustments.removeAttribute('disabled');
+            }
+            btnCurrentPageGridAdjustments.innerHTML = (journalVoucherLines.pageIndex + 1) + ' / ' + journalVoucherLines.pageCount;
+        }
+
+        // =========================
         // Journal Voucher Flex Grid
         // =========================
         function createJournalVoucherFlexGrid() {
             journalVoucherLines = new wijmo.collections.CollectionView(getJournalVoucherLine());
+            journalVoucherLines.canFilter = true;
+            journalVoucherLines.pageSize = cboAdjustmentsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#AdjustmentsInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                journalVoucherLines.refresh();
+            });
+
+            journalVoucherLines.filter = function (item) {
+                return !filterText || (item.JVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            journalVoucherLines.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsAdjustments();
+            });
+
             journalVoucherLineGrid.dispose();
             journalVoucherLineGrid = new wijmo.grid.FlexGrid('#adjustmentGrid');
             journalVoucherLineGrid.initialize({
@@ -869,6 +1317,32 @@
             });
 
             journalVoucherLineGrid.trackChanges = true;
+
+            if (!isAdjustmentsTabClicked) {
+                updateNavigateButtonsAdjustments();
+
+                btnFirstPageGridAdjustments.addEventListener('click', function () {
+                    journalVoucherLines.moveToFirstPage();
+                    updateNavigateButtonsAdjustments();
+                });
+
+                btnPreviousPageGridAdjustments.addEventListener('click', function () {
+                    journalVoucherLines.moveToPreviousPage();
+                    updateNavigateButtonsAdjustments();
+                });
+
+                btnNextPageGridAdjustments.addEventListener('click', function () {
+                    journalVoucherLines.moveToNextPage();
+                    updateNavigateButtonsAdjustments();
+                });
+
+                btnLastPageGridAdjustments.addEventListener('click', function () {
+                    journalVoucherLines.moveToLastPage();
+                    updateNavigateButtonsAdjustments();
+                });
+
+                isAdjustmentsTabClicked = true
+            }
         }
 
         // ====================
@@ -981,6 +1455,13 @@
             $('#adjustments').show();
             createJournalVoucherFlexGrid();
         });
+
+        // =================
+        // Download CSV File
+        // =================
+        function btnDownloadCSVFile() {
+
+        }
 
         // ============
         // On load page

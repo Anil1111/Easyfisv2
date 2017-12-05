@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public Int32 AccountTypeId { get; set; }
         public String AccountType { get; set; }
         public Int32 AccountCashFlowId { get; set; }
+        public String AccountCashFlow { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
         public String CreatedBy { get; set; }

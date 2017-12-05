@@ -31,6 +31,7 @@ namespace easyfis.ModifiedApiControllers
                                AccountTypeId = d.AccountTypeId,
                                AccountType = d.MstAccountType.AccountType,
                                AccountCashFlowId = d.AccountCashFlowId,
+                               AccountCashFlow = d.MstAccountCashFlow.AccountCashFlow,
                                IsLocked = d.IsLocked,
                                CreatedById = d.CreatedById,
                                CreatedBy = d.MstUser.FullName,
