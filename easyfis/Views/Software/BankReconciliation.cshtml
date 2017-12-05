@@ -352,6 +352,9 @@
         var isDepositsTabClicked = false;
         var isWithdrawalsTabClicked = false;
         var isAdjustmentsTabClicked = false;
+        var collectionLinesDepositCurrentPageIndex = 0;
+        var disbursementWithdrawalsDepositCurrentPageIndex = 0;
+        var journalVoucherLineAdjustmentsCurrentPageIndex = 0;
 
         // ========
         // Get Bank
@@ -740,21 +743,25 @@
 
                 btnFirstPageGridDeposits.addEventListener('click', function () {
                     collectionLines.moveToFirstPage();
+                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
                 btnPreviousPageGridDeposits.addEventListener('click', function () {
                     collectionLines.moveToPreviousPage();
+                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
                 btnNextPageGridDeposits.addEventListener('click', function () {
                     collectionLines.moveToNextPage();
+                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
                 btnLastPageGridDeposits.addEventListener('click', function () {
                     collectionLines.moveToLastPage();
+                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
@@ -795,8 +802,17 @@
                         collectionLineGrid.refresh();
 
                         var totalInTransitValue = 0;
-                        for (i = 0; i < collectionLines.items.length; i++) {
-                            totalInTransitValue += collectionLines.items[i]["InTransit"];
+
+                        collectionLines.moveToFirstPage();
+                        for (var p = 1; p <= collectionLines.pageCount; p++) {
+                            for (i = 0; i < collectionLines.items.length; i++) {
+                                totalInTransitValue += parseFloat(collectionLines.items[i]["InTransit"]);
+                            }
+
+                            collectionLines.moveToNextPage();
+                            if (p == collectionLines.pageCount) {
+                                collectionLines.moveToPage(collectionLinesDepositCurrentPageIndex - 1);
+                            }
                         }
 
                         document.getElementById("totalInTransit").value = parseFloat(totalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -1036,21 +1052,25 @@
 
                 btnFirstPageGridWithdrawals.addEventListener('click', function () {
                     disbursements.moveToFirstPage();
+                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
                 btnPreviousPageGridWithdrawals.addEventListener('click', function () {
                     disbursements.moveToPreviousPage();
+                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
                 btnNextPageGridWithdrawals.addEventListener('click', function () {
                     disbursements.moveToNextPage();
+                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
                 btnLastPageGridWithdrawals.addEventListener('click', function () {
                     disbursements.moveToLastPage();
+                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
@@ -1091,8 +1111,17 @@
                         disbursementGrid.refresh();
 
                         var totalOutStandingAmount = 0;
-                        for (i = 0; i < disbursements.items.length; i++) {
-                            totalOutStandingAmount += disbursements.items[i]["OutstandingAmount"];
+
+                        disbursements.moveToFirstPage();
+                        for (var p = 1; p <= disbursements.pageCount; p++) {
+                            for (i = 0; i < disbursements.items.length; i++) {
+                                totalOutStandingAmount += parseFloat(disbursements.items[i]["OutstandingAmount"]);
+                            }
+
+                            disbursements.moveToNextPage();
+                            if (p == disbursements.pageCount) {
+                                disbursements.moveToPage(disbursementWithdrawalsDepositCurrentPageIndex - 1);
+                            }
                         }
 
                         document.getElementById("totalOutstanding").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -1323,21 +1352,25 @@
 
                 btnFirstPageGridAdjustments.addEventListener('click', function () {
                     journalVoucherLines.moveToFirstPage();
+                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
                 btnPreviousPageGridAdjustments.addEventListener('click', function () {
                     journalVoucherLines.moveToPreviousPage();
+                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
                 btnNextPageGridAdjustments.addEventListener('click', function () {
                     journalVoucherLines.moveToNextPage();
+                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
                 btnLastPageGridAdjustments.addEventListener('click', function () {
                     journalVoucherLines.moveToLastPage();
+                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
@@ -1378,8 +1411,17 @@
                         journalVoucherLineGrid.refresh();
 
                         var totalAdjustmentAmount = 0;
-                        for (i = 0; i < journalVoucherLines.items.length; i++) {
-                            totalAdjustmentAmount += journalVoucherLines.items[i]["Adjustments"];
+
+                        journalVoucherLines.moveToFirstPage();
+                        for (var p = 1; p <= journalVoucherLines.pageCount; p++) {
+                            for (i = 0; i < journalVoucherLines.items.length; i++) {
+                                totalAdjustmentAmount += parseFloat(journalVoucherLines.items[i]["Adjustments"]);
+                            }
+
+                            journalVoucherLines.moveToNextPage();
+                            if (p == journalVoucherLines.pageCount) {
+                                journalVoucherLines.moveToPage(journalVoucherLineAdjustmentsCurrentPageIndex - 1);
+                            }
                         }
 
                         document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -1460,7 +1502,212 @@
         // Download CSV File
         // =================
         function btnDownloadCSVFile() {
+            var CSV = '';
 
+            var collectionLineHeaderValues = [];
+            collectionLineHeaderValues.push({
+                ORNumber: "OR Number",
+                ORDate: "OR Date",
+                Customer: "Customer",
+                PayType: "Pay Type",
+                CheckNumber: "Check Number",
+                CheckDate: "Check Date",
+                Amount: "Amount",
+                IsClear: "Is Clear",
+                InTransit: "In Transit"
+            });
+
+            var collectionLineHeader = '';
+            for (var ch in collectionLineHeaderValues[0]) {
+                collectionLineHeader += '"' + collectionLineHeaderValues[0][ch] + '",';
+            }
+
+            var collectionLinesDepositReport = [];
+
+            collectionLines.moveToFirstPage();
+            for (var p = 1; p <= collectionLines.pageCount; p++) {
+                for (i = 0; i < collectionLines.items.length; i++) {;
+                    var isClearValue = "Not Cleared";
+                    if (collectionLines.items[i].IsClear) {
+                        var isClearValue = "Cleared";
+                    }
+
+                    collectionLinesDepositReport.push({
+                        ORNumber: "OR-" + collectionLines.items[i].ORNumber,
+                        ORDate: collectionLines.items[i].ORDate,
+                        Customer: collectionLines.items[i].Customer,
+                        PayType: collectionLines.items[i].PayType,
+                        CheckNumber: collectionLines.items[i].CheckNumber,
+                        CheckDate: collectionLines.items[i].CheckDate,
+                        Amount: collectionLines.items[i].Amount,
+                        IsClear: isClearValue,
+                        InTransit: collectionLines.items[i].InTransit
+                    });
+                }
+
+                collectionLines.moveToNextPage();
+                if (p == collectionLines.pageCount) {
+                    collectionLines.moveToPage(collectionLinesDepositCurrentPageIndex - 1);
+                }
+            }
+
+            CSV = collectionLineHeader + '\r\n';
+            for (var i = 0; i < collectionLinesDepositReport.length; i++) {
+                var row = '';
+                for (var data in collectionLinesDepositReport[i]) {
+                    row += '"' + collectionLinesDepositReport[i][data] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            CSV += '\r\r';
+
+            var disbursementHeaderValues = [];
+            disbursementHeaderValues.push({
+                CVNumber: "CV Number",
+                CVDate: "CV Date",
+                Payee: "Payee",
+                PayType: "Pay Type",
+                CheckNumber: "Check Number",
+                CheckDate: "Check Date",
+                Amount: "Amount",
+                IsClear: "Is Clear",
+                OutstandingAmount: "Outstanding"
+            });
+
+            var disbursementHeader = '';
+            for (var dh in disbursementHeaderValues[0]) {
+                disbursementHeader += '"' + disbursementHeaderValues[0][dh] + '",';
+            }
+
+            var disbursemenWithdrawalsReport = [];
+
+            disbursements.moveToFirstPage();
+            for (var p = 1; p <= disbursements.pageCount; p++) {
+                for (i = 0; i < disbursements.items.length; i++) {
+                    var isClearValue = "Not Cleared";
+                    if (disbursements.items[i].IsClear) {
+                        var isClearValue = "Cleared";
+                    }
+
+                    disbursemenWithdrawalsReport.push({
+                        CVNumber: "CV-" + disbursements.items[i].CVNumber,
+                        CVDate: disbursements.items[i].CVDate,
+                        Payee: disbursements.items[i].Payee,
+                        PayType: disbursements.items[i].PayType,
+                        CheckNumber: disbursements.items[i].CheckNumber,
+                        CheckDate: disbursements.items[i].CheckDate,
+                        Amount: disbursements.items[i].Amount,
+                        IsClear: isClearValue,
+                        OutstandingAmount: disbursements.items[i].OutstandingAmount
+                    });
+                }
+
+                disbursements.moveToNextPage();
+                if (p == disbursements.pageCount) {
+                    disbursements.moveToPage(disbursementWithdrawalsDepositCurrentPageIndex - 1);
+                }
+            }
+
+            CSV += disbursementHeader + '\r\n';
+            for (var i = 0; i < disbursemenWithdrawalsReport.length; i++) {
+                var row = '';
+                for (var data in disbursemenWithdrawalsReport[i]) {
+                    row += '"' + disbursemenWithdrawalsReport[i][data] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            CSV += '\r\r';
+
+            var journalVoucherLineHeaderValues = [];
+            journalVoucherLineHeaderValues.push({
+                JVNumber: "JV Number",
+                JVDate: "JV Date",
+                Particulars: "Particulars",
+                DebitAmount: "Debit Amount",
+                CreditAmount: "Credit Amount",
+                BalanceAmount: "Balance Amount",
+                IsClear: "Is Clear",
+                Adjustments: "Adjustments"
+            });
+
+            var journalVoucherLineHeader = '';
+            for (var jh in journalVoucherLineHeaderValues[0]) {
+                journalVoucherLineHeader += '"' + journalVoucherLineHeaderValues[0][jh] + '",';
+            }
+
+            var journalVoucherLineAdjustmentsReport = [];
+
+            journalVoucherLines.moveToFirstPage();
+            for (var p = 1; p <= journalVoucherLines.pageCount; p++) {
+                for (i = 0; i < journalVoucherLines.items.length; i++) {
+                    var isClearValue = "Not Cleared";
+                    if (journalVoucherLines.items[i].IsClear) {
+                        var isClearValue = "Cleared";
+                    }
+
+                    journalVoucherLineAdjustmentsReport.push({
+                        JVNumber: "JV-" + journalVoucherLines.items[i].JVNumber,
+                        JVDate: journalVoucherLines.items[i].JVDate,
+                        Particulars: journalVoucherLines.items[i].Particulars,
+                        DebitAmount: journalVoucherLines.items[i].DebitAmount,
+                        CreditAmount: journalVoucherLines.items[i].CreditAmount,
+                        BalanceAmount: journalVoucherLines.items[i].BalanceAmount,
+                        IsClear: isClearValue,
+                        Adjustments: journalVoucherLines.items[i].Adjustments
+                    });
+                }
+
+                journalVoucherLines.moveToNextPage();
+                if (p == journalVoucherLines.pageCount) {
+                    journalVoucherLines.moveToPage(journalVoucherLineAdjustmentsCurrentPageIndex - 1);
+                }
+            }
+
+            CSV += journalVoucherLineHeader + '\r\n';
+            for (var i = 0; i < journalVoucherLineAdjustmentsReport.length; i++) {
+                var row = '';
+                for (var data in journalVoucherLineAdjustmentsReport[i]) {
+                    row += '"' + journalVoucherLineAdjustmentsReport[i][data] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            var fileName = cboBank.selectedItem["Article"] + '_BankReconciliation.CSV';
+            if (CSV == '') {
+                toastr.error("No data.");
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) {
+                    var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", fileName);
+                    link.style = "visibility:hidden";
+                }
+
+                if (navigator.msSaveBlob) {
+                    link.addEventListener("click", function (event) {
+                        var blob = new Blob([CSV], {
+                            "type": "text/csv;charset=utf-8;"
+                        });
+                        navigator.msSaveBlob(blob, fileName);
+                    }, false);
+                }
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toastr.success("Dowload successful.");
+            }
         }
 
         // ============
