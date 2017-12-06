@@ -191,7 +191,7 @@ namespace easyfis.ModifiedApiControllers
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this discount detail page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this system table page.");
                     }
                 }
                 else

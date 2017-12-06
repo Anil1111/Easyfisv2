@@ -12,10 +12,13 @@ namespace easyfis.Entities
         public Decimal TaxRate { get; set; }
         public Boolean IsInclusive { get; set; }
         public Int32 AccountId { get; set; }
+        public String Account { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
+        public String CreatedBy { get; set; }
         public String CreatedDateTime { get; set; }
         public Int32 UpdatedById { get; set; }
+        public String UpdatedBy { get; set; }
         public String UpdatedDateTime { get; set; }
     }
 }
