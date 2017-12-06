@@ -597,6 +597,15 @@ namespace easyfis.Controllers
         }
 
         // =========================
+        // View Statement of Account
+        // =========================
+        [Authorize]
+        public ActionResult StatementOfAccount()
+        {
+            return View();
+        }
+
+        // =========================
         // View Sales Summary Report
         // =========================
         [Authorize]
@@ -1064,7 +1073,7 @@ namespace easyfis.Controllers
                 return RedirectToAction("Forbidden", "Software");
             }
         }
-
+        
         // =======================
         // POS Integration Reports
         // =======================
