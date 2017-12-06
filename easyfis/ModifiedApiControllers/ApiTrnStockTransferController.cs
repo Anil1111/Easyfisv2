@@ -114,11 +114,17 @@ namespace easyfis.ModifiedApiControllers
         // =================================
         // Dropdown List - To Branch (Field)
         // =================================
-        [Authorize, HttpGet, Route("api/stockTransfer/dropdown/list/toBranch/{fromBranchId}")]
-        public List<Entities.MstBranch> DropdownListStockTransferToBranch(String fromBranchId)
+        [Authorize, HttpGet, Route("api/stockTransfer/dropdown/list/toBranch")]
+        public List<Entities.MstBranch> DropdownListStockTransferToBranch()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
-                           where d.Id != Convert.ToInt32(fromBranchId)
+                           where d.Id != Convert.ToInt32(branchId)
                            select new Entities.MstBranch
                            {
                                Id = d.Id,
