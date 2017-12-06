@@ -1504,6 +1504,54 @@
         function btnDownloadCSVFile() {
             var CSV = '';
 
+            var bankReconciliationHeaderValues = [];
+            bankReconciliationHeaderValues.push({
+                Bank: "Bank",
+                DateStart: "Date Start",
+                DateEnd: "Date End",
+                EndingBalanceAsPerBank: "Ending Balance As Per Bank",
+                TotalDepositInTransit: "Total Deposit In Transit",
+                TotalOutstandingWithdrawals: "Total Outstanding Withdrawals",
+                TotalAdjustments: "Total Adjustments",
+                AdjustedEndingBalanceAsPerBank: "Adjusted Ending Balance As Per Bank",
+            });
+
+            var bankReconciliationHeader = '';
+            for (var bh in bankReconciliationHeaderValues[0]) {
+                bankReconciliationHeader += '"' + bankReconciliationHeaderValues[0][bh] + '",';
+            }
+
+            var EndingBalanceAsPerBankData = document.getElementById("bankReconciliationEndingBalanceAsPerBank").value;
+            var TotalDepositInTransitData = document.getElementById("bankReconciliationTotalDepositInTransit").value;
+            var TotalOutstandingWithdrawalsData = document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value;
+            var TotalAdjustmentsData = document.getElementById("bankReconciliationTotalAdjustments").value;
+            var AdjustedEndingBalanceAsPerBankData = document.getElementById("bankReconciliationAdjustedEndingBalanceAsPerBank").value;
+
+            var bankReconciliationData = [];
+            bankReconciliationData.push({
+                Bank: cboBank.selectedItem["Article"],
+                DateStart: bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-'),
+                DateEnd: bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-'),
+                EndingBalanceAsPerBank: EndingBalanceAsPerBankData,
+                TotalDepositInTransit: TotalDepositInTransitData,
+                TotalOutstandingWithdrawals: TotalOutstandingWithdrawalsData,
+                TotalAdjustments: TotalAdjustmentsData,
+                AdjustedEndingBalanceAsPerBank: AdjustedEndingBalanceAsPerBankData,
+            });
+
+            CSV = bankReconciliationHeader + '\r\n';
+            for (var i = 0; i < bankReconciliationData.length; i++) {
+                var row = '';
+                for (var data in bankReconciliationData[i]) {
+                    row += '"' + bankReconciliationData[i][data] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            CSV += '\r\r';
+
             var collectionLineHeaderValues = [];
             collectionLineHeaderValues.push({
                 ORNumber: "OR Number",
@@ -1551,7 +1599,7 @@
                 }
             }
 
-            CSV = collectionLineHeader + '\r\n';
+            CSV += collectionLineHeader + '\r\n';
             for (var i = 0; i < collectionLinesDepositReport.length; i++) {
                 var row = '';
                 for (var data in collectionLinesDepositReport[i]) {
