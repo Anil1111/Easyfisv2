@@ -9,7 +9,9 @@ namespace easyfis.Entities
     {
         public Int32 Id { get; set; }
         public Int32 ArticleGroupId { get; set; }
+        public Int32 CompanyId { get; set; }
         public Int32 BranchId { get; set; }
+        public String Branch { get; set; }
         public Int32 AccountId { get; set; }
         public Int32 SalesAccountId { get; set; }
         public Int32 CostAccountId { get; set; }
