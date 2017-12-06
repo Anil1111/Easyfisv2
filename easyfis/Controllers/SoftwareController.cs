@@ -395,6 +395,15 @@ namespace easyfis.Controllers
             return UserRights("BankReconciliation");
         }
 
+        // ============
+        // System Table
+        // ============
+        [Authorize]
+        public ActionResult SystemTables()
+        {
+            return UserRights("SystemTables");
+        }
+
         // =======
         // Company
         // =======
@@ -1058,22 +1067,6 @@ namespace easyfis.Controllers
             }
         }
 
-        // ============
-        // System Table
-        // ============
-        [Authorize]
-        public ActionResult SystemTables()
-        {
-            if (PageAccess("SystemTables").Equals("SystemTables"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-        
         // =======================
         // POS Integration Reports
         // =======================

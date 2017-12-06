@@ -40,34 +40,34 @@ namespace easyfis.Controllers
             return taxTypes.ToList();
         }
 
-        // get tax type
-        [Authorize]
-        [HttpGet]
-        [Route("api/taxType/{id}")]
-        public Models.MstTaxType getTaxTypeById(String id)
-        {
-            var taxTypes = from d in db.MstTaxTypes
-                           where d.Id == Convert.ToInt32(id)
-                           select new Models.MstTaxType
-                           {
-                               Id = d.Id,
-                               TaxType = d.TaxType,
-                               TaxRate = d.TaxRate,
-                               IsInclusive = d.IsInclusive,
-                               AccountId = d.AccountId,
-                               AccountCode = d.MstAccount.AccountCode,
-                               Account = d.MstAccount.Account,
-                               IsLocked = d.IsLocked,
-                               CreatedById = d.CreatedById,
-                               CreatedBy = d.MstUser.FullName,
-                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                               UpdatedById = d.UpdatedById,
-                               UpdatedBy = d.MstUser1.FullName,
-                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                           };
+        //// get tax type
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/taxType/{id}")]
+        //public Models.MstTaxType getTaxTypeById(String id)
+        //{
+        //    var taxTypes = from d in db.MstTaxTypes
+        //                   where d.Id == Convert.ToInt32(id)
+        //                   select new Models.MstTaxType
+        //                   {
+        //                       Id = d.Id,
+        //                       TaxType = d.TaxType,
+        //                       TaxRate = d.TaxRate,
+        //                       IsInclusive = d.IsInclusive,
+        //                       AccountId = d.AccountId,
+        //                       AccountCode = d.MstAccount.AccountCode,
+        //                       Account = d.MstAccount.Account,
+        //                       IsLocked = d.IsLocked,
+        //                       CreatedById = d.CreatedById,
+        //                       CreatedBy = d.MstUser.FullName,
+        //                       CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                       UpdatedById = d.UpdatedById,
+        //                       UpdatedBy = d.MstUser1.FullName,
+        //                       UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                   };
 
-            return (Models.MstTaxType)taxTypes.FirstOrDefault();
-        }
+        //    return (Models.MstTaxType)taxTypes.FirstOrDefault();
+        //}
 
         // add tax type
         [Authorize]

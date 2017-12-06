@@ -35,29 +35,29 @@ namespace easyfis.Controllers
             return units.ToList();
         }
 
-        // get Unit by Id
-        [Authorize]
-        [HttpGet]
-        [Route("api/unit/{Id}")]
-        public Models.MstUnit getUnitById(String Id)
-        {
-            var units = from d in db.MstUnits
-                        where d.Id == Convert.ToInt32(Id)
-                        select new Models.MstUnit
-                        {
-                            Id = d.Id,
-                            Unit = d.Unit,
-                            IsLocked = d.IsLocked,
-                            CreatedById = d.CreatedById,
-                            CreatedBy = d.MstUser.FullName,
-                            CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                            UpdatedById = d.UpdatedById,
-                            UpdatedBy = d.MstUser1.FullName,
-                            UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                        };
+        //// get Unit by Id
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/unit/{Id}")]
+        //public Models.MstUnit getUnitById(String Id)
+        //{
+        //    var units = from d in db.MstUnits
+        //                where d.Id == Convert.ToInt32(Id)
+        //                select new Models.MstUnit
+        //                {
+        //                    Id = d.Id,
+        //                    Unit = d.Unit,
+        //                    IsLocked = d.IsLocked,
+        //                    CreatedById = d.CreatedById,
+        //                    CreatedBy = d.MstUser.FullName,
+        //                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                    UpdatedById = d.UpdatedById,
+        //                    UpdatedBy = d.MstUser1.FullName,
+        //                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                };
 
-            return (Models.MstUnit)units.FirstOrDefault();
-        }
+        //    return (Models.MstUnit)units.FirstOrDefault();
+        //}
 
         // add unit
         [Authorize]
