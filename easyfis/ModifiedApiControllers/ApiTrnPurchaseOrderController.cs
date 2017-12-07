@@ -376,6 +376,24 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
+                                    if (purchaseOrder.FirstOrDefault().TrnPurchaseOrderItems.Any())
+                                    {
+                                        foreach (var purchaseOrderItem in purchaseOrder.FirstOrDefault().TrnPurchaseOrderItems.ToList())
+                                        {
+                                            var item = from d in db.MstArticles
+                                                       where d.Id == purchaseOrderItem.ItemId
+                                                       select d;
+
+                                            if (item.Any())
+                                            {
+                                                var updateItem = item.FirstOrDefault();
+                                                updateItem.Cost = purchaseOrderItem.Cost;
+                                            }
+                                        }
+
+                                        db.SubmitChanges();
+                                    }
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else

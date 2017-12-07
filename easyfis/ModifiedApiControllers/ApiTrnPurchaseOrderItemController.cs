@@ -84,25 +84,6 @@ namespace easyfis.ModifiedApiControllers
             return itemUnit.ToList();
         }
 
-        // ====================================
-        // Get Last Purchase Price (Item Query)
-        // ====================================
-        public Decimal GetLastPurchasePriceItemQuery(Int32 itemId)
-        {
-            var purchaseOrderItems = from d in db.TrnPurchaseOrderItems.OrderByDescending(d => d.Id)
-                                     where d.ItemId == itemId
-                                     select d;
-
-            if (purchaseOrderItems.Any())
-            {
-                return purchaseOrderItems.FirstOrDefault().Cost;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         // ========================
         // Pop-Up List - Item Query
         // ========================
@@ -118,7 +99,7 @@ namespace easyfis.ModifiedApiControllers
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
                             Particulars = d.Particulars,
-                            LastPurchasePrice = GetLastPurchasePriceItemQuery(d.Id)
+                            LastPurchasePrice = d.Cost
                         };
 
             return items.ToList();
