@@ -748,7 +748,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="articleGroupModalLabel">Article Group <span id="articleGroupLockAndUnLock"></span></h4>
+                    <h4 class="modal-title" id="articleGroupModalLabel">Article Group</h4>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
@@ -839,8 +839,6 @@
                                             </tr>
                                         </table>
                                     </dd>
-                                    <dt>Lock</dt>
-                                    <dd><input type="checkbox" id="articleGroup_Lock" /></dd>
                                 </dl>
                             </form>
                         </div>
@@ -1024,7 +1022,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="employeeModalLabel">Employee <span id="employeeLockAndUnLock"></span></h4>
+                    <h4 class="modal-title" id="employeeModalLabel">Employee</h4>
                 </div>
                 <div class="modal-body">
                     <center>
@@ -1060,8 +1058,6 @@
                             <dd><input type="text" class="form-control  requiredEmployee" id="employee_ContactNumber" placeholder="Contact Number" /></dd>
                             <dt>Contact Person</dt>
                             <dd><input type="text" class="form-control  requiredEmployee" id="employee_ContactPerson" placeholder="Contact Person" /></dd>
-                            <dt>Lock</dt>
-                            <dd><input type="checkbox" id="employee_Lock" /></dd>
                         </dl>
                     </form>
                 </div>
@@ -1100,7 +1096,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="otherArticleModalLabel">Other Article <span id="otherArticleLockAndUnLock"></span></h4>
+                    <h4 class="modal-title" id="otherArticleModalLabel">Other Article</h4>
                 </div>
                 <div class="modal-body">
                     <center>
@@ -1136,8 +1132,6 @@
                             <dd><input type="text" class="form-control  requiredOtherArticle" id="otherArticle_ContactNumber" placeholder="Contact Number" /></dd>
                             <dt>Contact Person</dt>
                             <dd><input type="text" class="form-control  requiredOtherArticle" id="otherArticle_ContactPerson" placeholder="Contact Person" /></dd>
-                            <dt>Lock</dt>
-                            <dd><input type="checkbox" id="otherArticle_Lock" /></dd>
                         </dl>
                     </form>
                 </div>
@@ -1195,31 +1189,28 @@
             var discounts = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listDiscount',
+                url: '/api/discount/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (discountResults) {
-                    if (discountResults.length > 0) {
-                        for (i = 0; i < discountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             discounts.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' id='cmdDiscountEdit' onclick='btnDiscountEdit_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDiscountDelete_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: discountResults[i]["Id"],
-                                Discount: discountResults[i]["Discount"],
-                                DiscountRate: discountResults[i]["DiscountRate"],
-                                DiscountRateDisplay: parseFloat(discountResults[i]["DiscountRate"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsInclusive: discountResults[i]["IsInclusive"],
-                                AccountId: discountResults[i]["AccountId"],
-                                AccountCode: discountResults[i]["AccountCode"],
-                                Account: discountResults[i]["Account"],
-                                IsLocked: discountResults[i]["IsLocked"],
-                                CreatedById: discountResults[i]["CreatedById"],
-                                CreatedBy: discountResults[i]["CreatedBy"],
-                                CreatedDateTime: discountResults[i]["CreatedDateTime"],
-                                UpdatedById: discountResults[i]["UpdatedById"],
-                                UpdatedBy: discountResults[i]["UpdatedBy"],
-                                UpdatedDateTime: discountResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Discount: results[i]["Discount"],
+                                DiscountRate: results[i]["DiscountRate"],
+                                DiscountRateDisplay: parseFloat(results[i]["DiscountRate"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                IsInclusive: results[i]["IsInclusive"],
+                                AccountId: results[i]["AccountId"],
+                                Account: results[i]["Account"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -1286,23 +1277,23 @@
         function getDiscountAccountForComboBox(accountId) {
             var discountAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/discount/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (discountAccountResults) {
-                    if (discountAccountResults.length > 0) {
-                        for (i = 0; i < discountAccountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             discountAccountsObservableArray.push({
-                                Id: discountAccountResults[i]["Id"],
-                                AccountCode: discountAccountResults[i]["AccountCode"],
-                                Account: discountAccountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (discountAccountResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                         $('#cmdSaveDiscountButton').prop('disabled', false);
                     } else {
@@ -1407,7 +1398,7 @@
             document.getElementById('discount_DiscountRate').value = formatDecimalValues(discount.DiscountRate);
             document.getElementById('discount_VATInclusive').checked = discount.IsInclusive ? discount.IsInclusive : '';
             getDiscountAccountForComboBox(discount.AccountId);
-            
+
             document.getElementById('discount_Discount').disabled = false;
             document.getElementById('discount_DiscountRate').disabled = false;
             document.getElementById('discount_VATInclusive').disabled = false;
@@ -1481,7 +1472,7 @@
                 if (discountId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/discount/add/',
+                        url: '/api/discount/add',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: discountData,
@@ -1760,28 +1751,25 @@
             var paytypes = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listPayType',
+                url: '/api/payType/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (payTypeResults) {
-                    if (payTypeResults.length > 0) {
-                        for (i = 0; i < payTypeResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             paytypes.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPayTypeEdit_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnPayTypeDelete_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: payTypeResults[i]["Id"],
-                                PayType: payTypeResults[i]["PayType"],
-                                AccountId: payTypeResults[i]["AccountId"],
-                                AccountCode: payTypeResults[i]["AccountCode"],
-                                Account: payTypeResults[i]["Account"],
-                                IsLocked: payTypeResults[i]["IsLocked"],
-                                CreatedById: payTypeResults[i]["CreatedById"],
-                                CreatedBy: payTypeResults[i]["CreatedBy"],
-                                CreatedDateTime: payTypeResults[i]["CreatedDateTime"],
-                                UpdatedById: payTypeResults[i]["UpdatedById"],
-                                UpdatedBy: payTypeResults[i]["UpdatedBy"],
-                                UpdatedDateTime: payTypeResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                PayType: results[i]["PayType"],
+                                AccountId: results[i]["AccountId"],
+                                Account: results[i]["Account"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
 
                         }
@@ -1849,23 +1837,23 @@
         function getPayTypeAccountForComboBox(accountId) {
             var payTypeAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/payType/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (payTypeAccountResults) {
-                    if (payTypeAccountResults.length > 0) {
-                        for (i = 0; i < payTypeAccountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             payTypeAccountsObservableArray.push({
-                                Id: payTypeAccountResults[i]["Id"],
-                                AccountCode: payTypeAccountResults[i]["AccountCode"],
-                                Account: payTypeAccountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (payTypeAccountResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                         $('#cmdSavePayTypeButton').prop('disabled', false);
                     } else {
@@ -1964,7 +1952,7 @@
             payTypeId = paytype.Id;
             document.getElementById('payType_PayType').value = paytype.PayType ? paytype.PayType : '';
             getPayTypeAccountForComboBox(paytype.AccountId);
-            
+
             document.getElementById('payType_PayType').disabled = false;
         }
 
@@ -2033,7 +2021,7 @@
                 if (payTypeId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/payType/add/',
+                        url: '/api/payType/add',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: payTypeData,
@@ -2298,32 +2286,29 @@
             var taxes = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listTaxType',
+                url: '/api/taxType/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (taxResults) {
-                    if (taxResults.length > 0) {
-                        for (i = 0; i < taxResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             taxes.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnTaxEdit_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnTaxDelete_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: taxResults[i]["Id"],
-                                TaxType: taxResults[i]["TaxType"],
-                                TaxRate: taxResults[i]["TaxRate"],
-                                TaxRateDisplay: parseFloat(taxResults[i]["TaxRate"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsInclusive: taxResults[i]["IsInclusive"],
-                                AccountId: taxResults[i]["AccountId"],
-                                AccountCode: taxResults[i]["AccountCode"],
-                                Account: taxResults[i]["Account"],
-                                IsLocked: taxResults[i]["IsLocked"],
-                                CreatedById: taxResults[i]["CreatedById"],
-                                CreatedBy: taxResults[i]["CreatedBy"],
-                                CreatedDateTime: taxResults[i]["CreatedDateTime"],
-                                UpdatedById: taxResults[i]["UpdatedById"],
-                                UpdatedBy: taxResults[i]["UpdatedBy"],
-                                UpdatedDateTime: taxResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                TaxType: results[i]["TaxType"],
+                                TaxRate: results[i]["TaxRate"],
+                                TaxRateDisplay: parseFloat(results[i]["TaxRate"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                IsInclusive: results[i]["IsInclusive"],
+                                AccountId: results[i]["AccountId"],
+                                Account: results[i]["Account"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -2390,24 +2375,24 @@
         function getTaxAccountForComboBox(accountId) {
             var taxAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/taxType/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (taxAccountResults) {
-                    if (taxAccountResults.length > 0) {
-                        for (i = 0; i < taxAccountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             taxAccountsObservableArray.push({
-                                Id: taxAccountResults[i]["Id"],
-                                AccountCode: taxAccountResults[i]["AccountCode"],
-                                Account: taxAccountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (taxAccountResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                         $('#cmdSaveTaxTypeButton').prop('disabled', false);
                     } else {
@@ -2512,7 +2497,7 @@
             document.getElementById('taxType_TaxRate').value = formatDecimalValues(tax.TaxRate);
             document.getElementById('taxType_TaxVATInclusive').checked = tax.IsInclusive ? tax.IsInclusive : '';
             getTaxAccountForComboBox(tax.AccountId);
-            
+
             document.getElementById('taxType_TaxType').disabled = false;
             document.getElementById('taxType_TaxRate').disabled = false;
             document.getElementById('taxType_TaxVATInclusive').disabled = false;
@@ -2860,25 +2845,23 @@
             var units = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listUnit',
+                url: '/api/unit/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (unitResults) {
-                    if (unitResults.length > 0) {
-                        for (i = 0; i < unitResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             units.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditUnit_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeletetUnit_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: unitResults[i]["Id"],
-                                Unit: unitResults[i]["Unit"],
-                                IsLocked: unitResults[i]["IsLocked"],
-                                CreatedById: unitResults[i]["CreatedById"],
-                                CreatedBy: unitResults[i]["CreatedBy"],
-                                CreatedDateTime: unitResults[i]["CreatedDateTime"],
-                                UpdatedById: unitResults[i]["UpdatedById"],
-                                UpdatedBy: unitResults[i]["UpdatedBy"],
-                                UpdatedDateTime: unitResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Unit: results[i]["Unit"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -2991,7 +2974,7 @@
             var unit = units.currentEditItem;
             unitId = unit.Id ? unit.Id : '';
             document.getElementById('unit_Unit').value = unit.Unit ? unit.Unit : '';
-            
+
             setTimeout(function () {
                 $("#loadingModalUnit").hide();
                 $("#UnitDetailForm").show();
@@ -3321,27 +3304,27 @@
             var terms = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listTerm',
+                url: '/api/term/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (termResults) {
-                    if (termResults.length > 0) {
-                        for (i = 0; i < termResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             terms.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditTerm_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteTerm_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: termResults[i]["Id"],
-                                Term: termResults[i]["Term"],
-                                NumberOfDays: termResults[i]["NumberOfDays"],
-                                IsLocked: termResults[i]["IsLocked"],
-                                CreatedById: termResults[i]["CreatedById"],
-                                CreatedBy: termResults[i]["CreatedBy"],
-                                CreatedDateTime: termResults[i]["CreatedDateTime"],
-                                UpdatedById: termResults[i]["UpdatedById"],
-                                UpdatedBy: termResults[i]["UpdatedBy"],
-                                UpdatedDateTime: termResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Term: results[i]["Term"],
+                                NumberOfDays: results[i]["NumberOfDays"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedById: results[i]["CreatedById"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedById: results[i]["UpdatedById"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
 
                         }
@@ -3458,7 +3441,7 @@
             termId = term.Id;
             document.getElementById('term_Term').value = term.Term ? term.Term : '';
             document.getElementById('term_NoOfDays').value = term.NumberOfDays;
-            
+
             setTimeout(function () {
                 $("#loadingModalTerm").hide();
                 $("#TermDetailForm").show();
@@ -3823,42 +3806,37 @@
             var articlegroups = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listArticleGroup',
+                url: '/api/articleGroup/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleGroupResults) {
-                    if (articleGroupResults.length > 0) {
-                        for (i = 0; i < articleGroupResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articlegroups.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditArticleGroup_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteArticleGroup_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: articleGroupResults[i]["Id"],
-                                ArticleGroup: articleGroupResults[i]["ArticleGroup"],
-                                ArticleTypeId: articleGroupResults[i]["ArticleTypeId"],
-                                ArticleType: articleGroupResults[i]["ArticleType"],
-                                AccountId: articleGroupResults[i]["AccountId"],
-                                AccountCode: articleGroupResults[i]["AccountCode"],
-                                Account: articleGroupResults[i]["Account"],
-                                SalesAccountId: articleGroupResults[i]["SalesAccountId"],
-                                SalesAccountCode: articleGroupResults[i]["SalesAccountCode"],
-                                SalesAccount: articleGroupResults[i]["SalesAccount"],
-                                CostAccountId: articleGroupResults[i]["CostAccountId"],
-                                CostAccountCode: articleGroupResults[i]["CostAccountCode"],
-                                CostAccount: articleGroupResults[i]["CostAccount"],
-                                AssetAccountId: articleGroupResults[i]["AssetAccountId"],
-                                AssetAccountCode: articleGroupResults[i]["AssetAccountCode"],
-                                AssetAccount: articleGroupResults[i]["AssetAccount"],
-                                ExpenseAccountId: articleGroupResults[i]["ExpenseAccountId"],
-                                ExpenseAccountCode: articleGroupResults[i]["ExpenseAccountCode"],
-                                ExpenseAccount: articleGroupResults[i]["ExpenseAccount"],
-                                IsLocked: articleGroupResults[i]["IsLocked"],
-                                CreatedById: articleGroupResults[i]["CreatedById"],
-                                CreatedBy: articleGroupResults[i]["CreatedBy"],
-                                CreatedDateTime: articleGroupResults[i]["CreatedDateTime"],
-                                UpdatedById: articleGroupResults[i]["UpdatedById"],
-                                UpdatedBy: articleGroupResults[i]["UpdatedBy"],
-                                UpdatedDateTime: articleGroupResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"],
+                                ArticleTypeId: results[i]["ArticleTypeId"],
+                                ArticleType: results[i]["ArticleType"],
+                                AccountId: results[i]["AccountId"],
+                                Account: results[i]["Account"],
+                                SalesAccountId: results[i]["SalesAccountId"],
+                                SalesAccount: results[i]["SalesAccount"],
+                                CostAccountId: results[i]["CostAccountId"],
+                                CostAccount: results[i]["CostAccount"],
+                                AssetAccountId: results[i]["AssetAccountId"],
+                                AssetAccount: results[i]["AssetAccount"],
+                                ExpenseAccountId: results[i]["ExpenseAccountId"],
+                                ExpenseAccount: results[i]["ExpenseAccount"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedById: results[i]["CreatedById"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedById: results[i]["UpdatedById"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
 
                         }
@@ -3913,29 +3891,26 @@
         // ================
         // Get Article Type
         // ================
-        function getArticleType(articleTypeId, acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId, isLocked) {
+        function getArticleType(articleTypeId, acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId) {
             var articleTypesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listArticleType',
+                url: '/api/articleGroup/dropdown/list/articleType',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleTypeResults) {
-                    if (articleTypeResults.length > 0) {
-                        for (i = 0; i < articleTypeResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articleTypesObservableArray.push({
-                                Id: articleTypeResults[i]["Id"],
-                                ArticleType: articleTypeResults[i]["ArticleType"]
+                                Id: results[i]["Id"],
+                                ArticleType: results[i]["ArticleType"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (articleTypeResults.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
-
+                    if (results.length > 0) {
+                        disabled = false;
                         $('#cmdSaveArticleGroupButton').prop('disabled', false);
                     } else {
                         $('#cmdSaveArticleGroupButton').prop('disabled', true);
@@ -3951,7 +3926,7 @@
                         selectedValue: articleTypeId
                     });
 
-                    getArticleGroupAccount(acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId, isLocked);
+                    getArticleGroupAccount(acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId);
                 }
             });
         }
@@ -3959,29 +3934,27 @@
         // ============================================
         // Get Account list for article group combo box
         // ============================================
-        function getArticleGroupAccount(acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId, isLocked) {
+        function getArticleGroupAccount(acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId) {
             var articleGroupAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/articleGroup/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleGroupAccountResults) {
-                    if (articleGroupAccountResults.length > 0) {
-                        for (i = 0; i < articleGroupAccountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articleGroupAccountsObservableArray.push({
-                                Id: articleGroupAccountResults[i]["Id"],
-                                AccountCode: articleGroupAccountResults[i]["AccountCode"],
-                                Account: articleGroupAccountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (articleGroupAccountResults.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
+                    if (results.length > 0) {
+                        disabled = false;
                     } else {
                         $('#cmdSaveArticleGroupButton').prop('disabled', true);
                     }
@@ -4155,11 +4128,9 @@
 
             articleGroupId = 0;
             document.getElementById('articleGroup_ArticleGroup').value = "NA";
-            getArticleType(0, 0, 0, 0, 0, 0, false);
-            document.getElementById('articleGroup_Lock').checked = false;
+            getArticleType(0, 0, 0, 0, 0, 0);
 
             document.getElementById('articleGroup_ArticleGroup').disabled = false;
-            document.getElementById('articleGroupLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
 
             $('#btnAddArticleGroupBranch').prop('disabled', true);
         }
@@ -4191,18 +4162,7 @@
             var articlegroup = articlegroups.currentEditItem;
             articleGroupId = articlegroup.Id;
             document.getElementById('articleGroup_ArticleGroup').value = articlegroup.ArticleGroup;
-            getArticleType(articlegroup.ArticleTypeId, articlegroup.AccountId, articlegroup.SalesAccountId, articlegroup.CostAccountId, articlegroup.AssetAccountId, articlegroup.ExpenseAccountId, articlegroup.IsLocked);
-            document.getElementById('articleGroup_Lock').checked = articlegroup.IsLocked;
-
-            if (document.getElementById('articleGroup_Lock').checked == true) {
-                document.getElementById('articleGroup_ArticleGroup').disabled = true;
-                document.getElementById('articleGroupLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-                $('#btnAddArticleGroupBranch').prop('disabled', true);
-            } else {
-                document.getElementById('articleGroup_ArticleGroup').disabled = false;
-                document.getElementById('articleGroupLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-                $('#btnAddArticleGroupBranch').prop('disabled', false);
-            }
+            getArticleType(articlegroup.ArticleTypeId, articlegroup.AccountId, articlegroup.SalesAccountId, articlegroup.CostAccountId, articlegroup.AssetAccountId, articlegroup.ExpenseAccountId);
 
             $("#loadingArticleGroupBranch").show();
             document.getElementById("loadingArticleGroupBranch").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -4273,7 +4233,6 @@
             articleGroupObject.CostAccountId = cboArticleGroupCostAccount.selectedValue;
             articleGroupObject.AssetAccountId = cboArticleGroupAssetAccount.selectedValue;
             articleGroupObject.ExpenseAccountId = cboArticleGroupExpenseAccount.selectedValue;
-            articleGroupObject.IsLocked = document.getElementById('articleGroup_Lock').checked;
             var articleGroupData = JSON.stringify(articleGroupObject);
 
             if (articleGroupEntryValidation()) {
@@ -4284,17 +4243,30 @@
                 if (articleGroupId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/addArticleGroup',
+                        url: '/api/articleGroup/add',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: articleGroupData,
-                        success: function (id) {
-                            if (id > 0) {
+                        statusCode: {
+                            200: function () {
                                 toastr.success("Save Successful");
                                 $('#articleGroupEdit').modal('hide');
                                 refreshArticleGroupFlexgrid();
-                            } else {
-                                toastr.error("Internal Server Error");
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveArticleGroupButton').prop('disabled', false);
+                                $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveArticleGroupButton').prop('disabled', false);
+                                $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveArticleGroupButton').prop('disabled', false);
                                 $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
@@ -4304,7 +4276,7 @@
                 } else {
                     $.ajax({
                         type: "PUT",
-                        url: '/api/updateArticleGroup/' + articleGroupId,
+                        url: '/api/articleGroup/update/' + articleGroupId,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: articleGroupData,
@@ -4314,14 +4286,20 @@
                                 $('#articleGroupEdit').modal('hide');
                                 refreshArticleGroupFlexgrid();
                             },
-                            404: function () {
-                                toastr.error("Not Found");
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                                 document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveArticleGroupButton').prop('disabled', false);
                                 $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
                             },
-                            400: function () {
-                                toastr.error("Bad Request");
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveArticleGroupButton').prop('disabled', false);
+                                $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveArticleGroupButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveArticleGroupButton').prop('disabled', false);
                                 $('#cmdArticleGroupDetailCloseButton').prop('disabled', false);
@@ -4340,18 +4318,15 @@
         function btnDeleteArticleGroup_OnClick() {
             articlegroups.editItem(articlegroups.currentItem);
             var articlegroup = articlegroups.currentEditItem;
-            if (articlegroup.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteArticleGroupConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById("cmdConfirmDeleteArticleGroup").innerHTML = '<i class="fa fa-trash"></i> Delete';
-                $('#cmdConfirmDeleteArticleGroup').prop('disabled', false);
-                $('#cmdConfirmDeleteCloseButtonArticleGroup').prop('disabled', false);
-            }
+            $('#deleteArticleGroupConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById("cmdConfirmDeleteArticleGroup").innerHTML = '<i class="fa fa-trash"></i> Delete';
+            $('#cmdConfirmDeleteArticleGroup').prop('disabled', false);
+            $('#cmdConfirmDeleteCloseButtonArticleGroup').prop('disabled', false);
         }
 
         // Article Group Confirm Delete Button
@@ -4362,8 +4337,9 @@
 
             articlegroups.editItem(articlegroups.currentItem);
             var articleGroupId = articlegroups.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteArticleGroup/' + articleGroupId,
+                url: '/api/articleGroup/delete/' + articleGroupId,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -4373,16 +4349,22 @@
                         $('#deleteArticleGroupConfirm').modal('hide');
                         refreshArticleGroupFlexgrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteArticleGroupConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteArticleGroup").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteArticleGroup').prop('disabled', false);
                         $('#cmdConfirmDeleteCloseButtonArticleGroup').prop('disabled', false);
-
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteArticleGroupConfirm').modal('hide');
+                        document.getElementById("cmdConfirmDeleteArticleGroup").innerHTML = '<i class="fa fa-trash"></i> Delete';
+                        $('#cmdConfirmDeleteArticleGroup').prop('disabled', false);
+                        $('#cmdConfirmDeleteCloseButtonArticleGroup').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteArticleGroupConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteArticleGroup").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteArticleGroup').prop('disabled', false);
@@ -4544,35 +4526,25 @@
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (articleGroupBranchResults) {
-                        if (articleGroupBranchResults.length > 0) {
-                            for (i = 0; i < articleGroupBranchResults.length; i++) {
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
                                 var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditArticleGroupBranch_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
                                 var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteArticleGroupBranch_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
 
                                 articleGroupBranchesObservableArray.push({
                                     EditId: btnEditId,
                                     DeleteId: btnDeleteId,
-                                    Id: articleGroupBranchResults[i]["Id"],
-                                    ArticleGroupId: articleGroupBranchResults[i]["ArticleGroupId"],
-                                    ArticleGroup: articleGroupBranchResults[i]["ArticleGroup"],
-                                    BranchId: articleGroupBranchResults[i]["BranchId"],
-                                    Branch: articleGroupBranchResults[i]["Branch"],
-                                    AccountId: articleGroupBranchResults[i]["AccountId"],
-                                    AccountCode: articleGroupBranchResults[i]["AccountCode"],
-                                    Account: articleGroupBranchResults[i]["Account"],
-                                    SalesAccountId: articleGroupBranchResults[i]["SalesAccountId"],
-                                    SalesAccountCode: articleGroupBranchResults[i]["SalesAccountCode"],
-                                    SalesAccount: articleGroupBranchResults[i]["SalesAccount"],
-                                    CostAccountId: articleGroupBranchResults[i]["CostAccountId"],
-                                    CostAccountCode: articleGroupBranchResults[i]["CostAccountCode"],
-                                    CostAccount: articleGroupBranchResults[i]["CostAccount"],
-                                    AssetAccountId: articleGroupBranchResults[i]["AssetAccountId"],
-                                    AssetAccountCode: articleGroupBranchResults[i]["AssetAccountCode"],
-                                    AssetAccount: articleGroupBranchResults[i]["AssetAccount"],
-                                    ExpenseAccountId: articleGroupBranchResults[i]["ExpenseAccountId"],
-                                    ExpenseAccountCode: articleGroupBranchResults[i]["ExpenseAccountCode"],
-                                    ExpenseAccount: articleGroupBranchResults[i]["ExpenseAccount"]
+                                    Id: results[i]["Id"],
+                                    ArticleGroupId: results[i]["ArticleGroupId"],
+                                    CompanyId: results[i]["CompanyId"],
+                                    BranchId: results[i]["BranchId"],
+                                    Branch: results[i]["Branch"],
+                                    AccountId: results[i]["AccountId"],
+                                    SalesAccountId: results[i]["SalesAccountId"],
+                                    CostAccountId: results[i]["CostAccountId"],
+                                    AssetAccountId: results[i]["AssetAccountId"],
+                                    ExpenseAccountId: results[i]["ExpenseAccountId"],
                                 });
 
                             }
@@ -4653,22 +4625,22 @@
         function createCboArticleGroupBranchesCompany(companyId, branchId, acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId) {
             var companiesObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/company/list',
+                url: '/api/articleGroupBranch/dropdown/list/company',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (companyListResults) {
-                    if (companyListResults.length > 0) {
-                        for (i = 0; i < companyListResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             companiesObservableArray.push({
-                                Id: companyListResults[i]["Id"],
-                                Company: companyListResults[i]["Company"]
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (companyListResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                         $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
                     } else {
@@ -4701,22 +4673,22 @@
             var branchesObservableArray = new wijmo.collections.ObservableArray;
             if (cboArticleGroupBranchCompany.selectedValue != null) {
                 $.ajax({
-                    url: '/api/listBranchByCompanyId/' + cboArticleGroupBranchCompany.selectedValue,
+                    url: '/api/articleGroupBranch/dropdown/list/branch/' + cboArticleGroupBranchCompany.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (branchListResults) {
-                        if (branchListResults.length > 0) {
-                            for (i = 0; i < branchListResults.length; i++) {
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
                                 branchesObservableArray.push({
-                                    Id: branchListResults[i]["Id"],
-                                    Branch: branchListResults[i]["Branch"]
+                                    Id: results[i]["Id"],
+                                    Branch: results[i]["Branch"]
                                 });
                             }
                         }
 
                         var disabled = true;
-                        if (branchListResults.length > 0) {
+                        if (results.length > 0) {
                             disabled = false;
                         } else {
                             $('#cmdSaveArticleGroupBranchButton').prop('disabled', true);
@@ -4757,23 +4729,23 @@
         function getArticleGroupBranchAccount(acccountId, salesAccountId, costAccountId, assetAccountId, expenseAccountId) {
             var articleGroupBranchAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/articleGroupBranch/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleGroupBranchListAccountResults) {
-                    if (articleGroupBranchListAccountResults.length > 0) {
-                        for (i = 0; i < articleGroupBranchListAccountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articleGroupBranchAccountsObservableArray.push({
-                                Id: articleGroupBranchListAccountResults[i]["Id"],
-                                AccountCode: articleGroupBranchListAccountResults[i]["AccountCode"],
-                                Account: articleGroupBranchListAccountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (articleGroupBranchListAccountResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                     } else {
                         $('#cmdSaveArticleGroupBranchButton').prop('disabled', true);
@@ -4999,14 +4971,20 @@
                             $('#articleGroupBranchEdit').modal('hide');
                             createArticleGroupBranchFlexGrid();
                         },
-                        404: function () {
-                            toastr.error("Not Found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
                             $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
                             $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                            $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
+                            $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
                             $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
                             $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
@@ -5026,14 +5004,20 @@
                             $('#articleGroupBranchEdit').modal('hide');
                             createArticleGroupBranchFlexGrid();
                         },
-                        404: function () {
-                            toastr.error("Not Found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
                             $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
                             $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                            $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
+                            $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById("cmdSaveArticleGroupBranchButton").innerHTML = '<i class="fa fa-save"></i> Save';
                             $('#cmdSaveArticleGroupBranchButton').prop('disabled', false);
                             $('#cmdArticleGroupBranchDetailCloseButton').prop('disabled', false);
@@ -5067,6 +5051,7 @@
 
             articleGroupBranchCollectionView.editItem(articleGroupBranchCollectionView.currentItem);
             var articleGroupBranch = articleGroupBranchCollectionView.currentEditItem;
+
             $.ajax({
                 url: '/api/articleGroupBranch/delete/' + articleGroupBranch.Id,
                 type: "DELETE",
@@ -5078,16 +5063,22 @@
                         $('#deleteArticleGroupBranchConfirm').modal('hide');
                         createArticleGroupBranchFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteArticleGroupBranchConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteArticleGroupBranch").innerHTML = '<i class="fa fa-save"></i> Save';
                         $('#cmdConfirmDeleteArticleGroupBranch').prop('disabled', false);
                         $('#cmdConfirmDeleteCloseButtonArticleGroupBranch').prop('disabled', false);
-
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteArticleGroupBranchConfirm').modal('hide');
+                        document.getElementById("cmdConfirmDeleteArticleGroupBranch").innerHTML = '<i class="fa fa-save"></i> Save';
+                        $('#cmdConfirmDeleteArticleGroupBranch').prop('disabled', false);
+                        $('#cmdConfirmDeleteCloseButtonArticleGroupBranch').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteArticleGroupBranchConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteArticleGroupBranch").innerHTML = '<i class="fa fa-save"></i> Save';
                         $('#cmdConfirmDeleteArticleGroupBranch').prop('disabled', false);
@@ -5126,59 +5117,31 @@
             var employees = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listArticleByArticleTypeId/4',
+                url: '/api/employee/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (employeeResults) {
-                    if (employeeResults.length > 0) {
-                        for (i = 0; i < employeeResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             employees.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditEmployee_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteEmployee_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: employeeResults[i]["Id"],
-                                ArticleCode: employeeResults[i]["ArticleCode"],
-                                ManualArticleCode: employeeResults[i]["ManualArticleCode"],
-                                Article: employeeResults[i]["Article"],
-                                Category: employeeResults[i]["Category"],
-                                ArticleTypeId: employeeResults[i]["ArticleTypeId"],
-                                ArticleType: employeeResults[i]["ArticleType"],
-                                ArticleGroupId: employeeResults[i]["ArticleGroupId"],
-                                ArticleGroup: employeeResults[i]["ArticleGroup"],
-                                AccountId: employeeResults[i]["AccountId"],
-                                AccountCode: employeeResults[i]["AccountCode"],
-                                Account: employeeResults[i]["Account"],
-                                SalesAccountId: employeeResults[i]["SalesAccountId"],
-                                CostAccountId: employeeResults[i]["CostAccountId"],
-                                AssetAccountId: employeeResults[i]["AssetAccountId"],
-                                ExpenseAccountId: employeeResults[i]["ExpenseAccountId"],
-                                UnitId: employeeResults[i]["UnitId"],
-                                Unit: employeeResults[i]["Unit"],
-                                OutputTaxId: employeeResults[i]["OutputTaxId"],
-                                InputTaxId: employeeResults[i]["InputTaxId"],
-                                WTaxTypeId: employeeResults[i]["WTaxTypeId"],
-                                Price: employeeResults[i]["Price"],
-                                Cost: employeeResults[i]["Cost"],
-                                IsInventory: employeeResults[i]["IsInventory"],
-                                Particulars: employeeResults[i]["Particulars"],
-                                Address: employeeResults[i]["Address"],
-                                TermId: employeeResults[i]["TermId"],
-                                ContactNumber: employeeResults[i]["ContactNumber"],
-                                ContactPerson: employeeResults[i]["ContactPerson"],
-                                TaxNumber: employeeResults[i]["TaxNumber"],
-                                CreditLimit: employeeResults[i]["CreditLimit"],
-                                DateAcquired: employeeResults[i]["DateAcquired"],
-                                UsefulLife: employeeResults[i]["UsefulLife"],
-                                SalvageValue: employeeResults[i]["SalvageValue"],
-                                ManualArticleOldCode: employeeResults[i]["ManualArticleOldCode"],
-                                IsLocked: employeeResults[i]["IsLocked"],
-                                CreatedById: employeeResults[i]["CreatedById"],
-                                CreatedBy: employeeResults[i]["CreatedBy"],
-                                CreatedDateTime: employeeResults[i]["CreatedDateTime"],
-                                UpdatedById: employeeResults[i]["UpdatedById"],
-                                UpdatedBy: employeeResults[i]["UpdatedBy"],
-                                UpdatedDateTime: employeeResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                ArticleCode: results[i]["ArticleCode"],
+                                Article: results[i]["Article"],
+                                ArticleGroupId: results[i]["ArticleGroupId"],
+                                ArticleGroup: results[i]["ArticleGroup"],
+                                AccountId: results[i]["AccountId"],
+                                Address: results[i]["Address"],
+                                ContactNumber: results[i]["ContactNumber"],
+                                ContactPerson: results[i]["ContactPerson"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
 
                         }
@@ -5230,43 +5193,34 @@
             btnCurrentPageGridEmployee.innerHTML = (employees.pageIndex + 1) + ' / ' + employees.pageCount;
         }
 
-
         // =========================
         // Get Artile Employee Group
         // =========================
-        function getArticleEmployeeGroupForComboBox(employeeGroupId, accountId, isLocked) {
+        function getArticleEmployeeGroupForComboBox(employeeGroupId, accountId) {
             var articleEmployeeGroupsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listArticleGroupByArticleTypeId/4',
+                url: '/api/employee/dropdown/list/employeeGroup',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleEmployeeGroupResults) {
-                    if (articleEmployeeGroupResults.length > 0) {
-                        for (i = 0; i < articleEmployeeGroupResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articleEmployeeGroupsObservableArray.push({
-                                Id: articleEmployeeGroupResults[i]["Id"],
-                                ArticleGroup: articleEmployeeGroupResults[i]["ArticleGroup"],
-                                AccountId: articleEmployeeGroupResults[i]["AccountId"],
-                                AccountCode: articleEmployeeGroupResults[i]["AccountCode"],
-                                Account: articleEmployeeGroupResults[i]["Account"],
-                                SalesAccountId: articleEmployeeGroupResults[i]["SalesAccountId"],
-                                SalesAccount: articleEmployeeGroupResults[i]["SalesAccount"],
-                                CostAccountId: articleEmployeeGroupResults[i]["CostAccountId"],
-                                CostAccount: articleEmployeeGroupResults[i]["CostAccount"],
-                                AssetAccountId: articleEmployeeGroupResults[i]["AssetAccountId"],
-                                AssetAccount: articleEmployeeGroupResults[i]["AssetAccount"],
-                                ExpenseAccountId: articleEmployeeGroupResults[i]["ExpenseAccountId"],
-                                ExpenseAccount: articleEmployeeGroupResults[i]["ExpenseAccount"]
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"],
+                                AccountId: results[i]["AccountId"],
+                                SalesAccountId: results[i]["SalesAccountId"],
+                                CostAccountId: results[i]["CostAccountId"],
+                                AssetAccountId: results[i]["AssetAccountId"],
+                                ExpenseAccountId: results[i]["ExpenseAccountId"],
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (articleEmployeeGroupResults.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
+                    if (results.length > 0) {
+                        disabled = false;
                         $('#cmdSaveEmployeeButton').prop('disabled', false);
                     } else {
                         $('#cmdSaveEmployeeButton').prop('disabled', true);
@@ -5286,7 +5240,7 @@
                         }
                     });
 
-                    getEmployeeAccountForComboBox(accountId, isLocked);
+                    getEmployeeAccountForComboBox(accountId);
                 }
             });
         }
@@ -5294,29 +5248,27 @@
         // ===========
         // Get Account
         // ===========
-        function getEmployeeAccountForComboBox(accountId, isLocked) {
+        function getEmployeeAccountForComboBox(accountId) {
             var accountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/employee/dropdown/list/employeeGroup/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (accountResults) {
-                    if (accountResults.length > 0) {
-                        for (i = 0; i < accountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             accountsObservableArray.push({
-                                Id: accountResults[i]["Id"],
-                                AccountCode: accountResults[i]["AccountCode"],
-                                Account: accountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (accountsObservableArray.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
+                    if (results.length > 0) {
+                        disabled = false;
                     } else {
                         $('#cmdSaveEmployeeButton').prop('disabled', true);
                     }
@@ -5393,16 +5345,14 @@
             document.getElementById('employee_Code').value = "NA";
             document.getElementById('employee_ContactPerson').value = "NA";
             document.getElementById('employee_Employee').value = "NA";
-            getArticleEmployeeGroupForComboBox(0, 0, false);
+            getArticleEmployeeGroupForComboBox(0, 0);
             document.getElementById('employee_Address').value = "NA";
             document.getElementById('employee_ContactNumber').value = "NA";
-            document.getElementById('employee_Lock').checked = false;
 
             document.getElementById('employee_ContactPerson').disabled = false;
             document.getElementById('employee_Employee').disabled = false;
             document.getElementById('employee_Address').disabled = false;
             document.getElementById('employee_ContactNumber').disabled = false;
-            document.getElementById('employeeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
         }
 
         // =============
@@ -5437,25 +5387,10 @@
             employeeId = employee.Id;
             document.getElementById('employee_Code').value = employee.ArticleCode;
             document.getElementById('employee_Employee').value = employee.Article;
-            getArticleEmployeeGroupForComboBox(employee.ArticleGroupId, employee.AccountId, employee.IsLocked);
+            getArticleEmployeeGroupForComboBox(employee.ArticleGroupId, employee.AccountId);
             document.getElementById('employee_Address').value = employee.Address ? employee.Address : '';
             document.getElementById('employee_ContactNumber').value = employee.ContactNumber ? employee.ContactNumber : '';
             document.getElementById('employee_ContactPerson').value = employee.ContactPerson;
-            document.getElementById('employee_Lock').checked = employee.IsLocked;
-
-            if (document.getElementById('employee_Lock').checked == true) {
-                document.getElementById('employee_ContactPerson').disabled = true;
-                document.getElementById('employee_Employee').disabled = true;
-                document.getElementById('employee_Address').disabled = true;
-                document.getElementById('employee_ContactNumber').disabled = true;
-                document.getElementById('employeeLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('employee_ContactPerson').disabled = false;
-                document.getElementById('employee_Employee').disabled = false;
-                document.getElementById('employee_Address').disabled = false;
-                document.getElementById('employee_ContactNumber').disabled = false;
-                document.getElementById('employeeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
         }
 
         // =========================
@@ -5516,10 +5451,13 @@
             employeeObject.Article = document.getElementById('employee_Employee').value;
             employeeObject.ArticleGroupId = cboEmployeeGroup.selectedValue;
             employeeObject.AccountId = cboEmployeeAccount.selectedValue;
+            employeeObject.SalesAccountId = cboEmployeeGroup.selectedItem["SalesAccountId"];
+            employeeObject.CostAccountId = cboEmployeeGroup.selectedItem["CostAccountId"];
+            employeeObject.AssetAccountId = cboEmployeeGroup.selectedItem["AssetAccountId"];
+            employeeObject.ExpenseAccountId = cboEmployeeGroup.selectedItem["ExpenseAccountId"];
             employeeObject.Address = document.getElementById('employee_Address').value;
             employeeObject.ContactNumber = document.getElementById('employee_ContactNumber').value;
             employeeObject.ContactPerson = document.getElementById('employee_ContactPerson').value;
-            employeeObject.IsLocked = document.getElementById('employee_Lock').checked;
             var employeeData = JSON.stringify(employeeObject);
 
             if (employeeEntryValidation()) {
@@ -5530,17 +5468,30 @@
                 if (employeeId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/addArticle/4',
+                        url: '/api/employee/add',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: employeeData,
-                        success: function (id) {
-                            if (id > 0) {
+                        statusCode: {
+                            200: function () {
                                 toastr.success("Save Successful");
                                 $('#employeeEdit').modal('hide');
                                 refreshEmployeeFlexgrid();
-                            } else {
-                                toastr.error("Internal Server Error");
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveEmployeeButton').prop('disabled', false);
+                                $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveEmployeeButton').prop('disabled', false);
+                                $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveEmployeeButton').prop('disabled', false);
                                 $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
@@ -5550,7 +5501,7 @@
                 } else {
                     $.ajax({
                         type: "PUT",
-                        url: '/api/updateArticle/' + employeeId + '/4',
+                        url: '/api/employee/update/' + employeeId,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: employeeData,
@@ -5560,14 +5511,20 @@
                                 $('#employeeEdit').modal('hide');
                                 refreshEmployeeFlexgrid();
                             },
-                            404: function () {
-                                toastr.error("Not Found");
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                                 document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveEmployeeButton').prop('disabled', false);
                                 $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
                             },
-                            400: function () {
-                                toastr.error("Bad Request");
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveEmployeeButton').prop('disabled', false);
+                                $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveEmployeeButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveEmployeeButton').prop('disabled', false);
                                 $('#cmdEmployeeDetailCloseButton').prop('disabled', false);
@@ -5586,18 +5543,15 @@
         function btnDeleteEmployee_OnClick() {
             employees.editItem(employees.currentItem);
             var employee = employees.currentEditItem;
-            if (employee.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteEmployeeConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById("cmdConfirmDeleteEmployee").innerHTML = '<i class="fa fa-trash"></i> Delete';
-                $('#cmdConfirmDeleteEmployee').prop('disabled', false);
-                $('#cmdConfirmDeleteCloseButtonEmployee').prop('disabled', false);
-            }
+            $('#deleteEmployeeConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById("cmdConfirmDeleteEmployee").innerHTML = '<i class="fa fa-trash"></i> Delete';
+            $('#cmdConfirmDeleteEmployee').prop('disabled', false);
+            $('#cmdConfirmDeleteCloseButtonEmployee').prop('disabled', false);
         }
 
         // Employee Confirm Delete Button
@@ -5608,8 +5562,9 @@
 
             employees.editItem(employees.currentItem);
             var employeeId = employees.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteArticle/' + employeeId,
+                url: '/api/employee/delete/' + employeeId,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -5619,15 +5574,22 @@
                         $('#deleteEmployeeConfirm').modal('hide');
                         refreshEmployeeFlexgrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteEmployeeConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteEmployee").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteEmployee').prop('disabled', false);
                         $('#cmdConfirmDeleteCloseButtonEmployee').prop('disabled', false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteEmployeeConfirm').modal('hide');
+                        document.getElementById("cmdConfirmDeleteEmployee").innerHTML = '<i class="fa fa-trash"></i> Delete';
+                        $('#cmdConfirmDeleteEmployee').prop('disabled', false);
+                        $('#cmdConfirmDeleteCloseButtonEmployee').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteEmployeeConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteEmployee").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteEmployee').prop('disabled', false);
@@ -5787,59 +5749,31 @@
             var otherArticles = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
-                url: '/api/listArticleByArticleTypeId/6',
+                url: '/api/otherArticle/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (otherArticleResults) {
-                    if (otherArticleResults.length > 0) {
-                        for (i = 0; i < otherArticleResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             otherArticles.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditOtherArticle_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteOtherArticle_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: otherArticleResults[i]["Id"],
-                                ArticleCode: otherArticleResults[i]["ArticleCode"],
-                                ManualArticleCode: otherArticleResults[i]["ManualArticleCode"],
-                                Article: otherArticleResults[i]["Article"],
-                                Category: otherArticleResults[i]["Category"],
-                                ArticleTypeId: otherArticleResults[i]["ArticleTypeId"],
-                                ArticleType: otherArticleResults[i]["ArticleType"],
-                                ArticleGroupId: otherArticleResults[i]["ArticleGroupId"],
-                                ArticleGroup: otherArticleResults[i]["ArticleGroup"],
-                                AccountId: otherArticleResults[i]["AccountId"],
-                                AccountCode: otherArticleResults[i]["AccountCode"],
-                                Account: otherArticleResults[i]["Account"],
-                                SalesAccountId: otherArticleResults[i]["SalesAccountId"],
-                                CostAccountId: otherArticleResults[i]["CostAccountId"],
-                                AssetAccountId: otherArticleResults[i]["AssetAccountId"],
-                                ExpenseAccountId: otherArticleResults[i]["ExpenseAccountId"],
-                                UnitId: otherArticleResults[i]["UnitId"],
-                                Unit: otherArticleResults[i]["Unit"],
-                                OutputTaxId: otherArticleResults[i]["OutputTaxId"],
-                                InputTaxId: otherArticleResults[i]["InputTaxId"],
-                                WTaxTypeId: otherArticleResults[i]["WTaxTypeId"],
-                                Price: otherArticleResults[i]["Price"],
-                                Cost: otherArticleResults[i]["Cost"],
-                                IsInventory: otherArticleResults[i]["IsInventory"],
-                                Particulars: otherArticleResults[i]["Particulars"],
-                                Address: otherArticleResults[i]["Address"],
-                                TermId: otherArticleResults[i]["TermId"],
-                                ContactNumber: otherArticleResults[i]["ContactNumber"],
-                                ContactPerson: otherArticleResults[i]["ContactPerson"],
-                                TaxNumber: otherArticleResults[i]["TaxNumber"],
-                                CreditLimit: otherArticleResults[i]["CreditLimit"],
-                                DateAcquired: otherArticleResults[i]["DateAcquired"],
-                                UsefulLife: otherArticleResults[i]["UsefulLife"],
-                                SalvageValue: otherArticleResults[i]["SalvageValue"],
-                                ManualArticleOldCode: otherArticleResults[i]["ManualArticleOldCode"],
-                                IsLocked: otherArticleResults[i]["IsLocked"],
-                                CreatedById: otherArticleResults[i]["CreatedById"],
-                                CreatedBy: otherArticleResults[i]["CreatedBy"],
-                                CreatedDateTime: otherArticleResults[i]["CreatedDateTime"],
-                                UpdatedById: otherArticleResults[i]["UpdatedById"],
-                                UpdatedBy: otherArticleResults[i]["UpdatedBy"],
-                                UpdatedDateTime: otherArticleResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                ArticleCode: results[i]["ArticleCode"],
+                                Article: results[i]["Article"],
+                                ArticleGroupId: results[i]["ArticleGroupId"],
+                                ArticleGroup: results[i]["ArticleGroup"],
+                                AccountId: results[i]["AccountId"],
+                                Address: results[i]["Address"],
+                                ContactNumber: results[i]["ContactNumber"],
+                                ContactPerson: results[i]["ContactPerson"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
 
                         }
@@ -5895,39 +5829,31 @@
         // =========================
         // Get Artile OtherArticle Group
         // =========================
-        function getArticleOtherArticleGroupForComboBox(otherArticleGroupId, accountId, isLocked) {
+        function getArticleOtherArticleGroupForComboBox(otherArticleGroupId, accountId) {
             var articleOtherArticleGroupsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listArticleGroupByArticleTypeId/6',
+                url: '/api/otherArticle/dropdown/list/otherArticleGroup',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (articleOtherArticleGroupResults) {
-                    if (articleOtherArticleGroupResults.length > 0) {
-                        for (i = 0; i < articleOtherArticleGroupResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             articleOtherArticleGroupsObservableArray.push({
-                                Id: articleOtherArticleGroupResults[i]["Id"],
-                                ArticleGroup: articleOtherArticleGroupResults[i]["ArticleGroup"],
-                                AccountId: articleOtherArticleGroupResults[i]["AccountId"],
-                                AccountCode: articleOtherArticleGroupResults[i]["AccountCode"],
-                                Account: articleOtherArticleGroupResults[i]["Account"],
-                                SalesAccountId: articleOtherArticleGroupResults[i]["SalesAccountId"],
-                                SalesAccount: articleOtherArticleGroupResults[i]["SalesAccount"],
-                                CostAccountId: articleOtherArticleGroupResults[i]["CostAccountId"],
-                                CostAccount: articleOtherArticleGroupResults[i]["CostAccount"],
-                                AssetAccountId: articleOtherArticleGroupResults[i]["AssetAccountId"],
-                                AssetAccount: articleOtherArticleGroupResults[i]["AssetAccount"],
-                                ExpenseAccountId: articleOtherArticleGroupResults[i]["ExpenseAccountId"],
-                                ExpenseAccount: articleOtherArticleGroupResults[i]["ExpenseAccount"]
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"],
+                                AccountId: results[i]["AccountId"],
+                                SalesAccountId: results[i]["SalesAccountId"],
+                                CostAccountId: results[i]["CostAccountId"],
+                                AssetAccountId: results[i]["AssetAccountId"],
+                                ExpenseAccountId: results[i]["ExpenseAccountId"],
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (articleOtherArticleGroupResults.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
+                    if (results.length > 0) {
+                        disabled = false;
                         $('#cmdSaveOtherArticleButton').prop('disabled', false);
                     } else {
                         $('#cmdSaveOtherArticleButton').prop('disabled', true);
@@ -5947,7 +5873,7 @@
                         }
                     });
 
-                    getOtherArticleAccountForComboBox(accountId, isLocked);
+                    getOtherArticleAccountForComboBox(accountId);
                 }
             });
         }
@@ -5955,29 +5881,27 @@
         // ===========
         // Get Account
         // ===========
-        function getOtherArticleAccountForComboBox(accountId, isLocked) {
+        function getOtherArticleAccountForComboBox(accountId) {
             var accountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/otherArticle/dropdown/list/otherArticleGroup/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (accountResults) {
-                    if (accountResults.length > 0) {
-                        for (i = 0; i < accountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             accountsObservableArray.push({
-                                Id: accountResults[i]["Id"],
-                                AccountCode: accountResults[i]["AccountCode"],
-                                Account: accountResults[i]["Account"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (accountsObservableArray.length > 0) {
-                        if (!isLocked) {
-                            disabled = false;
-                        }
+                    if (results.length > 0) {
+                        disabled = false;
                     } else {
                         $('#cmdSaveOtherArticleButton').prop('disabled', true);
                     }
@@ -6057,13 +5981,11 @@
             getArticleOtherArticleGroupForComboBox(0, 0, false);
             document.getElementById('otherArticle_Address').value = "NA";
             document.getElementById('otherArticle_ContactNumber').value = "NA";
-            document.getElementById('otherArticle_Lock').checked = false;
 
             document.getElementById('otherArticle_ContactPerson').disabled = false;
             document.getElementById('otherArticle_OtherArticle').disabled = false;
             document.getElementById('otherArticle_Address').disabled = false;
             document.getElementById('otherArticle_ContactNumber').disabled = false;
-            document.getElementById('otherArticleLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
         }
 
         // =============
@@ -6098,25 +6020,10 @@
             otherArticleId = otherArticle.Id;
             document.getElementById('otherArticle_Code').value = otherArticle.ArticleCode;
             document.getElementById('otherArticle_OtherArticle').value = otherArticle.Article;
-            getArticleOtherArticleGroupForComboBox(otherArticle.ArticleGroupId, otherArticle.AccountId, otherArticle.IsLocked);
+            getArticleOtherArticleGroupForComboBox(otherArticle.ArticleGroupId, otherArticle.AccountId);
             document.getElementById('otherArticle_Address').value = otherArticle.Address ? otherArticle.Address : '';
             document.getElementById('otherArticle_ContactNumber').value = otherArticle.ContactNumber ? otherArticle.ContactNumber : '';
             document.getElementById('otherArticle_ContactPerson').value = otherArticle.ContactPerson;
-            document.getElementById('otherArticle_Lock').checked = otherArticle.IsLocked;
-
-            if (document.getElementById('otherArticle_Lock').checked == true) {
-                document.getElementById('otherArticle_ContactPerson').disabled = true;
-                document.getElementById('otherArticle_OtherArticle').disabled = true;
-                document.getElementById('otherArticle_Address').disabled = true;
-                document.getElementById('otherArticle_ContactNumber').disabled = true;
-                document.getElementById('otherArticleLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-            } else {
-                document.getElementById('otherArticle_ContactPerson').disabled = false;
-                document.getElementById('otherArticle_OtherArticle').disabled = false;
-                document.getElementById('otherArticle_Address').disabled = false;
-                document.getElementById('otherArticle_ContactNumber').disabled = false;
-                document.getElementById('otherArticleLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-            }
         }
 
         // =========================
@@ -6177,10 +6084,13 @@
             otherArticleObject.Article = document.getElementById('otherArticle_OtherArticle').value;
             otherArticleObject.ArticleGroupId = cboOtherArticleGroup.selectedValue;
             otherArticleObject.AccountId = cboOtherArticleAccount.selectedValue;
+            otherArticleObject.SalesAccountId = cboOtherArticleGroup.selectedItem["SalesAccountId"];
+            otherArticleObject.CostAccountId = cboOtherArticleGroup.selectedItem["CostAccountId"];
+            otherArticleObject.AssetAccountId = cboOtherArticleGroup.selectedItem["AssetAccountId"];
+            otherArticleObject.ExpenseAccountId = cboOtherArticleGroup.selectedItem["ExpenseAccountId"];
             otherArticleObject.Address = document.getElementById('otherArticle_Address').value;
             otherArticleObject.ContactNumber = document.getElementById('otherArticle_ContactNumber').value;
             otherArticleObject.ContactPerson = document.getElementById('otherArticle_ContactPerson').value;
-            otherArticleObject.IsLocked = document.getElementById('otherArticle_Lock').checked;
             var otherArticleData = JSON.stringify(otherArticleObject);
 
             if (otherArticleEntryValidation()) {
@@ -6191,17 +6101,30 @@
                 if (otherArticleId == 0) {
                     $.ajax({
                         type: "POST",
-                        url: '/api/addArticle/6',
+                        url: '/api/otherArticle/add',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: otherArticleData,
-                        success: function (id) {
-                            if (id > 0) {
+                        statusCode: {
+                            200: function () {
                                 toastr.success("Save Successful");
                                 $('#otherArticleEdit').modal('hide');
                                 refreshOtherArticleFlexgrid();
-                            } else {
-                                toastr.error("Internal Server Error");
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveOtherArticleButton').prop('disabled', false);
+                                $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveOtherArticleButton').prop('disabled', false);
+                                $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveOtherArticleButton').prop('disabled', false);
                                 $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
@@ -6211,7 +6134,7 @@
                 } else {
                     $.ajax({
                         type: "PUT",
-                        url: '/api/updateArticle/' + otherArticleId + '/6',
+                        url: '/api/otherArticle/update/' + otherArticleId,
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         data: otherArticleData,
@@ -6221,14 +6144,20 @@
                                 $('#otherArticleEdit').modal('hide');
                                 refreshOtherArticleFlexgrid();
                             },
-                            404: function () {
-                                toastr.error("Not Found");
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                                 document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveOtherArticleButton').prop('disabled', false);
                                 $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
                             },
-                            400: function () {
-                                toastr.error("Bad Request");
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
+                                $('#cmdSaveOtherArticleButton').prop('disabled', false);
+                                $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                                 document.getElementById("cmdSaveOtherArticleButton").innerHTML = '<i class="fa fa-save"></i> Save';
                                 $('#cmdSaveOtherArticleButton').prop('disabled', false);
                                 $('#cmdOtherArticleDetailCloseButton').prop('disabled', false);
@@ -6247,18 +6176,15 @@
         function btnDeleteOtherArticle_OnClick() {
             otherArticles.editItem(otherArticles.currentItem);
             var otherArticle = otherArticles.currentEditItem;
-            if (otherArticle.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteOtherArticleConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById("cmdConfirmDeleteOtherArticle").innerHTML = '<i class="fa fa-trash"></i> Delete';
-                $('#cmdConfirmDeleteOtherArticle').prop('disabled', false);
-                $('#cmdConfirmDeleteCloseButtonOtherArticle').prop('disabled', false);
-            }
+            $('#deleteOtherArticleConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById("cmdConfirmDeleteOtherArticle").innerHTML = '<i class="fa fa-trash"></i> Delete';
+            $('#cmdConfirmDeleteOtherArticle').prop('disabled', false);
+            $('#cmdConfirmDeleteCloseButtonOtherArticle').prop('disabled', false);
         }
 
         // OtherArticle Confirm Delete Button
@@ -6269,8 +6195,9 @@
 
             otherArticles.editItem(otherArticles.currentItem);
             var otherArticleId = otherArticles.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteArticle/' + otherArticleId,
+                url: '/api/otherArticle/delete/' + otherArticleId,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -6280,15 +6207,22 @@
                         $('#deleteOtherArticleConfirm').modal('hide');
                         refreshOtherArticleFlexgrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteOtherArticleConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteOtherArticle").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteOtherArticle').prop('disabled', false);
                         $('#cmdConfirmDeleteCloseButtonOtherArticle').prop('disabled', false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteOtherArticleConfirm').modal('hide');
+                        document.getElementById("cmdConfirmDeleteOtherArticle").innerHTML = '<i class="fa fa-trash"></i> Delete';
+                        $('#cmdConfirmDeleteOtherArticle').prop('disabled', false);
+                        $('#cmdConfirmDeleteCloseButtonOtherArticle').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteOtherArticleConfirm').modal('hide');
                         document.getElementById("cmdConfirmDeleteOtherArticle").innerHTML = '<i class="fa fa-trash"></i> Delete';
                         $('#cmdConfirmDeleteOtherArticle').prop('disabled', false);
@@ -6573,115 +6507,6 @@
         });
 
         $(document).ready(function () {
-            // ========================
-            // article Group - IsLocked
-            // ========================
-            $('#articleGroup_Lock').click(function () {
-                if ($(this).is(':checked')) {
-                    document.getElementById('articleGroup_ArticleGroup').disabled = true;
-                    document.getElementById('articleGroupLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-                    cboArticleType.disabled = true;
-                    cboArticleGroupAccountCode.disabled = true;
-                    cboArticleGroupSalesAccountCode.disabled = true;
-                    cboArticleGroupCostAccountCode.disabled = true;
-                    cboArticleGroupAssetAccountCode.disabled = true;
-                    cboArticleGroupExpenseAccountCode.disabled = true;
-                    cboArticleGroupAccount.disabled = true;
-                    cboArticleGroupSalesAccount.disabled = true;
-                    cboArticleGroupCostAccount.disabled = true;
-                    cboArticleGroupAssetAccount.disabled = true;
-                    cboArticleGroupExpenseAccount.disabled = true;
-
-                    $('#btnAddArticleGroupBranch').prop('disabled', true);
-                    if (articleGroupId != 0) {
-                        $("#loadingArticleGroupBranch").show();
-                        document.getElementById("loadingArticleGroupBranch").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                        $("#articleGroupBranchFlexGridDetail").hide();
-
-                        setTimeout(function () {
-                            createArticleGroupBranchFlexGrid();
-                        }, 500);
-                    } else {
-                        $("#loadingArticleGroupBranch").hide();
-                        $("#articleGroupBranchFlexGridDetail").hide();
-                    }
-                } else {
-                    document.getElementById('articleGroup_ArticleGroup').disabled = false;
-                    document.getElementById('articleGroupLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-                    cboArticleType.disabled = false;
-                    cboArticleGroupAccountCode.disabled = false;
-                    cboArticleGroupSalesAccountCode.disabled = false;
-                    cboArticleGroupCostAccountCode.disabled = false;
-                    cboArticleGroupAssetAccountCode.disabled = false;
-                    cboArticleGroupExpenseAccountCode.disabled = false;
-                    cboArticleGroupAccount.disabled = false;
-                    cboArticleGroupSalesAccount.disabled = false;
-                    cboArticleGroupCostAccount.disabled = false;
-                    cboArticleGroupAssetAccount.disabled = false;
-                    cboArticleGroupExpenseAccount.disabled = false;
-
-                    $('#btnAddArticleGroupBranch').prop('disabled', false);
-                    if (articleGroupId != 0) {
-                        $("#loadingArticleGroupBranch").show();
-                        document.getElementById("loadingArticleGroupBranch").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                        $("#articleGroupBranchFlexGridDetail").hide();
-
-                        setTimeout(function () {
-                            createArticleGroupBranchFlexGrid();
-                        }, 500);
-                    } else {
-                        $("#loadingArticleGroupBranch").hide();
-                        $("#articleGroupBranchFlexGridDetail").hide();
-                    }
-                }
-            });
-
-            // ========================
-            // employee Lock - IsLocked
-            // ========================
-            $('#employee_Lock').click(function () {
-                if ($(this).is(':checked')) {
-                    document.getElementById('employee_ContactPerson').disabled = true;
-                    document.getElementById('employee_Employee').disabled = true;
-                    document.getElementById('employee_Address').disabled = true;
-                    document.getElementById('employee_ContactNumber').disabled = true;
-                    document.getElementById('employeeLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-                    cboEmployeeGroup.disabled = true;
-                    cboEmployeeAccountCode.disabled = true;
-                    cboEmployeeAccount.disabled = true;
-                } else {
-                    document.getElementById('employee_ContactPerson').disabled = false;
-                    document.getElementById('employee_Employee').disabled = false;
-                    document.getElementById('employee_Address').disabled = false;
-                    document.getElementById('employee_ContactNumber').disabled = false;
-                    document.getElementById('employeeLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-                    cboEmployeeGroup.disabled = false;
-                }
-            });
-
-            // =============================
-            // Other Article Lock - IsLocked
-            // =============================
-            $('#otherArticle_Lock').click(function () {
-                if ($(this).is(':checked')) {
-                    document.getElementById('otherArticle_ContactPerson').disabled = true;
-                    document.getElementById('otherArticle_OtherArticle').disabled = true;
-                    document.getElementById('otherArticle_Address').disabled = true;
-                    document.getElementById('otherArticle_ContactNumber').disabled = true;
-                    document.getElementById('otherArticleLockAndUnLock').innerHTML = "<i class='fa fa-lock'></i>";
-                    cboOtherArticleGroup.disabled = true;
-                    cboOtherArticleAccountCode.disabled = true;
-                    cboOtherArticleAccount.disabled = true;
-                } else {
-                    document.getElementById('otherArticle_ContactPerson').disabled = false;
-                    document.getElementById('otherArticle_OtherArticle').disabled = false;
-                    document.getElementById('otherArticle_Address').disabled = false;
-                    document.getElementById('otherArticle_ContactNumber').disabled = false;
-                    document.getElementById('otherArticleLockAndUnLock').innerHTML = "<i class='fa fa-unlock'></i>";
-                    cboOtherArticleGroup.disabled = false;
-                }
-            });
-
             // ==================
             // On load - discount
             // ==================
@@ -6695,7 +6520,7 @@
             $('#OtherArticle').hide();
             $('#AccountType').hide();
             discountTab();
-        
+
             $(document).on('show.bs.modal', '.modal', function (event) {
                 var zIndex = 1040 + (10 * $('.modal:visible').length);
                 $(this).css('z-index', zIndex);

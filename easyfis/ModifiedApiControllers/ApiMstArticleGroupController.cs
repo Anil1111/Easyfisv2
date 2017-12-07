@@ -51,6 +51,23 @@ namespace easyfis.ModifiedApiControllers
             return articleGroups.ToList();
         }
 
+        // ====================================
+        // Dropdown List - Article Type (Field)
+        // ====================================
+        [Authorize, HttpGet, Route("api/articleGroup/dropdown/list/articleType")]
+        public List<Entities.MstArticleType> DropdownListArticleGroupArticleType()
+        {
+            var articleTypes = from d in db.MstArticleTypes.OrderBy(d => d.Id)
+                               where d.IsLocked == true
+                               select new Entities.MstArticleType
+                               {
+                                   Id = d.Id,
+                                   ArticleType = d.ArticleType
+                               };
+
+            return articleTypes.ToList();
+        }
+
         // ===============================
         // Dropdown List - Account (Field)
         // ===============================

@@ -71,12 +71,11 @@ namespace easyfis.ModifiedApiControllers
         // ==============================================
         // Dropdown List - Employee Group Account (Field)
         // ==============================================
-        [Authorize, HttpGet, Route("api/employee/dropdown/list/employeeGroup/account/{accountId}")]
-        public List<Entities.MstAccount> DropdownListEmployeeGroupAccount(String accountId)
+        [Authorize, HttpGet, Route("api/employee/dropdown/list/employeeGroup/account")]
+        public List<Entities.MstAccount> DropdownListEmployeeGroupAccount()
         {
             var employeeGroupAccounts = from d in db.MstAccounts.OrderBy(d => d.Account)
-                                        where d.Id == Convert.ToInt32(accountId)
-                                        && d.IsLocked == true
+                                        where d.IsLocked == true
                                         select new Entities.MstAccount
                                         {
                                             Id = d.Id,
