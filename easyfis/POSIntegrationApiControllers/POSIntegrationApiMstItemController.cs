@@ -35,6 +35,7 @@ namespace easyfis.POSIntegrationApiControllers
                             Cost = d.Cost,
                             IsInventory = d.IsInventory,
                             Particulars = d.Particulars,
+                            OutputTax = d.MstTaxType.TaxType,
                             UpdatedDateTime = d.UpdatedDateTime.ToShortDateString(),
                             ListPOSIntegrationMstItemPrice = db.MstArticlePrices.Select(p => new POSIntegrationEntities.POSIntegrationMstItemPrice
                             {

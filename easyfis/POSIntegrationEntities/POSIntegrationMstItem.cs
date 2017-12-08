@@ -16,6 +16,7 @@ namespace easyfis.POSIntegrationEntities
         public Decimal? Cost { get; set; }
         public Boolean IsInventory { get; set; }
         public String Particulars { get; set; }
+        public String OutputTax { get; set; }
         public String UpdatedDateTime { get; set; }
         public List<POSIntegrationMstItemPrice> ListPOSIntegrationMstItemPrice { get; set; }
     }
