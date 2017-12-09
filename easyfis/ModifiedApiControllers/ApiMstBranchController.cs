@@ -16,13 +16,194 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // =====================================
+        // OLD API for Branches for Some Reports
+        // =====================================
+        [Authorize, HttpGet, Route("api/branch/list")]
+        public List<Models.MstBranch> GetListBranch()
+        {
+            var branches = from d in db.MstBranches
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return branches.ToList();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/listBranch")]
+        public List<Models.MstBranch> ListBranch()
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var currentCompanyId = currentUser.FirstOrDefault().Id;
+
+            var branches = from d in db.MstBranches
+                           where d.CompanyId == currentCompanyId
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return branches.ToList();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/listBranchByCompanyId/{companyId}")]
+        public List<Models.MstBranch> ListBranchByCompanyId(String companyId)
+        {
+            var branches = from d in db.MstBranches
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return branches.ToList();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/branch/byCompanyId/list/locked/{companyId}")]
+        public List<Models.MstBranch> ListBranchByCompanyIdLocked(String companyId)
+        {
+            var branches = from d in db.MstBranches
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           && d.MstCompany.IsLocked == true
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return branches.ToList();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/listBranchLast")]
+        public Models.MstBranch GetBranchLastRecord()
+        {
+            var branches = from d in db.MstBranches.OrderByDescending(d => d.BranchCode)
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return (Models.MstBranch)branches.FirstOrDefault();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("api/listBranchById/{Id}")]
+        public Models.MstBranch GetBranchById(String Id)
+        {
+            var branches = from d in db.MstBranches
+                           where d.Id == Convert.ToInt32(Id)
+                           select new Models.MstBranch
+                           {
+                               Id = d.Id,
+                               CompanyId = d.CompanyId,
+                               Company = d.MstCompany.Company,
+                               BranchCode = d.BranchCode,
+                               Branch = d.Branch,
+                               Address = d.Address,
+                               ContactNumber = d.ContactNumber,
+                               TaxNumber = d.TaxNumber,
+                               IsLocked = d.IsLocked,
+                               CreatedById = d.CreatedById,
+                               CreatedBy = d.MstUser.FullName,
+                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                               UpdatedById = d.UpdatedById,
+                               UpdatedBy = d.MstUser1.FullName,
+                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                           };
+
+            return (Models.MstBranch)branches.FirstOrDefault();
+        }
+
         // ===========
         // List Branch
         // ===========
-        [Authorize, HttpGet, Route("api/branch/list")]
-        public List<Entities.MstBranch> ListBranch()
+        [Authorize, HttpGet, Route("api/branch/list/{companyId}")]
+        public List<Entities.MstBranch> ListBranch(String companyId)
         {
-            var branchs = from d in db.MstBranches.OrderBy(d => d.Branch)
+            var branchs = from d in db.MstBranches.OrderBy(d => d.BranchCode)
+                          where d.CompanyId == Convert.ToInt32(companyId)
                           select new Entities.MstBranch
                           {
                               Id = d.Id,
@@ -31,14 +212,7 @@ namespace easyfis.ModifiedApiControllers
                               Branch = d.Branch,
                               Address = d.Address,
                               ContactNumber = d.ContactNumber,
-                              TaxNumber = d.TaxNumber,
-                              IsLocked = d.IsLocked,
-                              CreatedById = d.CreatedById,
-                              CreatedBy = d.MstUser.FullName,
-                              CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                              UpdatedById = d.UpdatedById,
-                              UpdatedBy = d.MstUser1.FullName,
-                              UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                              TaxNumber = d.TaxNumber
                           };
 
             return branchs.ToList();
