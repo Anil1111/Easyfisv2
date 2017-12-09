@@ -99,7 +99,7 @@ namespace easyfis.ModifiedApiControllers
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
                             Particulars = d.Particulars,
-                            LastPurchasePrice = d.Cost
+                            Cost = d.Cost
                         };
 
             return items.ToList();

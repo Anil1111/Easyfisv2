@@ -410,23 +410,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult Company()
         {
-            if (PageAccess("CompanyList").Equals("CompanyList"))
-            {
-                if (AccessToDetail("CompanyDetail").Equals("CompanyDetail"))
-                {
-                    ViewData.Add("CanAccessToDetailPage", "True");
-                }
-                else
-                {
-                    ViewData.Add("CanAccessToDetailPage", "False");
-                }
-
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("CompanyList");
         }
 
         // ==============
@@ -435,14 +419,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CompanyDetail()
         {
-            if (PageAccess("CompanyDetail").Equals("CompanyDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("CompanyDetail");
         }
 
         // ================

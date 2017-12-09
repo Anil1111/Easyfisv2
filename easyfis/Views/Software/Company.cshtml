@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -40,7 +52,12 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 40%" align="right">
-                                    <button class="btn btn-primary" id="btnAddCompany" onclick="btnAddCompany_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                    @{
+                                        if (canAdd)
+                                        {
+                                            <button class="btn btn-primary" id="btnAddCompany" onclick="btnAddCompany_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        }
+                                    }
                                     <button class="btn btn-danger" id="btnCloseCompany" onclick="btnCloseCompany_OnClick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
@@ -120,21 +137,9 @@
                 success: function (Results) {
                     if (Results.length > 0) {
                         for (i = 0; i < Results.length; i++) {
-                            var canDelete = "@ViewData["CanDelete"]";
-                            var deleteDisabled = "";
-                            if (canDelete == "False") {
-                                deleteDisabled = "disabled";
-                            }
-
-                            var canEdit = "@ViewData["CanEdit"]";
-                            var editDisabled = "";
-                            if (canEdit == "False") {
-                                editDisabled = "disabled";
-                            }
-
                             companies.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='companyEditButton' onclick='cmdCompanyEditButton_OnClick()'" + editDisabled + "><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdCompanyDeleteButton_OnClick()' " + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='companyEditButton' onclick='cmdCompanyEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdCompanyDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: Results[i]["Id"],
                                 Company: Results[i]["Company"],
                                 Address: Results[i]["Address"],
@@ -166,28 +171,34 @@
             $('#btnAddCompany').prop('disabled', true);
             $('#btnCloseCompany').prop('disabled', true);
 
-            var canAccessToDetailPage = "@ViewData["CanAccessToDetailPage"]";
-            if (canAccessToDetailPage == "True") {
-                $.ajax({
-                    type: "POST",
-                    url: '/api/addCompany',
-                    contentType: "application/json; charset=utf-8",
-                    success: function (id) {
-                        if (id > 0) {
-                            window.location = '/Software/CompanyDetail?id=' + id;
-                        } else {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
-                            $('#btnAddCompany').prop('disabled', false);
-                            $('#btnCloseCompany').prop('disabled', false);
-                        }
+            $.ajax({
+                type: "POST",
+                url: '/api/company/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/CompanyDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddCompany').prop('disabled', false);
+                        $('#btnCloseCompany').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddCompany').prop('disabled', false);
+                        $('#btnCloseCompany').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnAddCompany').prop('disabled', false);
+                        $('#btnCloseCompany').prop('disabled', false);
                     }
-                });
-            } else {
-                if (canAccessToDetailPage == "False") {
-                    window.location = '/Software/Forbidden';
                 }
-            }
+            });
         }
 
         // ===================
@@ -213,18 +224,15 @@
         function cmdCompanyDeleteButton_OnClick() {
             companies.editItem(companies.currentItem);
             var company = companies.currentEditItem;
-            if (company.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteCompanyConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
 
-                document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteCompany").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-            }
+            $('#deleteCompanyConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteCompany").prop("disabled", false);
+            $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
         }
 
         // Company Confirm Delete Button
@@ -235,8 +243,9 @@
 
             companies.editItem(companies.currentItem);
             var id = companies.currentEditItem.Id;
+
             $.ajax({
-                url: '/api/deleteCompany/' + id,
+                url: '/api/company/delete/' + id,
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -246,15 +255,22 @@
                         $('#deleteCompanyConfirm').modal('hide');
                         refreshCompanyFlexGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteCompanyConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteCompany").prop("disabled", false);
                         $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteCompanyConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteCompany").prop("disabled", false);
+                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteCompanyConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#cmdConfirmDeleteCompany").prop("disabled", false);
@@ -362,24 +378,36 @@
             companyGrid = new wijmo.grid.FlexGrid('#CompanyGrid');
             companyGrid.initialize({
                 columns: [
-                    {
-                        "header": "Edit",
-                        "binding": "EditId",
-                        "width": 70,
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
-                    {
-                        "header": "Delete",
-                        "binding": "DeleteId",
-                        "width": 70,
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
+                    @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
                     {
                         "header": "Company",
                         "binding": "Company",
@@ -443,11 +471,6 @@
                 companies.moveToLastPage();
                 updateNavigateButtonsCompany();
             });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAddCompany").prop("disabled", true);
-            }
         }
 
         // ============

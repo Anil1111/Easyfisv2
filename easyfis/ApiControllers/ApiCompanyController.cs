@@ -18,30 +18,30 @@ namespace easyfis.Controllers
         }
 
         // list company
-        [Authorize]
-        [HttpGet]
-        [Route("api/company/list")]
-        public List<Models.MstCompany> listCompany()
-        {
-            var companies = from d in db.MstCompanies
-                            select new Models.MstCompany
-                            {
-                                Id = d.Id,
-                                Company = d.Company,
-                                Address = d.Address,
-                                ContactNumber = d.ContactNumber,
-                                TaxNumber = d.TaxNumber,
-                                IsLocked = d.IsLocked,
-                                CreatedById = d.CreatedById,
-                                CreatedBy = d.MstUser.FullName,
-                                CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                UpdatedById = d.UpdatedById,
-                                UpdatedBy = d.MstUser1.FullName,
-                                UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                            };
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/company/list")]
+        //public List<Models.MstCompany> listCompany()
+        //{
+        //    var companies = from d in db.MstCompanies
+        //                    select new Models.MstCompany
+        //                    {
+        //                        Id = d.Id,
+        //                        Company = d.Company,
+        //                        Address = d.Address,
+        //                        ContactNumber = d.ContactNumber,
+        //                        TaxNumber = d.TaxNumber,
+        //                        IsLocked = d.IsLocked,
+        //                        CreatedById = d.CreatedById,
+        //                        CreatedBy = d.MstUser.FullName,
+        //                        CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                        UpdatedById = d.UpdatedById,
+        //                        UpdatedBy = d.MstUser1.FullName,
+        //                        UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                    };
 
-            return companies.ToList();
-        }
+        //    return companies.ToList();
+        //}
 
         // list company by default CompanyId
         [Authorize]
@@ -71,31 +71,31 @@ namespace easyfis.Controllers
         }
 
         // get company
-        [Authorize]
-        [HttpGet]
-        [Route("api/company/{id}")]
-        public Models.MstCompany getCompany(String id)
-        {
-            var company = from d in db.MstCompanies
-                          where d.Id == Convert.ToInt32(id)
-                          select new Models.MstCompany
-                              {
-                                  Id = d.Id,
-                                  Company = d.Company,
-                                  Address = d.Address,
-                                  ContactNumber = d.ContactNumber,
-                                  TaxNumber = d.TaxNumber,
-                                  IsLocked = d.IsLocked,
-                                  CreatedById = d.CreatedById,
-                                  CreatedBy = d.MstUser.FullName,
-                                  CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                  UpdatedById = d.UpdatedById,
-                                  UpdatedBy = d.MstUser1.FullName,
-                                  UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                              };
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/company/{id}")]
+        //public Models.MstCompany getCompany(String id)
+        //{
+        //    var company = from d in db.MstCompanies
+        //                  where d.Id == Convert.ToInt32(id)
+        //                  select new Models.MstCompany
+        //                      {
+        //                          Id = d.Id,
+        //                          Company = d.Company,
+        //                          Address = d.Address,
+        //                          ContactNumber = d.ContactNumber,
+        //                          TaxNumber = d.TaxNumber,
+        //                          IsLocked = d.IsLocked,
+        //                          CreatedById = d.CreatedById,
+        //                          CreatedBy = d.MstUser.FullName,
+        //                          CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+        //                          UpdatedById = d.UpdatedById,
+        //                          UpdatedBy = d.MstUser1.FullName,
+        //                          UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+        //                      };
 
-            return (Models.MstCompany)company.FirstOrDefault();
-        }
+        //    return (Models.MstCompany)company.FirstOrDefault();
+        //}
 
         // add company
         [Authorize]
