@@ -122,9 +122,11 @@ namespace easyfis.ModifiedApiControllers
                               select d;
 
             var branchId = currentUser.FirstOrDefault().BranchId;
+            var companyId = currentUser.FirstOrDefault().CompanyId;
 
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
-                           where d.Id != Convert.ToInt32(branchId)
+                           where d.CompanyId == companyId
+                           && d.Id != Convert.ToInt32(branchId)
                            select new Entities.MstBranch
                            {
                                Id = d.Id,

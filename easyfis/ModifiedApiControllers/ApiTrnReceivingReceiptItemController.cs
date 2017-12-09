@@ -153,7 +153,14 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/receivingReceiptItem/dropdown/list/branch")]
         public List<Entities.MstBranch> DropdownListReceivingReceiptItemBranch()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var companyId = currentUser.FirstOrDefault().CompanyId;
+
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == companyId
                            select new Entities.MstBranch
                            {
                                Id = d.Id,

@@ -49,7 +49,14 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/disbursementLine/dropdown/list/branch")]
         public List<Entities.MstBranch> DropdownListDisbursementLineBranch()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var companyId = currentUser.FirstOrDefault().CompanyId;
+
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == companyId
                            select new Entities.MstBranch
                            {
                                Id = d.Id,
