@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                     Id = d.Id,
                                     CVNumber = d.CVNumber,
                                     CVDate = d.CVDate.ToShortDateString(),
+                                    ManualCVNumber = d.ManualCVNumber,
                                     Supplier = d.MstArticle.Article,
                                     Particulars = d.Particulars,
                                     CheckNumber = d.CheckNumber,

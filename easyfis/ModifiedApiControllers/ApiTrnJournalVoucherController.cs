@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                       Id = d.Id,
                                       JVNumber = d.JVNumber,
                                       JVDate = d.JVDate.ToShortDateString(),
+                                      ManualJVNumber = d.ManualJVNumber,
                                       Particulars = d.Particulars,
                                       IsLocked = d.IsLocked,
                                       CreatedById = d.CreatedById,

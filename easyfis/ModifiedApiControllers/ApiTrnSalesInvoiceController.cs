@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                     Id = d.Id,
                                     SINumber = d.SINumber,
                                     SIDate = d.SIDate.ToShortDateString(),
+                                    ManualSINumber = d.ManualSINumber,
                                     Customer = d.MstArticle.Article,
                                     Remarks = d.Remarks,
                                     DocumentReference = d.DocumentReference,

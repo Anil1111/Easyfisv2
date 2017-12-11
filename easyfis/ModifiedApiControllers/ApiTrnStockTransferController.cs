@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                      Id = d.Id,
                                      STNumber = d.STNumber,
                                      STDate = d.STDate.ToShortDateString(),
+                                     ManualSTNumber = d.ManualSTNumber,
                                      Branch = d.MstBranch.Branch,
                                      ToBranch = d.MstBranch1.Branch,
                                      Particulars = d.Particulars,

@@ -56,6 +56,7 @@ namespace easyfis.ModifiedApiControllers
                                   Id = d.Id,
                                   ORNumber = d.ORNumber,
                                   ORDate = d.ORDate.ToShortDateString(),
+                                  ManualORNumber = d.ManualORNumber,
                                   Customer = d.MstArticle.Article,
                                   Particulars = d.Particulars,
                                   Amount = GetCollectionAmount(d.Id),

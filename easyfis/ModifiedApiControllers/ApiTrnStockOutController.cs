@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                 Id = d.Id,
                                 OTNumber = d.OTNumber,
                                 OTDate = d.OTDate.ToShortDateString(),
+                                ManualOTNumber = d.ManualOTNumber,
                                 Account = d.MstAccount.Account,
                                 Article = d.MstArticle.Article,
                                 Particulars = d.Particulars,
