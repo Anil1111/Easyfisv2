@@ -73,7 +73,7 @@ namespace easyfis.ModifiedApiControllers
                                     String standardCaseVariablePrice = "Variable";
                                     Boolean isVariablePriceRestriction = false;
 
-                                    if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Replace(" ", string.Empty).Trim(), StringComparison.OrdinalIgnoreCase))
+                                    if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Trim(), StringComparison.OrdinalIgnoreCase))
                                     {
                                         isVariablePriceRestriction = true;
                                     }
@@ -191,7 +191,7 @@ namespace easyfis.ModifiedApiControllers
                                         String standardCaseVariablePrice = "Variable";
                                         Boolean isVariablePriceRestriction = false;
 
-                                        if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Replace(" ", string.Empty).Trim(), StringComparison.OrdinalIgnoreCase))
+                                        if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Trim(), StringComparison.OrdinalIgnoreCase))
                                         {
                                             isVariablePriceRestriction = true;
                                         }
