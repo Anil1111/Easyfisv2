@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -69,18 +70,51 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!item.FirstOrDefault().IsLocked)
                                 {
-                                    Data.MstArticlePrice newItemPrice = new Data.MstArticlePrice
+                                    String standardCaseVariablePrice = "Variable";
+                                    Boolean isVariablePriceRestriction = false;
+
+                                    if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Replace(" ", string.Empty).Trim(), StringComparison.OrdinalIgnoreCase))
                                     {
-                                        ArticleId = Convert.ToInt32(itemId),
-                                        PriceDescription = objItemPrice.PriceDescription,
-                                        Price = objItemPrice.Price,
-                                        Remarks = objItemPrice.Remarks
-                                    };
+                                        isVariablePriceRestriction = true;
+                                    }
 
-                                    db.MstArticlePrices.InsertOnSubmit(newItemPrice);
-                                    db.SubmitChanges();
+                                    if (isVariablePriceRestriction)
+                                    {
+                                        if (objItemPrice.Price == Convert.ToDecimal(1))
+                                        {
+                                            Data.MstArticlePrice newItemPrice = new Data.MstArticlePrice
+                                            {
+                                                ArticleId = Convert.ToInt32(itemId),
+                                                PriceDescription = objItemPrice.PriceDescription,
+                                                Price = objItemPrice.Price,
+                                                Remarks = objItemPrice.Remarks
+                                            };
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                            db.MstArticlePrices.InsertOnSubmit(newItemPrice);
+                                            db.SubmitChanges();
+
+                                            return Request.CreateResponse(HttpStatusCode.OK);
+                                        }
+                                        else
+                                        {
+                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid Price Description.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Data.MstArticlePrice newItemPrice = new Data.MstArticlePrice
+                                        {
+                                            ArticleId = Convert.ToInt32(itemId),
+                                            PriceDescription = objItemPrice.PriceDescription,
+                                            Price = objItemPrice.Price,
+                                            Remarks = objItemPrice.Remarks
+                                        };
+
+                                        db.MstArticlePrices.InsertOnSubmit(newItemPrice);
+                                        db.SubmitChanges();
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
                                 }
                                 else
                                 {
@@ -154,14 +188,43 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (itemPrice.Any())
                                     {
-                                        var updateItemPrice = itemPrice.FirstOrDefault();
-                                        updateItemPrice.ArticleId = Convert.ToInt32(itemId);
-                                        updateItemPrice.PriceDescription = objItemPrice.PriceDescription;
-                                        updateItemPrice.Price = objItemPrice.Price;
-                                        updateItemPrice.Remarks = objItemPrice.Remarks;
-                                        db.SubmitChanges();
+                                        String standardCaseVariablePrice = "Variable";
+                                        Boolean isVariablePriceRestriction = false;
 
-                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                        if (string.Equals(standardCaseVariablePrice, objItemPrice.PriceDescription.Replace(" ", string.Empty).Trim(), StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            isVariablePriceRestriction = true;
+                                        }
+
+                                        if (isVariablePriceRestriction)
+                                        {
+                                            if (objItemPrice.Price == Convert.ToDecimal(1))
+                                            {
+                                                var updateItemPrice = itemPrice.FirstOrDefault();
+                                                updateItemPrice.ArticleId = Convert.ToInt32(itemId);
+                                                updateItemPrice.PriceDescription = objItemPrice.PriceDescription;
+                                                updateItemPrice.Price = objItemPrice.Price;
+                                                updateItemPrice.Remarks = objItemPrice.Remarks;
+                                                db.SubmitChanges();
+
+                                                return Request.CreateResponse(HttpStatusCode.OK);
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid Price Description.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var updateItemPrice = itemPrice.FirstOrDefault();
+                                            updateItemPrice.ArticleId = Convert.ToInt32(itemId);
+                                            updateItemPrice.PriceDescription = objItemPrice.PriceDescription;
+                                            updateItemPrice.Price = objItemPrice.Price;
+                                            updateItemPrice.Remarks = objItemPrice.Remarks;
+                                            db.SubmitChanges();
+
+                                            return Request.CreateResponse(HttpStatusCode.OK);
+                                        }
                                     }
                                     else
                                     {

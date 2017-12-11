@@ -1930,6 +1930,7 @@
                                     ArticleId: itemPriceListresults[i]["ArticleId"],
                                     Article: itemPriceListresults[i]["Article"],
                                     PriceDescription: itemPriceListresults[i]["PriceDescription"] + " (" + formatDecimalValues(itemPriceListresults[i]["Price"]) + ")",
+                                    PriceDescriptionName: itemPriceListresults[i]["PriceDescription"],
                                     Price: itemPriceListresults[i]["Price"]
                                 });
                             }
@@ -1953,13 +1954,105 @@
                             selectedValuePath: "Price",
                             selectedValue: priceValue,
                             onSelectedIndexChanged: function () {
-                                document.getElementById("saleItem_Price").value = formatDecimalValues(this.selectedItem["Price"]);
+                                if (cboItemPrice.selectedValue != null) {
+                                    var isPriceValueFound = false;
+                                    for (var i = 0; i < itemPricesObservableArray.length; i++) {
+                                        if (itemPricesObservableArray[i]["Price"] === parseFloat(priceValue)) {
+                                            isPriceValueFound = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!isPriceValueFound) {
+                                        var upperCaseVariablePrice = "VARIABLE";
+                                        var lowerCaseVariablePrice = "variable";
+                                        var standardCaseVariablePrice = "Variable";
+
+                                        if ((cboItemPrice.selectedItem["PriceDescriptionName"] === upperCaseVariablePrice || cboItemPrice.selectedItem["PriceDescriptionName"] === lowerCaseVariablePrice) || cboItemPrice.selectedItem["PriceDescriptionName"] === standardCaseVariablePrice) {
+                                            if (cboItemPrice.selectedItem["Price"] === parseFloat(1)) {
+                                                document.getElementById("saleItem_Price").disabled = false;
+                                                if (parseFloat(priceValue) != 0) {
+                                                    document.getElementById("saleItem_Price").value = formatDecimalValues(priceValue);
+                                                } else {
+                                                    document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                                                }
+                                            }
+                                        } else {
+                                            document.getElementById("saleItem_Price").disabled = true;
+                                            document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                                        }
+                                    } else {
+                                        document.getElementById("saleItem_Price").disabled = true;
+                                        document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                                    }
+                                } else {
+                                    document.getElementById("saleItem_Price").value = formatDecimalValues(0);
+                                }
+
                                 computation();
                             }
                         });
 
                         if (cboItemPrice.selectedValue != null) {
-                            document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                            var isPriceValueFound = false;
+                            for (var i = 0; i < itemPricesObservableArray.length; i++) {
+                                if (itemPricesObservableArray[i]["Price"] === parseFloat(priceValue)) {
+                                    isPriceValueFound = true;
+                                    break;
+                                }
+                            }
+
+                            if (!isPriceValueFound) {
+                                var upperCaseVariablePrice = "VARIABLE";
+                                var lowerCaseVariablePrice = "variable";
+                                var standardCaseVariablePrice = "Variable";
+
+                                var isPriceDescriptionFound = false;
+                                var priceDescriptionName = "";
+                                var priceDescription = "";
+
+                                for (var i = 0; i < itemPricesObservableArray.length; i++) {
+                                    if ((itemPricesObservableArray[i].PriceDescriptionName === upperCaseVariablePrice || itemPricesObservableArray[i].PriceDescriptionName === lowerCaseVariablePrice) || itemPricesObservableArray[i].PriceDescriptionName === standardCaseVariablePrice) {
+                                        priceDescriptionName = itemPricesObservableArray[i].PriceDescriptionName;
+
+                                        if (itemPricesObservableArray[i].Price === parseFloat(1)) {
+                                            isPriceDescriptionFound = true;
+                                            priceDescription = priceDescriptionName + " (" + formatDecimalValues(1) + ")";
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!isPriceDescriptionFound) {
+                                    priceDescription = priceDescriptionName;
+                                }
+
+                                if (isPriceDescriptionFound) {
+                                    cboItemPrice.selectedValuePath = "PriceDescription";
+                                } else {
+                                    cboItemPrice.selectedValuePath = "PriceDescriptionName";
+                                }
+
+                                setTimeout(function () {
+                                    cboItemPrice.selectedValue = priceDescription;
+
+                                    if (parseFloat(priceValue) != 0) {
+                                        document.getElementById("saleItem_Price").value = formatDecimalValues(priceValue);
+                                    } else {
+                                        document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                                    }
+                                }, 50);
+
+                                if (isPriceDescriptionFound) {
+                                    document.getElementById("saleItem_Price").disabled = false;
+                                } else {
+                                    document.getElementById("saleItem_Price").disabled = true;
+                                }
+                            } else {
+                                document.getElementById("saleItem_Price").disabled = true;
+                                document.getElementById("saleItem_Price").value = formatDecimalValues(cboItemPrice.selectedItem["Price"]);
+                            }
                         } else {
                             document.getElementById("saleItem_Price").value = formatDecimalValues(0);
                         }
@@ -1974,7 +2067,7 @@
                     isEditable: false,
                     itemsSource: itemPricesObservableArray,
                     displayMemberPath: "PriceDescription",
-                    selectedValuePath: "Id",
+                    selectedValuePath: "Price",
                     selectedValue: priceValue
                 });
 
