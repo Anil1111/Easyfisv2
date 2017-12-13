@@ -60,6 +60,7 @@ namespace easyfis.ModifiedApiControllers
         public List<Entities.MstBranch> DropdownListUserBranchBranch(String companyId)
         {
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
                            select new Entities.MstBranch
                            {
                                Id = d.Id,
@@ -87,7 +88,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userBranches = from d in db.MstUserForms
                                        where d.UserId == currentUserId
-                                       && d.SysForm.FormName.Equals("UsersDetail")
+                                       && d.SysForm.FormName.Equals("UserDetail")
                                        select d;
 
                     if (userBranches.Any())
@@ -163,7 +164,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userBranches = from d in db.MstUserForms
                                        where d.UserId == currentUserId
-                                       && d.SysForm.FormName.Equals("UsersDetail")
+                                       && d.SysForm.FormName.Equals("UserDetail")
                                        select d;
 
                     if (userBranches.Any())
@@ -245,7 +246,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userBranches = from d in db.MstUserForms
                                        where d.UserId == currentUserId
-                                       && d.SysForm.FormName.Equals("UsersDetail")
+                                       && d.SysForm.FormName.Equals("UserDetail")
                                        select d;
 
                     if (userBranches.Any())
