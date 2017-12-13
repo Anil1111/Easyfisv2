@@ -422,6 +422,24 @@ namespace easyfis.Controllers
             return UserRights("CompanyDetail");
         }
 
+        // =====
+        // Users
+        // =====
+        [Authorize]
+        public ActionResult Users()
+        {
+            return UserRights("UserList");
+        }
+
+        // ============
+        // Users Detail
+        // ============
+        [Authorize]
+        public ActionResult UsersDetail()
+        {
+            return UserRights("UserDetail");
+        }
+
         // ================
         // Accounts Payable
         // ================
@@ -1010,38 +1028,6 @@ namespace easyfis.Controllers
         public ActionResult CollectionDetail()
         {
             return UserRights("CollectionDetail");
-        }
-
-        // =====
-        // Users
-        // =====
-        [Authorize]
-        public ActionResult Users()
-        {
-            if (PageAccess("UserList").Equals("UserList"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
-        }
-
-        // ============
-        // Users Detail
-        // ============
-        [Authorize]
-        public ActionResult UsersDetail()
-        {
-            if (PageAccess("UserDetail").Equals("UserDetail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
         }
 
         // =======================

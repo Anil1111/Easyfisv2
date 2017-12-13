@@ -1970,7 +1970,11 @@
 
                                         if ((cboItemPrice.selectedItem["PriceDescriptionName"] === upperCaseVariablePrice || cboItemPrice.selectedItem["PriceDescriptionName"] === lowerCaseVariablePrice) || cboItemPrice.selectedItem["PriceDescriptionName"] === standardCaseVariablePrice) {
                                             if (cboItemPrice.selectedItem["Price"] === parseFloat(1)) {
-                                                document.getElementById("saleItem_Price").disabled = false;
+
+                                                if (!isLocked) {
+                                                    document.getElementById("saleItem_Price").disabled = false;
+                                                }
+
                                                 if (parseFloat(priceValue) != 0) {
                                                     document.getElementById("saleItem_Price").value = formatDecimalValues(priceValue);
                                                 } else {
@@ -2045,7 +2049,9 @@
                                 }, 50);
 
                                 if (isPriceDescriptionFound) {
-                                    document.getElementById("saleItem_Price").disabled = false;
+                                    if (!isLocked) {
+                                        document.getElementById("saleItem_Price").disabled = false;
+                                    }
                                 } else {
                                     document.getElementById("saleItem_Price").disabled = true;
                                 }
@@ -2214,28 +2220,33 @@
         // Computation
         // ===========
         function computation() {
-            var quantity = document.getElementById('saleItem_Quantity').value.replace(/\,/g, '');
             var price = document.getElementById('saleItem_Price').value.replace(/\,/g, '');
             var discountRate = document.getElementById('saleItem_DiscountRate').value.replace(/\,/g, '');
-            var VATPercentage = document.getElementById('saleItem_VATRate').value.replace(/\,/g, '');
-
             var discountAmount = price * (discountRate / 100);
-            var netPrice = price - discountAmount;
-            var amount = netPrice * quantity;
+            document.getElementById('saleItem_DiscountAmount').value = formatDecimalValues(discountAmount);
 
+            var netPrice = price - discountAmount;
+            document.getElementById('saleItem_NetPrice').value = formatDecimalValues(netPrice);
+
+            var quantity = document.getElementById('saleItem_Quantity').value.replace(/\,/g, '');
+            var amount = netPrice * quantity;
+            document.getElementById('saleItem_Amount').value = formatDecimalValues(amount);
+
+            var VATPercentage = document.getElementById('saleItem_VATRate').value.replace(/\,/g, '');
             if (cboItemVAT.selectedItem["IsInclusive"]) {
                 VATAmount = amount / (1 + (VATPercentage / 100)) * (VATPercentage / 100);
             } else {
                 VATAmount = amount * (VATPercentage / 100);
             }
 
-            document.getElementById('saleItem_NetPrice').value = formatDecimalValues(netPrice);
-            document.getElementById('saleItem_DiscountAmount').value = formatDecimalValues(discountAmount);
-            document.getElementById('saleItem_Amount').value = formatDecimalValues(amount);
             document.getElementById('saleItem_VATAmount').value = formatDecimalValues(VATAmount);
         }
 
         $("#saleItem_Quantity").keyup(function (e) {
+            computation();
+        });
+
+        $("#saleItem_Price").keyup(function (e) {
             computation();
         });
 
@@ -2244,24 +2255,25 @@
         });
 
         $("#saleItem_DiscountAmount").keyup(function (e) {
-            var quantity = document.getElementById('saleItem_Quantity').value.replace(/\,/g, '');
             var price = document.getElementById('saleItem_Price').value.replace(/\,/g, '');
-            var VATPercentage = document.getElementById('saleItem_VATRate').value.replace(/\,/g, '');
             var discountAmount = document.getElementById('saleItem_DiscountAmount').value.replace(/\,/g, '');
             var discountRate = (discountAmount / price) * 100;
+            document.getElementById('saleItem_DiscountRate').value = formatDecimalValues(discountRate);
 
             var netPrice = price - discountAmount;
-            var amount = netPrice * quantity;
+            document.getElementById('saleItem_NetPrice').value = formatDecimalValues(netPrice);
 
+            var quantity = document.getElementById('saleItem_Quantity').value.replace(/\,/g, '');
+            var amount = netPrice * quantity;
+            document.getElementById('saleItem_Amount').value = formatDecimalValues(amount);
+
+            var VATPercentage = document.getElementById('saleItem_VATRate').value.replace(/\,/g, '');
             if (cboItemVAT.selectedItem["IsInclusive"]) {
                 VATAmount = amount / (1 + (VATPercentage / 100)) * (VATPercentage / 100);
             } else {
                 VATAmount = amount * (VATPercentage / 100);
             }
 
-            document.getElementById('saleItem_DiscountRate').value = formatDecimalValues(discountRate);
-            document.getElementById('saleItem_NetPrice').value = formatDecimalValues(netPrice);
-            document.getElementById('saleItem_Amount').value = formatDecimalValues(amount);
             document.getElementById('saleItem_VATAmount').value = formatDecimalValues(VATAmount);
         });
 

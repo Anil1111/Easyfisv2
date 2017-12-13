@@ -10,6 +10,7 @@ namespace easyfis.Entities
         public Int32 Id { get; set; }
         public Int32 UserId { get; set; }
         public Int32 FormId { get; set; }
+        public String Form { get; set; }
         public Boolean CanAdd { get; set; }
         public Boolean CanEdit { get; set; }
         public Boolean CanDelete { get; set; }

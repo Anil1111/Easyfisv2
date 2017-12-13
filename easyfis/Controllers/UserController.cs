@@ -36,7 +36,6 @@ namespace easyfis.Controllers
                     ViewData.Add("FullName", fullName);
                     ViewData.Add("Email", email);
                     ViewData.Add("UserName", userName);
-
                     ViewData.Add("BranchId", branchId);
                     ViewData.Add("Branch", branch);
                     ViewData.Add("Company", company);

@@ -314,7 +314,7 @@ namespace easyfis.ModifiedApiControllers
                                     db.MstBranches.InsertOnSubmit(newBranch);
                                     db.SubmitChanges();
 
-                                    return Request.CreateResponse(HttpStatusCode.OK, newBranch.Id);
+                                    return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
                                 {

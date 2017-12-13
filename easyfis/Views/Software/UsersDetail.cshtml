@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Meta -->
@@ -12,7 +24,7 @@
     <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
-<body> 
+<body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
@@ -32,8 +44,16 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                <button class="btn btn-primary" id="btnUserDetailLock" onclick="btnUserDetailLock_OnClick()"><i class="fa fa-lock"></i> Lock</button>
-                                <button class="btn btn-primary" id="btnUserDetailUnLock" onclick="btnUserDetailUnLock_OnClick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                @{
+                                    if (canLock)
+                                    {
+                                        <button class="btn btn-primary" id="btnUserDetailLock" onclick="btnUserDetailLock_OnClick()"><i class="fa fa-lock"></i> Lock</button>
+                                    }
+                                    if (canUnlock)
+                                    {
+                                        <button class="btn btn-primary" id="btnUserDetailUnLock" onclick="btnUserDetailUnLock_OnClick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                    }
+                                }
                                 <button class="btn btn-danger" id="btnUserDetailClose" onclick="btnUserDetailClose_OnClick()"><i class="fa fa-times"></i> Close</button>
                             </div>
                         </div>
@@ -65,7 +85,7 @@
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
                     <li role="presentation" class="active"><a data-toggle="tab" href="#UserForm" id="userForm">Forms</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#UserDefaults" id="userDefaults">Defaults</a></li>
-                     <li role="presentation"><a data-toggle="tab" href="#UserBranches" id="userBranches">Branches</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#UserBranches" id="userBranches">Branches</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
@@ -74,8 +94,13 @@
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-lg-12" align="right">
-                                        <button class="btn btn-primary " id="btnCopyUserRights" onclick="cmdCopyRights_OnClick()"><i class="fa fa-copy"></i> Copy rights</button>
-                                        <button class="btn btn-primary " id="btnAddUserForm" onclick="cmdAddUserForm_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                        @{
+                                            if (canAdd)
+                                            {
+                                                <button class="btn btn-primary " id="btnCopyUserRights" onclick="cmdCopyRights_OnClick()"><i class="fa fa-copy"></i> Copy rights</button>
+                                                <button class="btn btn-primary " id="btnAddUserForm" onclick="cmdAddUserForm_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                            }
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -343,26 +368,16 @@
         function getCompany() {
             var companies = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/company/list',
+                url: '/api/user/dropdown/list/company',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (companyResults) {
-                    if (companyResults.length > 0) {
-                        for (i = 0; i < companyResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             companies.push({
-                                Id: companyResults[i]["Id"],
-                                Company: companyResults[i]["Company"],
-                                Address: companyResults[i]["Address"],
-                                ContactNumber: companyResults[i]["ContactNumber"],
-                                TaxNumber: companyResults[i]["TaxNumber"],
-                                IsLocked: companyResults[i]["IsLocked"],
-                                CreatedById: companyResults[i]["CreatedById"],
-                                CreatedBy: companyResults[i]["CreatedBy"],
-                                CreatedDateTime: companyResults[i]["CreatedDateTime"],
-                                UpdatedById: companyResults[i]["UpdatedById"],
-                                UpdatedBy: companyResults[i]["UpdatedBy"],
-                                UpdatedDateTime: companyResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
                             });
                         }
                     }
@@ -389,29 +404,16 @@
             var branches = new wijmo.collections.ObservableArray;
             if (cboCompany.selectedValue != null) {
                 $.ajax({
-                    url: '/api/listBranchByCompanyId/' + cboCompany.selectedValue,
+                    url: '/api/user/dropdown/list/branch/' + cboCompany.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (branchResults) {
-                        if (branchResults.length > 0) {
-                            for (i = 0; i < branchResults.length; i++) {
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
                                 branches.push({
-                                    Id: branchResults[i]["Id"],
-                                    CompanyId: branchResults[i]["CompanyId"],
-                                    Company: branchResults[i]["Company"],
-                                    Branch: branchResults[i]["Branch"],
-                                    BranchCode: branchResults[i]["BranchCode"],
-                                    Address: branchResults[i]["Address"],
-                                    ContactNumber: branchResults[i]["ContactNumber"],
-                                    TaxNumber: branchResults[i]["TaxNumber"],
-                                    IsLocked: branchResults[i]["IsLocked"],
-                                    CreatedById: branchResults[i]["CreatedById"],
-                                    CreatedBy: branchResults[i]["CreatedBy"],
-                                    CreatedDateTime: branchResults[i]["CreatedDateTime"],
-                                    UpdatedById: branchResults[i]["UpdatedById"],
-                                    UpdatedBy: branchResults[i]["UpdatedBy"],
-                                    UpdatedDateTime: branchResults[i]["UpdatedDateTime"]
+                                    Id: results[i]["Id"],
+                                    Branch: results[i]["Branch"]
                                 });
                             }
                         }
@@ -419,13 +421,16 @@
                         var disabled = false;
                         if (IsLocked) {
                             disabled = true;
+                        } else {
+                            if (results.length <= 0) {
+                                disabled = true;
+                            }
                         }
 
                         cboBranch.dispose();
                         cboBranch = new wijmo.input.ComboBox('#defaultBranch', {
                             disabled: disabled,
                             isEditable: false,
-                            placeholder: "Branch",
                             itemsSource: branches,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
@@ -443,28 +448,17 @@
         function getAccount() {
             var accounts = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listAccount',
+                url: '/api/user/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (accountResults) {
-                    if (accountResults.length > 0) {
-                        for (i = 0; i < accountResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             accounts.push({
-                                Id: accountResults[i]["Id"],
-                                AccountCode: accountResults[i]["AccountCode"],
-                                Account: accountResults[i]["Account"],
-                                AccountTypeId: accountResults[i]["AccountTypeId"],
-                                AccountType: accountResults[i]["AccountType"],
-                                AccountCashFlowId: accountResults[i]["AccountCashFlowId"],
-                                AccountCashFlow: accountResults[i]["AccountCashFlow"],
-                                IsLocked: accountResults[i]["IsLocked"],
-                                CreatedById: accountResults[i]["CreatedById"],
-                                CreatedBy: accountResults[i]["CreatedBy"],
-                                CreatedDateTime: accountResults[i]["CreatedDateTime"],
-                                UpdatedById: accountResults[i]["UpdatedById"],
-                                UpdatedBy: accountResults[i]["UpdatedBy"],
-                                UpdatedDateTime: accountResults[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"]
                             });
                         }
                     }
@@ -502,23 +496,41 @@
         }
 
         function createCboInventoryType() {
+            var inventoryTypesObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/first/inventory',
+                url: '/api/user/dropdown/list/inventoryType',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (resultInventory) {
-                    var disabled = false;
-                    if (resultInventory != null) {
-                        disabled = true;
+                success: function (results) {
+                    var isInventoryDisabled = false;
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            isInventoryDisabled = results[i]["IsDisabled"];
+
+                            inventoryTypesObservableArray.push({
+                                InventoryType: results[i]["InventoryType"],
+                                IsDisabled: results[i]["IsDisabled"]
+                            });
+                        }
                     }
 
-                    var InventoryTypes = new Array("Specific Identification", "Moving Average");
+                    var disabled = false;
+                    if (IsLocked) {
+                        disabled = true;
+                    } else {
+                        if (isInventoryDisabled) {
+                            disabled = true;
+                        }
+                    }
+
                     cboInventoryType.dispose();
                     cboInventoryType = new wijmo.input.ComboBox('#cboInventoryType', {
                         disabled: disabled,
-                        placeholder: "Select Inventory Type",
-                        itemsSource: InventoryTypes
+                        itemsSource: inventoryTypesObservableArray,
+                        displayMemberPath: "InventoryType",
+                        selectedValuePath: "InventoryType",
+                        placeholder: "Select Inventory Type"
                     });
 
                     getDiscount();
@@ -529,16 +541,16 @@
         function getDiscount() {
             var discountsObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/listDiscount',
+                url: '/api/user/dropdown/list/discount',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (resultDiscounts) {
-                    if (resultDiscounts.length > 0) {
-                        for (i = 0; i < resultDiscounts.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             discountsObservableArray.push({
-                                Id: resultDiscounts[i]["Id"],
-                                Discount: resultDiscounts[i]["Discount"]
+                                Id: results[i]["Id"],
+                                Discount: results[i]["Discount"]
                             });
                         }
 
@@ -564,7 +576,7 @@
             NProgress.start();
             if (document.location.search.length > 0) {
                 $.ajax({
-                    url: '/api/listUserById/' + userId,
+                    url: '/api/user/detail/' + userId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -600,19 +612,9 @@
                                 $("#btnCopyUserRights").prop("disabled", true);
                                 $("#btnAddBranches").prop("disabled", true);
 
-                                var canUnLock = "@ViewData["CanUnlock"]";
-                                if (canUnLock == "False") {
-                                    $("#btnUserDetailUnLock").prop("disabled", true);
-                                }
-
                                 IsLocked = true;
                             } else {
                                 $("#btnUserDetailUnLock").prop("disabled", true);
-
-                                var canLock = "@ViewData["CanLock"]";
-                                if (canLock == "False") {
-                                    $("#btnUserDetailLock").prop("disabled", true);
-                                }
 
                                 var canAdd = "@ViewData["CanAdd"]";
                                 if (canAdd == "False") {
@@ -675,7 +677,7 @@
 
                 $.ajax({
                     type: "PUT",
-                    url: '/api/updateUser/' + userId,
+                    url: '/api/user/lock/' + userId,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: data,
@@ -683,24 +685,29 @@
                         200: function () {
                             toastr.success("Lock Successful");
                             window.setTimeout(function () {
-                                location.reload();
+                                location.reload()
                             }, 1000);
                         },
-                        404: function () {
-                            toastr.error("Not found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnUserDetailUnLock').prop('disabled', false);
+                            $('#btnUserDetailLock').prop('disabled', false);
                             $('#btnUserDetailClose').prop('disabled', false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnUserDetailUnLock').prop('disabled', false);
+                            $('#btnUserDetailLock').prop('disabled', false);
+                            $('#btnUserDetailClose').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnUserDetailLock').prop('disabled', false);
                             $('#btnUserDetailClose').prop('disabled', false);
                         }
                     }
                 });
-
             } else {
                 toastr.error("Invalid Entry");
             }
@@ -710,40 +717,40 @@
         // Unlock button
         // =============
         function btnUserDetailUnLock_OnClick() {
+            document.getElementById('btnUserDetailUnLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
             $('#btnUserDetailLock').prop('disabled', true);
             $('#btnUserDetailUnLock').prop('disabled', true);
             $('#btnUserDetailClose').prop('disabled', true);
 
-            document.getElementById('btnUserDetailUnLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
-
             $.ajax({
                 type: "PUT",
-                url: '/api/unlockUser/' + userId,
+                url: '/api/user/unlock/' + userId,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                data: {},
                 statusCode: {
                     200: function () {
-                        $('#btnUserDetailLock').prop('disabled', true);
-                        $('#btnUserDetailUnLock').prop('disabled', true);
-                        $('#btnUserDetailClose').prop('disabled', true);
                         toastr.success("Unlock Successful");
                         window.setTimeout(function () {
-                            location.reload();
+                            location.reload()
                         }, 1000);
                     },
-                    404: function () {
-                        $('#btnUserDetailLock').prop('disabled', true);
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnUserDetailUnLock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $('#btnUserDetailUnLock').prop('disabled', false);
                         $('#btnUserDetailClose').prop('disabled', false);
-                        toastr.error("Not found");
-
                     },
-                    400: function () {
-                        $('#btnUserDetailLock').prop('disabled', false);
-                        $('#btnUserDetailUnLock').prop('disabled', true);
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnUserDetailUnLock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnUserDetailUnLock').prop('disabled', false);
                         $('#btnUserDetailClose').prop('disabled', false);
-                        toastr.error("Bad Request");
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnUserDetailUnLock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnUserDetailUnLock').prop('disabled', false);
+                        $('#btnUserDetailClose').prop('disabled', false);
                     }
                 }
             });
@@ -762,24 +769,24 @@
         function getForm(formId) {
             var formsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/listForm',
+                url: '/api/userForm/dropdown/list/forms',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 data: {},
-                success: function (formResults) {
-                    if (formResults.length > 0) {
-                        for (i = 0; i < formResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             formsObservableArray.push({
-                                Id: formResults[i]["Id"],
-                                FormName: formResults[i]["FormName"],
-                                Particulars: formResults[i]["Particulars"]
+                                Id: results[i]["Id"],
+                                FormName: results[i]["FormName"],
+                                Particulars: results[i]["Particulars"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (formResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                         $('#cmdSaveUserFormButton').prop('disabled', false);
                     } else {
@@ -882,7 +889,7 @@
             if (userFormId == 0) {
                 $.ajax({
                     type: "POST",
-                    url: '/api/addUserForm',
+                    url: '/api/userForm/add/' + userId,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: data,
@@ -892,15 +899,22 @@
                             $('#userFormEdit').modal('hide');
                             refreshUserFormGrid();
                         },
-                        404: function () {
-                            toastr.error("Not found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             $('#userFormEdit').modal('hide');
                             document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
                             $('#cmdSaveUserFormButton').prop('disabled', false);
                             $('#cmdUserFormDetailCloseButton').prop('disabled', false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            $('#userFormEdit').modal('hide');
+                            document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#cmdSaveUserFormButton').prop('disabled', false);
+                            $('#cmdUserFormDetailCloseButton').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             $('#userFormEdit').modal('hide');
                             document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
                             $('#cmdSaveUserFormButton').prop('disabled', false);
@@ -911,7 +925,7 @@
             } else {
                 $.ajax({
                     type: "PUT",
-                    url: '/api/updateUserForm/' + userFormId,
+                    url: '/api/userForm/update/' + userFormId + '/' + userId,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: data,
@@ -921,15 +935,22 @@
                             $('#userFormEdit').modal('hide');
                             refreshUserFormGrid();
                         },
-                        404: function () {
-                            toastr.error("Not found");
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             $('#userFormEdit').modal('hide');
                             document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
                             $('#cmdSaveUserFormButton').prop('disabled', false);
                             $('#cmdUserFormDetailCloseButton').prop('disabled', false);
                         },
-                        400: function () {
-                            toastr.error("Bad Request");
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            $('#userFormEdit').modal('hide');
+                            document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#cmdSaveUserFormButton').prop('disabled', false);
+                            $('#cmdUserFormDetailCloseButton').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             $('#userFormEdit').modal('hide');
                             document.getElementById('cmdSaveUserFormButton').innerHTML = "<i class='fa fa-save'></i> Save";
                             $('#cmdSaveUserFormButton').prop('disabled', false);
@@ -963,9 +984,10 @@
             userForms.editItem(userForms.currentItem);
             var userForm = userForms.currentEditItem;
             var userFormId = userForm.Id;
+
             $.ajax({
+                url: '/api/userForm/delete/' + userFormId + '/' + userId,
                 type: "DELETE",
-                url: '/api/deleteUserForm/' + userFormId,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
@@ -974,15 +996,22 @@
                         $('#deleteUserFormConfirm').modal('hide');
                         refreshUserFormGrid();
                     },
-                    404: function () {
-                        toastr.error("Not Found");
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         $('#deleteUserFormConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteUserForm').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $('#cmdConfirmDeleteUserForm').prop('disabled', false);
                         $('#cmdConfirmDeleteUserFormCloseButton').prop('disabled', false);
                     },
-                    400: function () {
-                        toastr.error("Bad Request");
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteUserFormConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteUserForm').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#cmdConfirmDeleteUserForm').prop('disabled', false);
+                        $('#cmdConfirmDeleteUserFormCloseButton').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         $('#deleteUserFormConfirm').modal('hide');
                         document.getElementById('cmdConfirmDeleteUserForm').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $('#cmdConfirmDeleteUserForm').prop('disabled', false);
@@ -1054,20 +1083,8 @@
                     success: function (userFormResults) {
                         if (userFormResults.length > 0) {
                             for (i = 0; i < userFormResults.length; i++) {
-                                var canEdit = "@ViewData["CanEdit"]";
-                                var editDisabled = "";
-                                if (canEdit == "False") {
-                                    editDisabled = "disabled";
-                                }
-
-                                var canDelete = "@ViewData["CanDelete"]";
-                                var deleteDisabled = "";
-                                if (canDelete == "False") {
-                                    deleteDisabled = "disabled";
-                                }
-
-                                var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='cmdUserFormEditButton_OnClick()' " + editDisabled + "><i class='fa fa-edit'></i> Edit</button>";
-                                var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='cmdUserFormDeleteButton_OnClick()'" + deleteDisabled + "><i class='fa fa-trash'></i> Delete</button>";
+                                var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='cmdUserFormEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
+                                var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='cmdUserFormDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
                                 if (IsLocked) {
                                     btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='cmdUserFormEditButton_OnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
                                     btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='cmdUserFormDeleteButton_OnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
@@ -1116,24 +1133,36 @@
             userFormGrid = new wijmo.grid.FlexGrid('#userDetailUserFormGrid');
             userFormGrid.initialize({
                 columns: [
-                            {
-                                "header": "Edit",
-                                "binding": "EditId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "DeleteId",
-                                "width": 70,
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
                             {
                                 "header": "Form",
                                 "binding": "Particulars",
