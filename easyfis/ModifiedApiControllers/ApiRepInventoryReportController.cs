@@ -45,7 +45,8 @@ namespace easyfis.ApiControllers
                                             BegQuantity = d.Quantity,
                                             InQuantity = d.QuantityIn,
                                             OutQuantity = d.QuantityOut,
-                                            EndQuantity = d.Quantity
+                                            EndQuantity = d.Quantity,
+                                            ItemGroup = d.MstArticle.MstArticleGroup.ArticleGroup
                                         }).Union(from d in db.TrnInventories
                                                  where d.InventoryDate >= Convert.ToDateTime(startDate)
                                                  && d.InventoryDate <= Convert.ToDateTime(endDate)
@@ -69,7 +70,8 @@ namespace easyfis.ApiControllers
                                                      BegQuantity = d.Quantity,
                                                      InQuantity = d.QuantityIn,
                                                      OutQuantity = d.QuantityOut,
-                                                     EndQuantity = d.Quantity
+                                                     EndQuantity = d.Quantity,
+                                                     ItemGroup = d.MstArticle.MstArticleGroup.ArticleGroup
                                                  });
 
                 if (unionInventories.Any())
@@ -84,7 +86,8 @@ namespace easyfis.ApiControllers
                                           InventoryCode = d.InventoryCode,
                                           Cost = d.Cost,
                                           UnitId = d.UnitId,
-                                          Unit = d.Unit
+                                          Unit = d.Unit,
+                                          ItemGroup = d.ItemGroup
                                       } into g
                                       select new Models.MstArticleInventory
                                       {
@@ -100,7 +103,8 @@ namespace easyfis.ApiControllers
                                           InQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.InQuantity),
                                           OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
                                           EndQuantity = g.Sum(d => d.EndQuantity),
-                                          Amount = g.Sum(d => d.Quantity * d.Cost)
+                                          Amount = g.Sum(d => d.Quantity * d.Cost),
+                                          ItemGroup = g.Key.ItemGroup
                                       };
 
                     return inventories.ToList();

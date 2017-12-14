@@ -95,7 +95,8 @@ namespace easyfis.Reports
                                         BegQuantity = d.Quantity,
                                         InQuantity = d.QuantityIn,
                                         OutQuantity = d.QuantityOut,
-                                        EndQuantity = d.Quantity
+                                        EndQuantity = d.Quantity,
+                                        ItemGroup = d.MstArticle.MstArticleGroup.ArticleGroup
                                     }).Union(from d in db.TrnInventories
                                              where d.InventoryDate >= Convert.ToDateTime(StartDate)
                                              && d.InventoryDate <= Convert.ToDateTime(EndDate)
@@ -119,7 +120,8 @@ namespace easyfis.Reports
                                                  BegQuantity = d.Quantity,
                                                  InQuantity = d.QuantityIn,
                                                  OutQuantity = d.QuantityOut,
-                                                 EndQuantity = d.Quantity
+                                                 EndQuantity = d.Quantity,
+                                                 ItemGroup = d.MstArticle.MstArticleGroup.ArticleGroup
                                              });
 
             if (unionInventories.Any())
@@ -134,7 +136,8 @@ namespace easyfis.Reports
                                       InventoryCode = d.InventoryCode,
                                       Cost = d.Cost,
                                       UnitId = d.UnitId,
-                                      Unit = d.Unit
+                                      Unit = d.Unit,
+                                      ItemGroup = d.ItemGroup
                                   } into g
                                   select new
                                   {
@@ -150,7 +153,8 @@ namespace easyfis.Reports
                                       InQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.InQuantity),
                                       OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
                                       EndQuantity = g.Sum(d => d.EndQuantity),
-                                      Amount = g.Sum(d => d.Quantity * d.Cost)
+                                      Amount = g.Sum(d => d.Quantity * d.Cost),
+                                      ItemGroup = g.Key.ItemGroup
                                   };
 
                 if (inventories.Any())
@@ -169,24 +173,21 @@ namespace easyfis.Reports
                     // ===========
                     // Data Tables
                     // ===========
-                    PdfPTable data = new PdfPTable(12);
-                    float[] widthsCellsData = new float[] { 30f, 20f, 15f, 16f, 16f, 16f, 16f, 16f, 16f, 16f, 16f, 16f };
+                    PdfPTable data = new PdfPTable(10);
+                    float[] widthsCellsData = new float[] { 30f, 20f, 20f, 10f, 16f, 16f, 16f, 16f, 16f, 16f };
                     data.SetWidths(widthsCellsData);
                     data.WidthPercentage = 100;
                     data.AddCell(new PdfPCell(new Phrase("Item", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                    data.AddCell(new PdfPCell(new Phrase("Item Group", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Code", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Unit", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Cost", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { Colspan = 4, HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Total Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, Rowspan = 2, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { Colspan = 2, HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Variance Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, Rowspan = 2, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Beg", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("In", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Out", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("End", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Count", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Variance", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
 
                     Decimal totalAmount = 0;
                     Decimal count = 0;
@@ -206,6 +207,7 @@ namespace easyfis.Reports
                         varianceAmount = inventory.Cost * quantityVariance;
 
                         data.AddCell(new PdfPCell(new Phrase(inventory.Article, fontArial9)) { HorizontalAlignment = 0, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                        data.AddCell(new PdfPCell(new Phrase(inventory.ItemGroup, fontArial9)) { HorizontalAlignment = 0, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.InventoryCode, fontArial9)) { HorizontalAlignment = 0, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.Unit, fontArial9)) { HorizontalAlignment = 0, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.Cost.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -214,18 +216,14 @@ namespace easyfis.Reports
                         data.AddCell(new PdfPCell(new Phrase(inventory.OutQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.EndQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                        data.AddCell(new PdfPCell(new Phrase("0.00", fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                        data.AddCell(new PdfPCell(new Phrase(quantityVariance.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                        data.AddCell(new PdfPCell(new Phrase(varianceAmount.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         totalTotalAmount = totalTotalAmount + (inventory.Cost * inventory.EndQuantity);
                         quantityVariance = inventory.EndQuantity - count;
                         totalVarianceAmount = totalVarianceAmount + (inventory.Cost * quantityVariance);
                     }
 
-                    data.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Border = 0, Colspan = 7, HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 5f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Border = 0, Colspan = 8, HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 5f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(totalTotalAmount.ToString("#,##0.00"), fontArial10Bold)) { Colspan = 2, Border = 0, HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 5f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(totalVarianceAmount.ToString("#,##0.00"), fontArial10Bold)) { Border = 0, Colspan = 3, HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 5f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
 
                     document.Add(data);
                 }

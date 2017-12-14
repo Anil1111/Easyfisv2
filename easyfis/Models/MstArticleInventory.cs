@@ -40,6 +40,7 @@ namespace easyfis.Models
 
         public Boolean Inventory { get; set; }
         public Decimal Price { get; set; }
-        
+
+        public String ItemGroup { get; set; }
     }
 }

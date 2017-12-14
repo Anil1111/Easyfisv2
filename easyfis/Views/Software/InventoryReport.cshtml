@@ -122,12 +122,6 @@
                                     <dd>
                                         <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
                                     </dd>
-                                    <dt>
-                                        <b>Total Variance Amount</b>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField" id="totalVarianceAmount" placeholder="0.00" disabled />
-                                    </dd>
                                 </dl>
                             </div>
                         </div>
@@ -417,7 +411,8 @@
                                         inventoryReports.push({
                                             Branch: inventoryReportResult[i]["Branch"],
                                             ArticleId: inventoryReportResult[i]["ArticleId"],
-                                            Article: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 10px; text-align: left;'>" + inventoryReportResult[i]["Article"] + "</a>",
+                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 10px;'><i class='fa fa-cube'></i> Stock Card</a>",
+                                            Article: inventoryReportResult[i]["Article"],
                                             ArticleForCSV: inventoryReportResult[i]["Article"],
                                             InventoryCode: inventoryReportResult[i]["InventoryCode"],
                                             Cost: inventoryReportResult[i]["Cost"],
@@ -441,6 +436,7 @@
                                             VarianceAmount: varianceAmount,
                                             VarianceAmountDisplay: parseFloat(varianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             Count: "0.00",
+                                            ItemGroup: inventoryReportResult[i]["ItemGroup"],
                                         });
 
                                         totalAllAmount += totalAmount;
@@ -450,18 +446,15 @@
                             }
 
                             document.getElementById("totalAmount").value = parseFloat(totalAllAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalVarianceAmount").value = parseFloat(totalVarianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
                     document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVarianceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
                 document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalVarianceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
@@ -518,16 +511,15 @@
                     }
 
                     document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVarianceAmount").value = parseFloat(totalVarianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVarianceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
             inventoryReportCollections.filter = function (item) {
                 return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemGroup.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -561,16 +553,15 @@
                     }
 
                     document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVarianceAmount").value = parseFloat(totalVarianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
                     document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVarianceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
             inventoryReportCollections.filter = function (item) {
                 return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemGroup.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -582,11 +573,23 @@
             inventoryReportGrid.initialize({
                 columns: [
                     {
+                        "header": "Stock Card",
+                        "binding": "BtnDetail",
+                        "allowSorting": true,
+                        "width": "1*",
+                        "isContentHtml": true
+                    },
+                    {
                         "header": "Item",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "1.5*",
-                        "isContentHtml": true
+                        "width": "1.7*"
+                    },
+                    {
+                        "header": "Item Group",
+                        "binding": "ItemGroup",
+                        "allowSorting": true,
+                        "width": "1.5*"
                     },
                     {
                         "header": "Code",
@@ -641,27 +644,6 @@
                         "allowSorting": true,
                         "align": "right",
                         "width": "*"
-                    },
-                    {
-                        "header": "Count",
-                        "binding": "Count",
-                        "allowSorting": true,
-                        "align": "right",
-                        "width": "*"
-                    },
-                    {
-                        "header": "Variance",
-                        "binding": "QuantityVarianceDisplay",
-                        "allowSorting": true,
-                        "align": "right",
-                        "width": "*"
-                    },
-                    {
-                        "header": "Variance",
-                        "binding": "VarianceAmountDisplay",
-                        "allowSorting": true,
-                        "align": "right",
-                        "width": "*"
                     }
                 ],
                 autoGenerateColumns: false,
@@ -680,30 +662,29 @@
             inventoryReportGrid.columnHeaders.rows[0].allowMerging = true;
 
             inventoryReportGrid.columnHeaders.columns[0].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 0, 'Item');
+            inventoryReportGrid.columnHeaders.setCellData(0, 0, 'Stock Card');
 
             inventoryReportGrid.columnHeaders.columns[1].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 1, 'Code');
+            inventoryReportGrid.columnHeaders.setCellData(0, 1, 'Item');
 
             inventoryReportGrid.columnHeaders.columns[2].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 2, 'Unit');
+            inventoryReportGrid.columnHeaders.setCellData(0, 2, 'Item Group');
 
             inventoryReportGrid.columnHeaders.columns[3].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 3, 'Cost');
+            inventoryReportGrid.columnHeaders.setCellData(0, 3, 'Code');
 
-            for (var columnBasicUnitConversion = 4; columnBasicUnitConversion <= 7; columnBasicUnitConversion++) {
+            inventoryReportGrid.columnHeaders.columns[4].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 4, 'Unit');
+
+            inventoryReportGrid.columnHeaders.columns[5].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 5, 'Cost');
+
+            for (var columnBasicUnitConversion = 6; columnBasicUnitConversion <= 9; columnBasicUnitConversion++) {
                 inventoryReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            inventoryReportGrid.columnHeaders.columns[8].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 8, 'Amount');
-
-            for (var columnBasicUnitConversion = 9; columnBasicUnitConversion <= 10; columnBasicUnitConversion++) {
-                inventoryReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
-            }
-
-            inventoryReportGrid.columnHeaders.columns[11].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 11, 'Variance');
+            inventoryReportGrid.columnHeaders.columns[10].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 10, 'Amount');
 
             updateNavigateButtonsItems();
 
@@ -748,16 +729,14 @@
                         Branch: inventoryReportCollections.items[i].Branch,
                         InventoryCode: inventoryReportCollections.items[i].InventoryCode,
                         Article: inventoryReportCollections.items[i].ArticleForCSV,
+                        ItemGroup: inventoryReportCollections.items[i].ItemGroup,
                         Unit: inventoryReportCollections.items[i].Unit,
                         Cost: inventoryReportCollections.items[i].Cost,
                         BegQuantity: inventoryReportCollections.items[i].BegQuantity,
                         InQuantity: inventoryReportCollections.items[i].InQuantity,
                         OutQuantity: inventoryReportCollections.items[i].OutQuantity,
                         EndQuantity: inventoryReportCollections.items[i].EndQuantity,
-                        TotalAmount: inventoryReportCollections.items[i].TotalAmount,
-                        Count: inventoryReportCollections.items[i].Count,
-                        QuantityVariance: inventoryReportCollections.items[i].QuantityVariance,
-                        VarianceAmount: inventoryReportCollections.items[i].VarianceAmount,
+                        TotalAmount: inventoryReportCollections.items[i].TotalAmount
                     });
                 }
 
@@ -772,16 +751,14 @@
                 Branch: "Branch",
                 InventoryCode: "Inventory Code",
                 Article: "Item",
+                ItemGroup: "Item Group",
                 Unit: "Unit",
                 Cost: "Cost",
                 BegQuantity: "Beg Quantity",
                 InQuantity: "In Quantity",
                 OutQuantity: "Out Quantity",
                 EndQuantity: "End Quantity",
-                TotalAmount: "Total Amount",
-                Count: "Count",
-                QuantityVariance: "Quantity Variance",
-                VarianceAmount: "Variance Amount",
+                TotalAmount: "Total Amount"
             });
 
             var header = '';
