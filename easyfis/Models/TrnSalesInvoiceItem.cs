@@ -51,5 +51,6 @@ namespace easyfis.Models
         public Int32 AccountId { get; set; }
         public Decimal Cost { get; set; }
         public String Branch { get; set; }
+        public String SoldBy { get; set; }
     }
 }

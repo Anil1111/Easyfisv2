@@ -57,7 +57,8 @@ namespace easyfis.ApiControllers
                                     Remarks = d.Remarks,
                                     SoldBy = d.MstUser4.FullName,
                                     Amount = d.Amount,
-                                    SalesTimeStamp = GetSalesItemMaxTimeStamp(d.Id)
+                                    SalesTimeStamp = GetSalesItemMaxTimeStamp(d.Id),
+                                    DocumentReference = d.DocumentReference
                                 };
 
             return salesInvoices.ToList();

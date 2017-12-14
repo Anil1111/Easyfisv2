@@ -41,7 +41,8 @@ namespace easyfis.ApiControllers
                                         Amount = d.Amount,
                                         Price = d.Price,
                                         Customer = d.TrnSalesInvoice.MstArticle.Article,
-                                        ItemCategory = d.MstArticle.Category
+                                        ItemCategory = d.MstArticle.Category,
+                                        SoldBy = d.TrnSalesInvoice.MstUser4.FullName
                                     };
 
             return salesInvoiceItems.ToList();
