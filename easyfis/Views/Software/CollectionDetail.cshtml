@@ -545,21 +545,21 @@
 
     <!-- RR Picked Amount -->
     <div class="modal fade" id="pickBalanceAmountModal" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Amount</h4>
+                    <h4 class="modal-title">Pick</h4>
                 </div>
                 <div class="modal-body">
                     <form id="collectionLineDetailForm">
-                        <dl class="dl-horizontal">
+                        <dl class="">
                             <dt>Amount</dt>
                             <dd><input class="form-control  numberField  requiredPickedAmount" id="pickAmount" placeholder="0.00" /></dd>
                         </dl>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button id="savePickAmount" class="btn btn-primary" onclick="btnSavePickAmountOnclick()"><i class="fa fa-check"></i> Ok</button>
+                    <button id="savePickAmount" class="btn btn-primary" onclick="btnSavePickAmountOnclick()"><i class="fa fa-arrow-right"></i> Continue</button>
                     <button id="closePickAmountModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
@@ -2148,6 +2148,7 @@
                                 SINumber: results[i]["SINumber"],
                                 SIDate: SIDate,
                                 ManualSINumber: results[i]["ManualSINumber"],
+                                Remarks: results[i]["Remarks"],
                                 Amount: results[i]["Amount"],
                                 AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 PaidAmount: results[i]["PaidAmount"],
@@ -2355,7 +2356,7 @@
 
             saleInvoiceStatus.filter = function (item) {
                 return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualSINumber.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
             }
 
             saleInvoiceStatus.collectionChanged.addHandler(function (sender, args) {
@@ -2374,18 +2375,18 @@
                         "width": "1.5*"
                     },
                     {
-                        "header": "Manual SI No",
-                        "binding": "ManualSINumber",
-                        "allowSorting": true,
-                        "isReadOnly": true,
-                        "width": "3*"
-                    },
-                    {
                         "header": "Date",
                         "binding": "SIDate",
                         "allowSorting": true,
                         "isReadOnly": true,
                         "width": "1.5*"
+                    },
+                    {
+                        "header": "Particulars",
+                        "binding": "Remarks",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "3*"
                     },
                     {
                         "header": "SI Amount",
@@ -2468,10 +2469,10 @@
             SIStatusGrid.columnHeaders.setCellData(0, 0, 'SI Number');
 
             SIStatusGrid.columnHeaders.columns[1].allowMerging = true;
-            SIStatusGrid.columnHeaders.setCellData(0, 1, 'Manual SI No');
+            SIStatusGrid.columnHeaders.setCellData(0, 1, 'Date');
 
             SIStatusGrid.columnHeaders.columns[2].allowMerging = true;
-            SIStatusGrid.columnHeaders.setCellData(0, 2, 'Date');
+            SIStatusGrid.columnHeaders.setCellData(0, 2, 'Particulars');
 
             for (var columnQuantityTopAssigned = 3; columnQuantityTopAssigned <= 6; columnQuantityTopAssigned++) {
                 SIStatusGrid.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Amount');

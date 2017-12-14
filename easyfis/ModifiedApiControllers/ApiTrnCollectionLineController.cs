@@ -219,6 +219,7 @@ namespace easyfis.ModifiedApiControllers
                                     SINumber = d.SINumber,
                                     SIDate = d.SIDate.ToShortDateString(),
                                     ManualSINumber = d.ManualSINumber,
+                                    Remarks = d.Remarks,
                                     Amount = d.Amount,
                                     PaidAmount = d.PaidAmount,
                                     AdjustmentAmount = d.AdjustmentAmount,
