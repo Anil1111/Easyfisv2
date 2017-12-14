@@ -169,10 +169,11 @@ namespace easyfis.Reports
 
                 if (receivingReceiptItems.Any())
                 {
-                    PdfPTable tableReceivingReceiptItems = new PdfPTable(6);
-                    float[] widthsCellsReceivingReceiptItems = new float[] { 100f, 70f, 200f, 150f, 100f, 100f };
+                    PdfPTable tableReceivingReceiptItems = new PdfPTable(7);
+                    float[] widthsCellsReceivingReceiptItems = new float[] { 50f, 100f, 70f, 200f, 200f, 100f, 100f };
                     tableReceivingReceiptItems.SetWidths(widthsCellsReceivingReceiptItems);
                     tableReceivingReceiptItems.WidthPercentage = 100;
+                    tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
                     tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
                     tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("Unit", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
                     tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("Item", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
@@ -181,17 +182,20 @@ namespace easyfis.Reports
                     tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
 
                     Decimal totalAmount = 0;
+                    Decimal count = 0;
 
                     foreach (var receivingReceiptItem in receivingReceiptItems)
                     {
+                        count += 1;
+                        totalAmount += receivingReceiptItem.Amount;
+
+                        tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(count.ToString("#,##0"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Branch, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Cost.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Amount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-
-                        totalAmount += receivingReceiptItem.Amount;
                     }
 
                     tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
