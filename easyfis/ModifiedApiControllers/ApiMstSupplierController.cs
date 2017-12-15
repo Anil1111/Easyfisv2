@@ -265,32 +265,32 @@ namespace easyfis.ModifiedApiControllers
                                         }
                                         else
                                         {
-                                            return Request.CreateResponse(HttpStatusCode.NotFound, "No term found. Please setup more terms for all master tables.");
+                                            return Request.CreateResponse(HttpStatusCode.NotFound, "No term.");
                                         }
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.NotFound, "No tax type found. Please setup more tax types for all master tables.");
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "No tax type.");
                                     }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No unit found. Please setup more units for all master tables.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No unit.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No article group found. Please setup at least one article group for suppliers.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "No article group.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add supplier.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this supplier page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -365,22 +365,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These supplier details are already locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Already locked.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These supplier details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This supplier detail is no longer exist.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to lock supplier.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this supplier detail page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -440,22 +440,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These supplier details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Already unlocked.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These supplier details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This supplier detail is no longer exist.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to unlock supplier.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this supplier detail page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -509,17 +509,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. This selected supplier is not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This supplier detail is no longer exist.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete supplier.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this supplier page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else

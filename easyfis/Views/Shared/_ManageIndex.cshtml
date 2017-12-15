@@ -5,99 +5,117 @@
 {
     <section class="container">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <ul class="nav nav-pills nav-stacked pill-custom" role="tablist" id="myTab">
-                    <li class="active"><a data-toggle="pill" href="#UI"><i class="fa fa-user fa-fw"></i> &nbsp; User Information</a></li>
+                    <li class="active"><a data-toggle="pill" href="#UserDetail"><i class="fa fa-user fa-fw"></i> &nbsp; User Detail</a></li>
                     <li class="manageDivider"></li>
-                    <li><a data-toggle="pill" href="#ST"><i class="fa fa-gears fa-fw"></i> &nbsp; Settings</a></li>
-                    <li><a data-toggle="pill" href="#UT"><i class="fa fa-wrench fa-fw"></i> &nbsp; Utilities</a></li>
+                    <li><a data-toggle="pill" href="#Defaults"><i class="fa fa-gears fa-fw"></i> &nbsp; Defaults</a></li>
+                    <li><a data-toggle="pill" href="#System"><i class="fa fa-desktop fa-fw"></i> &nbsp; System</a></li>
+                    <li class="manageDivider"></li>
+                    <li><a data-toggle="pill" href="#AuditTrail"><i class="fa fa-history fa-fw"></i> &nbsp; Audit Trail</a></li>
+                    <li><a data-toggle="pill" href="#DeleteAllTransaction"><i class="fa fa-trash fa-fw"></i> &nbsp; Delete All Transaction</a></li>
                 </ul>
                 <br />
-                <button class="btn btn-info btn-block btn-xl launchSoftware" id="LaunchSoftware" onclick="cmdLaunchSoftware_OnClick()">Launch Application</button>
+                <button class="btn btn-primary btn-block btn-xl launchSoftware" id="LaunchSoftware" onclick="cmdLaunchSoftware_OnClick()">Main Menu</button>
                 <br /><br />
             </div>
-            <div class="col-md-9">
+            <div class="col-md-8">
                 <div class="tab-content">
-                    <div id="UI" class="tab-pane fade in active">
+                    <div id="UserDetail" class="tab-pane active">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h4><b>@ViewData["FullName"]</b></h4>
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 60%"></td>
+                                        <td style="width: 40%" align="right">
+                                            <button class="btn btn-primary" onclick="cmdEditProfileDetails_OnClickButton()"><i class="fa fa-edit"></i> Edit</button>
+                                            <a href="/Manage/ChangePassword" class="btn btn-primary"><i class="fa fa-edit"></i> Change Password</a>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                             <div class="panel-body">
-                                <button class="btn btn-primary" onclick="cmdEditProfileDetails_OnClickButton()"><i class="fa fa-edit"></i> Edit</button>
-                                <a href="/Manage/ChangePassword" class="btn btn-primary"><i class="fa fa-edit"></i> Change Password</a>
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Fullname</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " value="@ViewData["FullName"]" disabled/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Username</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " value="@ViewData["UserName"]" disabled/>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                    </div>
-                    <div id="ST" class="tab-pane fade in">
-                        <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
-                            <li role="presentation" class="active"><a data-toggle="tab" href="#Sys">System</a></li>
-                            <li role="presentation"><a data-toggle="tab" href="#DF">Defaults</a></li>
+                        <ul class="nav nav-tabs" role="tablist" id="myTab">
+                            <li role="presentation" class="active"><a data-toggle="tab" href="#UserForm" id="userForm">User Right Forms</a></li>
+                            <li role="presentation"><a data-toggle="tab" href="#UserBranches" id="userBranches">User Branches</a></li>
                         </ul>
                         <br />
                         <div class="tab-content">
-                            <div id="Sys" class="tab-pane fade in active">
+                            <div id="UserForm" class="tab-pane active">
 
                             </div>
-                            <div id="DF" class="tab-pane fade in">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" align="right">
-                                        <button class="btn btn-primary " id="btnIdSaveDefaults" onclick="btnOnclickSaveDefaults()"><i class="fa fa-save"></i> Save</button>
-                                    </div>
-                                    <div class="panel-body">
-                                        <form class="form-horizontal" role="form">
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-6">Branch</label>
-                                                <div class="col-sm-6">
-                                                    <div class="comboBox-wide" id="defaultBranch"></div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-6">Official Receipt Name</label>
-                                                <div class="col-sm-6">
-                                                    <input type="text" class="form-control " id="defaultOfficialReceiptName" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-6">Inventory Type</label>
-                                                <div class="col-sm-6">
-                                                    <div id="cboInventoryType" ></div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-6">Sales Invoice Discount</label>
-                                                <div class="col-sm-6">
-                                                    <div id="cboDiscounts"></div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-6">Sales Invoice Name</label>
-                                                <div class="col-sm-6">
-                                                    <input type="text" class="form-control " id="defaultSalesInvoiceName" />
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                            <div id="UserBranches" class="tab-pane">
+
                             </div>
                         </div>
                     </div>
-                    <div id="UT" class="tab-pane fade in">
-                        <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
-                            <li role="presentation" class="active"><a data-toggle="tab" href="#DAT">Delete All Transaction</a></li>
-                            <li role="presentation"><a data-toggle="tab" href="#AT">Audit Trail</a></li>
-                        </ul>
-                        <br />
-                        <div class="tab-content">
-                            <div id="DAT" class="tab-pane fade in active">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" align="right">
-                                        <button class="btn btn-danger" id="btnDeleteAllTransaction" onclick="btnDeleteAllTransactionOnclick()"><i class="fa fa-trash"></i> Delete</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="AT" class="tab-pane fade in">
+                    <div id="System" class="tab-pane">
 
+                    </div>
+                    <div id="Defaults" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" align="right">
+                                <button class="btn btn-primary " id="btnIdSaveDefaults" onclick="btnOnclickSaveDefaults()"><i class="fa fa-save"></i> Save</button>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Branch</label>
+                                        <div class="col-sm-7">
+                                            <div class="comboBox-wide" id="defaultBranch"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Official Receipt Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " id="defaultOfficialReceiptName" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Inventory Type</label>
+                                        <div class="col-sm-7">
+                                            <div id="cboInventoryType"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Sales Invoice Discount</label>
+                                        <div class="col-sm-7">
+                                            <div id="cboDiscounts"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Sales Invoice Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " id="defaultSalesInvoiceName" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="AuditTrail" class="tab-pane">
+
+                    </div>
+                    <div id="DeleteAllTransaction" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" align="right">
+                                <button class="btn btn-danger" id="btnDeleteAllTransaction" onclick="btnDeleteAllTransactionOnclick()"><i class="fa fa-trash"></i> Delete</button>
                             </div>
                         </div>
                     </div>

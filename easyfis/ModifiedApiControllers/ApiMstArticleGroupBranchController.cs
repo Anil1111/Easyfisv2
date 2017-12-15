@@ -123,35 +123,90 @@ namespace easyfis.ModifiedApiControllers
 
                             if (accounts.Any())
                             {
-                                Data.MstArticleGroupBranch newArticleGroupBranch = new Data.MstArticleGroupBranch
+                                var accountId = from d in accounts
+                                                where d.Id == objArticleGroupBranch.AccountId
+                                                select d;
+
+                                if (accountId.Any())
                                 {
-                                    ArticleGroupId = objArticleGroupBranch.ArticleGroupId,
-                                    BranchId = objArticleGroupBranch.BranchId,
-                                    AccountId = objArticleGroupBranch.AccountId,
-                                    SalesAccountId = objArticleGroupBranch.SalesAccountId,
-                                    CostAccountId = objArticleGroupBranch.CostAccountId,
-                                    AssetAccountId = objArticleGroupBranch.AssetAccountId,
-                                    ExpenseAccountId = objArticleGroupBranch.ExpenseAccountId
-                                };
+                                    var salesAccountId = from d in accounts
+                                                         where d.Id == objArticleGroupBranch.SalesAccountId
+                                                         select d;
 
-                                db.MstArticleGroupBranches.InsertOnSubmit(newArticleGroupBranch);
-                                db.SubmitChanges();
+                                    if (salesAccountId.Any())
+                                    {
+                                        var costAccountId = from d in accounts
+                                                            where d.Id == objArticleGroupBranch.CostAccountId
+                                                            select d;
 
-                                return Request.CreateResponse(HttpStatusCode.OK, newArticleGroupBranch.Id);
+                                        if (costAccountId.Any())
+                                        {
+                                            var assetAccountId = from d in accounts
+                                                                 where d.Id == objArticleGroupBranch.AssetAccountId
+                                                                 select d;
+
+                                            if (assetAccountId.Any())
+                                            {
+                                                var expenseAccountId = from d in accounts
+                                                                       where d.Id == objArticleGroupBranch.ExpenseAccountId
+                                                                       select d;
+
+                                                if (expenseAccountId.Any())
+                                                {
+                                                    Data.MstArticleGroupBranch newArticleGroupBranch = new Data.MstArticleGroupBranch
+                                                    {
+                                                        ArticleGroupId = objArticleGroupBranch.ArticleGroupId,
+                                                        BranchId = objArticleGroupBranch.BranchId,
+                                                        AccountId = objArticleGroupBranch.AccountId,
+                                                        SalesAccountId = objArticleGroupBranch.SalesAccountId,
+                                                        CostAccountId = objArticleGroupBranch.CostAccountId,
+                                                        AssetAccountId = objArticleGroupBranch.AssetAccountId,
+                                                        ExpenseAccountId = objArticleGroupBranch.ExpenseAccountId
+                                                    };
+
+                                                    db.MstArticleGroupBranches.InsertOnSubmit(newArticleGroupBranch);
+                                                    db.SubmitChanges();
+
+                                                    return Request.CreateResponse(HttpStatusCode.OK, newArticleGroupBranch.Id);
+                                                }
+                                                else
+                                                {
+                                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Expense account not found.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.NotFound, "Asset account not found.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            return Request.CreateResponse(HttpStatusCode.NotFound, "Cost account not found.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Sales account not found.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Account not found.");
+                                }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account found. Please setup at least one account for article group branches.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account setup.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add article group branch.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this system table page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -197,32 +252,98 @@ namespace easyfis.ModifiedApiControllers
 
                             if (articleGroupBranch.Any())
                             {
-                                var updateArticleGroupBranch = articleGroupBranch.FirstOrDefault();
-                                updateArticleGroupBranch.ArticleGroupId = objArticleGroupBranch.ArticleGroupId;
-                                updateArticleGroupBranch.BranchId = objArticleGroupBranch.BranchId;
-                                updateArticleGroupBranch.AccountId = objArticleGroupBranch.AccountId;
-                                updateArticleGroupBranch.SalesAccountId = objArticleGroupBranch.SalesAccountId;
-                                updateArticleGroupBranch.CostAccountId = objArticleGroupBranch.CostAccountId;
-                                updateArticleGroupBranch.AssetAccountId = objArticleGroupBranch.AssetAccountId;
-                                updateArticleGroupBranch.ExpenseAccountId = objArticleGroupBranch.ExpenseAccountId;
+                                var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
+                                               where d.IsLocked == true
+                                               select d;
 
-                                db.SubmitChanges();
+                                if (accounts.Any())
+                                {
+                                    var accountId = from d in accounts
+                                                    where d.Id == objArticleGroupBranch.AccountId
+                                                    select d;
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                    if (accountId.Any())
+                                    {
+                                        var salesAccountId = from d in accounts
+                                                             where d.Id == objArticleGroupBranch.SalesAccountId
+                                                             select d;
+
+                                        if (salesAccountId.Any())
+                                        {
+                                            var costAccountId = from d in accounts
+                                                                where d.Id == objArticleGroupBranch.CostAccountId
+                                                                select d;
+
+                                            if (costAccountId.Any())
+                                            {
+                                                var assetAccountId = from d in accounts
+                                                                     where d.Id == objArticleGroupBranch.AssetAccountId
+                                                                     select d;
+
+                                                if (assetAccountId.Any())
+                                                {
+                                                    var expenseAccountId = from d in accounts
+                                                                           where d.Id == objArticleGroupBranch.ExpenseAccountId
+                                                                           select d;
+
+                                                    if (expenseAccountId.Any())
+                                                    {
+                                                        var updateArticleGroupBranch = articleGroupBranch.FirstOrDefault();
+                                                        updateArticleGroupBranch.ArticleGroupId = objArticleGroupBranch.ArticleGroupId;
+                                                        updateArticleGroupBranch.BranchId = objArticleGroupBranch.BranchId;
+                                                        updateArticleGroupBranch.AccountId = objArticleGroupBranch.AccountId;
+                                                        updateArticleGroupBranch.SalesAccountId = objArticleGroupBranch.SalesAccountId;
+                                                        updateArticleGroupBranch.CostAccountId = objArticleGroupBranch.CostAccountId;
+                                                        updateArticleGroupBranch.AssetAccountId = objArticleGroupBranch.AssetAccountId;
+                                                        updateArticleGroupBranch.ExpenseAccountId = objArticleGroupBranch.ExpenseAccountId;
+
+                                                        db.SubmitChanges();
+
+                                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                                    }
+                                                    else
+                                                    {
+                                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Expense account not found.");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Asset account not found.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.NotFound, "Cost account not found.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            return Request.CreateResponse(HttpStatusCode.NotFound, "Sales account not found.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Account not found.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No account setup.");
+                                }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These article group branch details are not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This article group branch detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update article group branch.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this system table page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -275,17 +396,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. This selected article group branch is not found in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This article group branch detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete article group branch.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this system table page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else

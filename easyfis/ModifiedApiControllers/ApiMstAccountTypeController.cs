@@ -87,6 +87,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             var accountCategories = from d in db.MstAccountCategories
                                                     where d.IsLocked == true
+                                                    && d.Id == objAccountType.AccountCategoryId
                                                     select d;
 
                             if (accountCategories.Any())
@@ -111,17 +112,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account category found. Please setup more account categories for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Account category not found.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new account type in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -163,6 +164,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             var accountCategories = from d in db.MstAccountCategories
                                                     where d.IsLocked == true
+                                                    && d.Id == objAccountType.AccountCategoryId
                                                     select d;
 
                             if (accountCategories.Any())
@@ -189,22 +191,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "This account type detail is no longer exist in the server.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "This account type detail is no longer available.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account category found. Please setup more account categories for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Account category not found.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update account type in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else
@@ -259,17 +261,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account type detail is no longer exist in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account type detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete an account type in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
                     }
                 }
                 else

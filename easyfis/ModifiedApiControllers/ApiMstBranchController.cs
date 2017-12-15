@@ -54,7 +54,7 @@ namespace easyfis.ModifiedApiControllers
                               where d.UserId == User.Identity.GetUserId()
                               select d;
 
-            var currentCompanyId = currentUser.FirstOrDefault().Id;
+            var currentCompanyId = currentUser.FirstOrDefault().CompanyId;
 
             var branches = from d in db.MstBranches
                            where d.CompanyId == currentCompanyId

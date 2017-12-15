@@ -83,12 +83,12 @@ namespace easyfis.ModifiedApiControllers
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new account cash flow in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -148,17 +148,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account cash flow detail is no longer exist in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account cash flow detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update account cash flow in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -213,17 +213,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account cash flow detail is no longer exist in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account cash flow detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete an account cash flow in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else

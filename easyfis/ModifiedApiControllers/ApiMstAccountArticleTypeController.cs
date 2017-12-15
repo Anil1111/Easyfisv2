@@ -68,6 +68,7 @@ namespace easyfis.ModifiedApiControllers
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
+                    var currentUserLock = currentUser.FirstOrDefault().IsLocked;
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
@@ -80,6 +81,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             var account = from d in db.MstAccounts
                                           where d.IsLocked == true
+                                          && d.Id == objAccountArticleType.AccountId
                                           select d;
 
                             if (account.Any())
@@ -97,17 +99,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account found. Please setup more account for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Account not exist.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new account article type in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -147,17 +149,18 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanEdit)
                         {
-                            var account = from d in db.MstAccounts
-                                          where d.IsLocked == true
-                                          select d;
+                            var accountArticleType = from d in db.MstAccountArticleTypes
+                                                     where d.Id == Convert.ToInt32(id)
+                                                     select d;
 
-                            if (account.Any())
+                            if (accountArticleType.Any())
                             {
-                                var accountArticleType = from d in db.MstAccountArticleTypes
-                                                         where d.Id == Convert.ToInt32(id)
-                                                         select d;
+                                var account = from d in db.MstAccounts
+                                              where d.IsLocked == true
+                                              && d.Id == objAccountArticleType.AccountId
+                                              select d;
 
-                                if (accountArticleType.Any())
+                                if (account.Any())
                                 {
                                     var updateAccountArticleType = accountArticleType.FirstOrDefault();
                                     updateAccountArticleType.AccountId = objAccountArticleType.AccountId;
@@ -169,22 +172,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "This account article detail is no longer exist in the server.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Account not exist.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account found. Please setup more account for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account article detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update account article in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -237,17 +240,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account article type detail is no longer exist in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account article type detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete an account article type in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else

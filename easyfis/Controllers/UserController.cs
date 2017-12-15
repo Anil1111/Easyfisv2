@@ -50,7 +50,5 @@ namespace easyfis.Controllers
 
             base.OnActionExecuted(filterContext);
         }
-        //public UserAccountController()
-        //{ }
     }
 }

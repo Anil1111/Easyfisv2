@@ -99,7 +99,7 @@ namespace easyfis.Controllers
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("LoginError", "Username or Password is incorrect. Please Try again.");
+                    ModelState.AddModelError("LoginError", "Username or Password is incorrect.");
                     return View(model);
             }
         }
@@ -218,7 +218,7 @@ namespace easyfis.Controllers
 
             if (!verificationResult.Success)
             {
-                ModelState.AddModelError("CaptiaError", "ERROR: Invalid recaptcha challenge.");
+                ModelState.AddModelError("CaptiaError", "Invalid recaptcha challenge.");
             }
             else
             {
@@ -244,10 +244,18 @@ namespace easyfis.Controllers
 
                         Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-                        var company = from d in db.MstCompanies select d;
-                        var branch = from d in db.MstBranches where d.CompanyId == company.FirstOrDefault().Id select d;
-                        var account = from d in db.MstAccounts select d;
-                        var discount = from d in db.MstDiscounts select d;
+                        var company = from d in db.MstCompanies
+                                      select d;
+
+                        var branch = from d in db.MstBranches
+                                     where d.CompanyId == company.FirstOrDefault().Id
+                                     select d;
+
+                        var account = from d in db.MstAccounts
+                                      select d;
+
+                        var discount = from d in db.MstDiscounts
+                                       select d;
 
                         var companyId = company.FirstOrDefault().Id;
                         var branchId = branch.FirstOrDefault().Id;
@@ -272,29 +280,35 @@ namespace easyfis.Controllers
                             defaultSalesInvoiceDiscountId = adminUser.FirstOrDefault().DefaultSalesInvoiceDiscountId;
                         }
 
-                        Data.MstUser newMstUser = new Data.MstUser();
-                        newMstUser.UserId = user.Id;
-                        newMstUser.UserName = model.UserName;
-                        newMstUser.Password = model.Password;
-                        newMstUser.FullName = model.FullName;
-                        newMstUser.CompanyId = companyId;
-                        newMstUser.BranchId = branchId;
-                        newMstUser.IncomeAccountId = incomeAccountId;
-                        newMstUser.SupplierAdvancesAccountId = supplierAdvancesAccountId;
-                        newMstUser.CustomerAdvancesAccountId = customerAdvancesAccountId;
-                        newMstUser.OfficialReceiptName = officialReceiptName;
-                        newMstUser.InventoryType = inventoryType;
-                        newMstUser.DefaultSalesInvoiceDiscountId = defaultSalesInvoiceDiscountId;
-                        newMstUser.SalesInvoiceName = salesInvoiceName;
-                        newMstUser.IsLocked = true;
-                        newMstUser.CreatedById = 0;
-                        newMstUser.CreatedDateTime = DateTime.Now;
-                        newMstUser.UpdatedById = 0;
-                        newMstUser.UpdatedDateTime = DateTime.Now;
+                        Data.MstUser newMstUser = new Data.MstUser
+                        {
+                            UserId = user.Id,
+                            UserName = model.UserName,
+                            Password = model.Password,
+                            FullName = model.FullName,
+                            CompanyId = companyId,
+                            BranchId = branchId,
+                            IncomeAccountId = incomeAccountId,
+                            SupplierAdvancesAccountId = supplierAdvancesAccountId,
+                            CustomerAdvancesAccountId = customerAdvancesAccountId,
+                            OfficialReceiptName = officialReceiptName,
+                            InventoryType = inventoryType,
+                            DefaultSalesInvoiceDiscountId = defaultSalesInvoiceDiscountId,
+                            SalesInvoiceName = salesInvoiceName,
+                            IsLocked = false,
+                            CreatedById = 0,
+                            CreatedDateTime = DateTime.Now,
+                            UpdatedById = 0,
+                            UpdatedDateTime = DateTime.Now
+                        };
+
                         db.MstUsers.InsertOnSubmit(newMstUser);
                         db.SubmitChanges();
 
-                        var mstUsersData = from d in db.MstUsers where d.Id == newMstUser.Id select d;
+                        var mstUsersData = from d in db.MstUsers
+                                           where d.Id == newMstUser.Id
+                                           select d;
+
                         if (mstUsersData.Any())
                         {
                             var updateMstUsersData = mstUsersData.FirstOrDefault();
@@ -306,7 +320,7 @@ namespace easyfis.Controllers
                         return RedirectToAction("Register", "Account");
                     }
 
-                    //AddErrors(result);
+                    AddErrors(result);
                 }
             }
 

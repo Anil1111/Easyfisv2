@@ -12,57 +12,48 @@ else
         <div class="container">
             <br /><br /><br /><br /><br />
             <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-6">
-                    <div class="panel-group">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    @using easyfis.Models
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "", role = "form" }))
+                    {
                         <div class="panel panel-default">
+                            <div class="panel-heading text-center">
+                                <h4>LOGIN</h4>
+                            </div>
                             <div class="panel-body">
-                                <br />
-                                @using easyfis.Models
-                                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username..." })
+                                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="form-group">
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password..." })
+                                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                                </div>
+                                <label>
+                                    @Html.CheckBoxFor(m => m.RememberMe)
+                                    @Html.LabelFor(m => m.RememberMe)
+                                </label>
+                            </div>
+                            <div class="panel-footer">
+                                <input type="submit" value="Login" class="btn btn-primary btn-block btn-lg" style="border-radius: 4px;">
+                            </div>
+                        </div>
+                        <div style="font-weight: bold;">
+                            <div class="text-center">
+                                @if (ViewData.ModelState.Keys.Any(k => ViewData.ModelState[k].Errors.Any()))
                                 {
-                                    @Html.AntiForgeryToken()
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-3">Username:</label>
-                                        <div class="col-sm-9">
-                                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "Username" })
-                                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-3">Password:</label>
-                                        <div class="col-sm-9">
-                                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", @placeholder = "Password" })
-                                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9">
-                                            <label>
-                                                @Html.CheckBoxFor(m => m.RememberMe)
-                                                @Html.LabelFor(m => m.RememberMe)
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9">
-                                            @Html.ValidationMessage("LoginError", new { @class = "text-danger" })
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9">
-                                            <input type="submit" value="Login" class="btn btn-primary">
-                                        </div>
+                                    <div class="alert alert-danger">
+                                        <button class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                                        @Html.ValidationMessage("LoginError", new { @class = "text-danger" })
                                     </div>
                                 }
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
-                <div class="col-md-3"></div>
+                <div class="col-md-4"></div>
             </div>
         </div>
     </section>

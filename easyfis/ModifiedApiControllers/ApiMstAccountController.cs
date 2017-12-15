@@ -105,12 +105,14 @@ namespace easyfis.ModifiedApiControllers
                         {
                             var accountTypes = from d in db.MstAccountTypes
                                                where d.IsLocked == true
+                                               && d.Id == objAccount.AccountTypeId
                                                select d;
 
                             if (accountTypes.Any())
                             {
                                 var accountCashFlows = from d in db.MstAccountCashFlows
                                                        where d.IsLocked == true
+                                                       && d.Id == objAccount.AccountCashFlowId
                                                        select d;
 
                                 if (accountCashFlows.Any())
@@ -135,22 +137,22 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No account cash flow found. Please setup more account cash flows for all chart of account tables.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Account cash flow not found.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account type found. Please setup more account types for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Account type not found.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new account in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -192,12 +194,14 @@ namespace easyfis.ModifiedApiControllers
                         {
                             var accountTypes = from d in db.MstAccountTypes
                                                where d.IsLocked == true
+                                               && d.Id == objAccount.AccountTypeId
                                                select d;
 
                             if (accountTypes.Any())
                             {
                                 var accountCashFlows = from d in db.MstAccountCashFlows
                                                        where d.IsLocked == true
+                                                       && d.Id == objAccount.AccountCashFlowId
                                                        select d;
 
                                 if (accountCashFlows.Any())
@@ -223,27 +227,27 @@ namespace easyfis.ModifiedApiControllers
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.NotFound, "This account detail is no longer exist in the server.");
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "This account detail is no longer available.");
                                     }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No account cash flow found. Please setup more account cash flows for all chart of account tables.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Account cash flow not found.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No account type found. Please setup more account types for all chart of account tables.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Account type not found.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update account in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
@@ -296,17 +300,17 @@ namespace easyfis.ModifiedApiControllers
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account detail is no longer exist in the server.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "This account detail is no longer available.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete an account in this chart of account page.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this chart of account page.");
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "No rights.");
                     }
                 }
                 else
