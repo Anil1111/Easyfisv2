@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // Account Ledger List
         // ===================
         [Authorize, HttpGet, Route("api/accountLedger/list/{startDate}/{endDate}/{companyId}/{branchId}/{accountId}")]
-        public List<Entities.TrnJournal> ListAccountLedger(String startDate, String endDate, String companyId, String branchId, String accountId)
+        public List<Entities.RepAccountLedger> ListAccountLedger(String startDate, String endDate, String companyId, String branchId, String accountId)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace easyfis.ApiControllers
                                && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                && d.BranchId == Convert.ToInt32(branchId)
                                && d.AccountId == Convert.ToInt32(accountId)
-                               select new Entities.TrnJournal
+                               select new Entities.RepAccountLedger
                                {
                                    JournalDate = d.JournalDate.ToShortDateString(),
                                    DocumentReference = d.DocumentReference,
@@ -53,6 +53,57 @@ namespace easyfis.ApiControllers
             {
                 return null;
             }
+        }
+
+        // ===============================
+        // Dropdown List - Company (Field)
+        // ===============================
+        [Authorize, HttpGet, Route("api/accountLedger/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListAccountLedgerListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ==============================
+        // Dropdown List - Branch (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/accountLedger/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListAccountLedgerBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Account (Field)
+        // ===============================
+        [Authorize, HttpGet, Route("api/accountLedger/dropdown/list/account")]
+        public List<Entities.MstAccount> DropdownListAccountLedgerAccount()
+        {
+            var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
+                           where d.IsLocked == true
+                           select new Entities.MstAccount
+                           {
+                               Id = d.Id,
+                               AccountCode = d.AccountCode,
+                               Account = d.Account
+                           };
+
+            return accounts.ToList();
         }
     }
 }

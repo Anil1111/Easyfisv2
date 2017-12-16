@@ -67,10 +67,8 @@ namespace easyfis.ApiControllers
         // ===============================
         // Accounts Receivable Report list
         // ===============================
-        [Authorize]
-        [HttpGet]
-        [Route("api/accountsReceivable/list/{dateAsOf}/{companyId}/{branchId}/{accountId}")]
-        public List<Models.TrnSalesInvoice> ListAccountsReceivable(String dateAsOf, String companyId, String branchId, String accountId)
+        [Authorize, HttpGet, Route("api/accountsReceivable/list/{dateAsOf}/{companyId}/{branchId}/{accountId}")]
+        public List<Entities.RepAccountsReceivable> ListAccountsReceivable(String dateAsOf, String companyId, String branchId, String accountId)
         {
             try
             {
@@ -81,7 +79,7 @@ namespace easyfis.ApiControllers
                                    && d.MstArticle.AccountId == Convert.ToInt32(accountId)
                                    && d.BalanceAmount > 0
                                    && d.IsLocked == true
-                                   select new Models.TrnSalesInvoice
+                                   select new Entities.RepAccountsReceivable
                                    {
                                        Id = d.Id,
                                        Branch = d.MstBranch.Branch,
@@ -109,6 +107,62 @@ namespace easyfis.ApiControllers
             {
                 return null;
             }
+        }
+
+        // ===============================
+        // Dropdown List - Company (Field)
+        // ===============================
+        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListAccountsReceivableListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ==============================
+        // Dropdown List - Branch (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListAccountsReceivableBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Account (Field)
+        // ===============================
+        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/articleGroupAccount")]
+        public List<Entities.MstArticleGroup> DropdownListAccountsReceivableArticleGroupAccount()
+        {
+            var articleGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
+                                where d.ArticleTypeId == 2
+                                group d by new
+                                {
+                                    AccountId = d.AccountId,
+                                    AccountCode = d.MstAccount.AccountCode,
+                                    Account = d.MstAccount.Account
+                                } into g
+                                select new Entities.MstArticleGroup
+                                {
+                                    AccountId = g.Key.AccountId,
+                                    Account = g.Key.Account
+                                };
+
+            return articleGroups.ToList();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Cancelled Sales Summary Report List
         // ===================================
         [Authorize, HttpGet, Route("api/cancelledSalesSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoice> ListSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepCancelledSalesSummaryReport> ListSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoices = from d in db.TrnSalesInvoices
                                 where d.BranchId == Convert.ToInt32(branchId)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                 && d.SIDate >= Convert.ToDateTime(startDate)
                                 && d.SIDate <= Convert.ToDateTime(endDate)
                                 && d.IsLocked == false
-                                select new Models.TrnSalesInvoice
+                                select new Entities.RepCancelledSalesSummaryReport
                                 {
                                     Id = d.Id,
                                     Branch = d.MstBranch.Branch,
@@ -40,6 +40,39 @@ namespace easyfis.ApiControllers
                                 };
 
             return salesInvoices.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Company (Field)
+        // ===============================
+        [Authorize, HttpGet, Route("api/cancelledSalesSummaryReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListCancelledSalesSummaryReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ==============================
+        // Dropdown List - Branch (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/cancelledSalesSummaryReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListCancelledSalesSummaryReportBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }

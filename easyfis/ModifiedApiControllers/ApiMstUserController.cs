@@ -22,16 +22,39 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/user/list")]
         public List<Entities.MstUser> ListUser()
         {
-            var users = from d in db.MstUsers
-                        select new Entities.MstUser
-                        {
-                            Id = d.Id,
-                            UserName = d.UserName,
-                            FullName = d.FullName,
-                            IsLocked = d.IsLocked
-                        };
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
 
-            return users.ToList();
+            var currentUserName = currentUser.FirstOrDefault().UserName;
+
+            if (currentUserName.Equals("admin"))
+            {
+                var users = from d in db.MstUsers
+                            select new Entities.MstUser
+                            {
+                                Id = d.Id,
+                                UserName = d.UserName,
+                                FullName = d.FullName,
+                                IsLocked = d.IsLocked
+                            };
+
+                return users.ToList();
+            }
+            else
+            {
+                var users = from d in db.MstUsers
+                            where !d.UserName.Equals("admin")
+                            select new Entities.MstUser
+                            {
+                                Id = d.Id,
+                                UserName = d.UserName,
+                                FullName = d.FullName,
+                                IsLocked = d.IsLocked
+                            };
+
+                return users.ToList();
+            }
         }
 
         // ===========

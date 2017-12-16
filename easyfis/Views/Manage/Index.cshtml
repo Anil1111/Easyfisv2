@@ -209,38 +209,44 @@
             $("#confirmDeleteAllTrasactionsClose").prop("disabled", true);
             document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
 
-            $('#deleteAllTrasactionsModalConfirm').modal('hide');
             $('#deleteAllTrasactionsModalLoading').modal({
                 show: true,
                 backdrop: 'static'
             });
 
             $.ajax({
-                url: '/api/utilities/deleteAllTransactions',
+                url: '/api/utilities/delete/allTransactions',
                 type: "DELETE",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 statusCode: {
                     200: function () {
-                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
-                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
                         toastr.success("Successfully deleted");
-                        $('#deleteAllTrasactionsModalLoading').modal('hide');
+
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
                     },
-                    404: function () {
+                    404: function (message) {
                         document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#confirmDeleteAllTrasactions").prop("disabled", false);
                         $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
                         $('#deleteAllTrasactionsModalLoading').modal('hide');
-                        toastr.error("No Transactions");
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                     },
-                    400: function () {
+                    400: function (message) {
                         document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
                         $("#confirmDeleteAllTrasactions").prop("disabled", false);
                         $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
                         $('#deleteAllTrasactionsModalLoading').modal('hide');
-                        toastr.error("Cannot delete record");
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                    },
+                    500: function (message) {
+                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
+                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
+                        $('#deleteAllTrasactionsModalLoading').modal('hide');
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                     }
                 }
             });
@@ -422,6 +428,18 @@
                 document.getElementById("defaultOfficialReceiptName").disabled = true;
                 document.getElementById("defaultSalesInvoiceName").disabled = true;
             }
+
+            $(document).on('show.bs.modal', '.modal', function (event) {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('.modal:visible').length && $(document.body).addClass('modal-open');
+            });
         });
     </script>
     <script type="text/javascript">

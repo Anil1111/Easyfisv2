@@ -47,15 +47,149 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/userForm/dropdown/list/forms")]
         public List<Entities.SysForm> DropdownListUserFormListForms()
         {
-            var forms = from d in db.SysForms.OrderBy(d => d.Particulars)
-                        select new Entities.SysForm
-                        {
-                            Id = d.Id,
-                            FormName = d.FormName,
-                            Particulars = d.Particulars
-                        };
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
 
-            return forms.ToList();
+            var currentUserName = currentUser.FirstOrDefault().UserName;
+
+            if (currentUserName.Equals("admin"))
+            {
+                var forms = from d in db.SysForms.OrderBy(d => d.Particulars)
+                            select new Entities.SysForm
+                            {
+                                Id = d.Id,
+                                FormName = d.FormName,
+                                Particulars = d.Particulars
+                            };
+
+                return forms.ToList();
+            }
+            else
+            {
+                var forms = from d in db.SysForms.OrderBy(d => d.Particulars)
+                            where !d.FormName.Equals("CompanyList")
+                            && !d.FormName.Equals("CompanyDetail")
+                            && !d.FormName.Equals("UserList")
+                            && !d.FormName.Equals("UserDetail")
+                            select new Entities.SysForm
+                            {
+                                Id = d.Id,
+                                FormName = d.FormName,
+                                Particulars = d.Particulars
+                            };
+
+                return forms.ToList();
+            }
+        }
+
+        // ================
+        // Copy Rights Form
+        // ================
+        [Authorize, HttpPost, Route("api/userform/copyrights/{name}/{userId}")]
+        public HttpResponseMessage CopyRightsUserForms(String name, String userId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("UserDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanAdd)
+                        {
+                            Boolean canCopy = false;
+                            var currentUserName = currentUser.FirstOrDefault().UserName;
+
+                            if (currentUserName.Equals("admin"))
+                            {
+                                canCopy = true;
+                            }
+                            else
+                            {
+                                if (!name.Equals("admin"))
+                                {
+                                    canCopy = true;
+                                }
+                            }
+
+                            if (canCopy)
+                            {
+                                var userFormSource = from d in db.MstUserForms
+                                                     where d.MstUser.UserName.Equals(name)
+                                                     && d.MstUser.IsLocked == true
+                                                     select d;
+
+                                if (userFormSource.Any())
+                                {
+                                    var deleteUserForms = from d in db.MstUserForms
+                                                          where d.UserId == Convert.ToInt32(userId)
+                                                          select d;
+
+                                    db.MstUserForms.DeleteAllOnSubmit(deleteUserForms.ToList());
+                                    db.SubmitChanges();
+
+                                    foreach (var userForm in userFormSource)
+                                    {
+                                        Data.MstUserForm newUserForm = new Data.MstUserForm
+                                        {
+                                            UserId = Convert.ToInt32(userId),
+                                            FormId = userForm.FormId,
+                                            CanAdd = userForm.CanAdd,
+                                            CanEdit = userForm.CanEdit,
+                                            CanDelete = userForm.CanDelete,
+                                            CanLock = userForm.CanLock,
+                                            CanUnlock = userForm.CanUnlock,
+                                            CanPrint = userForm.CanPrint
+                                        };
+
+                                        db.MstUserForms.InsertOnSubmit(newUserForm);
+                                    }
+
+                                    db.SubmitChanges();
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "No user rights found.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add user form.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this user page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
         }
 
         // =============
