@@ -1,21 +1,17 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Accounts Payable Report</title>
-
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -35,21 +31,21 @@
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="filterAccountsPayableReport" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboAPReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboAccountsPayableReportNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="accountsPayableReportCSVOnclick()" id="btnCSV" class="btn btn-success "><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="accountsPayableReportPDFOnclick()" id="btnPrintPDF" class="btn btn-primary "><i class="fa fa-print"></i> Print</button>
-                                    <a href="/Software/AccountsPayable" class="btn btn-danger "><i class="fa fa-close"></i> Close</a>
+                                    <button onclick="btnAccountsPayableReportCSVOnclick()" id="btnAccountsPayableReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnAccountsPayableReportPDFOnclick()" id="btnAccountsPayableReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <a href="/Software/AccountsPayable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
@@ -60,50 +56,50 @@
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Date as of</b></span>
-                                        <div class="comboBox-wide" id="cboAPReportDateAsOf" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsPayableReportDateAsOf" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboAPReportComapny" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsPayableReportCompany" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboAPReportBranch" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsPayableReportBranch" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Account</b></span>
-                                        <div class="comboBox-wide" id="cboAPReportAccount" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsPayableReportAccount" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
                     <div class="panel-body">
-                        <div id="accountsPayableGrid" style="font-size: 11.5px;"></div>
+                        <div id="accountsPayableReportFlexGrid" style="font-size: 11.5px;"></div>
                     </div>
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="navigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnAccountsPayableReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnAccountsPayableReportMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnAccountsPayableReportMoveToCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnAccountsPayableReportMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnAccountsPayableReportMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
@@ -158,6 +154,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -168,32 +165,40 @@
         // ================
         // Global Variables
         // ================
-        var cboAPReportDateAsOf = new wijmo.input.InputDate('#cboAPReportDateAsOf');
+        var cboAccountsPayableReportDateAsOf = new wijmo.input.InputDate('#cboAccountsPayableReportDateAsOf');
         var isDateAsOfSelected = true;
-        var cboAPReportComapny = new wijmo.input.ComboBox('#cboAPReportComapny');
-        var cboAPReportBranch = new wijmo.input.ComboBox('#cboAPReportBranch');
-        var cboAPReportAccount = new wijmo.input.ComboBox('#cboAPReportAccount');
-        var accountsPayableCollections;
-        var accountsPayableGrid;
+
+        var cboAccountsPayableReportCompany = new wijmo.input.ComboBox('#cboAccountsPayableReportCompany');
+        var isCompanySelected = false;
+
+        var cboAccountsPayableReportBranch = new wijmo.input.ComboBox('#cboAccountsPayableReportBranch');
+        var cboAccountsPayableReportAccount = new wijmo.input.ComboBox('#cboAccountsPayableReportAccount');
+
+        var accountsPayableReportCollectionView;
+        var accountsPayableReportFlexGrid;
         var accountHasData = false;
-        var cboAPReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+
+        var cboAccountsPayableReportNumberOfRows = new wijmo.input.ComboBox('#cboAccountsPayableReportNumberOfRows');
+
+        var btnAccountsPayableReportMoveToFirstPageGrid = document.getElementById('btnAccountsPayableReportMoveToFirstPageGrid');
+        var btnAccountsPayableReportMoveToPreviousPageGrid = document.getElementById('btnAccountsPayableReportMoveToPreviousPageGrid');
+        var btnAccountsPayableReportMoveToNextPageGrid = document.getElementById('btnAccountsPayableReportMoveToNextPageGrid');
+        var btnAccountsPayableReportMoveToLastPageGrid = document.getElementById('btnAccountsPayableReportMoveToLastPageGrid');
+        var btnAccountsPayableReportMoveToCurrentPageGrid = document.getElementById('btnAccountsPayableReportMoveToCurrentPageGrid');
+
         var currentPageIndex = 0;
 
-        // ====================
-        // Get Parameter Values
-        // ====================
-        function getParam(name) {
+        // =================
+        // Get URL Parameter
+        // =================
+        function getURLParameter(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
             var regex = new RegExp(regexS);
 
             var results = regex.exec(window.location.href);
+
             if (results == null) {
                 return "";
             } else {
@@ -201,35 +206,35 @@
             }
         }
 
-        // ==============
-        // AP Filter Date
-        // ==============
-        function createCboAPAllDateFilters() {
+        // ===================================
+        // Accounts Payable Report Date Filter
+        // ===================================
+        function createCboAccountsPayableReportDateFilter() {
             NProgress.start();
-            cboAPReportDateAsOf.dispose();
-            cboAPReportDateAsOf = new wijmo.input.InputDate('#cboAPReportDateAsOf', {
+
+            cboAccountsPayableReportDateAsOf.dispose();
+            cboAccountsPayableReportDateAsOf = new wijmo.input.InputDate('#cboAccountsPayableReportDateAsOf', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("DateAsOf")),
+                value: new Date(getURLParameter("DateAsOf")),
                 onValueChanged: function () {
                     if (isDateAsOfSelected) {
                         NProgress.start();
-                        refreshAccountsPayableFlexGrid();
+                        refreshAccountsPayableReportFlexGrid();
                     } else {
                         isDateAsOfSelected = false;
                     }
                 }
             });
 
-            createCboAPAllCompanyFilter();
+            createCboAccountsPayableReportCompanyFilter();
         }
 
-        var isCompanySelected = false;
-
-        // ======================
-        // AP All Company Filters
-        // ======================
-        function createCboAPAllCompanyFilter() {
+        // ======================================
+        // Accounts Payable Report Company Filter
+        // ======================================
+        function createCboAccountsPayableReportCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
+
             $.ajax({
                 url: '/api/accountsPayable/dropdown/list/company',
                 cache: false,
@@ -249,41 +254,44 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnCSV").prop("disabled", true);
-                        $("#btnPrintPDF").prop("disabled", true);
+                        $("#btnAccountsPayableReportCSV").prop("disabled", true);
+                        $("#btnAccountsPayableReportPDF").prop("disabled", true);
                     }
 
-                    cboAPReportComapny.dispose();
-                    cboAPReportComapny = new wijmo.input.ComboBox('#cboAPReportComapny', {
+                    cboAccountsPayableReportCompany.dispose();
+                    cboAccountsPayableReportCompany = new wijmo.input.ComboBox('#cboAccountsPayableReportCompany', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameter("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
+
                             if (accountHasData) {
-                                $("#btnCSV").prop("disabled", false);
-                                $("#btnPrintPDF").prop("disabled", false);
+                                $("#btnAccountsPayableReportCSV").prop("disabled", false);
+                                $("#btnAccountsPayableReportPDF").prop("disabled", false);
                             }
+
                             isCompanySelected = true;
-                            createCboAPBranchFilter();
+                            createCboAccountsPayableReportBranchFilter();
                         }
                     });
 
-                    createCboAPBranchFilter();
+                    createCboAccountsPayableReportBranchFilter();
                 }
             });
         }
 
-        // ================
-        // AP Branch Filter
-        // ================
-        function createCboAPBranchFilter() {
+        // =====================================
+        // Accounts Payable Report Branch Filter
+        // =====================================
+        function createCboAccountsPayableReportBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboAPReportComapny.selectedValue != null) {
-                var companyId = cboAPReportComapny.selectedValue;
+
+            if (cboAccountsPayableReportCompany.selectedValue != null) {
+                var companyId = cboAccountsPayableReportCompany.selectedValue;
 
                 $.ajax({
                     url: '/api/accountsPayable/dropdown/list/branch/' + companyId,
@@ -304,48 +312,48 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnCSV").prop("disabled", true);
-                            $("#btnPrintPDF").prop("disabled", true);
+                            $("#btnAccountsPayableReportCSV").prop("disabled", true);
+                            $("#btnAccountsPayableReportPDF").prop("disabled", true);
                         }
 
-                        cboAPReportBranch.dispose();
-                        cboAPReportBranch = new wijmo.input.ComboBox('#cboAPReportBranch', {
+                        cboAccountsPayableReportBranch.dispose();
+                        cboAccountsPayableReportBranch = new wijmo.input.ComboBox('#cboAccountsPayableReportBranch', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameter("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
-                                refreshAccountsPayableFlexGrid();
+                                refreshAccountsPayableReportFlexGrid();
                             }
                         });
 
                         if (!isCompanySelected) {
-                            createCboAPAccountFilter();
+                            createCboAccountsPayableReportAccountFilter();
                         } else {
-                            refreshAccountsPayableFlexGrid();
+                            refreshAccountsPayableReportFlexGrid();
                         }
                     }
                 });
             } else {
-                cboAPReportBranch.dispose();
-                cboAPReportBranch = new wijmo.input.ComboBox('#cboAPReportBranch', {
+                cboAccountsPayableReportBranch.dispose();
+                cboAccountsPayableReportBranch = new wijmo.input.ComboBox('#cboAccountsPayableReportBranch', {
                     disabled: true,
-                    isEditable: false,
                     itemsSource: branchObservableArray
                 });
 
-                refreshAccountsPayableFlexGrid();
+                refreshAccountsPayableReportFlexGrid();
             }
         }
 
-        // =================
-        // AP Account Filter
-        // =================
-        function createCboAPAccountFilter() {
-            var accountsObservableArray = new wijmo.collections.ObservableArray();
+        // ======================================
+        // Accounts Payable Report Account Filter
+        // ======================================
+        function createCboAccountsPayableReportAccountFilter() {
+            var accountObservableArray = new wijmo.collections.ObservableArray();
+
             $.ajax({
                 url: '/api/accountsPayable/dropdown/list/articleGroupAccount',
                 cache: false,
@@ -354,7 +362,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountsObservableArray.push({
+                            accountObservableArray.push({
                                 AccountId: results[i]["AccountId"],
                                 Account: results[i]["Account"]
                             });
@@ -366,33 +374,33 @@
                         disabled = false;
                         accountHasData = true;
                     } else {
-                        $("#btnCSV").prop("disabled", true);
-                        $("#btnPrintPDF").prop("disabled", true);
+                        $("#btnAccountsPayableReportCSV").prop("disabled", true);
+                        $("#btnAccountsPayableReportPDF").prop("disabled", true);
                     }
 
-                    cboAPReportAccount.dispose();
-                    cboAPReportAccount = new wijmo.input.ComboBox('#cboAPReportAccount', {
+                    cboAccountsPayableReportAccount.dispose();
+                    cboAccountsPayableReportAccount = new wijmo.input.ComboBox('#cboAccountsPayableReportAccount', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: accountsObservableArray,
+                        itemsSource: accountObservableArray,
                         displayMemberPath: "Account",
                         selectedValuePath: "AccountId",
-                        selectedValue: getParam("AccountId"),
+                        selectedValue: getURLParameter("AccountId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            refreshAccountsPayableFlexGrid();
+                            refreshAccountsPayableReportFlexGrid();
                         }
                     });
 
-                    createCboShowRows();
+                    createCboAccountsPayableReportShowNumberOfRows();
                 }
             });
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===========================================
+        // Accounts Payable Report Show Number Of Rows
+        // ===========================================
+        function createCboAccountsPayableReportShowNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -422,8 +430,8 @@
                 });
             }
 
-            cboAPReportShowNumberOfRows.dispose();
-            cboAPReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPReportShowNumberOfRows', {
+            cboAccountsPayableReportNumberOfRows.dispose();
+            cboAccountsPayableReportNumberOfRows = new wijmo.input.ComboBox('#cboAccountsPayableReportNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -433,39 +441,40 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboAPReportShowNumberOfRows.selectedValue;
-                        accountsPayableCollections.pageSize = parseInt(numberOfRows);
-                        accountsPayableCollections.refresh();
-                        accountsPayableGrid.refresh();
+                        var numberOfRows = cboAccountsPayableReportNumberOfRows.selectedValue;
+                        accountsPayableReportCollectionView.pageSize = parseInt(numberOfRows);
+                        accountsPayableReportCollectionView.refresh();
+                        accountsPayableReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            createAccounstPayableFlexGrid();
+            createAccounstPayableReportFlexGrid();
         }
 
-        // ================
-        // Accounts Payable
-        // ================
-        function getAccountsPayable() {
+        // ===========================
+        // Get Accounts Payable Report
+        // ===========================
+        function getAccountsPayableReport() {
             var accountsPayableObservableArray = new wijmo.collections.ObservableArray;
-            if (cboAPReportComapny.selectedValue != null) {
-                if (cboAPReportBranch.selectedValue != null) {
-                    if (cboAPReportAccount.selectedValue != null) {
 
-                        var dateAsOf = cboAPReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboAPReportComapny.selectedValue;
-                        var branchId = cboAPReportBranch.selectedValue;
-                        var accountId = cboAPReportAccount.selectedValue;
+            if (cboAccountsPayableReportCompany.selectedValue != null) {
+                if (cboAccountsPayableReportBranch.selectedValue != null) {
+                    if (cboAccountsPayableReportAccount.selectedValue != null) {
+
+                        var dateAsOf = cboAccountsPayableReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboAccountsPayableReportCompany.selectedValue;
+                        var branchId = cboAccountsPayableReportBranch.selectedValue;
+                        var accountId = cboAccountsPayableReportAccount.selectedValue;
 
                         $.ajax({
                             url: '/api/accountsPayable/list/' + dateAsOf + "/" + companyId + "/" + branchId + "/" + accountId,
                             cache: false,
                             type: 'GET',
                             contentType: 'application/json; charset=utf-8',
-                            success: function (accountsPayableResults) {
+                            success: function (results) {
                                 var totalBalance = 0;
                                 var totalCurrentAmount = 0;
                                 var totalAge30Amount = 0;
@@ -473,51 +482,45 @@
                                 var totalAge90Amount = 0;
                                 var totalAge120Amount = 0;
 
-                                if (accountsPayableResults.length > 0) {
-                                    for (i = 0; i < accountsPayableResults.length; i++) {
-                                        var docLink = "/Software/ReceivingReceiptDetail?id=" + accountsPayableResults[i]["Id"];
+                                if (results.length > 0) {
+                                    for (i = 0; i < results.length; i++) {
+                                        var docLink = "/Software/ReceivingReceiptDetail?id=" + results[i]["RRId"];
 
-                                        totalBalance = totalBalance + accountsPayableResults[i]["BalanceAmount"];
-                                        totalCurrentAmount = totalCurrentAmount + accountsPayableResults[i]["CurrentAmount"];
-                                        totalAge30Amount = totalAge30Amount + accountsPayableResults[i]["Age30Amount"];
-                                        totalAge60Amount = totalAge60Amount + accountsPayableResults[i]["Age60Amount"];
-                                        totalAge90Amount = totalAge90Amount + accountsPayableResults[i]["Age90Amount"];
-                                        totalAge120Amount = totalAge120Amount + accountsPayableResults[i]["Age120Amount"];
+                                        totalBalance = totalBalance + results[i]["BalanceAmount"];
+                                        totalCurrentAmount = totalCurrentAmount + results[i]["CurrentAmount"];
+                                        totalAge30Amount = totalAge30Amount + results[i]["Age30Amount"];
+                                        totalAge60Amount = totalAge60Amount + results[i]["Age60Amount"];
+                                        totalAge90Amount = totalAge90Amount + results[i]["Age90Amount"];
+                                        totalAge120Amount = totalAge120Amount + results[i]["Age120Amount"];
 
-                                        var RRDateResult = new Date(accountsPayableResults[i]["RRDate"])
+                                        var RRDateResult = new Date(results[i]["RRDate"])
                                         var RRDate = ('0' + (RRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + RRDateResult.getDate()).slice(-2) + '-' + RRDateResult.getFullYear();
 
-                                        var DueDateResult = new Date(accountsPayableResults[i]["DueDate"])
+                                        var DueDateResult = new Date(results[i]["DueDate"])
                                         var DueDate = ('0' + (DueDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + DueDateResult.getDate()).slice(-2) + '-' + DueDateResult.getFullYear();
 
                                         accountsPayableObservableArray.push({
-                                            Id: accountsPayableResults[i]["Id"],
-                                            Branch: accountsPayableResults[i]["Branch"],
-                                            AccountId: accountsPayableResults[i]["AccountId"],
-                                            AccountCode: accountsPayableResults[i]["AccountCode"],
-                                            Account: accountsPayableResults[i]["AccountCode"] + "-" + accountsPayableResults[i]["Account"],
-                                            SupplierId: accountsPayableResults[i]["SupplierId"],
-                                            Supplier: accountsPayableResults[i]["Supplier"],
                                             BtnDetail: "<a href='" + docLink + "' style='font-size: 9px;' class='btn btn-primary btn-xs btn-block'><i class='fa fa-edit'></i> Detail</a>",
-                                            RRNumber: accountsPayableResults[i]["RRNumber"],
-                                            RRNumberValue: accountsPayableResults[i]["RRNumber"],
-                                            RRNumberCSVValue: "RR-" + accountsPayableResults[i]["RRNumber"],
+                                            RRId: results[i]["RRId"],
+                                            Branch: results[i]["Branch"],
+                                            Account: results[i]["Account"],
+                                            RRNumber: results[i]["RRNumber"],
+                                            Supplier: results[i]["Supplier"],
                                             RRDate: RRDate,
-                                            DocumentReference: accountsPayableResults[i]["DocumentReference"],
-                                            BalanceAmount: accountsPayableResults[i]["BalanceAmount"],
-                                            BalanceAmountDisplay: parseFloat(accountsPayableResults[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            DocumentReference: results[i]["DocumentReference"],
                                             DueDate: DueDate,
-                                            NumberOfDaysFromDueDate: accountsPayableResults[i]["NumberOfDaysFromDueDate"],
-                                            CurrentAmount: accountsPayableResults[i]["CurrentAmount"],
-                                            CurrentAmountDisplay: parseFloat(accountsPayableResults[i]["CurrentAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age30Amount: accountsPayableResults[i]["Age30Amount"],
-                                            Age30AmountDisplay: parseFloat(accountsPayableResults[i]["Age30Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age60Amount: accountsPayableResults[i]["Age60Amount"],
-                                            Age60AmountDisplay: parseFloat(accountsPayableResults[i]["Age60Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age90Amount: accountsPayableResults[i]["Age90Amount"],
-                                            Age90AmountDisplay: parseFloat(accountsPayableResults[i]["Age90Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age120Amount: accountsPayableResults[i]["Age120Amount"],
-                                            Age120AmountDisplay: parseFloat(accountsPayableResults[i]["Age120Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            BalanceAmount: results[i]["BalanceAmount"],
+                                            BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            CurrentAmount: results[i]["CurrentAmount"],
+                                            CurrentAmountDisplay: parseFloat(results[i]["CurrentAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age30Amount: results[i]["Age30Amount"],
+                                            Age30AmountDisplay: parseFloat(results[i]["Age30Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age60Amount: results[i]["Age60Amount"],
+                                            Age60AmountDisplay: parseFloat(results[i]["Age60Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age90Amount: results[i]["Age90Amount"],
+                                            Age90AmountDisplay: parseFloat(results[i]["Age90Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age120Amount: results[i]["Age120Amount"],
+                                            Age120AmountDisplay: parseFloat(results[i]["Age120Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                         });
                                     }
                                 }
@@ -528,7 +531,6 @@
                                 document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
                                 NProgress.done();
                             }
                         });
@@ -539,7 +541,6 @@
                         document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
                         NProgress.done();
                     }
                 } else {
@@ -549,7 +550,6 @@
                     document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
                     NProgress.done();
                 }
             } else {
@@ -559,105 +559,73 @@
                 document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
                 NProgress.done();
             }
 
             return accountsPayableObservableArray;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (accountsPayableCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
+        // =================================================
+        // Update Accounst Payable Report Navigation Buttons
+        // =================================================
+        function updateAccountsPayableReportNavigateButtons() {
+            if (accountsPayableReportCollectionView.pageSize <= 0) {
+                document.getElementById('navigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (accountsPayableCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (accountsPayableCollections.pageIndex === (accountsPayableCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
+
+            document.getElementById('navigationPageGrid').style.display = 'block';
+
+            if (accountsPayableReportCollectionView.pageIndex === 0) {
+                btnAccountsPayableReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsPayableReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsPayableReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (accountsPayableReportCollectionView.pageIndex === (accountsPayableReportCollectionView.pageCount - 1)) {
+                btnAccountsPayableReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsPayableReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountsPayableReportMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGrid.innerHTML = (accountsPayableCollections.pageIndex + 1) + ' / ' + accountsPayableCollections.pageCount;
+
+            btnAccountsPayableReportMoveToCurrentPageGrid.innerHTML = (accountsPayableReportCollectionView.pageIndex + 1) + ' / ' + accountsPayableReportCollectionView.pageCount;
         }
 
-        // ==========================
-        // Accounts Payable Flex Grid
-        // ==========================
-        function createAccounstPayableFlexGrid() {
-            accountsPayableCollections = new wijmo.collections.CollectionView(getAccountsPayable());
-            accountsPayableCollections.canFilter = true;
-            accountsPayableCollections.pageSize = cboAPReportShowNumberOfRows.selectedValue;
+        // ========================================
+        // Create Accounts Payable Report Flex Grid
+        // ========================================
+        function createAccounstPayableReportFlexGrid() {
+            accountsPayableReportCollectionView = new wijmo.collections.CollectionView(getAccountsPayableReport());
+            accountsPayableReportCollectionView.canFilter = true;
+            accountsPayableReportCollectionView.pageSize = cboAccountsPayableReportNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#filterAccountsPayableReport').keyup(function () {
                 filterText = this.value.toLowerCase();
-                accountsPayableCollections.refresh();
-
-                if (accountsPayableCollections.items.length > 0) {
-                    var totalBalance = 0;
-                    var totalCurrentAmount = 0;
-                    var totalAge30Amount = 0;
-                    var totalAge60Amount = 0;
-                    var totalAge90Amount = 0;
-                    var totalAge120Amount = 0;
-
-                    for (var i = 0; i < accountsPayableCollections.items.length; i++) {
-                        totalBalance = totalBalance + accountsPayableCollections.items[i]["BalanceAmount"];
-                        totalCurrentAmount = totalCurrentAmount + accountsPayableCollections.items[i]["CurrentAmount"];
-                        totalAge30Amount = totalAge30Amount + accountsPayableCollections.items[i]["Age30Amount"];
-                        totalAge60Amount = totalAge60Amount + accountsPayableCollections.items[i]["Age60Amount"];
-                        totalAge90Amount = totalAge90Amount + accountsPayableCollections.items[i]["Age90Amount"];
-                        totalAge120Amount = totalAge120Amount + accountsPayableCollections.items[i]["Age120Amount"];
-                    }
-
-                    document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                accountsPayableReportCollectionView.refresh();
             });
 
-            accountsPayableCollections.filter = function (item) {
-                return !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+            accountsPayableReportCollectionView.filter = function (item) {
+                return !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.RRNumberValue.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            accountsPayableCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            accountsPayableReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountsPayableReportNavigateButtons();
             });
 
-            accountsPayableGrid = new wijmo.grid.FlexGrid('#accountsPayableGrid');
-            accountsPayableGrid.initialize({
+            accountsPayableReportFlexGrid = new wijmo.grid.FlexGrid('#accountsPayableReportFlexGrid');
+            accountsPayableReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
                         "binding": "BtnDetail",
-                        "allowSorting": true,
                         "width": 70,
                         "isContentHtml": true
                     },
@@ -668,17 +636,16 @@
                         "width": 80
                     },
                     {
-                        "header": "Supplier",
-                        "binding": "Supplier",
-                        "allowSorting": true,
-                        "width": "1.2*",
-
-                    },
-                    {
                         "header": "RR Date",
                         "binding": "RRDate",
                         "allowSorting": true,
                         "width": "0.8*"
+                    },
+                    {
+                        "header": "Supplier",
+                        "binding": "Supplier",
+                        "allowSorting": true,
+                        "width": "1.2*",
                     },
                     {
                         "header": "Doc. Ref.",
@@ -733,148 +700,115 @@
                         "allowSorting": true,
                         "align": "right",
                         "width": "1*"
-                    },
+                    }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: accountsPayableCollections,
+                itemsSource: accountsPayableReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            accountsPayableGrid.trackChanges = true;
+            accountsPayableReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateAccountsPayableReportNavigateButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                accountsPayableCollections.moveToFirstPage();
-                currentPageIndex = accountsPayableCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnAccountsPayableReportMoveToFirstPageGrid.addEventListener('click', function () {
+                accountsPayableReportCollectionView.moveToFirstPage();
+                currentPageIndex = accountsPayableReportCollectionView.pageIndex + 1;
+                updateAccountsPayableReportNavigateButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                accountsPayableCollections.moveToPreviousPage();
-                currentPageIndex = accountsPayableCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnAccountsPayableReportMoveToPreviousPageGrid.addEventListener('click', function () {
+                accountsPayableReportCollectionView.moveToPreviousPage();
+                currentPageIndex = accountsPayableReportCollectionView.pageIndex + 1;
+                updateAccountsPayableReportNavigateButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                accountsPayableCollections.moveToNextPage();
-                currentPageIndex = accountsPayableCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnAccountsPayableReportMoveToNextPageGrid.addEventListener('click', function () {
+                accountsPayableReportCollectionView.moveToNextPage();
+                currentPageIndex = accountsPayableReportCollectionView.pageIndex + 1;
+                updateAccountsPayableReportNavigateButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                accountsPayableCollections.moveToLastPage();
-                currentPageIndex = accountsPayableCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnAccountsPayableReportMoveToLastPageGrid.addEventListener('click', function () {
+                accountsPayableReportCollectionView.moveToLastPage();
+                currentPageIndex = accountsPayableReportCollectionView.pageIndex + 1;
+                updateAccountsPayableReportNavigateButtons();
             });
         }
 
-        // ==================================
-        // Refresh Accounts Payable Flex Grid
-        // ==================================
-        function refreshAccountsPayableFlexGrid() {
-            accountsPayableCollections = new wijmo.collections.CollectionView(getAccountsPayable());
-            accountsPayableCollections.canFilter = true;
-            accountsPayableCollections.pageSize = cboAPReportShowNumberOfRows.selectedValue;
+        // =========================================
+        // Refresh Accounts Payable Report Flex Grid
+        // =========================================
+        function refreshAccountsPayableReportFlexGrid() {
+            accountsPayableReportCollectionView = new wijmo.collections.CollectionView(getAccountsPayableReport());
+            accountsPayableReportCollectionView.canFilter = true;
+            accountsPayableReportCollectionView.pageSize = cboAccountsPayableReportNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#filterAccountsPayableReport').keyup(function () {
                 filterText = this.value.toLowerCase();
-                accountsPayableCollections.refresh();
-
-                if (accountsPayableCollections.items.length > 0) {
-                    var totalBalance = 0;
-                    var totalCurrentAmount = 0;
-                    var totalAge30Amount = 0;
-                    var totalAge60Amount = 0;
-                    var totalAge90Amount = 0;
-                    var totalAge120Amount = 0;
-
-                    for (var i = 0; i < accountsPayableCollections.items.length; i++) {
-                        totalBalance = totalBalance + accountsPayableCollections.items[i]["BalanceAmount"];
-                        totalCurrentAmount = totalCurrentAmount + accountsPayableCollections.items[i]["CurrentAmount"];
-                        totalAge30Amount = totalAge30Amount + accountsPayableCollections.items[i]["Age30Amount"];
-                        totalAge60Amount = totalAge60Amount + accountsPayableCollections.items[i]["Age60Amount"];
-                        totalAge90Amount = totalAge90Amount + accountsPayableCollections.items[i]["Age90Amount"];
-                        totalAge120Amount = totalAge120Amount + accountsPayableCollections.items[i]["Age120Amount"];
-                    }
-
-                    document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                accountsPayableReportCollectionView.refresh();
             });
 
-            accountsPayableCollections.filter = function (item) {
-                return !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+            accountsPayableReportCollectionView.filter = function (item) {
+                return !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.RRNumberValue.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            accountsPayableCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            accountsPayableReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountsPayableReportNavigateButtons();
             });
 
-            accountsPayableGrid.itemsSource = accountsPayableCollections;
-            accountsPayableGrid.trackChanges = true;
+            accountsPayableReportFlexGrid.itemsSource = accountsPayableReportCollectionView;
+            accountsPayableReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function accountsPayableReportCSVOnclick() {
+        function btnAccountsPayableReportCSVOnclick() {
             var CSV = '';
             var accountPayables = [];
             var fileName = 'AccountsPayableReport.CSV';
 
-            accountsPayableCollections.moveToFirstPage();
+            accountsPayableReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= accountsPayableCollections.pageCount; p++) {
-                for (i = 0; i < accountsPayableCollections.items.length; i++) {
+            for (var p = 1; p <= accountsPayableReportCollectionView.pageCount; p++) {
+                for (i = 0; i < accountsPayableReportCollectionView.items.length; i++) {
                     accountPayables.push({
-                        Branch: accountsPayableCollections.items[i].Branch,
-                        RRNumber: accountsPayableCollections.items[i].RRNumberCSVValue,
-                        Account: accountsPayableCollections.items[i].Account,
-                        Supplier: accountsPayableCollections.items[i].Supplier,
-                        RRDate: accountsPayableCollections.items[i].RRDate,
-                        DocumentReference: accountsPayableCollections.items[i].DocumentReference,
-                        DueDate: accountsPayableCollections.items[i].DueDate,
-                        BalanceAmount: accountsPayableCollections.items[i].BalanceAmount,
-                        CurrentAmount: accountsPayableCollections.items[i].CurrentAmount,
-                        Age30Amount: accountsPayableCollections.items[i].Age30Amount,
-                        Age60Amount: accountsPayableCollections.items[i].Age60Amount,
-                        Age90Amount: accountsPayableCollections.items[i].Age90Amount,
-                        Age120Amount: accountsPayableCollections.items[i].Age120Amount
+                        Branch: accountsPayableReportCollectionView.items[i].Branch,
+                        Account: accountsPayableReportCollectionView.items[i].Account,
+                        RRNumber: accountsPayableReportCollectionView.items[i].RRNumber,
+                        RRDate: accountsPayableReportCollectionView.items[i].RRDate,
+                        Supplier: accountsPayableReportCollectionView.items[i].Supplier,
+                        DocumentReference: accountsPayableReportCollectionView.items[i].DocumentReference,
+                        DueDate: accountsPayableReportCollectionView.items[i].DueDate,
+                        BalanceAmount: accountsPayableReportCollectionView.items[i].BalanceAmount,
+                        CurrentAmount: accountsPayableReportCollectionView.items[i].CurrentAmount,
+                        Age30Amount: accountsPayableReportCollectionView.items[i].Age30Amount,
+                        Age60Amount: accountsPayableReportCollectionView.items[i].Age60Amount,
+                        Age90Amount: accountsPayableReportCollectionView.items[i].Age90Amount,
+                        Age120Amount: accountsPayableReportCollectionView.items[i].Age120Amount
                     });
                 }
 
-                accountsPayableCollections.moveToNextPage();
-                if (p == accountsPayableCollections.pageCount) {
-                    accountsPayableCollections.moveToPage(currentPageIndex - 1);
+                accountsPayableReportCollectionView.moveToNextPage();
+                if (p == accountsPayableReportCollectionView.pageCount) {
+                    accountsPayableReportCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
             var Headers = [];
             Headers.push({
                 Branch: "Branch",
-                RRNumber: "RR Number",
                 Account: "Account",
-                Supplier: "Supplier",
+                RRNumber: "RR Number",
                 RRDate: "RR Date",
+                Supplier: "Supplier",
                 DocumentReference: "Doc Reference",
                 DueDate: "Due Date",
                 BalanceAmount: "Balance",
@@ -932,14 +866,14 @@
         // =========
         // Print PDF
         // =========
-        function accountsPayableReportPDFOnclick() {
-            if (cboAPReportComapny.selectedValue != null) {
-                if (cboAPReportBranch.selectedValue != null) {
-                    if (cboAPReportAccount.selectedValue != null) {
-                        var dateAsOf = cboAPReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboAPReportComapny.selectedValue;
-                        var branchId = cboAPReportBranch.selectedValue;
-                        var accountId = cboAPReportAccount.selectedValue;
+        function btnAccountsPayableReportPDFOnclick() {
+            if (cboAccountsPayableReportCompany.selectedValue != null) {
+                if (cboAccountsPayableReportBranch.selectedValue != null) {
+                    if (cboAccountsPayableReportAccount.selectedValue != null) {
+                        var dateAsOf = cboAccountsPayableReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboAccountsPayableReportCompany.selectedValue;
+                        var branchId = cboAccountsPayableReportBranch.selectedValue;
+                        var accountId = cboAccountsPayableReportAccount.selectedValue;
 
                         window.location.href = '/RepAccountsPayable/AccountsPayableReport?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&AccountId=' + accountId;
                     } else {
@@ -957,7 +891,7 @@
         // On load Page
         // ============
         $(document).ready(function () {
-            createCboAPAllDateFilters();
+            createCboAccountsPayableReportDateFilter();
         });
     </script>
     <script type="text/javascript">

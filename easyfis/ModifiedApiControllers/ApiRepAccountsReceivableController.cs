@@ -81,19 +81,15 @@ namespace easyfis.ApiControllers
                                    && d.IsLocked == true
                                    select new Entities.RepAccountsReceivable
                                    {
-                                       Id = d.Id,
+                                       SIId = d.Id,
                                        Branch = d.MstBranch.Branch,
-                                       AccountId = d.MstArticle.AccountId,
-                                       AccountCode = d.MstArticle.MstAccount.AccountCode,
                                        Account = d.MstArticle.MstAccount.Account,
                                        SINumber = d.SINumber,
                                        SIDate = d.SIDate.ToShortDateString(),
-                                       DocumentReference = d.DocumentReference,
-                                       BalanceAmount = d.BalanceAmount,
-                                       CustomerId = d.CustomerId,
                                        Customer = d.MstArticle.Article,
+                                       DocumentReference = d.DocumentReference,
                                        DueDate = d.SIDate.AddDays(Convert.ToInt32(d.MstTerm.NumberOfDays)).ToShortDateString(),
-                                       NumberOfDaysFromDueDate = Convert.ToDateTime(dateAsOf).Subtract(d.SIDate.AddDays(Convert.ToInt32(d.MstTerm.NumberOfDays))).Days,
+                                       BalanceAmount = d.BalanceAmount,
                                        CurrentAmount = ComputeAge(0, Convert.ToDateTime(dateAsOf).Subtract(d.SIDate.AddDays(Convert.ToInt32(d.MstTerm.NumberOfDays))).Days, d.BalanceAmount),
                                        Age30Amount = ComputeAge(1, Convert.ToDateTime(dateAsOf).Subtract(d.SIDate.AddDays(Convert.ToInt32(d.MstTerm.NumberOfDays))).Days, d.BalanceAmount),
                                        Age60Amount = ComputeAge(2, Convert.ToDateTime(dateAsOf).Subtract(d.SIDate.AddDays(Convert.ToInt32(d.MstTerm.NumberOfDays))).Days, d.BalanceAmount),
@@ -109,9 +105,9 @@ namespace easyfis.ApiControllers
             }
         }
 
-        // ===============================
-        // Dropdown List - Company (Field)
-        // ===============================
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
         [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/company")]
         public List<Entities.MstCompany> DropdownListAccountsReceivableListCompany()
         {
@@ -125,9 +121,9 @@ namespace easyfis.ApiControllers
             return companies.ToList();
         }
 
-        // ==============================
-        // Dropdown List - Branch (Field)
-        // ==============================
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
         [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/branch/{companyId}")]
         public List<Entities.MstBranch> DropdownListAccountsReceivableBranch(String companyId)
         {
@@ -142,9 +138,9 @@ namespace easyfis.ApiControllers
             return branches.ToList();
         }
 
-        // ===============================
-        // Dropdown List - Account (Field)
-        // ===============================
+        // ================================
+        // Dropdown List - Account (Filter)
+        // ================================
         [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/articleGroupAccount")]
         public List<Entities.MstArticleGroup> DropdownListAccountsReceivableArticleGroupAccount()
         {
@@ -153,7 +149,6 @@ namespace easyfis.ApiControllers
                                 group d by new
                                 {
                                     AccountId = d.AccountId,
-                                    AccountCode = d.MstAccount.AccountCode,
                                     Account = d.MstAccount.Account
                                 } into g
                                 select new Entities.MstArticleGroup
