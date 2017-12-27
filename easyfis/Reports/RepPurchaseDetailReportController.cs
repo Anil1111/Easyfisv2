@@ -78,19 +78,17 @@ namespace easyfis.Controllers
                                      && d.TrnPurchaseOrder.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                      && d.TrnPurchaseOrder.BranchId == Convert.ToInt32(BranchId)
                                      && d.TrnPurchaseOrder.IsLocked == true
-                                     select new Models.TrnPurchaseOrderItem
+                                     select new
                                      {
-                                         Id = d.Id,
                                          POId = d.POId,
                                          Branch = d.TrnPurchaseOrder.MstBranch.Branch,
-                                         PO = d.TrnPurchaseOrder.PONumber,
-                                         PODate = d.TrnPurchaseOrder.PODate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture),
+                                         PONumber = d.TrnPurchaseOrder.PONumber,
+                                         PODate = d.TrnPurchaseOrder.PODate.ToShortDateString(),
                                          Supplier = d.TrnPurchaseOrder.MstArticle.Article,
+                                         Quantity = d.Quantity,
+                                         Unit = d.MstUnit.Unit,
                                          Item = d.MstArticle.Article,
                                          Cost = d.Cost,
-                                         Price = d.MstArticle.Price,
-                                         Unit = d.MstUnit.Unit,
-                                         Quantity = d.Quantity,
                                          Amount = d.Amount
                                      };
 
@@ -111,29 +109,30 @@ namespace easyfis.Controllers
                 // Data
                 // ====
                 PdfPTable data = new PdfPTable(8);
-                float[] widthsCellsData = new float[] { 15f, 13f, 25f, 25f, 15f, 10f, 15f, 15f };
+                float[] widthsCellsData = new float[] { 15f, 12f, 20f, 12f, 30f, 10f, 15f, 15f };
                 data.SetWidths(widthsCellsData);
                 data.WidthPercentage = 100;
                 data.AddCell(new PdfPCell(new Phrase("PO Number", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("PO Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Supplier", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Item", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Cost", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Unit", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Item", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Unit", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Cost", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
 
                 Decimal total = 0;
                 foreach (var purchaseOrderItem in purchaseOrderItems)
                 {
-                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.PO, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.PONumber, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.PODate, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Supplier, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Item, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Cost.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Unit, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Quantity.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Item, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Unit, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Cost.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Amount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+
                     total += purchaseOrderItem.Amount;
                 }
 

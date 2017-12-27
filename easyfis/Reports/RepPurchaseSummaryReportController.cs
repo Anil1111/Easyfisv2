@@ -16,25 +16,6 @@ namespace easyfis.Controllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // =====================================
-        // Get Purchase Order Items Total Amount
-        // =====================================
-        public Decimal GetPurchaseOrderItemTotalAmount(Int32 POId)
-        {
-            var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
-                                     where d.POId == POId
-                                     select d;
-
-            if (purchaseOrderItems.Any())
-            {
-                return purchaseOrderItems.Sum(d => d.Amount);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         // =====================
         // Preview and Print PDF
         // =====================
@@ -92,21 +73,22 @@ namespace easyfis.Controllers
             // Data (Purchase Order)
             // =====================
             var purchaseOrders = from d in db.TrnPurchaseOrders
-                                 where d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
-                                 && d.BranchId == Convert.ToInt32(BranchId)
-                                 && d.PODate >= Convert.ToDateTime(StartDate)
+                                 where d.PODate >= Convert.ToDateTime(StartDate)
                                  && d.PODate <= Convert.ToDateTime(EndDate)
+                                 && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                                 && d.BranchId == Convert.ToInt32(BranchId)
                                  && d.IsLocked == true
                                  select new
                                  {
-                                     Id = d.Id,
                                      Branch = d.MstBranch.Branch,
                                      PONumber = d.PONumber,
-                                     PODate = d.PODate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture),
+                                     PODate = d.PODate.ToShortDateString(),
                                      Supplier = d.MstArticle.Article,
-                                     Remarks = d.Remarks,
+                                     Term = d.MstTerm.Term,
+                                     ManualRequestNumber = d.ManualRequestNumber,
+                                     DateNeeded = d.DateNeeded.ToShortDateString(),
                                      IsClose = d.IsClose,
-                                     Amount = GetPurchaseOrderItemTotalAmount(d.Id)
+                                     Amount = d.TrnPurchaseOrderItems != null ? d.TrnPurchaseOrderItems.Sum(a => a.Amount) : 0
                                  };
 
             if (purchaseOrders.Any())
@@ -125,14 +107,16 @@ namespace easyfis.Controllers
                 // ====
                 // Data
                 // ====
-                PdfPTable data = new PdfPTable(6);
-                float[] widthsCellsData = new float[] { 15f, 11f, 25f, 25f, 10f, 20f };
+                PdfPTable data = new PdfPTable(8);
+                float[] widthsCellsData = new float[] { 15f, 13f, 35f, 15f, 15f, 15f, 13f, 20f };
                 data.SetWidths(widthsCellsData);
                 data.WidthPercentage = 100;
-                data.AddCell(new PdfPCell(new Phrase("PO Number", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("PO No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("PO Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Supplier", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Remarks", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Terms", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Request No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Date Needed", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Status", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
 
@@ -142,7 +126,9 @@ namespace easyfis.Controllers
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrder.PONumber, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrder.PODate, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrder.Supplier, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(purchaseOrder.Remarks, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrder.Term, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrder.ManualRequestNumber, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(purchaseOrder.DateNeeded, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
 
                     String POStatus = "Not Closed";
                     if (purchaseOrder.IsClose)
@@ -152,14 +138,15 @@ namespace easyfis.Controllers
 
                     data.AddCell(new PdfPCell(new Phrase(POStatus, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(purchaseOrder.Amount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+
                     total += purchaseOrder.Amount;
                 }
 
                 // =====
                 // Total
                 // =====
-                data.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 10f, PaddingLeft = 10f });
-                data.AddCell(new PdfPCell(new Phrase(total.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase("TOTAL", fontArial10Bold)) { Colspan = 7, HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingRight = 10f, PaddingLeft = 10f });
+                data.AddCell(new PdfPCell(new Phrase(total.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingRight = 5f, PaddingLeft = 5f });
                 document.Add(data);
             }
 
