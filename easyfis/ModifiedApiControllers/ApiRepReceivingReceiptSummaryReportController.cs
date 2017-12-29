@@ -18,8 +18,8 @@ namespace easyfis.ApiControllers
         // =====================================
         // Receiving Receipt Summary Report List
         // =====================================
-        [Authorize, HttpGet, Route("api/ReceivingReceiptSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnReceivingReceipt> ListReceivingReceiptSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        [Authorize, HttpGet, Route("api/receivingReceiptSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Entities.RepReceivingReceiptSummaryReport> ListReceivingReceiptSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var receivingReceipts = from d in db.TrnReceivingReceipts
                                     where d.RRDate >= Convert.ToDateTime(startDate)
@@ -27,20 +27,55 @@ namespace easyfis.ApiControllers
                                     && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                     && d.BranchId == Convert.ToInt32(branchId)
                                     && d.IsLocked == true
-                                    select new Models.TrnReceivingReceipt
+                                    select new Entities.RepReceivingReceiptSummaryReport
                                     {
 
-                                        Id = d.Id,
+                                        RRId = d.Id,
                                         Branch = d.MstBranch.Branch,
-                                        RRDate = d.RRDate.ToShortDateString(),
                                         RRNumber = d.RRNumber,
+                                        RRDate = d.RRDate.ToShortDateString(),
                                         Supplier = d.MstArticle.Article,
+                                        Term = d.MstArticle.MstTerm.Term,
                                         DocumentReference = d.DocumentReference,
-                                        Remarks = d.Remarks,
-                                        Amount = d.Amount
+                                        Amount = d.Amount,
+                                        WTaxAmount = d.WTaxAmount,
+                                        RRAmount = d.Amount - d.WTaxAmount
                                     };
 
             return receivingReceipts.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/receivingReceiptSummaryReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListReceivingReceiptSummaryReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/receivingReceiptSummaryReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListReceivingReceiptSummaryReportBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }

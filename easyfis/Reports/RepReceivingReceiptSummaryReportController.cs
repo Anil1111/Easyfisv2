@@ -78,16 +78,19 @@ namespace easyfis.Controllers
                                     && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                     && d.BranchId == Convert.ToInt32(BranchId)
                                     && d.IsLocked == true
-                                    select new Models.TrnReceivingReceipt
+                                    select new
                                     {
-                                        Id = d.Id,
+
+                                        RRId = d.Id,
                                         Branch = d.MstBranch.Branch,
-                                        RRDate = d.RRDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture),
                                         RRNumber = d.RRNumber,
+                                        RRDate = d.RRDate.ToShortDateString(),
                                         Supplier = d.MstArticle.Article,
+                                        Term = d.MstArticle.MstTerm.Term,
                                         DocumentReference = d.DocumentReference,
-                                        Remarks = d.Remarks,
-                                        Amount = d.Amount
+                                        Amount = d.Amount,
+                                        WTaxAmount = d.WTaxAmount,
+                                        RRAmount = d.Amount - d.WTaxAmount
                                     };
 
             if (receivingReceipts.Any())
@@ -106,34 +109,45 @@ namespace easyfis.Controllers
                 // ====
                 // Data
                 // ====
-                PdfPTable data = new PdfPTable(6);
-                float[] widthsCellsData = new float[] { 15f, 13f, 20f, 25f, 25f, 20f };
+                PdfPTable data = new PdfPTable(8);
+                float[] widthsCellsData = new float[] { 15f, 13f, 30f, 15f, 20f, 18f, 18f, 18f };
                 data.SetWidths(widthsCellsData);
                 data.WidthPercentage = 100;
                 data.AddCell(new PdfPCell(new Phrase("RR Number", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("RR Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Doc. Reference", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Supplier", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                data.AddCell(new PdfPCell(new Phrase("Remarks", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Terms", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Doc. Reference", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                data.AddCell(new PdfPCell(new Phrase("WTax", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                 data.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
 
-                Decimal total = 0;
+                Decimal totalAmount = 0;
+                Decimal totalWTaxAmount = 0;
+                Decimal totalRRAmount = 0;
                 foreach (var receivingReceipt in receivingReceipts)
                 {
                     data.AddCell(new PdfPCell(new Phrase(receivingReceipt.RRNumber, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceipt.RRDate, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.DocumentReference, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceipt.Supplier, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.Remarks, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.Term, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.DocumentReference, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceipt.Amount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
-                    total += receivingReceipt.Amount;
+                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.WTaxAmount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(receivingReceipt.RRAmount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+
+                    totalAmount += receivingReceipt.Amount;
+                    totalWTaxAmount += receivingReceipt.WTaxAmount;
+                    totalRRAmount += receivingReceipt.RRAmount;
                 }
 
                 // =====
                 // Total
                 // =====
-                data.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 10f, PaddingLeft = 10f });
-                data.AddCell(new PdfPCell(new Phrase(total.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase("TOTAL", fontArial10Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 10f, PaddingLeft = 10f });
+                data.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalWTaxAmount.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalRRAmount.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingRight = 5f, PaddingLeft = 5f });
                 document.Add(data);
             }
 
