@@ -20,137 +20,145 @@ namespace easyfis.ApiControllers
         [Authorize, HttpGet, Route("api/stockCard/list/{startDate}/{endDate}/{companyId}/{branchId}/{itemId}")]
         public List<Models.TrnInventory> ListStockCard(String startDate, String endDate, String companyId, String branchId, String itemId)
         {
-            var unionInventories = (from d in db.TrnInventories
-                                    where d.InventoryDate < Convert.ToDateTime(startDate)
-                                    && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                    && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
-                                    && d.MstArticleInventory.MstArticle.IsInventory == true 
-                                    && d.ArticleId == Convert.ToInt32(itemId)
-                                    select new
-                                    {
-                                        Id = d.Id,
-                                        Document = "Beginning Balance",
-                                        InventoryDate = d.InventoryDate,
-                                        BranchId = d.BranchId,
-                                        Branch = d.MstBranch.Branch,
-                                        BranchCode = d.MstBranch.BranchCode,
-                                        ArticleId = d.MstArticleInventory.ArticleId,
-                                        Article = d.MstArticleInventory.MstArticle.Article,
-                                        InventoryCode = d.MstArticleInventory.InventoryCode,
-                                        Quantity = d.MstArticleInventory.Quantity,
-                                        BegQuantity = d.Quantity,
-                                        InQuantity = d.QuantityIn,
-                                        OutQuantity = d.QuantityOut,
-                                        EndQuantity = d.Quantity,
-                                        UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                        Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                        Cost = d.MstArticleInventory.Cost,
-                                        Amount = d.MstArticleInventory.Amount,
-                                        RRId = d.RRId,
-                                        RRNumber = d.TrnReceivingReceipt.RRNumber,
-                                        SIId = d.SIId,
-                                        SINumber = d.TrnSalesInvoice.SINumber,
-                                        INId = d.INId,
-                                        INNumber = d.TrnStockIn.INNumber,
-                                        OTId = d.OTId,
-                                        OTNumber = d.TrnStockOut.OTNumber,
-                                        STId = d.STId,
-                                        STNumber = d.TrnStockTransfer.STNumber,
-                                    }).Union(from d in db.TrnInventories
-                                             where d.InventoryDate >= Convert.ToDateTime(startDate)
-                                             && d.InventoryDate <= Convert.ToDateTime(endDate)
-                                             && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                             && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
-                                             && d.MstArticleInventory.MstArticle.IsInventory == true
-                                             && d.ArticleId == Convert.ToInt32(itemId)
-                                             select new
-                                             {
-                                                 Id = d.Id,
-                                                 Document = "Current",
-                                                 InventoryDate = d.InventoryDate,
-                                                 BranchId = d.BranchId,
-                                                 Branch = d.MstBranch.Branch,
-                                                 BranchCode = d.MstBranch.BranchCode,
-                                                 ArticleId = d.MstArticleInventory.ArticleId,
-                                                 Article = d.MstArticleInventory.MstArticle.Article,
-                                                 InventoryCode = d.MstArticleInventory.InventoryCode,
-                                                 Quantity = d.MstArticleInventory.Quantity,
-                                                 BegQuantity = d.Quantity,
-                                                 InQuantity = d.QuantityIn,
-                                                 OutQuantity = d.QuantityOut,
-                                                 EndQuantity = d.Quantity,
-                                                 UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                                 Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                                 Cost = d.MstArticleInventory.Cost,
-                                                 Amount = d.MstArticleInventory.Amount,
-                                                 RRId = d.RRId,
-                                                 RRNumber = d.TrnReceivingReceipt.RRNumber,
-                                                 SIId = d.SIId,
-                                                 SINumber = d.TrnSalesInvoice.SINumber,
-                                                 INId = d.INId,
-                                                 INNumber = d.TrnStockIn.INNumber,
-                                                 OTId = d.OTId,
-                                                 OTNumber = d.TrnStockOut.OTNumber,
-                                                 STId = d.STId,
-                                                 STNumber = d.TrnStockTransfer.STNumber,
-                                             });
+            var stockCardBeginningBalance = from d in db.TrnInventories
+                                            where d.InventoryDate < Convert.ToDateTime(startDate)
+                                            && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                            && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
+                                            && d.MstArticleInventory.MstArticle.IsInventory == true
+                                            && d.ArticleId == Convert.ToInt32(itemId)
+                                            select new
+                                            {
+                                                Document = "Beginning Balance",
+                                                BranchCode = d.MstBranch.BranchCode,
+                                                InventoryDate = DateTime.Today,
+                                                Quantity = d.Quantity,
+                                                BegQuantity = d.Quantity,
+                                                InQuantity = d.QuantityIn,
+                                                OutQuantity = d.QuantityOut,
+                                                EndQuantity = d.Quantity,
+                                                Unit = d.MstArticle.MstUnit.Unit,
+                                                Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0
+                                            };
 
-            if (unionInventories.Any())
+            var groupedStockCardBeginningBalance = from d in stockCardBeginningBalance
+                                                   group d by new
+                                                   {
+                                                       Document = d.Document,
+                                                       BranchCode = d.BranchCode,
+                                                       InventoryDate = d.InventoryDate,
+                                                       Unit = d.Unit,
+                                                       Cost = d.Cost
+                                                   } into g
+                                                   select new
+                                                   {
+                                                       Document = g.Key.Document,
+                                                       BranchCode = g.Key.BranchCode,
+                                                       InventoryDate = g.Key.InventoryDate,
+                                                       BegQuantity = g.Sum(d => d.BegQuantity),
+                                                       InQuantity = g.Sum(d => d.InQuantity),
+                                                       OutQuantity = g.Sum(d => d.OutQuantity),
+                                                       EndQuantity = g.Sum(d => d.EndQuantity),
+                                                       Unit = g.Key.Unit,
+                                                       Cost = g.Key.Cost,
+                                                       Amount = g.Sum(d => d.Quantity) * g.Key.Cost
+                                                   };
+
+            var stockCardCurrentBalance = from d in db.TrnInventories
+                                          where d.InventoryDate >= Convert.ToDateTime(startDate)
+                                          && d.InventoryDate <= Convert.ToDateTime(endDate)
+                                          && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                          && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
+                                          && d.MstArticleInventory.MstArticle.IsInventory == true
+                                          && d.ArticleId == Convert.ToInt32(itemId)
+                                          select new
+                                          {
+                                              Document = "Current",
+                                              BranchCode = d.MstBranch.BranchCode,
+                                              InventoryDate = d.InventoryDate,
+                                              BegQuantity = d.Quantity,
+                                              InQuantity = d.QuantityIn,
+                                              OutQuantity = d.QuantityOut,
+                                              EndQuantity = d.Quantity,
+                                              Unit = d.MstArticle.MstUnit.Unit,
+                                              Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0,
+                                              Amount = d.MstArticleInventory != null ? d.MstArticleInventory.Amount : 0,
+                                              RRId = d.RRId,
+                                              RRNumber = d.TrnReceivingReceipt.RRNumber,
+                                              SIId = d.SIId,
+                                              SINumber = d.TrnSalesInvoice.SINumber,
+                                              INId = d.INId,
+                                              INNumber = d.TrnStockIn.INNumber,
+                                              OTId = d.OTId,
+                                              OTNumber = d.TrnStockOut.OTNumber,
+                                              STId = d.STId,
+                                              STNumber = d.TrnStockTransfer.STNumber
+                                          };
+
+            List<Models.TrnInventory> listStockCardInventory = new List<Models.TrnInventory>();
+
+            if (groupedStockCardBeginningBalance.Any())
             {
-                var inventories = from d in unionInventories
-                                  group d by new
-                                  {
-                                      InventoryDate = d.InventoryDate,
-                                      BranchId = d.BranchId,
-                                      Branch = d.Branch,
-                                      BranchCode = d.BranchCode,
-                                      ArticleId = d.ArticleId,
-                                      Article = d.Article,
-                                      InventoryCode = d.InventoryCode,
-                                      Cost = d.Cost,
-                                      UnitId = d.UnitId,
-                                      Unit = d.Unit,
-                                      RRId = d.RRId,
-                                      RRNumber = d.RRNumber,
-                                      SIId = d.SIId,
-                                      SINumber = d.SINumber,
-                                      INId = d.INId,
-                                      INNumber = d.INNumber,
-                                      OTId = d.OTId,
-                                      OTNumber = d.OTNumber,
-                                      STId = d.STId,
-                                      STNumber = d.STNumber,
-                                  } into g
-                                  select new Models.TrnInventory
-                                  {
-                                      InventoryDate = g.Key.InventoryDate.ToShortDateString(),
-                                      BranchId = g.Key.BranchId,
-                                      Branch = g.Key.Branch,
-                                      BranchCode = g.Key.BranchCode,
-                                      ArticleId = g.Key.ArticleId,
-                                      Article = g.Key.Article,
-                                      ArticleInventoryCode = g.Key.InventoryCode,
-                                      Cost = g.Key.Cost,
-                                      UnitId = g.Key.UnitId,
-                                      Unit = g.Key.Unit,
-                                      BegQuantity = g.Sum(d => d.Document == "Current" ? 0 : d.BegQuantity),
-                                      InQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.InQuantity),
-                                      OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
-                                      EndQuantity = g.Sum(d => d.EndQuantity),
-                                      Amount = g.Sum(d => d.Quantity * d.Cost),
-                                      RRId = g.Key.RRId,
-                                      RRNumber = g.Key.RRNumber,
-                                      SIId = g.Key.SIId,
-                                      SINumber = g.Key.SINumber,
-                                      INId = g.Key.INId,
-                                      INNumber = g.Key.INNumber,
-                                      OTId = g.Key.OTId,
-                                      OTNumber = g.Key.OTNumber,
-                                      STId = g.Key.STId,
-                                      STNumber = g.Key.STNumber,
-                                  };
+                foreach (var begBalance in groupedStockCardBeginningBalance)
+                {
+                    listStockCardInventory.Add(new Models.TrnInventory()
+                    {
+                        Document = begBalance.Document,
+                        BranchCode = begBalance.BranchCode,
+                        InventoryDate = begBalance.InventoryDate.ToShortDateString(),
+                        BegQuantity = begBalance.BegQuantity,
+                        InQuantity = 0,
+                        OutQuantity = 0,
+                        EndQuantity = begBalance.EndQuantity,
+                        Unit = begBalance.Unit,
+                        Cost = begBalance.Cost,
+                        Amount = begBalance.Amount,
+                        RRId = null,
+                        RRNumber = "Beginning Balance",
+                        SIId = null,
+                        SINumber = "Beginning Balance",
+                        INId = null,
+                        INNumber = "Beginning Balance",
+                        OTId = null,
+                        OTNumber = "Beginning Balance",
+                        STId = null,
+                        STNumber = "Beginning Balance"
+                    });
+                }
+            }
 
-                return inventories.ToList();
+            if (stockCardCurrentBalance.Any())
+            {
+                foreach (var curBalance in stockCardCurrentBalance)
+                {
+                    listStockCardInventory.Add(new Models.TrnInventory()
+                    {
+                        Document = curBalance.Document,
+                        BranchCode = curBalance.BranchCode,
+                        InventoryDate = curBalance.InventoryDate.ToShortDateString(),
+                        BegQuantity = 0,
+                        InQuantity = curBalance.InQuantity,
+                        OutQuantity = curBalance.OutQuantity,
+                        EndQuantity = curBalance.EndQuantity,
+                        Unit = curBalance.Unit,
+                        Cost = curBalance.Cost,
+                        Amount = curBalance.Amount,
+                        RRId = curBalance.RRId,
+                        RRNumber = curBalance.RRNumber,
+                        SIId = curBalance.SIId,
+                        SINumber = curBalance.SINumber,
+                        INId = curBalance.INId,
+                        INNumber = curBalance.INNumber,
+                        OTId = curBalance.OTId,
+                        OTNumber = curBalance.OTNumber,
+                        STId = curBalance.STId,
+                        STNumber = curBalance.STNumber
+                    });
+                }
+            }
+
+            if (listStockCardInventory.Any())
+            {
+                return listStockCardInventory.ToList();
             }
             else
             {
