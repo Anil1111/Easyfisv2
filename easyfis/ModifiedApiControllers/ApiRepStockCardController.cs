@@ -29,38 +29,32 @@ namespace easyfis.ApiControllers
                                             select new
                                             {
                                                 Document = "Beginning Balance",
-                                                BranchCode = d.MstBranch.BranchCode,
-                                                InventoryDate = DateTime.Today,
+                                                InventoryDate = Convert.ToDateTime(startDate),
                                                 Quantity = d.Quantity,
-                                                BegQuantity = d.Quantity,
                                                 InQuantity = d.QuantityIn,
                                                 OutQuantity = d.QuantityOut,
-                                                EndQuantity = d.Quantity,
-                                                Unit = d.MstArticle.MstUnit.Unit,
-                                                Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0
+                                                BalanceQuantity = d.Quantity,
+                                                Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
+                                                Amount = d.MstArticleInventory != null ? d.MstArticleInventory.Amount : 0
                                             };
 
             var groupedStockCardBeginningBalance = from d in stockCardBeginningBalance
                                                    group d by new
                                                    {
                                                        Document = d.Document,
-                                                       BranchCode = d.BranchCode,
                                                        InventoryDate = d.InventoryDate,
-                                                       Unit = d.Unit,
-                                                       Cost = d.Cost
+                                                       Unit = d.Unit
                                                    } into g
                                                    select new
                                                    {
                                                        Document = g.Key.Document,
-                                                       BranchCode = g.Key.BranchCode,
                                                        InventoryDate = g.Key.InventoryDate,
-                                                       BegQuantity = g.Sum(d => d.BegQuantity),
                                                        InQuantity = g.Sum(d => d.InQuantity),
                                                        OutQuantity = g.Sum(d => d.OutQuantity),
-                                                       EndQuantity = g.Sum(d => d.EndQuantity),
+                                                       BalanceQuantity = g.Sum(d => d.BalanceQuantity),
                                                        Unit = g.Key.Unit,
-                                                       Cost = g.Key.Cost,
-                                                       Amount = g.Sum(d => d.Quantity) * g.Key.Cost
+                                                       Cost = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) / g.Sum(d => d.InQuantity) : 0,
+                                                       Amount = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) : 0
                                                    };
 
             var stockCardCurrentBalance = from d in db.TrnInventories
@@ -75,13 +69,12 @@ namespace easyfis.ApiControllers
                                               Document = "Current",
                                               BranchCode = d.MstBranch.BranchCode,
                                               InventoryDate = d.InventoryDate,
-                                              BegQuantity = d.Quantity,
+                                              Quantity = d.Quantity,
                                               InQuantity = d.QuantityIn,
                                               OutQuantity = d.QuantityOut,
-                                              EndQuantity = d.Quantity,
-                                              Unit = d.MstArticle.MstUnit.Unit,
-                                              Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0,
-                                              Amount = d.MstArticleInventory != null ? d.MstArticleInventory.Amount : 0,
+                                              BalanceQuantity = d.Quantity,
+                                              Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
+                                              Amount = d.Amount,
                                               RRId = d.RRId,
                                               RRNumber = d.TrnReceivingReceipt.RRNumber,
                                               SIId = d.SIId,
@@ -96,52 +89,64 @@ namespace easyfis.ApiControllers
 
             List<Models.TrnInventory> listStockCardInventory = new List<Models.TrnInventory>();
 
+            Decimal beginningQuantity = 0;
+
             if (groupedStockCardBeginningBalance.Any())
             {
-                foreach (var begBalance in groupedStockCardBeginningBalance)
+                var begBalance = groupedStockCardBeginningBalance.FirstOrDefault();
+
+                beginningQuantity = begBalance.InQuantity > 0 ? begBalance.BalanceQuantity : 0;
+
+                listStockCardInventory.Add(new Models.TrnInventory()
                 {
-                    listStockCardInventory.Add(new Models.TrnInventory()
-                    {
-                        Document = begBalance.Document,
-                        BranchCode = begBalance.BranchCode,
-                        InventoryDate = begBalance.InventoryDate.ToShortDateString(),
-                        BegQuantity = begBalance.BegQuantity,
-                        InQuantity = 0,
-                        OutQuantity = 0,
-                        EndQuantity = begBalance.EndQuantity,
-                        Unit = begBalance.Unit,
-                        Cost = begBalance.Cost,
-                        Amount = begBalance.Amount,
-                        RRId = null,
-                        RRNumber = "Beginning Balance",
-                        SIId = null,
-                        SINumber = "Beginning Balance",
-                        INId = null,
-                        INNumber = "Beginning Balance",
-                        OTId = null,
-                        OTNumber = "Beginning Balance",
-                        STId = null,
-                        STNumber = "Beginning Balance"
-                    });
-                }
+                    Document = begBalance.Document,
+                    BranchCode = " ",
+                    InventoryDate = begBalance.InventoryDate.ToShortDateString(),
+                    InQuantity = begBalance.InQuantity,
+                    OutQuantity = begBalance.OutQuantity,
+                    BalanceQuantity = begBalance.BalanceQuantity,
+                    RunQuantity = begBalance.BalanceQuantity,
+                    Unit = begBalance.Unit,
+                    Cost = begBalance.Cost,
+                    Amount = begBalance.Amount,
+                    RRId = null,
+                    RRNumber = "Beginning Balance",
+                    SIId = null,
+                    SINumber = "Beginning Balance",
+                    INId = null,
+                    INNumber = "Beginning Balance",
+                    OTId = null,
+                    OTNumber = "Beginning Balance",
+                    STId = null,
+                    STNumber = "Beginning Balance"
+                });
+
+                beginningQuantity = begBalance.BalanceQuantity;
             }
+
+            Decimal runningQuantity = 0, cost = 0, amount = 0;
 
             if (stockCardCurrentBalance.Any())
             {
                 foreach (var curBalance in stockCardCurrentBalance)
                 {
+                    runningQuantity = (beginningQuantity + curBalance.InQuantity) - curBalance.OutQuantity;
+
+                    cost = curBalance.Quantity != 0 ? curBalance.Amount / curBalance.Quantity : 0;
+                    amount = curBalance.InQuantity > 0 ? curBalance.Amount : 0;
+
                     listStockCardInventory.Add(new Models.TrnInventory()
                     {
                         Document = curBalance.Document,
                         BranchCode = curBalance.BranchCode,
                         InventoryDate = curBalance.InventoryDate.ToShortDateString(),
-                        BegQuantity = 0,
                         InQuantity = curBalance.InQuantity,
                         OutQuantity = curBalance.OutQuantity,
-                        EndQuantity = curBalance.EndQuantity,
+                        BalanceQuantity = curBalance.BalanceQuantity,
+                        RunQuantity = runningQuantity,
                         Unit = curBalance.Unit,
-                        Cost = curBalance.Cost,
-                        Amount = curBalance.Amount,
+                        Cost = cost,
+                        Amount = amount,
                         RRId = curBalance.RRId,
                         RRNumber = curBalance.RRNumber,
                         SIId = curBalance.SIId,
@@ -153,6 +158,8 @@ namespace easyfis.ApiControllers
                         STId = curBalance.STId,
                         STNumber = curBalance.STNumber
                     });
+
+                    beginningQuantity = runningQuantity;
                 }
             }
 

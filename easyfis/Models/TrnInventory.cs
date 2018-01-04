@@ -46,6 +46,7 @@ namespace easyfis.Models
         public Decimal InQuantity { get; set; }
         public Decimal OutQuantity { get; set; }
         public Decimal EndQuantity { get; set; }
-
+        public Decimal BalanceQuantity { get; set; }
+        public Decimal RunQuantity { get; set; }
     }
 }
