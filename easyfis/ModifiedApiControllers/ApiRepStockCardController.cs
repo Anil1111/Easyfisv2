@@ -18,36 +18,39 @@ namespace easyfis.ApiControllers
         // Stock Card Report List
         // ======================
         [Authorize, HttpGet, Route("api/stockCard/list/{startDate}/{endDate}/{companyId}/{branchId}/{itemId}")]
-        public List<Models.TrnInventory> ListStockCard(String startDate, String endDate, String companyId, String branchId, String itemId)
+        public List<Entities.RepStockCardReport> ListStockCard(String startDate, String endDate, String companyId, String branchId, String itemId)
         {
             var stockCardBeginningBalance = from d in db.TrnInventories
                                             where d.InventoryDate < Convert.ToDateTime(startDate)
-                                            && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                            && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
-                                            && d.MstArticleInventory.MstArticle.IsInventory == true
+                                            && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                            && d.BranchId == Convert.ToInt32(branchId)
+                                            && d.MstArticle.IsInventory == true
                                             && d.ArticleId == Convert.ToInt32(itemId)
                                             select new
                                             {
                                                 Document = "Beginning Balance",
+                                                Branch = d.MstBranch.Branch,
                                                 InventoryDate = Convert.ToDateTime(startDate),
                                                 Quantity = d.Quantity,
                                                 InQuantity = d.QuantityIn,
                                                 OutQuantity = d.QuantityOut,
                                                 BalanceQuantity = d.Quantity,
-                                                Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                                Amount = d.MstArticleInventory != null ? d.MstArticleInventory.Amount : 0
+                                                Unit = d.MstArticle.MstUnit.Unit,
+                                                Amount = d.Amount
                                             };
 
             var groupedStockCardBeginningBalance = from d in stockCardBeginningBalance
                                                    group d by new
                                                    {
                                                        Document = d.Document,
+                                                       Branch = d.Branch,
                                                        InventoryDate = d.InventoryDate,
                                                        Unit = d.Unit
                                                    } into g
                                                    select new
                                                    {
                                                        Document = g.Key.Document,
+                                                       Branch = g.Key.Branch,
                                                        InventoryDate = g.Key.InventoryDate,
                                                        InQuantity = g.Sum(d => d.InQuantity),
                                                        OutQuantity = g.Sum(d => d.OutQuantity),
@@ -60,20 +63,21 @@ namespace easyfis.ApiControllers
             var stockCardCurrentBalance = from d in db.TrnInventories
                                           where d.InventoryDate >= Convert.ToDateTime(startDate)
                                           && d.InventoryDate <= Convert.ToDateTime(endDate)
-                                          && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                          && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
-                                          && d.MstArticleInventory.MstArticle.IsInventory == true
+                                          && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                          && d.BranchId == Convert.ToInt32(branchId)
+                                          && d.MstArticle.IsInventory == true
                                           && d.ArticleId == Convert.ToInt32(itemId)
                                           select new
                                           {
                                               Document = "Current",
                                               BranchCode = d.MstBranch.BranchCode,
+                                              Branch = d.MstBranch.Branch,
                                               InventoryDate = d.InventoryDate,
                                               Quantity = d.Quantity,
                                               InQuantity = d.QuantityIn,
                                               OutQuantity = d.QuantityOut,
                                               BalanceQuantity = d.Quantity,
-                                              Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
+                                              Unit = d.MstArticle.MstUnit.Unit,
                                               Amount = d.Amount,
                                               RRId = d.RRId,
                                               RRNumber = d.TrnReceivingReceipt.RRNumber,
@@ -84,10 +88,11 @@ namespace easyfis.ApiControllers
                                               OTId = d.OTId,
                                               OTNumber = d.TrnStockOut.OTNumber,
                                               STId = d.STId,
-                                              STNumber = d.TrnStockTransfer.STNumber
+                                              STNumber = d.TrnStockTransfer.STNumber,
+                                              ManualNo = d.RRId != null ? d.TrnReceivingReceipt.ManualRRNumber : d.SIId != null ? d.TrnSalesInvoice.ManualSINumber : d.INId != null ? d.TrnStockIn.ManualINNumber : d.OTId != null ? d.TrnStockOut.ManualOTNumber : d.STId != null ? d.TrnStockTransfer.ManualSTNumber : " "
                                           };
 
-            List<Models.TrnInventory> listStockCardInventory = new List<Models.TrnInventory>();
+            List<Entities.RepStockCardReport> listStockCardInventory = new List<Entities.RepStockCardReport>();
 
             Decimal beginningQuantity = 0;
 
@@ -97,15 +102,16 @@ namespace easyfis.ApiControllers
 
                 beginningQuantity = begBalance.InQuantity > 0 ? begBalance.BalanceQuantity : 0;
 
-                listStockCardInventory.Add(new Models.TrnInventory()
+                listStockCardInventory.Add(new Entities.RepStockCardReport()
                 {
                     Document = begBalance.Document,
                     BranchCode = " ",
+                    Branch = begBalance.Branch,
                     InventoryDate = begBalance.InventoryDate.ToShortDateString(),
                     InQuantity = begBalance.InQuantity,
                     OutQuantity = begBalance.OutQuantity,
                     BalanceQuantity = begBalance.BalanceQuantity,
-                    RunQuantity = begBalance.BalanceQuantity,
+                    RunningQuantity = begBalance.BalanceQuantity,
                     Unit = begBalance.Unit,
                     Cost = begBalance.Cost,
                     Amount = begBalance.Amount,
@@ -118,7 +124,8 @@ namespace easyfis.ApiControllers
                     OTId = null,
                     OTNumber = "Beginning Balance",
                     STId = null,
-                    STNumber = "Beginning Balance"
+                    STNumber = "Beginning Balance",
+                    ManualNumber = " "
                 });
 
                 beginningQuantity = begBalance.BalanceQuantity;
@@ -135,15 +142,16 @@ namespace easyfis.ApiControllers
                     cost = curBalance.Quantity != 0 ? curBalance.Amount / curBalance.Quantity : 0;
                     amount = curBalance.InQuantity > 0 ? curBalance.Amount : 0;
 
-                    listStockCardInventory.Add(new Models.TrnInventory()
+                    listStockCardInventory.Add(new Entities.RepStockCardReport()
                     {
                         Document = curBalance.Document,
                         BranchCode = curBalance.BranchCode,
+                        Branch = curBalance.Branch,
                         InventoryDate = curBalance.InventoryDate.ToShortDateString(),
                         InQuantity = curBalance.InQuantity,
                         OutQuantity = curBalance.OutQuantity,
                         BalanceQuantity = curBalance.BalanceQuantity,
-                        RunQuantity = runningQuantity,
+                        RunningQuantity = runningQuantity,
                         Unit = curBalance.Unit,
                         Cost = cost,
                         Amount = amount,
@@ -156,7 +164,8 @@ namespace easyfis.ApiControllers
                         OTId = curBalance.OTId,
                         OTNumber = curBalance.OTNumber,
                         STId = curBalance.STId,
-                        STNumber = curBalance.STNumber
+                        STNumber = curBalance.STNumber,
+                        ManualNumber = curBalance.ManualNo
                     });
 
                     beginningQuantity = runningQuantity;

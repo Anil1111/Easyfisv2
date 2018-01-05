@@ -101,7 +101,7 @@
                         </table>
                     </div>
                     <div class="panel-body">
-                        <div id="stockCardReportGrid" class="grid"></div>
+                        <div id="stockCardReportGrid" class="grid" style="font-size: 12.5px;"></div>
                     </div>
                     <div class="panel-footer">
                         <div class="row">
@@ -490,6 +490,7 @@
                                         for (i = 0; i < stockCardReportResult.length; i++) {
                                             var docRef = "";
                                             var docRefLink = "";
+
                                             if (stockCardReportResult[i]["RRId"] != null) {
                                                 docRef = "RR-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["RRNumber"];
                                                 docRefLink = "/Software/ReceivingReceiptDetail?id=" + stockCardReportResult[i]["RRId"];
@@ -515,15 +516,11 @@
 
                                             stockCardReports.push({
                                                 Id: stockCardReportResult[i]["Id"],
-                                                DocumentReference: "<a href='" + docRefLink + "' class='btn btn-primary btn-xs btn-block'>" + docRef + " </a>",
-                                                DocumentReferenceValue: docRef,
-                                                InventoryDate: InventoryDate,
-                                                BranchId: stockCardReportResult[i]["BranchId"],
+                                                BtnDetail: "<a href='" + docRefLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 9.5px;'><i class='fa fa-edit'></i> Detail</a>",
+                                                Document: docRef,
                                                 Branch: stockCardReportResult[i]["Branch"],
-                                                BranchCode: stockCardReportResult[i]["BranchCode"],
-                                                ArticleId: stockCardReportResult[i]["ArticleId"],
-                                                Article: stockCardReportResult[i]["Article"],
-                                                ArticleInventoryCode: stockCardReportResult[i]["ArticleInventoryCode"],
+                                                InventoryDate: InventoryDate,
+                                                ManualNumber: stockCardReportResult[i]["ManualNumber"],
                                                 Cost: stockCardReportResult[i]["Cost"],
                                                 CostDisplay: parseFloat(stockCardReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                                 Unit: stockCardReportResult[i]["Unit"],
@@ -533,8 +530,8 @@
                                                 OutQuantityDisplay: parseFloat(stockCardReportResult[i]["OutQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                                 BalanceQuantity: stockCardReportResult[i]["BalanceQuantity"],
                                                 BalanceQuantityDisplay: parseFloat(stockCardReportResult[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                RunQuantity: stockCardReportResult[i]["RunQuantity"],
-                                                RunQuantityDisplay: parseFloat(stockCardReportResult[i]["RunQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                RunningQuantity: stockCardReportResult[i]["RunningQuantity"],
+                                                RunningQuantityDisplay: parseFloat(stockCardReportResult[i]["RunningQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                                 Amount: stockCardReportResult[i]["Amount"],
                                                 AmountDisplay: parseFloat(stockCardReportResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             });
@@ -634,7 +631,8 @@
             });
 
             stockCardReportCollections.filter = function (item) {
-                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.Document.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -661,7 +659,8 @@
             });
 
             stockCardReportCollections.filter = function (item) {
-                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.Document.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -673,10 +672,16 @@
             stockCardReportGrid.initialize({
                 columns: [
                     {
-                        "header": "Document",
-                        "binding": "DocumentReference",
-                        "width": "1.5*",
+                        "header": "Detail",
+                        "binding": "BtnDetail",
+                        "width": "0.7*",
                         "allowSorting": true,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Document",
+                        "binding": "Document",
+                        "width": "1.5*",
                         "isContentHtml": true
                     },
                     {
@@ -684,6 +689,12 @@
                         "binding": "InventoryDate",
                         "allowSorting": true,
                         "width": "1*"
+                    },
+                    {
+                        "header": "Manual No.",
+                        "binding": "ManualNumber",
+                        "width": "1.2*",
+                        "allowSorting": true
                     },
                     {
                         "header": "In",
@@ -708,7 +719,7 @@
                     },
                     {
                         "header": "Running",
-                        "binding": "RunQuantityDisplay",
+                        "binding": "RunningQuantityDisplay",
                         "allowSorting": true,
                         "align": "right",
                         "width": "*"
@@ -717,7 +728,7 @@
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "width": "1*"
+                        "width": "0.7*"
                     },
                     {
                         "header": "Cost",
@@ -750,23 +761,29 @@
             stockCardReportGrid.columnHeaders.rows[0].allowMerging = true;
 
             stockCardReportGrid.columnHeaders.columns[0].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 0, 'Document');
+            stockCardReportGrid.columnHeaders.setCellData(0, 0, 'Detail');
 
             stockCardReportGrid.columnHeaders.columns[1].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 1, 'Date');
+            stockCardReportGrid.columnHeaders.setCellData(0, 1, 'Document');
 
-            for (var columnBasicUnitConversion = 2; columnBasicUnitConversion <= 5; columnBasicUnitConversion++) {
+            stockCardReportGrid.columnHeaders.columns[2].allowMerging = true;
+            stockCardReportGrid.columnHeaders.setCellData(0, 2, 'Date');
+
+            stockCardReportGrid.columnHeaders.columns[3].allowMerging = true;
+            stockCardReportGrid.columnHeaders.setCellData(0, 3, 'Manual No.');
+
+            for (var columnBasicUnitConversion = 4; columnBasicUnitConversion <= 7; columnBasicUnitConversion++) {
                 stockCardReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            stockCardReportGrid.columnHeaders.columns[6].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 6, 'Unit');
-
-            stockCardReportGrid.columnHeaders.columns[7].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 7, 'Cost');
-
             stockCardReportGrid.columnHeaders.columns[8].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 8, 'Amount');
+            stockCardReportGrid.columnHeaders.setCellData(0, 8, 'Unit');
+
+            stockCardReportGrid.columnHeaders.columns[9].allowMerging = true;
+            stockCardReportGrid.columnHeaders.setCellData(0, 9, 'Cost');
+
+            stockCardReportGrid.columnHeaders.columns[10].allowMerging = true;
+            stockCardReportGrid.columnHeaders.setCellData(0, 10, 'Amount');
 
             updateNavigateButtonsItems();
 
@@ -809,13 +826,13 @@
                 for (i = 0; i < stockCardReportCollections.items.length; i++) {
                     stockCardReport.push({
                         Branch: stockCardReportCollections.items[i].Branch,
-                        Item: stockCardReportCollections.items[i].Article,
-                        Document: stockCardReportCollections.items[i].DocumentReferenceValue,
-                        Date: stockCardReportCollections.items[i].InventoryDate,
-                        BegQuantity: stockCardReportCollections.items[i].Beg,
-                        InQuantity: stockCardReportCollections.items[i].QuantityIn,
-                        OutQuantity: stockCardReportCollections.items[i].QuantityOut,
-                        EndQuantity: stockCardReportCollections.items[i].Quantity,
+                        Document: stockCardReportCollections.items[i].Document,
+                        InventoryDate: stockCardReportCollections.items[i].InventoryDate,
+                        ManualNumber: stockCardReportCollections.items[i].ManualNumber,
+                        InQuantity: stockCardReportCollections.items[i].InQuantity,
+                        OutQuantity: stockCardReportCollections.items[i].OutQuantity,
+                        BalanceQuantity: stockCardReportCollections.items[i].BalanceQuantity,
+                        RunningQuantity: stockCardReportCollections.items[i].RunningQuantity,
                         Unit: stockCardReportCollections.items[i].Unit,
                         Cost: stockCardReportCollections.items[i].Cost,
                         Amount: stockCardReportCollections.items[i].Amount
@@ -831,13 +848,13 @@
             var Headers = [];
             Headers.push({
                 Branch: "Branch",
-                Item: "Item",
                 Document: "Document",
-                Date: "Date",
-                BegQuantity: "Beg Quantity",
+                InventoryDate: "Inventory Date",
+                ManualNumber: "Manual Number",
                 InQuantity: "In Quantity",
                 OutQuantity: "Out Quantity",
-                EndQuantity: "End Quantity",
+                BalanceQuantity: "Balance Quantity",
+                RunningQuantity: "Running Quantity",
                 Unit: "Unit",
                 Cost: "Cost",
                 Amount: "Amount"
