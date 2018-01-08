@@ -157,8 +157,8 @@ namespace easyfis.Reports
 
                 if (stockTransferItems.Any())
                 {
-                    var numberOfTableColumns = 5;
-                    float[] widthscellsPOLines = new float[] { 100f, 70f, 150f, 200f, 100f };
+                    var numberOfTableColumns = 4;
+                    float[] widthscellsPOLines = new float[] { 100f, 70f, 150f, 200f };
 
                     if (currentIsIncludeCostStockReports)
                     {
@@ -177,9 +177,8 @@ namespace easyfis.Reports
                     if (currentIsIncludeCostStockReports)
                     {
                         tableStockTransferItems.AddCell(new PdfPCell(new Phrase("Cost", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
+                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
                     }
-
-                    tableStockTransferItems.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
 
                     Decimal totalAmount = 0;
 
@@ -193,21 +192,18 @@ namespace easyfis.Reports
                         if (currentIsIncludeCostStockReports)
                         {
                             tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Cost.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                            tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Amount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         }
-
-                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Amount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         totalAmount += stockTransferItem.Amount;
                     }
 
-                    var numberOfColspan = 4;
                     if (currentIsIncludeCostStockReports)
                     {
-                        numberOfColspan = 5;
+                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     }
 
-                    tableStockTransferItems.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = numberOfColspan, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    tableStockTransferItems.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     document.Add(tableStockTransferItems);
 
                     document.Add(spaceTable);
