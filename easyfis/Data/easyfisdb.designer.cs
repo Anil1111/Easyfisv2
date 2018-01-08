@@ -2440,6 +2440,8 @@ namespace easyfis.Data
 		
 		private string _Particulars;
 		
+		private string _Location;
+		
 		private decimal _NumberOfHours;
 		
 		private decimal _ActivityAmount;
@@ -2492,6 +2494,8 @@ namespace easyfis.Data
     partial void OnParticularCategoryChanged();
     partial void OnParticularsChanging(string value);
     partial void OnParticularsChanged();
+    partial void OnLocationChanging(string value);
+    partial void OnLocationChanged();
     partial void OnNumberOfHoursChanging(decimal value);
     partial void OnNumberOfHoursChanged();
     partial void OnActivityAmountChanging(decimal value);
@@ -2691,6 +2695,26 @@ namespace easyfis.Data
 					this._Particulars = value;
 					this.SendPropertyChanged("Particulars");
 					this.OnParticularsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Location", DbType="NVarChar(50)")]
+		public string Location
+		{
+			get
+			{
+				return this._Location;
+			}
+			set
+			{
+				if ((this._Location != value))
+				{
+					this.OnLocationChanging(value);
+					this.SendPropertyChanging();
+					this._Location = value;
+					this.SendPropertyChanged("Location");
+					this.OnLocationChanged();
 				}
 			}
 		}
@@ -19433,6 +19457,8 @@ namespace easyfis.Data
 		
 		private string _SalesInvoiceName;
 		
+		private bool _IsIncludeCostStockReports;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -19691,6 +19717,8 @@ namespace easyfis.Data
     partial void OnDefaultSalesInvoiceDiscountIdChanged();
     partial void OnSalesInvoiceNameChanging(string value);
     partial void OnSalesInvoiceNameChanged();
+    partial void OnIsIncludeCostStockReportsChanging(bool value);
+    partial void OnIsIncludeCostStockReportsChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -20120,6 +20148,26 @@ namespace easyfis.Data
 					this._SalesInvoiceName = value;
 					this.SendPropertyChanged("SalesInvoiceName");
 					this.OnSalesInvoiceNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsIncludeCostStockReports", DbType="Bit NOT NULL")]
+		public bool IsIncludeCostStockReports
+		{
+			get
+			{
+				return this._IsIncludeCostStockReports;
+			}
+			set
+			{
+				if ((this._IsIncludeCostStockReports != value))
+				{
+					this.OnIsIncludeCostStockReportsChanging(value);
+					this.SendPropertyChanging();
+					this._IsIncludeCostStockReports = value;
+					this.SendPropertyChanged("IsIncludeCostStockReports");
+					this.OnIsIncludeCostStockReportsChanged();
 				}
 			}
 		}
@@ -29627,7 +29675,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnJournalVoucher_TrnJournalVoucherLine", Storage="_TrnJournalVoucher", ThisKey="JVId", OtherKey="Id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnJournalVoucher_TrnJournalVoucherLine", Storage="_TrnJournalVoucher", ThisKey="JVId", OtherKey="Id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public TrnJournalVoucher TrnJournalVoucher
 		{
 			get

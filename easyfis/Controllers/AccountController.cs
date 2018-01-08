@@ -300,6 +300,7 @@ namespace easyfis.Controllers
                             InventoryType = inventoryType,
                             DefaultSalesInvoiceDiscountId = defaultSalesInvoiceDiscountId,
                             SalesInvoiceName = salesInvoiceName,
+                            IsIncludeCostStockReports = false,
                             IsLocked = false,
                             CreatedById = 0,
                             CreatedDateTime = DateTime.Now,

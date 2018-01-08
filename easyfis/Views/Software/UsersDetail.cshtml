@@ -204,6 +204,12 @@
                                                     <input type="text" class="form-control " id="defaultSalesInvoiceName" />
                                                 </div>
                                             </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-6">Include Cost in Stock Reports</label>
+                                                <div class="col-sm-6">
+                                                    <input type="checkbox" id="defaultIncludeCostInStockReport" />
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-4"></div>
                                     </div>
@@ -708,6 +714,7 @@
                             cboDiscounts.selectedValue = userResults.DefaultSalesInvoiceDiscountId;
                             document.getElementById("defaultOfficialReceiptName").value = userResults.OfficialReceiptName;
                             document.getElementById("defaultSalesInvoiceName").value = userResults.SalesInvoiceName;
+                            document.getElementById("defaultIncludeCostInStockReport").checked = userResults.IsIncludeCostStockReports;
 
                             if (userResults.IsLocked) {
                                 document.getElementById("userDetail_Fullname").disabled = true;
@@ -720,6 +727,7 @@
                                 cboDiscounts.disabled = true;
                                 document.getElementById("defaultOfficialReceiptName").disabled = true;
                                 document.getElementById("defaultSalesInvoiceName").disabled = true;
+                                document.getElementById("defaultIncludeCostInStockReport").disabled = true;
 
                                 $("#btnUserDetailLock").prop("disabled", true);
                                 $("#btnAddUserForm").prop("disabled", true);
@@ -864,6 +872,8 @@
                 userObject.InventoryType = cboInventoryType.selectedValue;
                 userObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedValue;
                 userObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
+                userObject.IsIncludeCostStockReports = document.getElementById("defaultIncludeCostInStockReport").checked;
+
                 var data = JSON.stringify(userObject);
 
                 $.ajax({

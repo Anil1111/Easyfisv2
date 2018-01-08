@@ -80,6 +80,7 @@ namespace easyfis.ModifiedApiControllers
                            InventoryType = d.InventoryType,
                            DefaultSalesInvoiceDiscountId = d.DefaultSalesInvoiceDiscountId,
                            SalesInvoiceName = d.SalesInvoiceName,
+                           IsIncludeCostStockReports = d.IsIncludeCostStockReports,
                            IsLocked = d.IsLocked,
                        };
 
@@ -252,6 +253,7 @@ namespace easyfis.ModifiedApiControllers
                                                 lockUser.InventoryType = objUser.InventoryType;
                                                 lockUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
                                                 lockUser.SalesInvoiceName = objUser.SalesInvoiceName;
+                                                lockUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
                                                 lockUser.IsLocked = true;
                                                 lockUser.UpdatedById = currentUserId;
                                                 lockUser.UpdatedDateTime = DateTime.Now;

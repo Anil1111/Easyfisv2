@@ -21,6 +21,7 @@ namespace easyfis.Entities
         public String InventoryType { get; set; }
         public Int32 DefaultSalesInvoiceDiscountId { get; set; }
         public String SalesInvoiceName { get; set; }
+        public Boolean IsIncludeCostStockReports { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
         public String CreatedBy { get; set; }
