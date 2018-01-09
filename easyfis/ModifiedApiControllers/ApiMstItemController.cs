@@ -243,7 +243,7 @@ namespace easyfis.ModifiedApiControllers
                                             Data.MstArticle newItem = new Data.MstArticle
                                             {
                                                 ArticleCode = defaultItemCode,
-                                                ManualArticleCode = "NA",
+                                                ManualArticleCode = defaultItemCode,
                                                 Article = "NA",
                                                 Category = "NA",
                                                 ArticleTypeId = 1,
@@ -365,36 +365,49 @@ namespace easyfis.ModifiedApiControllers
                                     {
                                         if (item.FirstOrDefault().MstArticlePrices.Any())
                                         {
-                                            var lockItem = item.FirstOrDefault();
-                                            lockItem.ManualArticleCode = objItem.ManualArticleCode;
-                                            lockItem.Article = objItem.Article;
-                                            lockItem.ArticleGroupId = objItem.ArticleGroupId;
-                                            lockItem.AccountId = objItem.AccountId;
-                                            lockItem.SalesAccountId = objItem.SalesAccountId;
-                                            lockItem.CostAccountId = objItem.CostAccountId;
-                                            lockItem.AssetAccountId = objItem.AssetAccountId;
-                                            lockItem.ExpenseAccountId = objItem.ExpenseAccountId;
-                                            lockItem.Category = objItem.Category;
-                                            lockItem.UnitId = objItem.UnitId;
-                                            lockItem.Price = objItem.Price;
-                                            lockItem.Particulars = objItem.Particulars;
-                                            lockItem.InputTaxId = objItem.InputTaxId;
-                                            lockItem.OutputTaxId = objItem.OutputTaxId;
-                                            lockItem.WTaxTypeId = objItem.WTaxTypeId;
-                                            lockItem.IsInventory = objItem.IsInventory;
-                                            lockItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
-                                            lockItem.Cost = objItem.Cost;
-                                            lockItem.Kitting = objItem.Kitting;
-                                            lockItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
-                                            lockItem.UsefulLife = objItem.UsefulLife;
-                                            lockItem.SalvageValue = objItem.SalvageValue;
-                                            lockItem.IsLocked = true;
-                                            lockItem.UpdatedById = currentUserId;
-                                            lockItem.UpdatedDateTime = DateTime.Now;
+                                            var itemByManualCode = from d in db.MstArticles
+                                                                   where d.ArticleTypeId == 1
+                                                                   && d.ManualArticleCode.Equals(objItem.ManualArticleCode)
+                                                                   && d.IsLocked == true
+                                                                   select d;
 
-                                            db.SubmitChanges();
+                                            if (!itemByManualCode.Any())
+                                            {
+                                                var lockItem = item.FirstOrDefault();
+                                                lockItem.ManualArticleCode = objItem.ManualArticleCode;
+                                                lockItem.Article = objItem.Article;
+                                                lockItem.ArticleGroupId = objItem.ArticleGroupId;
+                                                lockItem.AccountId = objItem.AccountId;
+                                                lockItem.SalesAccountId = objItem.SalesAccountId;
+                                                lockItem.CostAccountId = objItem.CostAccountId;
+                                                lockItem.AssetAccountId = objItem.AssetAccountId;
+                                                lockItem.ExpenseAccountId = objItem.ExpenseAccountId;
+                                                lockItem.Category = objItem.Category;
+                                                lockItem.UnitId = objItem.UnitId;
+                                                lockItem.Price = objItem.Price;
+                                                lockItem.Particulars = objItem.Particulars;
+                                                lockItem.InputTaxId = objItem.InputTaxId;
+                                                lockItem.OutputTaxId = objItem.OutputTaxId;
+                                                lockItem.WTaxTypeId = objItem.WTaxTypeId;
+                                                lockItem.IsInventory = objItem.IsInventory;
+                                                lockItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
+                                                lockItem.Cost = objItem.Cost;
+                                                lockItem.Kitting = objItem.Kitting;
+                                                lockItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
+                                                lockItem.UsefulLife = objItem.UsefulLife;
+                                                lockItem.SalvageValue = objItem.SalvageValue;
+                                                lockItem.IsLocked = true;
+                                                lockItem.UpdatedById = currentUserId;
+                                                lockItem.UpdatedDateTime = DateTime.Now;
 
-                                            return Request.CreateResponse(HttpStatusCode.OK);
+                                                db.SubmitChanges();
+
+                                                return Request.CreateResponse(HttpStatusCode.OK);
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                            }
                                         }
                                         else
                                         {

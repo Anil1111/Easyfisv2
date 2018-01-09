@@ -221,7 +221,7 @@ namespace easyfis.ModifiedApiControllers
                                             Data.MstArticle newSupplier = new Data.MstArticle
                                             {
                                                 ArticleCode = defaultSupplierCode,
-                                                ManualArticleCode = "NA",
+                                                ManualArticleCode = defaultSupplierCode,
                                                 Article = "NA",
                                                 Category = "NA",
                                                 ArticleTypeId = 3,
@@ -339,29 +339,42 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!supplier.FirstOrDefault().IsLocked)
                                 {
-                                    var lockSupplier = supplier.FirstOrDefault();
-                                    lockSupplier.ManualArticleCode = objSupplier.ManualArticleCode;
-                                    lockSupplier.Article = objSupplier.Article;
-                                    lockSupplier.ArticleGroupId = objSupplier.ArticleGroupId;
-                                    lockSupplier.AccountId = objSupplier.AccountId;
-                                    lockSupplier.SalesAccountId = objSupplier.SalesAccountId;
-                                    lockSupplier.CostAccountId = objSupplier.CostAccountId;
-                                    lockSupplier.AssetAccountId = objSupplier.AssetAccountId;
-                                    lockSupplier.ExpenseAccountId = objSupplier.ExpenseAccountId;
-                                    lockSupplier.TermId = objSupplier.TermId;
-                                    lockSupplier.Address = objSupplier.Address;
-                                    lockSupplier.ContactNumber = objSupplier.ContactNumber;
-                                    lockSupplier.ContactPerson = objSupplier.ContactPerson;
-                                    lockSupplier.TaxNumber = objSupplier.TaxNumber;
-                                    lockSupplier.Particulars = objSupplier.Particulars;
-                                    lockSupplier.EmailAddress = objSupplier.EmailAddress;
-                                    lockSupplier.IsLocked = true;
-                                    lockSupplier.UpdatedById = currentUserId;
-                                    lockSupplier.UpdatedDateTime = DateTime.Now;
+                                    var supplierByManualCode = from d in db.MstArticles
+                                                               where d.ArticleTypeId == 3
+                                                               && d.ManualArticleCode.Equals(objSupplier.ManualArticleCode)
+                                                               && d.IsLocked == true
+                                                               select d;
 
-                                    db.SubmitChanges();
+                                    if (!supplierByManualCode.Any())
+                                    {
+                                        var lockSupplier = supplier.FirstOrDefault();
+                                        lockSupplier.ManualArticleCode = objSupplier.ManualArticleCode;
+                                        lockSupplier.Article = objSupplier.Article;
+                                        lockSupplier.ArticleGroupId = objSupplier.ArticleGroupId;
+                                        lockSupplier.AccountId = objSupplier.AccountId;
+                                        lockSupplier.SalesAccountId = objSupplier.SalesAccountId;
+                                        lockSupplier.CostAccountId = objSupplier.CostAccountId;
+                                        lockSupplier.AssetAccountId = objSupplier.AssetAccountId;
+                                        lockSupplier.ExpenseAccountId = objSupplier.ExpenseAccountId;
+                                        lockSupplier.TermId = objSupplier.TermId;
+                                        lockSupplier.Address = objSupplier.Address;
+                                        lockSupplier.ContactNumber = objSupplier.ContactNumber;
+                                        lockSupplier.ContactPerson = objSupplier.ContactPerson;
+                                        lockSupplier.TaxNumber = objSupplier.TaxNumber;
+                                        lockSupplier.Particulars = objSupplier.Particulars;
+                                        lockSupplier.EmailAddress = objSupplier.EmailAddress;
+                                        lockSupplier.IsLocked = true;
+                                        lockSupplier.UpdatedById = currentUserId;
+                                        lockSupplier.UpdatedDateTime = DateTime.Now;
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                        db.SubmitChanges();
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                    }
                                 }
                                 else
                                 {

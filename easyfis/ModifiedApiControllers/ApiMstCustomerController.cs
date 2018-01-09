@@ -221,7 +221,7 @@ namespace easyfis.ModifiedApiControllers
                                             Data.MstArticle newCustomer = new Data.MstArticle
                                             {
                                                 ArticleCode = defaultCustomerCode,
-                                                ManualArticleCode = "NA",
+                                                ManualArticleCode = defaultCustomerCode,
                                                 Article = "NA",
                                                 Category = "NA",
                                                 ArticleTypeId = 2,
@@ -339,29 +339,42 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!customer.FirstOrDefault().IsLocked)
                                 {
-                                    var lockCustomer = customer.FirstOrDefault();
-                                    lockCustomer.ManualArticleCode = objCustomer.ManualArticleCode;
-                                    lockCustomer.Article = objCustomer.Article;
-                                    lockCustomer.ArticleGroupId = objCustomer.ArticleGroupId;
-                                    lockCustomer.AccountId = objCustomer.AccountId;
-                                    lockCustomer.SalesAccountId = objCustomer.SalesAccountId;
-                                    lockCustomer.CostAccountId = objCustomer.CostAccountId;
-                                    lockCustomer.AssetAccountId = objCustomer.AssetAccountId;
-                                    lockCustomer.ExpenseAccountId = objCustomer.ExpenseAccountId;
-                                    lockCustomer.TermId = objCustomer.TermId;
-                                    lockCustomer.Address = objCustomer.Address;
-                                    lockCustomer.ContactNumber = objCustomer.ContactNumber;
-                                    lockCustomer.ContactPerson = objCustomer.ContactPerson;
-                                    lockCustomer.TaxNumber = objCustomer.TaxNumber;
-                                    lockCustomer.Particulars = objCustomer.Particulars;
-                                    lockCustomer.EmailAddress = objCustomer.EmailAddress;
-                                    lockCustomer.IsLocked = true;
-                                    lockCustomer.UpdatedById = currentUserId;
-                                    lockCustomer.UpdatedDateTime = DateTime.Now;
+                                     var customerByManualCode = from d in db.MstArticles
+                                                               where d.ArticleTypeId == 2
+                                                               && d.ManualArticleCode.Equals(objCustomer.ManualArticleCode)
+                                                               && d.IsLocked == true
+                                                               select d;
 
-                                    db.SubmitChanges();
+                                    if (!customerByManualCode.Any())
+                                    {
+                                        var lockCustomer = customer.FirstOrDefault();
+                                        lockCustomer.ManualArticleCode = objCustomer.ManualArticleCode;
+                                        lockCustomer.Article = objCustomer.Article;
+                                        lockCustomer.ArticleGroupId = objCustomer.ArticleGroupId;
+                                        lockCustomer.AccountId = objCustomer.AccountId;
+                                        lockCustomer.SalesAccountId = objCustomer.SalesAccountId;
+                                        lockCustomer.CostAccountId = objCustomer.CostAccountId;
+                                        lockCustomer.AssetAccountId = objCustomer.AssetAccountId;
+                                        lockCustomer.ExpenseAccountId = objCustomer.ExpenseAccountId;
+                                        lockCustomer.TermId = objCustomer.TermId;
+                                        lockCustomer.Address = objCustomer.Address;
+                                        lockCustomer.ContactNumber = objCustomer.ContactNumber;
+                                        lockCustomer.ContactPerson = objCustomer.ContactPerson;
+                                        lockCustomer.TaxNumber = objCustomer.TaxNumber;
+                                        lockCustomer.Particulars = objCustomer.Particulars;
+                                        lockCustomer.EmailAddress = objCustomer.EmailAddress;
+                                        lockCustomer.IsLocked = true;
+                                        lockCustomer.UpdatedById = currentUserId;
+                                        lockCustomer.UpdatedDateTime = DateTime.Now;
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                        db.SubmitChanges();
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                    }
                                 }
                                 else
                                 {
