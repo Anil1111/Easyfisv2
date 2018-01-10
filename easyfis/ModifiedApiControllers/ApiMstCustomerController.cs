@@ -128,6 +128,7 @@ namespace easyfis.ModifiedApiControllers
                                ExpenseAccountId = d.ExpenseAccountId,
                                Particulars = d.Particulars,
                                Address = d.Address,
+                               CreditLimit = d.CreditLimit,
                                TermId = d.TermId,
                                ContactNumber = d.ContactNumber,
                                ContactPerson = d.ContactPerson,
@@ -358,6 +359,7 @@ namespace easyfis.ModifiedApiControllers
                                         lockCustomer.ExpenseAccountId = objCustomer.ExpenseAccountId;
                                         lockCustomer.TermId = objCustomer.TermId;
                                         lockCustomer.Address = objCustomer.Address;
+                                        lockCustomer.CreditLimit = objCustomer.CreditLimit;
                                         lockCustomer.ContactNumber = objCustomer.ContactNumber;
                                         lockCustomer.ContactPerson = objCustomer.ContactPerson;
                                         lockCustomer.TaxNumber = objCustomer.TaxNumber;
