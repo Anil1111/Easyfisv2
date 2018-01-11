@@ -138,8 +138,8 @@
         // ================
         var cboDisbursementSummaryReportStartDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportStartDate');
         var cboDisbursementSummaryReportEndDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportEndDate');
-        var isAPDisbursementSummaryReportStartDateSelected = false;
-        var isAPDisbursementSummaryReportEndDateSelected = false;
+        var isDisbursementSummaryReportStartDateSelected = false;
+        var isDisbursementSummaryReportEndDateSelected = false;
 
         var cboDisbursementSummaryReportCompany = new wijmo.input.ComboBox('#cboDisbursementSummaryReportCompany');
         var cboDisbursementSummaryReportBranch = new wijmo.input.ComboBox('#cboDisbursementSummaryReportBranch');
@@ -150,10 +150,10 @@
 
         var cboDisbursementSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportShowNumberOfRows');
 
-        var btnFirstPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToLastPageGrid');
+        var btnDisbursementSummaryReportMoveToFirstPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToFirstPageGrid');
+        var btnDisbursementSummaryReportMoveToPreviousPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToPreviousPageGrid');
+        var btnDisbursementSummaryReportMoveToNextPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToNextPageGrid');
+        var btnDisbursementSummaryReportMoveToLastPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToLastPageGrid');
         var btnDisbursementSummaryReportCurrentPageGrid = document.getElementById('btnDisbursementSummaryReportCurrentPageGrid');
         var currentPageIndex = 0;
 
@@ -185,11 +185,11 @@
                 format: 'MM-dd-yyyy',
                 value: new Date(getURLParameter("StartDate")),
                 onValueChanged: function () {
-                    if (!isAPDisbursementSummaryReportStartDateSelected) {
+                    if (!isDisbursementSummaryReportStartDateSelected) {
                         NProgress.start();
                         refreshDisbursementSummaryReportFlexGrid();
                     } else {
-                        isAPDisbursementSummaryReportStartDateSelected = false;
+                        isDisbursementSummaryReportStartDateSelected = false;
                     }
                 }
             });
@@ -199,11 +199,11 @@
                 format: 'MM-dd-yyyy',
                 value: new Date(getURLParameter("EndDate")),
                 onValueChanged: function () {
-                    if (!isAPDisbursementSummaryReportEndDateSelected) {
+                    if (!isDisbursementSummaryReportEndDateSelected) {
                         NProgress.start();
                         refreshDisbursementSummaryReportFlexGrid();
                     } else {
-                        isAPDisbursementSummaryReportEndDateSelected = false;
+                        isDisbursementSummaryReportEndDateSelected = false;
                     }
                 }
             });
@@ -446,20 +446,20 @@
             }
             document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'block';
             if (disbursementSummaryReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
             } else if (disbursementSummaryReportCollections.pageIndex === (disbursementSummaryReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
             }
             btnDisbursementSummaryReportCurrentPageGrid.innerHTML = (disbursementSummaryReportCollections.pageIndex + 1) + ' / ' + disbursementSummaryReportCollections.pageCount;
         }
@@ -592,25 +592,25 @@
 
             updateNavigateButtonsItems();
 
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnDisbursementSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToFirstPage();
                 currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnDisbursementSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToPreviousPage();
                 currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnDisbursementSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToNextPage();
                 currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnDisbursementSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToLastPage();
                 currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
                 updateNavigateButtonsItems();

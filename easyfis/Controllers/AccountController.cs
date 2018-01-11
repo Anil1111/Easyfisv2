@@ -91,7 +91,7 @@ namespace easyfis.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Index", "Manage");
+                    return RedirectToAction("Index", "Software");
                 //return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
