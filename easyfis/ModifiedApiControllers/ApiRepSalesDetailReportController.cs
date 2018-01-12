@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Sales Detail Report List
         // ========================
         [Authorize, HttpGet, Route("api/salesDetailReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListSalesDetailReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepSalesDetailReport> ListSalesDetailReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -27,25 +27,59 @@ namespace easyfis.ApiControllers
                                     && d.TrnSalesInvoice.SIDate >= Convert.ToDateTime(startDate)
                                     && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
                                     && d.TrnSalesInvoice.IsLocked == true
-                                    select new Models.TrnSalesInvoiceItem
+                                    select new Entities.RepSalesDetailReport
                                     {
-                                        Id = d.Id,
                                         SIId = d.SIId,
                                         Branch = d.TrnSalesInvoice.MstBranch.Branch,
-                                        SI = d.TrnSalesInvoice.SINumber,
+                                        SINumber = d.TrnSalesInvoice.SINumber,
                                         SIDate = d.TrnSalesInvoice.SIDate.ToShortDateString(),
+                                        Customer = d.TrnSalesInvoice.MstArticle.Article,
+                                        Sales = d.TrnSalesInvoice.MstUser4.FullName,
                                         Item = d.MstArticle.Article,
-                                        ItemInventory = d.MstArticleInventory.InventoryCode,
+                                        ItemCategory = d.MstArticle.Category,
                                         Unit = d.MstUnit.Unit,
                                         Quantity = d.Quantity,
-                                        Amount = d.Amount,
                                         Price = d.Price,
-                                        Customer = d.TrnSalesInvoice.MstArticle.Article,
-                                        ItemCategory = d.MstArticle.Category,
-                                        SoldBy = d.TrnSalesInvoice.MstUser4.FullName
+                                        DiscountAmount = d.DiscountAmount,
+                                        NetPrice = d.NetPrice,
+                                        Amount = d.Amount,
+                                        VATAmount = d.VATAmount
                                     };
 
             return salesInvoiceItems.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/salesDetailReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListSalesDetailReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/salesDetailReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListSalesDetailReportBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }
