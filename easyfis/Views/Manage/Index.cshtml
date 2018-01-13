@@ -110,6 +110,58 @@
         var isUserFormSelected = true;
         var isUserBranchesSelected = false;
 
+        // =======================================
+        // Launch Modal for Delete All Transaction
+        // =======================================
+        function btnDeleteAllTransactionOnclick() {
+            $('#deleteAllTrasactionsModalConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+        }
+
+        function confirmDeleteAllTrasactionsOnclick() {
+            $("#confirmDeleteAllTrasactions").prop("disabled", true);
+            $("#confirmDeleteAllTrasactionsClose").prop("disabled", true);
+            document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+
+            $.ajax({
+                url: '/api/utilities/delete/allTransactions',
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful.");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
+                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
+                        $('#deleteAllTrasactionsModalLoading').modal('hide');
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                    },
+                    400: function (message) {
+                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
+                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
+                        $('#deleteAllTrasactionsModalLoading').modal('hide');
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                    },
+                    500: function (message) {
+                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
+                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
+                        $('#deleteAllTrasactionsModalLoading').modal('hide');
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                    }
+                }
+            });
+        }
+
         // ===============
         // Luanch Software
         // ===============
@@ -372,7 +424,7 @@
                 }
             });
         }
-        
+
         // ===============
         // Show Rows Table
         // ===============
@@ -658,49 +710,49 @@
             userFormGrid = new wijmo.grid.FlexGrid('#userDetailUserFormGrid');
             userFormGrid.initialize({
                 columns: [
-                            {
-                                "header": "Form",
-                                "binding": "Form",
-                                "width": "3*",
-                                "allowResizing": true,
-                                "allowSorting": true
-                            },
-                            {
-                                "header": "Add",
-                                "binding": "CanAdd",
-                                "allowSorting": true,
-                                "width": 80
-                            },
-                            {
-                                "header": "Edit",
-                                "binding": "CanEdit",
-                                "allowSorting": true,
-                                "width": 80
-                            },
-                            {
-                                "header": "Delete",
-                                "binding": "CanDelete",
-                                "allowSorting": true,
-                                "width": 80
-                            },
-                            {
-                                "header": "Lock",
-                                "binding": "CanLock",
-                                "allowSorting": true,
-                                "width": 80
-                            },
-                            {
-                                "header": "Unlock",
-                                "binding": "CanUnlock",
-                                "allowSorting": true,
-                                "width": 80
-                            },
-                            {
-                                "header": "Print",
-                                "binding": "CanPrint",
-                                "allowSorting": true,
-                                "width": 80
-                            }
+                    {
+                        "header": "Form",
+                        "binding": "Form",
+                        "width": "3*",
+                        "allowResizing": true,
+                        "allowSorting": true
+                    },
+                    {
+                        "header": "Add",
+                        "binding": "CanAdd",
+                        "allowSorting": true,
+                        "width": 80
+                    },
+                    {
+                        "header": "Edit",
+                        "binding": "CanEdit",
+                        "allowSorting": true,
+                        "width": 80
+                    },
+                    {
+                        "header": "Delete",
+                        "binding": "CanDelete",
+                        "allowSorting": true,
+                        "width": 80
+                    },
+                    {
+                        "header": "Lock",
+                        "binding": "CanLock",
+                        "allowSorting": true,
+                        "width": 80
+                    },
+                    {
+                        "header": "Unlock",
+                        "binding": "CanUnlock",
+                        "allowSorting": true,
+                        "width": 80
+                    },
+                    {
+                        "header": "Print",
+                        "binding": "CanPrint",
+                        "allowSorting": true,
+                        "width": 80
+                    }
                 ],
                 autoGenerateColumns: false,
                 itemsSource: userForms,
