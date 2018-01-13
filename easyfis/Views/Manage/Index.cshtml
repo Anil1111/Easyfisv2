@@ -35,29 +35,6 @@
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- User Edit Detail -->
-    <div class="modal fade" id="userEdit" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">User</h4>
-                </div>
-                <div class="modal-body">
-                    <form id="userDetailForm">
-                        <dl class="dl-horizontal">
-                            <dt>Full Name:</dt>
-                            <dd><input type="text" class="form-control requiredUser" id="profileDetail_fullName" value="@ViewData["FullName"]"/></dd>
-                        </dl>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary " id="cmdSaveUserButton" onclick="cmdUserSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
-                    <button id="cmdUserDetailCloseButton" class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="deleteAllTrasactionsModalConfirm" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -97,349 +74,804 @@
         // ================
         // Global Variables
         // ================
-        var branches;
-        var cboBranch;
-        var cboDefaultBranch;
-        var cboDiscounts;
-        var inventoryTypeSelectedValue = "@ViewData["InventoryType"]";
+        var cboCompany = new wijmo.input.ComboBox('#defaultCompany');
+        var cboBranch = new wijmo.input.ComboBox('#defaultBranch');
+        var cboIncomeAccount = new wijmo.input.ComboBox('#defaultIncomeAccount');
+        var cboSupplierAvancesAccount = new wijmo.input.ComboBox('#defaultSupplierAdvancesAccount');
+        var cboCustomerAdvancesAccount = new wijmo.input.ComboBox('#defaultCustomerAdvancesAccount');
+        var cboInventoryType = new wijmo.input.ComboBox('#cboInventoryType');
+        var cboDiscounts = new wijmo.input.ComboBox('#cboDiscounts');
 
-        // =================
-        // Modal User Detail
-        // =================
-        function cmdEditProfileDetails_OnClickButton() {
-            $('#userEdit').modal({
-                show: true,
-                backdrop: 'static'
+        var userForms;
+        var userFormGrid;
+
+        var isCompanyChanged = false;
+        var branchSelectedValue = 0;
+
+        var userDefaultBranchesCollectionView;
+        var userDefaultBranchesFlexGrid;
+
+        var cboUserFormShowNumberOfRows = new wijmo.input.ComboBox('#cboUserFormShowNumberOfRows');
+        var btnMoveToFirstPageGridUserForm = document.getElementById('btnMoveToFirstPageGridUserForm');
+        var btnMoveToPreviousPageGridUserForm = document.getElementById('btnMoveToPreviousPageGridUserForm');
+        var btnMoveToNextPageGridUserForm = document.getElementById('btnMoveToNextPageGridUserForm');
+        var btnMoveToLastPageGridUserForm = document.getElementById('btnMoveToLastPageGridUserForm');
+        var btnCurrentPageGridUserForm = document.getElementById('btnCurrentPageGridUserForm');
+
+        var cboUserDefaultBranchesShowNumberOfRows = new wijmo.input.ComboBox('#cboUserDefaultBranchesShowNumberOfRows');
+        var btnMoveToFirstPageGridUserDefaultBranches = document.getElementById('btnMoveToFirstPageGridUserDefaultBranches');
+        var btnMoveToPreviousPageGridUserDefaultBranches = document.getElementById('btnMoveToPreviousPageGridUserDefaultBranches');
+        var btnMoveToNextPageGridUserDefaultBranches = document.getElementById('btnMoveToNextPageGridUserDefaultBranches');
+        var btnMoveToLastPageGridUserDefaultBranches = document.getElementById('btnMoveToLastPageGridUserDefaultBranches');
+        var btnCurrentPageGridUserDefaultBranches = document.getElementById('btnCurrentPageGridUserDefaultBranches');
+
+        // ===============
+        // Current Company
+        // ===============
+        function getCurrentCompany() {
+            var companies = new wijmo.collections.ObservableArray;
+            $.ajax({
+                url: '/api/manage/current/user/dropdown/list/company',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            companies.push({
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
+                            });
+                        }
+                    }
+
+                    cboCompany.dispose();
+                    cboCompany = new wijmo.input.ComboBox('#defaultCompany', {
+                        isEditable: false,
+                        placeholder: "Select Company",
+                        itemsSource: companies,
+                        displayMemberPath: "Company",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            isCompanyChanged = true;
+                            getCurrentBranch();
+                        }
+                    });
+
+                    getCurrentBranch();
+                }
             });
         }
 
-        // =====================
-        // User Entry Validation
-        // =====================
-        function userEntryValidation() {
-            var isValid = true;
-            $('.requiredUser').each(function () {
-                if ($.trim($(this).val()) == '') {
-                    isValid = false;
-                    $(this).css({
-                        "border": "2px solid red",
-                        "transition": "border 1s ease 0s"
-                    });
-                }
-                else {
-                    $(this).css({
-                        "border": "",
-                    });
-                }
-            });
-
-            return isValid;
-        }
-
-        // ==================
-        // Update User Detail
-        // ==================
-        function cmdUserSaveButton_OnClick() {
-            var userObject = new Object();
-            var userId = "@ViewData["UserId"]";
-            userObject.FullName = document.getElementById('profileDetail_fullName').value;
-            var data = JSON.stringify(userObject);
-
-            if (userEntryValidation() == false) {
-                toastr.error("Invalid Entry");
-            } else {
-                document.getElementById('cmdSaveUserButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $('#cmdSaveUserButton').prop('disabled', true);
-                $('#cmdUserDetailCloseButton').prop('disabled', true);
-
+        // ==============
+        // Current Branch
+        // ==============
+        function getCurrentBranch() {
+            var branches = new wijmo.collections.ObservableArray;
+            if (cboCompany.selectedValue != null) {
                 $.ajax({
-                    type: "PUT",
-                    url: '/api/updateMstUser/' + userId,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data: data,
-                    statusCode: {
-                        200: function () {
-                            toastr.success("Update Successful");
-                            window.setTimeout(function () {
-                                location.reload()
-                            }, 1000);
-                        },
-                        404: function () {
-                            toastr.error("Update request not found");
-                            document.getElementById('cmdSaveUserButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $('#cmdSaveUserButton').prop('disabled', false);
-                            $('#cmdUserDetailCloseButton').prop('disabled', false);
-                        },
-                        400: function () {
-                            toastr.error("Cannot update profile");
-                            document.getElementById('cmdSaveUserButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $('#cmdSaveUserButton').prop('disabled', false);
-                            $('#cmdUserDetailCloseButton').prop('disabled', false);
-                        },
-                        500: function () {
-                            toastr.error("Internal Server Error");
-                            document.getElementById('cmdSaveUserButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $('#cmdSaveUserButton').prop('disabled', false);
-                            $('#cmdUserDetailCloseButton').prop('disabled', false);
+                    url: '/api/manage/current/user/dropdown/list/branch/' + cboCompany.selectedValue,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                branches.push({
+                                    Id: results[i]["Id"],
+                                    Branch: results[i]["Branch"]
+                                });
+                            }
+                        }
+
+                        cboBranch.dispose();
+                        cboBranch = new wijmo.input.ComboBox('#defaultBranch', {
+                            disabled: false,
+                            isEditable: false,
+                            itemsSource: branches,
+                            displayMemberPath: "Branch",
+                            selectedValuePath: "Id",
+                            selectedValue: branchSelectedValue
+                        });
+
+                        if (!isCompanyChanged) {
+                            getCurrentAccounts();
                         }
                     }
                 });
             }
         }
 
-        // ===============
-        // Launch Software
-        // ===============
-        function cmdLaunchSoftware_OnClick() {
-            document.getElementById('LaunchSoftware').innerHTML = "<i class='fa fa-spinner fa-spin fa-fw'></i> Launching"
-            document.getElementById('LaunchSoftware').disabled = true;
-            window.location = '/Software';
-        }
-
-        function btnDeleteAllTransactionOnclick() {
-            $('#deleteAllTrasactionsModalConfirm').modal({
-                show: true,
-                backdrop: 'static'
-            });
-        }
-
-        function confirmDeleteAllTrasactionsOnclick() {
-            $("#confirmDeleteAllTrasactions").prop("disabled", true);
-            $("#confirmDeleteAllTrasactionsClose").prop("disabled", true);
-            document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-
-            $('#deleteAllTrasactionsModalLoading').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
+        // ================
+        // Current Accounts
+        // ================
+        function getCurrentAccounts() {
+            var accounts = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/utilities/delete/allTransactions',
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Successfully deleted");
-
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1000);
-                    },
-                    404: function (message) {
-                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
-                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
-                        $('#deleteAllTrasactionsModalLoading').modal('hide');
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                    },
-                    400: function (message) {
-                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
-                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
-                        $('#deleteAllTrasactionsModalLoading').modal('hide');
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                    },
-                    500: function (message) {
-                        document.getElementById('confirmDeleteAllTrasactions').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#confirmDeleteAllTrasactions").prop("disabled", false);
-                        $("#confirmDeleteAllTrasactionsClose").prop("disabled", false);
-                        $('#deleteAllTrasactionsModalLoading').modal('hide');
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                    }
-                }
-            });
-        }
-
-        function getBranch() {
-            var branches = new Array();
-            $.ajax({
-                url: '/api/listBranch',
+                url: '/api/manage/current/user/dropdown/list/account',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (resultsBranch) {
-                    if (resultsBranch.length > 0) {
-                        for (i = 0; i < resultsBranch.length; i++) {
-                            branches.push({
-                                Id: resultsBranch[i]["Id"],
-                                Branch: resultsBranch[i]["Branch"]
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            accounts.push({
+                                Id: results[i]["Id"],
+                                Account: results[i]["Account"]
                             });
                         }
-
-                        var disabled = false;
-                        var userName = "@ViewData["UserName"]";
-                        if (userName == "admin") {
-                            disabled = false;
-                        } else {
-                            disabled = true;
-                        }
-
-                        var defaultBranch = "@ViewData["Branch"]";
-                        cboDefaultBranch.dispose();
-                        cboDefaultBranch = new wijmo.input.ComboBox('#defaultBranch', {
-                            disabled: disabled,
-                            placeholder: "Select Branch",
-                            itemsSource: branches,
-                            displayMemberPath: "Branch",
-                            selectedValuePath: "Branch",
-                            selectedValue: defaultBranch.toString()
-                        });
-                        document.getElementById("defaultOfficialReceiptName").value = "@ViewData["OfficialReceiptName"]";
-                        document.getElementById("defaultSalesInvoiceName").value = "@ViewData["SalesInvoiceName"]";
                     }
+
+                    cboIncomeAccount.dispose();
+                    cboIncomeAccount = new wijmo.input.ComboBox('#defaultIncomeAccount', {
+                        isEditable: true,
+                        placeholder: "Account",
+                        itemsSource: accounts,
+                        displayMemberPath: "Account",
+                        selectedValuePath: "Id"
+                    });
+
+                    cboSupplierAvancesAccount.dispose();
+                    cboSupplierAvancesAccount = new wijmo.input.ComboBox('#defaultSupplierAdvancesAccount', {
+                        isEditable: true,
+                        placeholder: "Account",
+                        itemsSource: accounts,
+                        displayMemberPath: "Account",
+                        selectedValuePath: "Id"
+                    });
+
+                    cboCustomerAdvancesAccount.dispose();
+                    cboCustomerAdvancesAccount = new wijmo.input.ComboBox('#defaultCustomerAdvancesAccount', {
+                        isEditable: true,
+                        placeholder: "Account",
+                        itemsSource: accounts,
+                        displayMemberPath: "Account",
+                        selectedValuePath: "Id"
+                    });
+
+                    getCurrentInventoryType();
                 }
             });
         }
 
-        function btnOnclickSaveDefaults() {
-            document.getElementById('btnIdSaveDefaults').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-            $("#btnIdSaveDefaults").prop("disabled", true);
-
-            var userDefaultObject = new Object();
-            userDefaultObject.BranchId = cboDefaultBranch.selectedItem["Id"];
-            userDefaultObject.OfficialReceiptName = document.getElementById("defaultOfficialReceiptName").value;
-            userDefaultObject.InventoryType = cboInventoryType.selectedValue;
-            userDefaultObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedItem["Id"];
-            userDefaultObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
-            var userDefaultData = JSON.stringify(userDefaultObject);
-
-            var userId = "@ViewData["UserId"]";
+        // ======================
+        // Current Inventory Type
+        // ======================
+        function getCurrentInventoryType() {
+            var inventoryTypesObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                type: "PUT",
-                url: '/api/user/updateUserDefaults/byUserId/' + userId,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                data: userDefaultData,
-                statusCode: {
-                    200: function () {
-                        document.getElementById('btnIdSaveDefaults').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                        $("#btnIdSaveDefaults").prop("disabled", true);
-                        toastr.success("Updated");
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1000);
-                    },
-                    404: function () {
-                        document.getElementById('btnIdSaveDefaults').innerHTML = "<i class='fa fa-spinner fa-save'></i> Save";
-                        toastr.error("Not found");
-                    },
-                    400: function () {
-                        document.getElementById('btnIdSaveDefaults').innerHTML = "<i class='fa fa-spinner fa-save'></i> Save";
-                        toastr.error("Bad Request");
-                    }
-                }
-            });
-        }
-
-        function createCboInventoryType() {
-            $.ajax({
-                url: '/api/first/inventory',
+                url: '/api/manage/current/user/dropdown/list/inventoryType',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (resultInventory) {
+                success: function (results) {
+                    var isInventoryDisabled = false;
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            isInventoryDisabled = results[i]["IsDisabled"];
 
-                    var disabled = false;
-                    var userName = "@ViewData["UserName"]";
-                    if (resultInventory != null) {
-                        disabled = true;
-                    } else {
-                        if (userName == "admin") {
-                            disabled = false;
-                        } else {
-                            disabled = true;
+                            inventoryTypesObservableArray.push({
+                                InventoryType: results[i]["InventoryType"],
+                                IsDisabled: results[i]["IsDisabled"]
+                            });
                         }
                     }
 
-                    var InventoryTypes = new Array("Specific Identification", "Moving Average");
+                    var disabled = false;
+                    if (isInventoryDisabled) {
+                        disabled = true;
+                    }
+
                     cboInventoryType.dispose();
                     cboInventoryType = new wijmo.input.ComboBox('#cboInventoryType', {
                         disabled: disabled,
-                        placeholder: "Select Inventory Type",
-                        itemsSource: InventoryTypes,
-                        selectedValue: inventoryTypeSelectedValue
+                        itemsSource: inventoryTypesObservableArray,
+                        displayMemberPath: "InventoryType",
+                        selectedValuePath: "InventoryType",
+                        placeholder: "Select Inventory Type"
                     });
+
+                    getCurrentDiscount();
                 }
             });
         }
 
-        function getDiscount() {
+        // ================
+        // Current Discount
+        // ================
+        function getCurrentDiscount() {
             var discountsObservableArray = new wijmo.collections.ObservableArray;
-             $.ajax({
-                 url: '/api/listDiscount',
+            $.ajax({
+                url: '/api/manage/current/user/dropdown/list/discount',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (resultDiscounts) {
-                    if (resultDiscounts.length > 0) {
-                        for (i = 0; i < resultDiscounts.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             discountsObservableArray.push({
-                                Id: resultDiscounts[i]["Id"],
-                                Discount: resultDiscounts[i]["Discount"]
+                                Id: results[i]["Id"],
+                                Discount: results[i]["Discount"]
                             });
                         }
 
-                        var disabled = false;
-                        var userName = "@ViewData["UserName"]";
-                        if (userName == "admin") {
-                            disabled = false;
-                        } else {
-                            disabled = true;
-                        }
-
-                        var defaultDiscount = "@ViewData["DefaultSalesInvoiceDiscount"]";
                         cboDiscounts.dispose();
                         cboDiscounts = new wijmo.input.ComboBox('#cboDiscounts', {
-                            disabled: disabled,
-                            placeholder: "Select Branch",
+                            isEditable: false,
+                            placeholder: "Select Discount",
                             itemsSource: discountsObservableArray,
                             displayMemberPath: "Discount",
-                            selectedValuePath: "Discount",
-                            selectedValue: defaultDiscount.toString()
+                            selectedValuePath: "Id"
                         });
-                        document.getElementById("defaultOfficialReceiptName").value = "@ViewData["OfficialReceiptName"]";
-                        document.getElementById("defaultSalesInvoiceName").value = "@ViewData["SalesInvoiceName"]";
+                    }
+
+                    getCurrentLoggedInUser();
+                }
+            });
+        }
+
+        // ================
+        // Get Current User
+        // ================
+        function getCurrentLoggedInUser() {
+            NProgress.start();
+            $.ajax({
+                url: '/api/manage/current/user/detail',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results != null) {
+                        document.getElementById("userDetail_Username").value = results.UserName;
+                        document.getElementById("userDetail_Fullname").value = results.FullName;
+                        cboCompany.selectedValue = results.CompanyId;
+                        cboBranch.selectedValue = results.BranchId;
+                        branchSelectedValue = results.BranchId;
+                        cboIncomeAccount.selectedValue = results.IncomeAccountId;
+                        cboSupplierAvancesAccount.selectedValue = results.SupplierAdvancesAccountId;
+                        cboCustomerAdvancesAccount.selectedValue = results.CustomerAdvancesAccountId;
+                        cboInventoryType.selectedValue = results.InventoryType;
+                        cboDiscounts.selectedValue = results.DefaultSalesInvoiceDiscountId;
+                        document.getElementById("defaultOfficialReceiptName").value = results.OfficialReceiptName;
+                        document.getElementById("defaultSalesInvoiceName").value = results.SalesInvoiceName;
+                        document.getElementById("defaultIncludeCostInStockReport").checked = results.IsIncludeCostStockReports;
+
+                        createCboShowRows();
+                        createCurrentUserFormFlexGrid();
+                        createCurrentUserBranchesFlexGrid();
+                    } else {
+                        confirm("No Data");
+                        window.location = '/Software/Users';
                     }
                 }
             });
         }
 
-        // =======
-        // On Load
-        // =======
-        $(document).ready(function () {
-            cboDefaultBranch = new wijmo.input.ComboBox('#defaultBranch');
-            cboInventoryType = new wijmo.input.ComboBox('#cboInventoryType');
-            cboDiscounts = new wijmo.input.ComboBox('#cboDiscounts');
-            getDiscount();
-            createCboInventoryType();
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
 
-            getBranch();
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
 
-            var userName = "@ViewData["UserName"]";
-            if (userName == "admin") {
-                document.getElementById("defaultOfficialReceiptName").disabled = false;
-                document.getElementById("defaultSalesInvoiceName").disabled = false;
-            } else {
-                $('#btnDeleteAllTransaction').prop('disabled', true);
-                $('#btnIdSaveDefaults').prop('disabled', true);
-                document.getElementById("defaultOfficialReceiptName").disabled = true;
-                document.getElementById("defaultSalesInvoiceName").disabled = true;
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
             }
 
-            $(document).on('show.bs.modal', '.modal', function (event) {
-                var zIndex = 1040 + (10 * $('.modal:visible').length);
-                $(this).css('z-index', zIndex);
-                setTimeout(function () {
-                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-                }, 0);
+            cboUserFormShowNumberOfRows.dispose();
+            cboUserFormShowNumberOfRows = new wijmo.input.ComboBox('#cboUserFormShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboUserFormShowNumberOfRows.selectedValue;
+                        userForms.pageSize = parseInt(numberOfRows);
+                        userForms.refresh();
+                        userFormGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
             });
 
-            $(document).on('hidden.bs.modal', '.modal', function () {
-                $('.modal:visible').length && $(document.body).addClass('modal-open');
+            cboUserDefaultBranchesShowNumberOfRows.dispose();
+            cboUserDefaultBranchesShowNumberOfRows = new wijmo.input.ComboBox('#cboUserDefaultBranchesShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboUserDefaultBranchesShowNumberOfRows.selectedValue;
+                        userDefaultBranchesCollectionView.pageSize = parseInt(numberOfRows);
+                        userDefaultBranchesCollectionView.refresh();
+                        userDefaultBranchesFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
             });
+        }
+
+        // ===========
+        // Lock button
+        // ===========
+        function btnUserDetailLock_OnClick() {
+            var isValid = true;
+            $('.requiredUser').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $('#btnUserDetailLock').prop('disabled', true);
+                $('#btnUserDetailUnLock').prop('disabled', true);
+                $('#btnUserDetailClose').prop('disabled', true);
+
+                var userObject = new Object();
+                userObject.FullName = document.getElementById('userDetail_Fullname').value;
+                userObject.CompanyId = cboCompany.selectedValue;
+                userObject.BranchId = cboBranch.selectedValue;
+                userObject.IncomeAccountId = cboIncomeAccount.selectedValue;
+                userObject.SupplierAdvancesAccountId = cboSupplierAvancesAccount.selectedValue;
+                userObject.CustomerAdvancesAccountId = cboCustomerAdvancesAccount.selectedValue;
+                userObject.OfficialReceiptName = document.getElementById("defaultOfficialReceiptName").value;
+                userObject.InventoryType = cboInventoryType.selectedValue;
+                userObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedValue;
+                userObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
+                userObject.IsIncludeCostStockReports = document.getElementById("defaultIncludeCostInStockReport").checked;
+
+                var data = JSON.stringify(userObject);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/user/lock/' + userId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Lock Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnUserDetailLock').prop('disabled', false);
+                            $('#btnUserDetailClose').prop('disabled', false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnUserDetailLock').prop('disabled', false);
+                            $('#btnUserDetailClose').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnUserDetailLock').prop('disabled', false);
+                            $('#btnUserDetailClose').prop('disabled', false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =================
+        // Current User Form
+        // =================
+        function getCurrentUserForm() {
+            var userForms = new wijmo.collections.ObservableArray;
+            $.ajax({
+                url: '/api/manage/current/user/userForm/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            userForms.push({
+                                Id: results[i]["Id"],
+                                UserId: results[i]["UserId"],
+                                User: results[i]["User"],
+                                FormId: results[i]["FormId"],
+                                Form: results[i]["Form"],
+                                Particulars: results[i]["Particulars"],
+                                CanAdd: results[i]["CanAdd"],
+                                CanEdit: results[i]["CanEdit"],
+                                CanDelete: results[i]["CanDelete"],
+                                CanLock: results[i]["CanLock"],
+                                CanUnlock: results[i]["CanUnlock"],
+                                CanPrint: results[i]["CanPrint"]
+                            });
+                        }
+                    }
+
+                    NProgress.done();
+                }
+            });
+
+            return userForms;
+        }
+
+        // ============================
+        // User Form Navigation Buttons
+        // ============================
+        function updateNavigateButtonsCurrentUserForm() {
+            if (userForms.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridUserForm').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridUserForm').style.display = 'block';
+            if (userForms.pageIndex === 0) {
+                btnMoveToFirstPageGridUserForm.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridUserForm.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridUserForm.removeAttribute('disabled');
+                btnMoveToLastPageGridUserForm.removeAttribute('disabled');
+            } else if (userForms.pageIndex === (userForms.pageCount - 1)) {
+                btnMoveToFirstPageGridUserForm.removeAttribute('disabled');
+                btnMoveToPreviousPageGridUserForm.removeAttribute('disabled');
+                btnMoveToLastPageGridUserForm.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridUserForm.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridUserForm.removeAttribute('disabled');
+                btnMoveToPreviousPageGridUserForm.removeAttribute('disabled');
+                btnMoveToNextPageGridUserForm.removeAttribute('disabled');
+                btnMoveToLastPageGridUserForm.removeAttribute('disabled');
+            }
+            btnCurrentPageGridUserForm.innerHTML = (userForms.pageIndex + 1) + ' / ' + userForms.pageCount;
+        }
+
+        // ===========================
+        // Refresh User Form Flex Grid
+        // ===========================
+        function refreshUserFormFlexGrid() {
+            userForms = new wijmo.collections.CollectionView(getCurrentUserForm());
+            userForms.canFilter = true;
+            userForms.pageSize = cboUserFormShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#UserFormInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                userForms.refresh();
+            });
+
+            userForms.filter = function (item) {
+                return !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            userForms.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsCurrentUserForm();
+            });
+
+            userFormGrid.itemsSource = userForms;
+            userFormGrid.trackChanges = true;
+        }
+
+        // ==========================
+        // Create User Form Flex Grid
+        // ==========================
+        function createCurrentUserFormFlexGrid() {
+            userForms = new wijmo.collections.CollectionView(getCurrentUserForm());
+            userForms.canFilter = true;
+            userForms.pageSize = cboUserFormShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#UserFormInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                userForms.refresh();
+            });
+
+            userForms.filter = function (item) {
+                return !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            userForms.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsCurrentUserForm();
+            });
+
+            userFormGrid = new wijmo.grid.FlexGrid('#userDetailUserFormGrid');
+            userFormGrid.initialize({
+                columns: [
+                            {
+                                "header": "Form",
+                                "binding": "Form",
+                                "width": "3*",
+                                "allowResizing": true,
+                                "allowSorting": true
+                            },
+                            {
+                                "header": "Add",
+                                "binding": "CanAdd",
+                                "allowSorting": true,
+                                "width": 80
+                            },
+                            {
+                                "header": "Edit",
+                                "binding": "CanEdit",
+                                "allowSorting": true,
+                                "width": 80
+                            },
+                            {
+                                "header": "Delete",
+                                "binding": "CanDelete",
+                                "allowSorting": true,
+                                "width": 80
+                            },
+                            {
+                                "header": "Lock",
+                                "binding": "CanLock",
+                                "allowSorting": true,
+                                "width": 80
+                            },
+                            {
+                                "header": "Unlock",
+                                "binding": "CanUnlock",
+                                "allowSorting": true,
+                                "width": 80
+                            },
+                            {
+                                "header": "Print",
+                                "binding": "CanPrint",
+                                "allowSorting": true,
+                                "width": 80
+                            }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: userForms,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            userFormGrid.trackChanges = true;
+
+            updateNavigateButtonsCurrentUserForm();
+
+            btnMoveToFirstPageGridUserForm.addEventListener('click', function () {
+                userForms.moveToFirstPage();
+                updateNavigateButtonsCurrentUserForm();
+            });
+
+            btnMoveToPreviousPageGridUserForm.addEventListener('click', function () {
+                userForms.moveToPreviousPage();
+                updateNavigateButtonsCurrentUserForm();
+            });
+
+            btnMoveToNextPageGridUserForm.addEventListener('click', function () {
+                userForms.moveToNextPage();
+                updateNavigateButtonsCurrentUserForm();
+            });
+
+            btnMoveToLastPageGridUserForm.addEventListener('click', function () {
+                userForms.moveToLastPage();
+                updateNavigateButtonsCurrentUserForm();
+            });
+        }
+
+        // ===================
+        // Current User Branch
+        // ===================
+        function getCurrentUserBranches() {
+            var userDefaultBranchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/manage/current/user/userBranch/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            userDefaultBranchesObservableArray.push({
+                                Id: results[i]["Id"],
+                                CompanyId: results[i]["CompanyId"],
+                                Company: results[i]["Company"],
+                                BranchId: results[i]["BranchId"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    NProgress.done();
+                }
+            });
+
+            return userDefaultBranchesObservableArray;
+        }
+
+        // ==============================
+        // User Branch Navigation Buttons
+        // ==============================
+        function updateNavigateButtonsCurrentUserBranches() {
+            if (userDefaultBranchesCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridUserDefaultBranches').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridUserDefaultBranches').style.display = 'block';
+            if (userDefaultBranchesCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridUserDefaultBranches.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridUserDefaultBranches.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToLastPageGridUserDefaultBranches.removeAttribute('disabled');
+            } else if (userDefaultBranchesCollectionView.pageIndex === (userDefaultBranchesCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToPreviousPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToLastPageGridUserDefaultBranches.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridUserDefaultBranches.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToPreviousPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToNextPageGridUserDefaultBranches.removeAttribute('disabled');
+                btnMoveToLastPageGridUserDefaultBranches.removeAttribute('disabled');
+            }
+            btnCurrentPageGridUserDefaultBranches.innerHTML = (userDefaultBranchesCollectionView.pageIndex + 1) + ' / ' + userDefaultBranchesCollectionView.pageCount;
+        }
+
+        // ==============================
+        // Refresh User Branches FlexGrid
+        // ==============================
+        function refreshCurrentUserBranchesFlexGrid() {
+            userDefaultBranchesCollectionView = new wijmo.collections.CollectionView(getCurrentUserBranches());
+            userDefaultBranchesCollectionView.canFilter = true;
+            userDefaultBranchesCollectionView.pageSize = cboUserDefaultBranchesShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#UserDefaultBranchesInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                userDefaultBranchesCollectionView.refresh();
+            });
+
+            userDefaultBranchesCollectionView.filter = function (item) {
+                return !filterText || (item.Company.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Branch.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            userDefaultBranchesCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsCurrentUserBranches();
+            });
+
+            userDefaultBranchesFlexGrid.itemsSource = userDefaultBranchesCollectionView;
+            userDefaultBranchesFlexGrid.trackChanges = true;
+        }
+
+        // =============================
+        // Create User Branches FlexGrid
+        // =============================
+        function createCurrentUserBranchesFlexGrid() {
+            userDefaultBranchesCollectionView = new wijmo.collections.CollectionView(getCurrentUserBranches());
+            userDefaultBranchesCollectionView.canFilter = true;
+            userDefaultBranchesCollectionView.pageSize = cboUserDefaultBranchesShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#UserDefaultBranchesInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                userDefaultBranchesCollectionView.refresh();
+            });
+
+            userDefaultBranchesCollectionView.filter = function (item) {
+                return !filterText || (item.Company.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Branch.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            userDefaultBranchesCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsCurrentUserBranches();
+            });
+
+            userDefaultBranchesFlexGrid = new wijmo.grid.FlexGrid('#userDefaultBranchesFlexGrid');
+            userDefaultBranchesFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Company",
+                        "binding": "Company",
+                        "width": "3*",
+                        "allowResizing": true,
+                        "allowSorting": true
+                    },
+                    {
+                        "header": "Branch",
+                        "binding": "Branch",
+                        "width": "3*",
+                        "allowResizing": true,
+                        "allowSorting": true
+                    }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: userDefaultBranchesCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            userDefaultBranchesFlexGrid.trackChanges = true;
+
+            updateNavigateButtonsCurrentUserBranches();
+
+            btnMoveToFirstPageGridUserDefaultBranches.addEventListener('click', function () {
+                userDefaultBranchesCollectionView.moveToFirstPage();
+                updateNavigateButtonsCurrentUserBranches();
+            });
+
+            btnMoveToPreviousPageGridUserDefaultBranches.addEventListener('click', function () {
+                userDefaultBranchesCollectionView.moveToPreviousPage();
+                updateNavigateButtonsCurrentUserBranches();
+            });
+
+            btnMoveToNextPageGridUserDefaultBranches.addEventListener('click', function () {
+                userDefaultBranchesCollectionView.moveToNextPage();
+                updateNavigateButtonsCurrentUserBranches();
+            });
+
+            btnMoveToLastPageGridUserDefaultBranches.addEventListener('click', function () {
+                userDefaultBranchesCollectionView.moveToLastPage();
+                updateNavigateButtonsCurrentUserBranches();
+            });
+        }
+
+        $('#userForm').click(function () {
+            $("#UserForm").show();
+            $("#UserBranches").hide();
+            NProgress.start();
+            refreshUserFormFlexGrid();
+        });
+
+        $('#userBranches').click(function () {
+            $("#UserForm").hide();
+            $("#UserBranches").show();
+            NProgress.start();
+            refreshCurrentUserBranchesFlexGrid();
+        });
+
+        // ============
+        // On Load Page
+        // ============
+        $(document).ready(function () {
+            getCurrentCompany();
         });
     </script>
     <script type="text/javascript">
