@@ -74,6 +74,8 @@
         // ================
         // Global Variables
         // ================
+        var isSaved = true;
+
         var cboCompany = new wijmo.input.ComboBox('#defaultCompany');
         var cboBranch = new wijmo.input.ComboBox('#defaultBranch');
         var cboIncomeAccount = new wijmo.input.ComboBox('#defaultIncomeAccount');
@@ -105,6 +107,18 @@
         var btnMoveToLastPageGridUserDefaultBranches = document.getElementById('btnMoveToLastPageGridUserDefaultBranches');
         var btnCurrentPageGridUserDefaultBranches = document.getElementById('btnCurrentPageGridUserDefaultBranches');
 
+        var isUserFormSelected = true;
+        var isUserBranchesSelected = false;
+
+        // ===============
+        // Luanch Software
+        // ===============
+        function cmdLaunchSoftware_OnClick() {
+            $('#LaunchSoftware').prop('disabled', true);
+            document.getElementById('LaunchSoftware').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Main Menu...";
+            window.location = "/Software";
+        }
+
         // ===============
         // Current Company
         // ===============
@@ -119,7 +133,7 @@
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
                             companies.push({
-                                Id: results[i]["Id"],
+                                CompanyId: results[i]["CompanyId"],
                                 Company: results[i]["Company"]
                             });
                         }
@@ -127,11 +141,12 @@
 
                     cboCompany.dispose();
                     cboCompany = new wijmo.input.ComboBox('#defaultCompany', {
+                        disabled: true,
                         isEditable: false,
                         placeholder: "Select Company",
                         itemsSource: companies,
                         displayMemberPath: "Company",
-                        selectedValuePath: "Id",
+                        selectedValuePath: "CompanyId",
                         onSelectedIndexChanged: function () {
                             isCompanyChanged = true;
                             getCurrentBranch();
@@ -158,19 +173,24 @@
                         if (results.length > 0) {
                             for (i = 0; i < results.length; i++) {
                                 branches.push({
-                                    Id: results[i]["Id"],
+                                    BranchId: results[i]["BranchId"],
                                     Branch: results[i]["Branch"]
                                 });
                             }
                         }
 
+                        var disabled = true;
+                        if (!isSaved) {
+                            disabled = false;
+                        }
+
                         cboBranch.dispose();
                         cboBranch = new wijmo.input.ComboBox('#defaultBranch', {
-                            disabled: false,
+                            disabled: disabled,
                             isEditable: false,
                             itemsSource: branches,
                             displayMemberPath: "Branch",
-                            selectedValuePath: "Id",
+                            selectedValuePath: "BranchId",
                             selectedValue: branchSelectedValue
                         });
 
@@ -204,7 +224,8 @@
 
                     cboIncomeAccount.dispose();
                     cboIncomeAccount = new wijmo.input.ComboBox('#defaultIncomeAccount', {
-                        isEditable: true,
+                        disabled: true,
+                        isEditable: false,
                         placeholder: "Account",
                         itemsSource: accounts,
                         displayMemberPath: "Account",
@@ -213,7 +234,8 @@
 
                     cboSupplierAvancesAccount.dispose();
                     cboSupplierAvancesAccount = new wijmo.input.ComboBox('#defaultSupplierAdvancesAccount', {
-                        isEditable: true,
+                        disabled: true,
+                        isEditable: false,
                         placeholder: "Account",
                         itemsSource: accounts,
                         displayMemberPath: "Account",
@@ -222,7 +244,8 @@
 
                     cboCustomerAdvancesAccount.dispose();
                     cboCustomerAdvancesAccount = new wijmo.input.ComboBox('#defaultCustomerAdvancesAccount', {
-                        isEditable: true,
+                        disabled: true,
+                        isEditable: false,
                         placeholder: "Account",
                         itemsSource: accounts,
                         displayMemberPath: "Account",
@@ -297,6 +320,7 @@
 
                         cboDiscounts.dispose();
                         cboDiscounts = new wijmo.input.ComboBox('#cboDiscounts', {
+                            disabled: true,
                             isEditable: false,
                             placeholder: "Select Discount",
                             itemsSource: discountsObservableArray,
@@ -339,6 +363,8 @@
                         createCboShowRows();
                         createCurrentUserFormFlexGrid();
                         createCurrentUserBranchesFlexGrid();
+
+                        $('#btnEditCurrentUser').prop('disabled', false);
                     } else {
                         confirm("No Data");
                         window.location = '/Software/Users';
@@ -346,7 +372,7 @@
                 }
             });
         }
-
+        
         // ===============
         // Show Rows Table
         // ===============
@@ -386,7 +412,7 @@
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
                 selectedValuePath: "rowNumber",
-                selectedValue: 50,
+                selectedValue: 15,
                 onSelectedIndexChanged: function () {
                     NProgress.start();
 
@@ -407,7 +433,7 @@
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
                 selectedValuePath: "rowNumber",
-                selectedValue: 50,
+                selectedValue: 15,
                 onSelectedIndexChanged: function () {
                     NProgress.start();
 
@@ -423,10 +449,10 @@
             });
         }
 
-        // ===========
-        // Lock button
-        // ===========
-        function btnUserDetailLock_OnClick() {
+        // ========================
+        // Save Current User button
+        // ========================
+        function btnSaveCurrentUserOnclick() {
             var isValid = true;
             $('.requiredUser').each(function () {
                 if ($.trim($(this).val()) == '') {
@@ -442,10 +468,9 @@
             });
 
             if (isValid) {
-                document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
-                $('#btnUserDetailLock').prop('disabled', true);
-                $('#btnUserDetailUnLock').prop('disabled', true);
-                $('#btnUserDetailClose').prop('disabled', true);
+                document.getElementById('btnSaveCurrentUser').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving...";
+                $('#btnSaveCurrentUser').prop('disabled', true);
+                $('#btnEditCurrentUser').prop('disabled', true);
 
                 var userObject = new Object();
                 userObject.FullName = document.getElementById('userDetail_Fullname').value;
@@ -459,45 +484,61 @@
                 userObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedValue;
                 userObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
                 userObject.IsIncludeCostStockReports = document.getElementById("defaultIncludeCostInStockReport").checked;
-
                 var data = JSON.stringify(userObject);
 
                 $.ajax({
                     type: "PUT",
-                    url: '/api/user/lock/' + userId,
+                    url: '/api/manage/current/user/update',
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     data: data,
                     statusCode: {
                         200: function () {
-                            toastr.success("Lock Successful");
+                            toastr.success("Save Successful");
                             window.setTimeout(function () {
                                 location.reload()
                             }, 1000);
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnUserDetailLock').prop('disabled', false);
-                            $('#btnUserDetailClose').prop('disabled', false);
+                            document.getElementById('btnSaveCurrentUser').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveCurrentUser').prop('disabled', false);
+                            $('#btnEditCurrentUser').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnUserDetailLock').prop('disabled', false);
-                            $('#btnUserDetailClose').prop('disabled', false);
+                            document.getElementById('btnSaveCurrentUser').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveCurrentUser').prop('disabled', false);
+                            $('#btnEditCurrentUser').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnUserDetailLock').prop('disabled', false);
-                            $('#btnUserDetailClose').prop('disabled', false);
+                            document.getElementById('btnSaveCurrentUser').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveCurrentUser').prop('disabled', false);
+                            $('#btnEditCurrentUser').prop('disabled', false);
                         }
                     }
                 });
             } else {
                 toastr.error("Invalid Entry");
             }
+        }
+
+        // ========================
+        // Edit Current User button
+        // ========================
+        function btnEditCurrentUserOnclick() {
+            $('#btnEditCurrentUser').prop('disabled', true);
+            $('#btnSaveCurrentUser').prop('disabled', false);
+
+            isSaved = false;
+            document.getElementById('userDetail_Fullname').disabled = false;
+            cboCompany.disabled = false;
+            cboBranch.disabled = false;
+            document.getElementById('defaultSalesInvoiceName').disabled = false;
+            cboDiscounts.disabled = false;
+            document.getElementById('defaultOfficialReceiptName').disabled = false;
+            document.getElementById('defaultIncludeCostInStockReport').disabled = false;
         }
 
         // =================
@@ -569,7 +610,7 @@
         // ===========================
         // Refresh User Form Flex Grid
         // ===========================
-        function refreshUserFormFlexGrid() {
+        function refreshCurrentUserFormFlexGrid() {
             userForms = new wijmo.collections.CollectionView(getCurrentUserForm());
             userForms.canFilter = true;
             userForms.pageSize = cboUserFormShowNumberOfRows.selectedValue;
@@ -581,7 +622,7 @@
             });
 
             userForms.filter = function (item) {
-                return !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+                return !filterText || (item.Form.toLowerCase().indexOf(filterText) > -1);
             }
 
             userForms.collectionChanged.addHandler(function (sender, args) {
@@ -607,7 +648,7 @@
             });
 
             userForms.filter = function (item) {
-                return !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+                return !filterText || (item.Form.toLowerCase().indexOf(filterText) > -1);
             }
 
             userForms.collectionChanged.addHandler(function (sender, args) {
@@ -853,11 +894,30 @@
             });
         }
 
+        $('#UserDetailPill').click(function () {
+            NProgress.start();
+
+            if (isUserFormSelected) {
+                $("#UserForm").show();
+                $("#UserBranches").hide();
+                refreshCurrentUserFormFlexGrid();
+            } else {
+                if (isUserBranchesSelected) {
+                    $("#UserForm").hide();
+                    $("#UserBranches").show();
+                    refreshCurrentUserBranchesFlexGrid();
+                }
+            }
+        });
+
         $('#userForm').click(function () {
             $("#UserForm").show();
             $("#UserBranches").hide();
             NProgress.start();
-            refreshUserFormFlexGrid();
+            refreshCurrentUserFormFlexGrid();
+
+            isUserFormSelected = true;
+            isUserBranchesSelected = false;
         });
 
         $('#userBranches').click(function () {
@@ -865,6 +925,9 @@
             $("#UserBranches").show();
             NProgress.start();
             refreshCurrentUserBranchesFlexGrid();
+
+            isUserFormSelected = false;
+            isUserBranchesSelected = true;
         });
 
         // ============

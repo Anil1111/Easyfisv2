@@ -63,7 +63,7 @@ namespace easyfis.ModifiedApiControllers
         // Dropdown List - Company (Field)
         // ===============================
         [Authorize, HttpGet, Route("api/manage/current/user/dropdown/list/company")]
-        public List<Entities.MstCompany> DropdownListUserListCompany()
+        public List<Entities.MstUserBranch> DropdownListUserListCompany()
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -73,10 +73,15 @@ namespace easyfis.ModifiedApiControllers
 
             var companies = from d in db.MstUserBranches
                             where d.UserId == currentUserId
-                            select new Entities.MstCompany
+                            group d by new
                             {
-                                Id = d.Id,
-                                Company = d.MstBranch.MstCompany.Company,
+                                CompanyId = d.MstBranch.CompanyId,
+                                Company = d.MstBranch.MstCompany.Company
+                            } into g
+                            select new Entities.MstUserBranch
+                            {
+                                CompanyId = g.Key.CompanyId,
+                                Company = g.Key.Company
                             };
 
             return companies.ToList();
@@ -86,7 +91,7 @@ namespace easyfis.ModifiedApiControllers
         // Dropdown List - Branch (Field)
         // ==============================
         [Authorize, HttpGet, Route("api/manage/current/user/dropdown/list/branch/{companyId}")]
-        public List<Entities.MstBranch> DropdownListUserBranch(String companyId)
+        public List<Entities.MstUserBranch> DropdownListUserBranch(String companyId)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -97,10 +102,15 @@ namespace easyfis.ModifiedApiControllers
             var branches = from d in db.MstUserBranches
                            where d.UserId == currentUserId
                            && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                           select new Entities.MstBranch
+                           group d by new
                            {
-                               Id = d.Id,
+                               BranchId = d.BranchId,
                                Branch = d.MstBranch.Branch
+                           } into g
+                           select new Entities.MstUserBranch
+                           {
+                               BranchId = g.Key.BranchId,
+                               Branch = g.Key.Branch
                            };
 
             return branches.ToList();
@@ -252,76 +262,69 @@ namespace easyfis.ModifiedApiControllers
 
                     if (user.Any())
                     {
-                        if (!user.FirstOrDefault().IsLocked)
+                        var branch = from d in db.MstBranches
+                                     where d.Id == objUser.BranchId
+                                     select d;
+
+                        if (branch.Any())
                         {
-                            var branch = from d in db.MstBranches
-                                         where d.Id == objUser.BranchId
-                                         select d;
+                            var account = from d in db.MstAccounts
+                                          select d;
 
-                            if (branch.Any())
+                            if (account.Any())
                             {
-                                var account = from d in db.MstAccounts
-                                              select d;
+                                var discounts = from d in db.MstDiscounts
+                                                where d.Id == objUser.DefaultSalesInvoiceDiscountId
+                                                select d;
 
-                                if (account.Any())
+                                if (discounts.Any())
                                 {
-                                    var discounts = from d in db.MstDiscounts
-                                                    where d.Id == objUser.DefaultSalesInvoiceDiscountId
-                                                    select d;
+                                    var currentASPNetUser = from d in db.AspNetUsers
+                                                            where d.Id == currenteAspNetUserId
+                                                            select d;
 
-                                    if (discounts.Any())
+                                    if (currentASPNetUser.Any())
                                     {
-                                        var currentASPNetUser = from d in db.AspNetUsers
-                                                                where d.Id == currenteAspNetUserId
-                                                                select d;
+                                        var updateCurrentASPNetUser = currentASPNetUser.FirstOrDefault();
+                                        updateCurrentASPNetUser.FullName = objUser.FullName;
+                                        db.SubmitChanges();
 
-                                        if (currentASPNetUser.Any())
-                                        {
-                                            var updateCurrentASPNetUser = currentASPNetUser.FirstOrDefault();
-                                            updateCurrentASPNetUser.FullName = objUser.FullName;
-                                            db.SubmitChanges();
+                                        var updateCurrentUser = user.FirstOrDefault();
+                                        updateCurrentUser.FullName = objUser.FullName;
+                                        updateCurrentUser.CompanyId = objUser.CompanyId;
+                                        updateCurrentUser.BranchId = objUser.BranchId;
+                                        updateCurrentUser.IncomeAccountId = objUser.IncomeAccountId;
+                                        updateCurrentUser.SupplierAdvancesAccountId = objUser.SupplierAdvancesAccountId;
+                                        updateCurrentUser.CustomerAdvancesAccountId = objUser.CustomerAdvancesAccountId;
+                                        updateCurrentUser.OfficialReceiptName = objUser.OfficialReceiptName;
+                                        updateCurrentUser.InventoryType = objUser.InventoryType;
+                                        updateCurrentUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
+                                        updateCurrentUser.SalesInvoiceName = objUser.SalesInvoiceName;
+                                        updateCurrentUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
+                                        updateCurrentUser.UpdatedById = currentUserId;
+                                        updateCurrentUser.UpdatedDateTime = DateTime.Now;
+                                        db.SubmitChanges();
 
-                                            var updateCurrentUser = user.FirstOrDefault();
-                                            updateCurrentUser.FullName = objUser.FullName;
-                                            updateCurrentUser.CompanyId = objUser.CompanyId;
-                                            updateCurrentUser.BranchId = objUser.BranchId;
-                                            updateCurrentUser.IncomeAccountId = objUser.IncomeAccountId;
-                                            updateCurrentUser.SupplierAdvancesAccountId = objUser.SupplierAdvancesAccountId;
-                                            updateCurrentUser.CustomerAdvancesAccountId = objUser.CustomerAdvancesAccountId;
-                                            updateCurrentUser.OfficialReceiptName = objUser.OfficialReceiptName;
-                                            updateCurrentUser.InventoryType = objUser.InventoryType;
-                                            updateCurrentUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
-                                            updateCurrentUser.SalesInvoiceName = objUser.SalesInvoiceName;
-                                            updateCurrentUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
-                                            updateCurrentUser.UpdatedById = currentUserId;
-                                            updateCurrentUser.UpdatedDateTime = DateTime.Now;
-                                            db.SubmitChanges();
-
-                                            return Request.CreateResponse(HttpStatusCode.OK);
-                                        }
-                                        else
-                                        {
-                                            return Request.CreateResponse(HttpStatusCode.NotFound, "Current user not found.");
-                                        }
+                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
                                     else
                                     {
-                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Sales Invoice Discount not found.");
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Current user not found.");
                                     }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Some Account data not found.");
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Sales Invoice Discount not found.");
                                 }
                             }
                             else
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "Branch not found.");
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Some Account data not found.");
                             }
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These user details are already locked.");
+                            return Request.CreateResponse(HttpStatusCode.NotFound, "Branch not found.");
                         }
                     }
                     else

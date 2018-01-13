@@ -91,7 +91,32 @@ namespace easyfis.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToAction("Index", "Software");
+                    Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+                    var currentUser = from d in db.MstUsers
+                                      where d.AspNetUser.UserName.Equals(model.UserName)
+                                      select d;
+
+                    if (currentUser.Any())
+                    {
+                        var userForms = from d in db.MstUserForms
+                                        where d.UserId == currentUser.FirstOrDefault().Id
+                                        && d.SysForm.FormName.Equals("Software")
+                                        select d;
+
+                        if (userForms.Any())
+                        {
+                            return RedirectToAction("Index", "Software");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Manage");
+                        }
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
                 //return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
