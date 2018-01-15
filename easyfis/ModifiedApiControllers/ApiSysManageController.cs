@@ -71,20 +71,35 @@ namespace easyfis.ModifiedApiControllers
 
             var currentUserId = currentUser.FirstOrDefault().Id;
 
-            var companies = from d in db.MstUserBranches
-                            where d.UserId == currentUserId
-                            group d by new
-                            {
-                                CompanyId = d.MstBranch.CompanyId,
-                                Company = d.MstBranch.MstCompany.Company
-                            } into g
-                            select new Entities.MstUserBranch
-                            {
-                                CompanyId = g.Key.CompanyId,
-                                Company = g.Key.Company
-                            };
+            var userBranches = from d in db.MstUserBranches
+                               where d.UserId == currentUserId
+                               group d by new
+                               {
+                                   CompanyId = d.MstBranch.CompanyId,
+                                   Company = d.MstBranch.MstCompany.Company
+                               } into g
+                               select new Entities.MstUserBranch
+                               {
+                                   CompanyId = g.Key.CompanyId,
+                                   Company = g.Key.Company
+                               };
 
-            return companies.ToList();
+            if (userBranches.Any())
+            {
+                return userBranches.ToList();
+            }
+            else
+            {
+                var userCompany = from d in db.MstUsers
+                                  where d.Id == currentUserId
+                                  select new Entities.MstUserBranch
+                                  {
+                                      CompanyId = d.CompanyId,
+                                      Company = d.MstCompany.Company
+                                  };
+
+                return userCompany.ToList();
+            }
         }
 
         // ==============================
@@ -99,21 +114,36 @@ namespace easyfis.ModifiedApiControllers
 
             var currentUserId = currentUser.FirstOrDefault().Id;
 
-            var branches = from d in db.MstUserBranches
-                           where d.UserId == currentUserId
-                           && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                           group d by new
-                           {
-                               BranchId = d.BranchId,
-                               Branch = d.MstBranch.Branch
-                           } into g
-                           select new Entities.MstUserBranch
-                           {
-                               BranchId = g.Key.BranchId,
-                               Branch = g.Key.Branch
-                           };
+            var userBranches = from d in db.MstUserBranches
+                               where d.UserId == currentUserId
+                               && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                               group d by new
+                               {
+                                   BranchId = d.BranchId,
+                                   Branch = d.MstBranch.Branch
+                               } into g
+                               select new Entities.MstUserBranch
+                               {
+                                   BranchId = g.Key.BranchId,
+                                   Branch = g.Key.Branch
+                               };
 
-            return branches.ToList();
+            if (userBranches.Any())
+            {
+                return userBranches.ToList();
+            }
+            else
+            {
+                var userBranch = from d in db.MstUsers
+                                 where d.Id == currentUserId
+                                 select new Entities.MstUserBranch
+                                 {
+                                     BranchId = d.BranchId,
+                                     Branch = d.MstBranch.Branch
+                                 };
+
+                return userBranch.ToList();
+            }
         }
 
         // ===============================

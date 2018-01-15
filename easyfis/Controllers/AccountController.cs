@@ -345,8 +345,18 @@ namespace easyfis.Controllers
                             var updateMstUsersData = mstUsersData.FirstOrDefault();
                             updateMstUsersData.CreatedById = newMstUser.Id;
                             updateMstUsersData.UpdatedById = newMstUser.Id;
+
                             db.SubmitChanges();
                         }
+
+                        Data.MstUserBranch newUserBranch = new Data.MstUserBranch
+                        {
+                            UserId = newMstUser.Id,
+                            BranchId = branchId
+                        };
+
+                        db.MstUserBranches.InsertOnSubmit(newUserBranch);
+                        db.SubmitChanges();
 
                         return RedirectToAction("Register", "Account");
                     }
