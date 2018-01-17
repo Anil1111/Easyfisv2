@@ -282,41 +282,45 @@ namespace easyfis.Controllers
                         var company = from d in db.MstCompanies
                                       select d;
 
+                        var companyId = company.FirstOrDefault().Id;
+
                         var branch = from d in db.MstBranches
-                                     where d.CompanyId == company.FirstOrDefault().Id
+                                     where d.CompanyId == companyId
                                      select d;
+
+                        var branchId = branch.FirstOrDefault().Id;
 
                         var account = from d in db.MstAccounts
                                       select d;
 
-                        var discount = from d in db.MstDiscounts
-                                       select d;
-
-                        var companyId = company.FirstOrDefault().Id;
-                        var branchId = branch.FirstOrDefault().Id;
                         var incomeAccountId = account.FirstOrDefault().Id;
                         var supplierAdvancesAccountId = account.FirstOrDefault().Id;
                         var customerAdvancesAccountId = account.FirstOrDefault().Id;
+
+                        var discount = from d in db.MstDiscounts
+                                       select d;
+
+                        var discountId = discount.FirstOrDefault().Id;
+
                         var officialReceiptName = "Official Receipt";
                         var inventoryType = "Moving Average";
-                        var defaultSalesInvoiceDiscountId = discount.FirstOrDefault().Id;
+                        var defaultSalesInvoiceDiscountId = discountId;
                         var salesInvoiceName = "Sales Invoice";
                         Int32? salesInvoiceCheckedById = null;
                         Int32? salesInvoiceApprovedById = null;
 
-                        var adminUser = from d in db.MstUsers
-                                        where d.UserName.Equals("admin")
-                                        select d;
+                        var users = from d in db.MstUsers
+                                    select d;
 
-                        if (adminUser.Any())
+                        if (users.Any())
                         {
-                            companyId = adminUser.FirstOrDefault().CompanyId;
-                            branchId = adminUser.FirstOrDefault().BranchId;
-                            incomeAccountId = adminUser.FirstOrDefault().IncomeAccountId;
-                            customerAdvancesAccountId = adminUser.FirstOrDefault().CustomerAdvancesAccountId;
-                            defaultSalesInvoiceDiscountId = adminUser.FirstOrDefault().DefaultSalesInvoiceDiscountId;
-                            salesInvoiceCheckedById = adminUser.FirstOrDefault().SalesInvoiceCheckedById;
-                            salesInvoiceApprovedById = adminUser.FirstOrDefault().SalesInvoiceApprovedById;
+                            companyId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().CompanyId;
+                            branchId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().BranchId;
+                            incomeAccountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().IncomeAccountId;
+                            customerAdvancesAccountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().CustomerAdvancesAccountId;
+                            defaultSalesInvoiceDiscountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().DefaultSalesInvoiceDiscountId;
+                            salesInvoiceCheckedById = users.Where(d => !d.UserName.Equals("admin")).FirstOrDefault().SalesInvoiceCheckedById;
+                            salesInvoiceApprovedById = users.Where(d => !d.UserName.Equals("admin")).FirstOrDefault().SalesInvoiceApprovedById;
                         }
 
                         // ======================
