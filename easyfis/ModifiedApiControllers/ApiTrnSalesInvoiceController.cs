@@ -200,6 +200,18 @@ namespace easyfis.ModifiedApiControllers
                     var currentUserId = currentUser.FirstOrDefault().Id;
                     var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
+                    var currentSalesInvoiceCheckedById = currentUserId;
+                    if (currentUser.FirstOrDefault().SalesInvoiceCheckedById != null)
+                    {
+                        currentSalesInvoiceCheckedById = Convert.ToInt32(currentUser.FirstOrDefault().SalesInvoiceCheckedById);
+                    }
+
+                    var currentSalesInvoiceApprovedById = currentUserId;
+                    if (currentUser.FirstOrDefault().SalesInvoiceApprovedById != null)
+                    {
+                        currentSalesInvoiceApprovedById = Convert.ToInt32(currentUser.FirstOrDefault().SalesInvoiceApprovedById);
+                    }
+
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
                                     && d.SysForm.FormName.Equals("SalesInvoiceList")
@@ -255,8 +267,8 @@ namespace easyfis.ModifiedApiControllers
                                             BalanceAmount = 0,
                                             SoldById = currentUserId,
                                             PreparedById = currentUserId,
-                                            CheckedById = currentUserId,
-                                            ApprovedById = currentUserId,
+                                            CheckedById = currentSalesInvoiceCheckedById,
+                                            ApprovedById = currentSalesInvoiceApprovedById,
                                             IsLocked = false,
                                             CreatedById = currentUserId,
                                             CreatedDateTime = DateTime.Now,
