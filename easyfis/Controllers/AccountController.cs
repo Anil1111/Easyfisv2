@@ -309,18 +309,19 @@ namespace easyfis.Controllers
                         Int32? salesInvoiceCheckedById = null;
                         Int32? salesInvoiceApprovedById = null;
 
-                        var users = from d in db.MstUsers
-                                    select d;
+                        var adminUser = from d in db.MstUsers
+                                        where d.UserName.Equals("admin")
+                                        select d;
 
-                        if (users.Any())
+                        if (adminUser.Any())
                         {
-                            companyId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().CompanyId;
-                            branchId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().BranchId;
-                            incomeAccountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().IncomeAccountId;
-                            customerAdvancesAccountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().CustomerAdvancesAccountId;
-                            defaultSalesInvoiceDiscountId = users.Where(d => d.UserName.Equals("admin")).FirstOrDefault().DefaultSalesInvoiceDiscountId;
-                            salesInvoiceCheckedById = users.Where(d => !d.UserName.Equals("admin")).FirstOrDefault().SalesInvoiceCheckedById;
-                            salesInvoiceApprovedById = users.Where(d => !d.UserName.Equals("admin")).FirstOrDefault().SalesInvoiceApprovedById;
+                            companyId = adminUser.FirstOrDefault().CompanyId;
+                            branchId = adminUser.FirstOrDefault().BranchId;
+                            incomeAccountId = adminUser.FirstOrDefault().IncomeAccountId;
+                            customerAdvancesAccountId = adminUser.FirstOrDefault().CustomerAdvancesAccountId;
+                            defaultSalesInvoiceDiscountId = adminUser.FirstOrDefault().DefaultSalesInvoiceDiscountId;
+                            salesInvoiceCheckedById = adminUser.FirstOrDefault().SalesInvoiceCheckedById;
+                            salesInvoiceApprovedById = adminUser.FirstOrDefault().SalesInvoiceApprovedById;
                         }
 
                         // ======================
