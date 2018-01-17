@@ -41,9 +41,11 @@ namespace easyfis.ModifiedApiControllers
                            IncomeAccountId = d.IncomeAccountId,
                            SupplierAdvancesAccountId = d.SupplierAdvancesAccountId,
                            CustomerAdvancesAccountId = d.CustomerAdvancesAccountId,
-                           OfficialReceiptName = d.OfficialReceiptName,
                            InventoryType = d.InventoryType,
                            DefaultSalesInvoiceDiscountId = d.DefaultSalesInvoiceDiscountId,
+                           SalesInvoiceCheckedById = d.SalesInvoiceCheckedById,
+                           SalesInvoiceApprovedById = d.SalesInvoiceApprovedById,
+                           OfficialReceiptName = d.OfficialReceiptName,
                            SalesInvoiceName = d.SalesInvoiceName,
                            IsIncludeCostStockReports = d.IsIncludeCostStockReports,
                            IsLocked = d.IsLocked,
@@ -269,6 +271,22 @@ namespace easyfis.ModifiedApiControllers
             return userBranches.ToList();
         }
 
+        // ==================
+        // List Current Users
+        // ==================
+        [Authorize, HttpGet, Route("api/manage/current/user/users/list")]
+        public List<Entities.MstUser> ManageCurrentUserListUsers()
+        {
+            var users = from d in db.MstUsers
+                        select new Entities.MstUser
+                        {
+                            Id = d.Id,
+                            FullName = d.FullName
+                        };
+
+            return users.ToList();
+        }
+
         // ===================
         // Update Current User
         // ===================
@@ -326,10 +344,12 @@ namespace easyfis.ModifiedApiControllers
                                         updateCurrentUser.IncomeAccountId = objUser.IncomeAccountId;
                                         updateCurrentUser.SupplierAdvancesAccountId = objUser.SupplierAdvancesAccountId;
                                         updateCurrentUser.CustomerAdvancesAccountId = objUser.CustomerAdvancesAccountId;
-                                        updateCurrentUser.OfficialReceiptName = objUser.OfficialReceiptName;
                                         updateCurrentUser.InventoryType = objUser.InventoryType;
                                         updateCurrentUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
                                         updateCurrentUser.SalesInvoiceName = objUser.SalesInvoiceName;
+                                        updateCurrentUser.SalesInvoiceCheckedById = objUser.SalesInvoiceCheckedById;
+                                        updateCurrentUser.SalesInvoiceApprovedById = objUser.SalesInvoiceApprovedById;
+                                        updateCurrentUser.OfficialReceiptName = objUser.OfficialReceiptName;
                                         updateCurrentUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
                                         updateCurrentUser.UpdatedById = currentUserId;
                                         updateCurrentUser.UpdatedDateTime = DateTime.Now;

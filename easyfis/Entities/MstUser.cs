@@ -17,16 +17,18 @@ namespace easyfis.Entities
         public Int32 IncomeAccountId { get; set; }
         public Int32 SupplierAdvancesAccountId { get; set; }
         public Int32 CustomerAdvancesAccountId { get; set; }
-        public String OfficialReceiptName { get; set; }
         public String InventoryType { get; set; }
         public Int32 DefaultSalesInvoiceDiscountId { get; set; }
         public String SalesInvoiceName { get; set; }
+        public Int32? SalesInvoiceCheckedById { get; set; }
+        public Int32? SalesInvoiceApprovedById { get; set; }
+        public String OfficialReceiptName { get; set; }
         public Boolean IsIncludeCostStockReports { get; set; }
         public Boolean IsLocked { get; set; }
-        public Int32 CreatedById { get; set; }
+        public Int32? CreatedById { get; set; }
         public String CreatedBy { get; set; }
         public String CreatedDateTime { get; set; }
-        public Int32 UpdatedById { get; set; }
+        public Int32? UpdatedById { get; set; }
         public String UpdatedBy { get; set; }
         public String UpdatedDateTime { get; set; }
     }

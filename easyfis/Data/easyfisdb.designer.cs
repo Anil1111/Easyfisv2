@@ -19449,23 +19449,27 @@ namespace easyfis.Data
 		
 		private int _CustomerAdvancesAccountId;
 		
-		private string _OfficialReceiptName;
-		
 		private string _InventoryType;
 		
 		private int _DefaultSalesInvoiceDiscountId;
 		
 		private string _SalesInvoiceName;
 		
+		private System.Nullable<int> _SalesInvoiceCheckedById;
+		
+		private System.Nullable<int> _SalesInvoiceApprovedById;
+		
+		private string _OfficialReceiptName;
+		
 		private bool _IsIncludeCostStockReports;
 		
 		private bool _IsLocked;
 		
-		private int _CreatedById;
+		private System.Nullable<int> _CreatedById;
 		
 		private System.DateTime _CreatedDateTime;
 		
-		private int _UpdatedById;
+		private System.Nullable<int> _UpdatedById;
 		
 		private System.DateTime _UpdatedDateTime;
 		
@@ -19709,23 +19713,27 @@ namespace easyfis.Data
     partial void OnSupplierAdvancesAccountIdChanged();
     partial void OnCustomerAdvancesAccountIdChanging(int value);
     partial void OnCustomerAdvancesAccountIdChanged();
-    partial void OnOfficialReceiptNameChanging(string value);
-    partial void OnOfficialReceiptNameChanged();
     partial void OnInventoryTypeChanging(string value);
     partial void OnInventoryTypeChanged();
     partial void OnDefaultSalesInvoiceDiscountIdChanging(int value);
     partial void OnDefaultSalesInvoiceDiscountIdChanged();
     partial void OnSalesInvoiceNameChanging(string value);
     partial void OnSalesInvoiceNameChanged();
+    partial void OnSalesInvoiceCheckedByIdChanging(System.Nullable<int> value);
+    partial void OnSalesInvoiceCheckedByIdChanged();
+    partial void OnSalesInvoiceApprovedByIdChanging(System.Nullable<int> value);
+    partial void OnSalesInvoiceApprovedByIdChanged();
+    partial void OnOfficialReceiptNameChanging(string value);
+    partial void OnOfficialReceiptNameChanged();
     partial void OnIsIncludeCostStockReportsChanging(bool value);
     partial void OnIsIncludeCostStockReportsChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
-    partial void OnCreatedByIdChanging(int value);
+    partial void OnCreatedByIdChanging(System.Nullable<int> value);
     partial void OnCreatedByIdChanged();
     partial void OnCreatedDateTimeChanging(System.DateTime value);
     partial void OnCreatedDateTimeChanged();
-    partial void OnUpdatedByIdChanging(int value);
+    partial void OnUpdatedByIdChanging(System.Nullable<int> value);
     partial void OnUpdatedByIdChanged();
     partial void OnUpdatedDateTimeChanging(System.DateTime value);
     partial void OnUpdatedDateTimeChanged();
@@ -20068,27 +20076,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OfficialReceiptName", DbType="NVarChar(255)")]
-		public string OfficialReceiptName
-		{
-			get
-			{
-				return this._OfficialReceiptName;
-			}
-			set
-			{
-				if ((this._OfficialReceiptName != value))
-				{
-					this.OnOfficialReceiptNameChanging(value);
-					this.SendPropertyChanging();
-					this._OfficialReceiptName = value;
-					this.SendPropertyChanged("OfficialReceiptName");
-					this.OnOfficialReceiptNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_InventoryType", DbType="NVarChar(255)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_InventoryType", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
 		public string InventoryType
 		{
 			get
@@ -20132,7 +20120,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SalesInvoiceName", DbType="NVarChar(255)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SalesInvoiceName", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
 		public string SalesInvoiceName
 		{
 			get
@@ -20148,6 +20136,66 @@ namespace easyfis.Data
 					this._SalesInvoiceName = value;
 					this.SendPropertyChanged("SalesInvoiceName");
 					this.OnSalesInvoiceNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SalesInvoiceCheckedById", DbType="Int")]
+		public System.Nullable<int> SalesInvoiceCheckedById
+		{
+			get
+			{
+				return this._SalesInvoiceCheckedById;
+			}
+			set
+			{
+				if ((this._SalesInvoiceCheckedById != value))
+				{
+					this.OnSalesInvoiceCheckedByIdChanging(value);
+					this.SendPropertyChanging();
+					this._SalesInvoiceCheckedById = value;
+					this.SendPropertyChanged("SalesInvoiceCheckedById");
+					this.OnSalesInvoiceCheckedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SalesInvoiceApprovedById", DbType="Int")]
+		public System.Nullable<int> SalesInvoiceApprovedById
+		{
+			get
+			{
+				return this._SalesInvoiceApprovedById;
+			}
+			set
+			{
+				if ((this._SalesInvoiceApprovedById != value))
+				{
+					this.OnSalesInvoiceApprovedByIdChanging(value);
+					this.SendPropertyChanging();
+					this._SalesInvoiceApprovedById = value;
+					this.SendPropertyChanged("SalesInvoiceApprovedById");
+					this.OnSalesInvoiceApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_OfficialReceiptName", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string OfficialReceiptName
+		{
+			get
+			{
+				return this._OfficialReceiptName;
+			}
+			set
+			{
+				if ((this._OfficialReceiptName != value))
+				{
+					this.OnOfficialReceiptNameChanging(value);
+					this.SendPropertyChanging();
+					this._OfficialReceiptName = value;
+					this.SendPropertyChanged("OfficialReceiptName");
+					this.OnOfficialReceiptNameChanged();
 				}
 			}
 		}
@@ -20192,8 +20240,8 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedById", DbType="Int NOT NULL")]
-		public int CreatedById
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedById", DbType="Int")]
+		public System.Nullable<int> CreatedById
 		{
 			get
 			{
@@ -20232,8 +20280,8 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdatedById", DbType="Int NOT NULL")]
-		public int UpdatedById
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdatedById", DbType="Int")]
+		public System.Nullable<int> UpdatedById
 		{
 			get
 			{

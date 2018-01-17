@@ -243,12 +243,12 @@ namespace easyfis.Controllers
                         // =============
                         // Customer Name
                         // =============
-                        PdfPTable supplierName = new PdfPTable(1);
+                        PdfPTable customerName = new PdfPTable(1);
                         float[] widthCellsCustomerName = new float[] { 100f };
-                        supplierName.SetWidths(widthCellsCustomerName);
-                        supplierName.WidthPercentage = 100;
-                        supplierName.AddCell(new PdfPCell(new Phrase(salesInvoiceGroupedCustomer.Customer, fontArial10Bold)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 9f, PaddingBottom = 6f });
-                        document.Add(supplierName);
+                        customerName.SetWidths(widthCellsCustomerName);
+                        customerName.WidthPercentage = 100;
+                        customerName.AddCell(new PdfPCell(new Phrase(salesInvoiceGroupedCustomer.Customer, fontArial10Bold)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 9f, PaddingBottom = 6f });
+                        document.Add(customerName);
 
                         var salesInvoicesComputeAges = from d in salesInvoices
                                                        where d.CustomerId == salesInvoiceGroupedCustomer.CustomerId

@@ -265,7 +265,7 @@ namespace easyfis.Controllers
                         FullName = model.FullName,
                     };
 
-                    //var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                    // var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                     var result = await UserManager.CreateAsync(user, model.Password);
                     if (result.Succeeded)
                     {
@@ -301,6 +301,8 @@ namespace easyfis.Controllers
                         var inventoryType = "Moving Average";
                         var defaultSalesInvoiceDiscountId = discount.FirstOrDefault().Id;
                         var salesInvoiceName = "Sales Invoice";
+                        Int32? salesInvoiceCheckedById = null;
+                        Int32? salesInvoiceApprovedById = null;
 
                         var adminUser = from d in db.MstUsers
                                         where d.UserName.Equals("admin")
@@ -313,8 +315,13 @@ namespace easyfis.Controllers
                             incomeAccountId = adminUser.FirstOrDefault().IncomeAccountId;
                             customerAdvancesAccountId = adminUser.FirstOrDefault().CustomerAdvancesAccountId;
                             defaultSalesInvoiceDiscountId = adminUser.FirstOrDefault().DefaultSalesInvoiceDiscountId;
+                            salesInvoiceCheckedById = adminUser.FirstOrDefault().SalesInvoiceCheckedById;
+                            salesInvoiceApprovedById = adminUser.FirstOrDefault().SalesInvoiceApprovedById;
                         }
 
+                        // ======================
+                        // Create Registered User
+                        // ======================
                         Data.MstUser newMstUser = new Data.MstUser
                         {
                             UserId = user.Id,
@@ -326,34 +333,49 @@ namespace easyfis.Controllers
                             IncomeAccountId = incomeAccountId,
                             SupplierAdvancesAccountId = supplierAdvancesAccountId,
                             CustomerAdvancesAccountId = customerAdvancesAccountId,
-                            OfficialReceiptName = officialReceiptName,
                             InventoryType = inventoryType,
                             DefaultSalesInvoiceDiscountId = defaultSalesInvoiceDiscountId,
                             SalesInvoiceName = salesInvoiceName,
+                            SalesInvoiceCheckedById = salesInvoiceCheckedById,
+                            SalesInvoiceApprovedById = salesInvoiceApprovedById,
+                            OfficialReceiptName = officialReceiptName,
                             IsIncludeCostStockReports = false,
                             IsLocked = false,
-                            CreatedById = 0,
+                            CreatedById = null,
                             CreatedDateTime = DateTime.Now,
-                            UpdatedById = 0,
+                            UpdatedById = null,
                             UpdatedDateTime = DateTime.Now
                         };
 
                         db.MstUsers.InsertOnSubmit(newMstUser);
                         db.SubmitChanges();
 
+                        // ==========================
+                        // Current Registered User Id
+                        // ==========================
+                        var currentRegisteredUserId = newMstUser.Id;
+
+                        // ======================
+                        // Update Registered User
+                        // ======================
                         var mstUsersData = from d in db.MstUsers
-                                           where d.Id == newMstUser.Id
+                                           where d.Id == currentRegisteredUserId
                                            select d;
 
                         if (mstUsersData.Any())
                         {
                             var updateMstUsersData = mstUsersData.FirstOrDefault();
-                            updateMstUsersData.CreatedById = newMstUser.Id;
-                            updateMstUsersData.UpdatedById = newMstUser.Id;
+                            updateMstUsersData.CreatedById = currentRegisteredUserId;
+                            updateMstUsersData.CreatedDateTime = DateTime.Now;
+                            updateMstUsersData.UpdatedById = currentRegisteredUserId;
+                            updateMstUsersData.UpdatedDateTime = DateTime.Now;
 
                             db.SubmitChanges();
                         }
 
+                        // =============================
+                        // Create Registered User Branch
+                        // =============================
                         Data.MstUserBranch newUserBranch = new Data.MstUserBranch
                         {
                             UserId = newMstUser.Id,

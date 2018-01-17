@@ -16,6 +16,32 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ==================
+        // Get User Full Name
+        // ==================
+        public String GetCurrentUserFullName(Int32? id)
+        {
+            if (id != null)
+            {
+                var mstUser = from d in db.MstUsers
+                              where d.Id == id
+                              select d;
+
+                if (mstUser.Any())
+                {
+                    return mstUser.FirstOrDefault().FullName;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else
+            {
+                return "";
+            }
+        }
+
         // =========
         // List User
         // =========
@@ -36,7 +62,11 @@ namespace easyfis.ModifiedApiControllers
                                 Id = d.Id,
                                 UserName = d.UserName,
                                 FullName = d.FullName,
-                                IsLocked = d.IsLocked
+                                IsLocked = d.IsLocked,
+                                CreatedBy = GetCurrentUserFullName(d.CreatedById),
+                                CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                UpdatedBy = GetCurrentUserFullName(d.UpdatedById),
+                                UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
                             };
 
                 return users.ToList();
@@ -50,7 +80,11 @@ namespace easyfis.ModifiedApiControllers
                                 Id = d.Id,
                                 UserName = d.UserName,
                                 FullName = d.FullName,
-                                IsLocked = d.IsLocked
+                                IsLocked = d.IsLocked,
+                                CreatedBy = GetCurrentUserFullName(d.CreatedById),
+                                CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                UpdatedBy = GetCurrentUserFullName(d.UpdatedById),
+                                UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
                             };
 
                 return users.ToList();
@@ -76,12 +110,18 @@ namespace easyfis.ModifiedApiControllers
                            IncomeAccountId = d.IncomeAccountId,
                            SupplierAdvancesAccountId = d.SupplierAdvancesAccountId,
                            CustomerAdvancesAccountId = d.CustomerAdvancesAccountId,
-                           OfficialReceiptName = d.OfficialReceiptName,
                            InventoryType = d.InventoryType,
                            DefaultSalesInvoiceDiscountId = d.DefaultSalesInvoiceDiscountId,
                            SalesInvoiceName = d.SalesInvoiceName,
+                           SalesInvoiceCheckedById = d.SalesInvoiceCheckedById,
+                           SalesInvoiceApprovedById = d.SalesInvoiceApprovedById,
+                           OfficialReceiptName = d.OfficialReceiptName,
                            IsIncludeCostStockReports = d.IsIncludeCostStockReports,
                            IsLocked = d.IsLocked,
+                           CreatedBy = GetCurrentUserFullName(d.CreatedById),
+                           CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                           UpdatedBy = GetCurrentUserFullName(d.UpdatedById),
+                           UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
                        };
 
             if (user.Any())
@@ -192,6 +232,22 @@ namespace easyfis.ModifiedApiControllers
             return discounts.ToList();
         }
 
+        // =============================
+        // Dropdown List - Users (Field)
+        // =============================
+        [Authorize, HttpGet, Route("api/user/dropdown/list/users")]
+        public List<Entities.MstUser> DropdownListUserListUsers()
+        {
+            var users = from d in db.MstUsers
+                        select new Entities.MstUser
+                        {
+                            Id = d.Id,
+                            FullName = d.FullName
+                        };
+
+            return users.ToList();
+        }
+
         // =========
         // Lock User
         // =========
@@ -249,10 +305,12 @@ namespace easyfis.ModifiedApiControllers
                                                 lockUser.IncomeAccountId = objUser.IncomeAccountId;
                                                 lockUser.SupplierAdvancesAccountId = objUser.SupplierAdvancesAccountId;
                                                 lockUser.CustomerAdvancesAccountId = objUser.CustomerAdvancesAccountId;
-                                                lockUser.OfficialReceiptName = objUser.OfficialReceiptName;
                                                 lockUser.InventoryType = objUser.InventoryType;
                                                 lockUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
                                                 lockUser.SalesInvoiceName = objUser.SalesInvoiceName;
+                                                lockUser.SalesInvoiceCheckedById = objUser.SalesInvoiceCheckedById;
+                                                lockUser.SalesInvoiceApprovedById = objUser.SalesInvoiceApprovedById;
+                                                lockUser.OfficialReceiptName = objUser.OfficialReceiptName;
                                                 lockUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
                                                 lockUser.IsLocked = true;
                                                 lockUser.UpdatedById = currentUserId;

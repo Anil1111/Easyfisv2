@@ -84,6 +84,9 @@
         var cboInventoryType = new wijmo.input.ComboBox('#cboInventoryType');
         var cboDiscounts = new wijmo.input.ComboBox('#cboDiscounts');
 
+        var cboSalesInvoiceCheckedBy = new wijmo.input.ComboBox('#cboSalesInvoiceCheckedBy');
+        var cboSalesInvoiceApprovedBy = new wijmo.input.ComboBox('#cboSalesInvoiceApprovedBy');
+
         var userForms;
         var userFormGrid;
 
@@ -381,6 +384,51 @@
                         });
                     }
 
+                    getCurrentUsersList();
+                }
+            });
+        }
+
+        // ==================
+        // Current Users List
+        // ==================
+        function getCurrentUsersList() {
+            var usersObservableArray = new wijmo.collections.ObservableArray;
+            $.ajax({
+                url: '/api/manage/current/user/users/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            usersObservableArray.push({
+                                Id: results[i]["Id"],
+                                FullName: results[i]["FullName"]
+                            });
+                        }
+
+                        cboSalesInvoiceCheckedBy.dispose();
+                        cboSalesInvoiceCheckedBy = new wijmo.input.ComboBox('#cboSalesInvoiceCheckedBy', {
+                            disabled: true,
+                            isEditable: false,
+                            placeholder: "Select User",
+                            itemsSource: usersObservableArray,
+                            displayMemberPath: "FullName",
+                            selectedValuePath: "Id"
+                        });
+
+                        cboSalesInvoiceApprovedBy.dispose();
+                        cboSalesInvoiceApprovedBy = new wijmo.input.ComboBox('#cboSalesInvoiceApprovedBy', {
+                            disabled: true,
+                            isEditable: false,
+                            placeholder: "Select User",
+                            itemsSource: usersObservableArray,
+                            displayMemberPath: "FullName",
+                            selectedValuePath: "Id"
+                        });
+                    }
+
                     getCurrentLoggedInUser();
                 }
             });
@@ -411,6 +459,9 @@
                         document.getElementById("defaultOfficialReceiptName").value = results.OfficialReceiptName;
                         document.getElementById("defaultSalesInvoiceName").value = results.SalesInvoiceName;
                         document.getElementById("defaultIncludeCostInStockReport").checked = results.IsIncludeCostStockReports;
+
+                        cboSalesInvoiceCheckedBy.selectedValue = results.SalesInvoiceCheckedById;
+                        cboSalesInvoiceApprovedBy.selectedValue = results.SalesInvoiceApprovedById;
 
                         createCboShowRows();
                         createCurrentUserFormFlexGrid();
@@ -531,10 +582,12 @@
                 userObject.IncomeAccountId = cboIncomeAccount.selectedValue;
                 userObject.SupplierAdvancesAccountId = cboSupplierAvancesAccount.selectedValue;
                 userObject.CustomerAdvancesAccountId = cboCustomerAdvancesAccount.selectedValue;
-                userObject.OfficialReceiptName = document.getElementById("defaultOfficialReceiptName").value;
                 userObject.InventoryType = cboInventoryType.selectedValue;
                 userObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedValue;
                 userObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
+                userObject.SalesInvoiceCheckedById = cboSalesInvoiceCheckedBy.selectedValue;
+                userObject.SalesInvoiceApprovedById = cboSalesInvoiceApprovedBy.selectedValue;
+                userObject.OfficialReceiptName = document.getElementById("defaultOfficialReceiptName").value;
                 userObject.IsIncludeCostStockReports = document.getElementById("defaultIncludeCostInStockReport").checked;
                 var data = JSON.stringify(userObject);
 
@@ -587,6 +640,8 @@
             document.getElementById('userDetail_Fullname').disabled = false;
             cboCompany.disabled = false;
             cboBranch.disabled = false;
+            cboSalesInvoiceCheckedBy.disabled = false;
+            cboSalesInvoiceApprovedBy.disabled = false;
             //document.getElementById('defaultSalesInvoiceName').disabled = false;
             //cboDiscounts.disabled = false;
             //document.getElementById('defaultOfficialReceiptName').disabled = false;
