@@ -350,11 +350,32 @@ namespace easyfis.Controllers
                 var checkedBy = " ";
                 var approvedBy = " ";
 
-                var mstUsers = from d in db.MstUsers select d;
+                var mstUsers = from d in db.MstUsers
+                               select new
+                               {
+                                   Id = d.Id,
+                                   FullName = d.FullName
+                               };
+
                 if (mstUsers.Any())
                 {
-                    checkedBy = mstUsers.Where(d => d.Id == currentUser.FirstOrDefault().SalesInvoiceCheckedById).FirstOrDefault().FullName;
-                    approvedBy = mstUsers.Where(d => d.Id == currentUser.FirstOrDefault().SalesInvoiceApprovedById).FirstOrDefault().FullName;
+                    var checkedByUser = from d in mstUsers
+                                        where d.Id == currentUser.FirstOrDefault().SalesInvoiceCheckedById
+                                        select d;
+
+                    if (checkedByUser.Any())
+                    {
+                        checkedBy = checkedByUser.FirstOrDefault().FullName;
+                    }
+
+                    var approvedByUser = from d in mstUsers
+                                         where d.Id == currentUser.FirstOrDefault().SalesInvoiceApprovedById
+                                         select d;
+
+                    if (approvedByUser.Any())
+                    {
+                        approvedBy = approvedByUser.FirstOrDefault().FullName;
+                    }
                 }
 
                 document.Add(spaceTable);
