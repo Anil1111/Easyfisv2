@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Collection Summary Report List
         // ==============================
         [Authorize, HttpGet, Route("api/collectionSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnCollection> ListCollectionSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepCollectionSummaryReport> ListCollectionSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var collections = from d in db.TrnCollections
                               where d.BranchId == Convert.ToInt32(branchId)
@@ -27,18 +27,51 @@ namespace easyfis.ApiControllers
                               && d.ORDate >= Convert.ToDateTime(startDate)
                               && d.ORDate <= Convert.ToDateTime(endDate)
                               && d.IsLocked == true
-                              select new Models.TrnCollection
+                              select new Entities.RepCollectionSummaryReport
                               {
-                                  Id = d.Id,
+                                  ORId = d.Id,
                                   Branch = d.MstBranch.Branch,
                                   ORNumber = d.ORNumber,
                                   ORDate = d.ORDate.ToShortDateString(),
                                   Customer = d.MstArticle.Article,
-                                  Particulars = d.Particulars,
-                                  Amount = d.TrnCollectionLines.Sum(a => a.Amount)
+                                  ManualORNumber = d.ManualORNumber,
+                                  Amount = d.TrnCollectionLines != null ? d.TrnCollectionLines.Sum(a => a.Amount) : 0
                               };
 
             return collections.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/collectionSummaryReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListCollectionSummaryReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/collectionSummaryReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListCollectionSummaryReportBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }
