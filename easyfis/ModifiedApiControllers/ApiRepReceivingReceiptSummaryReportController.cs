@@ -36,6 +36,7 @@ namespace easyfis.ApiControllers
                                         RRDate = d.RRDate.ToShortDateString(),
                                         Supplier = d.MstArticle.Article,
                                         Term = d.MstArticle.MstTerm.Term,
+                                        Remarks = d.Remarks,
                                         DocumentReference = d.DocumentReference,
                                         Amount = d.Amount,
                                         WTaxAmount = d.WTaxAmount,

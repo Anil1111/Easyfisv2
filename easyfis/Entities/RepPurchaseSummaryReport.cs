@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public String PODate { get; set; }
         public String Supplier { get; set; }
         public String Term { get; set; }
+        public String Remarks { get; set; }
         public String ManualRequestNumber { get; set; }
         public String DateNeeded { get; set; }
         public Boolean IsClose { get; set; }

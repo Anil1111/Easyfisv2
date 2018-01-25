@@ -33,6 +33,7 @@ namespace easyfis.ApiControllers
                                          PONumber = d.TrnPurchaseOrder.PONumber,
                                          PODate = d.TrnPurchaseOrder.PODate.ToShortDateString(),
                                          Supplier = d.TrnPurchaseOrder.MstArticle.Article,
+                                         Remarks = d.TrnPurchaseOrder.Remarks,
                                          Quantity = d.Quantity,
                                          Unit = d.MstUnit.Unit,
                                          Item = d.MstArticle.Article,

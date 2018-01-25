@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public String RRDate { get; set; }
         public String Supplier { get; set; }
         public String Term { get; set; }
+        public String Remarks { get; set; }
         public String DocumentReference { get; set; }
         public Decimal Amount { get; set; }
         public Decimal WTaxAmount { get; set; }

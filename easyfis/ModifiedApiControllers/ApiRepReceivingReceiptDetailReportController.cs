@@ -34,6 +34,7 @@ namespace easyfis.ApiControllers
                                             RRDate = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
                                             RRNumber = d.TrnReceivingReceipt.RRNumber,
                                             Supplier = d.TrnReceivingReceipt.MstArticle.Article,
+                                            Remarks = d.TrnReceivingReceipt.Remarks,
                                             PONumber = d.TrnPurchaseOrder.PONumber,
                                             ItemCode = d.MstArticle.ManualArticleCode,
                                             ItemDescription = d.MstArticle.Article,

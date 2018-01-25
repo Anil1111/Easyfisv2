@@ -33,6 +33,7 @@ namespace easyfis.ApiControllers
                                      PODate = d.PODate.ToShortDateString(),
                                      Supplier = d.MstArticle.Article,
                                      Term = d.MstTerm.Term,
+                                     Remarks = d.Remarks,
                                      ManualRequestNumber = d.ManualRequestNumber,
                                      DateNeeded = d.DateNeeded.ToShortDateString(),
                                      IsClose = d.IsClose,

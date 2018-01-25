@@ -12,6 +12,7 @@ namespace easyfis.Entities
         public String RRNumber { get; set; }
         public String RRDate { get; set; }
         public String Supplier { get; set; }
+        public String Remarks { get; set; }
         public String PONumber { get; set; }
         public String ItemCode { get; set; }
         public String ItemDescription { get; set; }

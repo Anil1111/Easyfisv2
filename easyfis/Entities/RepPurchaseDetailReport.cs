@@ -12,6 +12,7 @@ namespace easyfis.Entities
         public String PONumber { get; set; }
         public String PODate { get; set; }
         public String Supplier { get; set; }
+        public String Remarks { get; set; }
         public Decimal Quantity { get; set; }
         public String Unit { get; set; }
         public String Item { get; set; }
