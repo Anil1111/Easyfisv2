@@ -32,21 +32,21 @@ namespace easyfis.ApiControllers
                                        Branch = d.TrnSalesInvoice.MstBranch.Branch,
                                        ItemId = d.ItemId,
                                        Item = d.MstArticle.Article,
-                                       BasePrice = d.MstArticle.Price,
-                                       BaseUnit = d.MstArticle.MstUnit.Unit
+                                       Unit = d.MstUnit.Unit,
+                                       Price = d.Price
                                    } into g
                                    select new Models.TrnSalesInvoiceItem
                                    {
                                        Branch = g.Key.Branch,
                                        ItemId = g.Key.ItemId,
                                        Item = g.Key.Item,
-                                       BaseUnit = g.Key.BaseUnit,
-                                       BaseQuantity = g.Sum(d => d.BaseQuantity),
-                                       BasePrice = g.Key.BasePrice,
-                                       Amount = g.Sum(d => d.BaseQuantity) * g.Key.BasePrice
+                                       Unit = g.Key.Unit,
+                                       Quantity = g.Sum(d => d.Quantity),
+                                       Price = g.Key.Price,
+                                       Amount = g.Sum(d => d.Amount)
                                    };
 
-            return salesInvoiceItem.OrderByDescending(q => q.BaseQuantity).ToList();
+            return salesInvoiceItem.OrderByDescending(q => q.Quantity).ToList();
         }
     }
 }
