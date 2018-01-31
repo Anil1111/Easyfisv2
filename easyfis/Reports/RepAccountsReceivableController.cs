@@ -120,7 +120,7 @@ namespace easyfis.Controllers
             headerPage.SetWidths(widthsCellsHeaderPage);
             headerPage.WidthPercentage = 100;
             headerPage.AddCell(new PdfPCell(new Phrase(companyName, fontArial17Bold)) { Border = 0 });
-            headerPage.AddCell(new PdfPCell(new Phrase("Accounts Payable", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
+            headerPage.AddCell(new PdfPCell(new Phrase("Accounts Receivable", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(address, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Date as of " + Convert.ToDateTime(DateAsOf).ToString("MM-dd-yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2, });
             headerPage.AddCell(new PdfPCell(new Phrase(contactNo, fontArial11)) { Border = 0, PaddingTop = 5f });
