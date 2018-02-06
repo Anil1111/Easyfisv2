@@ -360,7 +360,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockStockTransfer.IsLocked)
                                     {
-                                        journal.insertSTJournal(Convert.ToInt32(id));
+                                        journal.InsertStockTransferJournal(Convert.ToInt32(id));
                                         inventory.InsertStockTransferInventory(Convert.ToInt32(id));
                                     }
 
@@ -446,7 +446,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockStockTransfer.IsLocked)
                                     {
-                                        journal.deleteSTJournal(Convert.ToInt32(id));
+                                        journal.DeleteStockTransferJournal(Convert.ToInt32(id));
                                         inventory.DeleteStockTransferInventory(Convert.ToInt32(id));
                                     }
 

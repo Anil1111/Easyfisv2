@@ -472,7 +472,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    journal.insertCVJournal(Convert.ToInt32(id));
+                    journal.InsertCashVoucherJournal(Convert.ToInt32(id));
                     updateAPDisbursement(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -509,7 +509,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    journal.deleteCVJournal(Convert.ToInt32(id));
+                    journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
                     updateAPDisbursement(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);

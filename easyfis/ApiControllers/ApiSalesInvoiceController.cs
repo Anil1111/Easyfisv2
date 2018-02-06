@@ -436,7 +436,7 @@ namespace easyfis.Controllers
                     db.SubmitChanges();
 
                     inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
-                    journal.insertSIJournal(Convert.ToInt32(id));
+                    journal.InsertSalesInvoiceJournal(Convert.ToInt32(id));
 
                     // Check for negative inventory
                     bool foundNegativeQuantity = false;
@@ -469,7 +469,7 @@ namespace easyfis.Controllers
                     else
                     {
                         inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
-                        journal.deleteSIJournal(Convert.ToInt32(id));
+                        journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
 
                         updateSalesInvoice.IsLocked = false;
                         db.SubmitChanges();
@@ -513,12 +513,12 @@ namespace easyfis.Controllers
                     if (updateSalesInvoice.IsLocked == true)
                     {
                         inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
-                        journal.insertSIJournal(Convert.ToInt32(id));
+                        journal.InsertSalesInvoiceJournal(Convert.ToInt32(id));
                     }
                     else
                     {
                         inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
-                        journal.deleteSIJournal(Convert.ToInt32(id));
+                        journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
                     }
 
                     return Request.CreateResponse(HttpStatusCode.OK);

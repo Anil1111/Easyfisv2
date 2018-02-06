@@ -458,12 +458,12 @@ namespace easyfis.Controllers
                     if (updatereceivingReceipt.IsLocked == true)
                     {
                         inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
-                        journal.insertRRJournal(Convert.ToInt32(id));
+                        journal.InsertReceivingReceiptJournal(Convert.ToInt32(id));
                     }
                     else
                     {
                         inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
-                        journal.deleteRRJournal(Convert.ToInt32(id));
+                        journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
                     }
 
                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -503,12 +503,12 @@ namespace easyfis.Controllers
                     if (updatereceivingReceipt.IsLocked == true)
                     {
                         inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
-                        journal.insertRRJournal(Convert.ToInt32(id));
+                        journal.InsertReceivingReceiptJournal(Convert.ToInt32(id));
                     }
                     else
                     {
                         inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
-                        journal.deleteRRJournal(Convert.ToInt32(id));
+                        journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
                     }
 
                     return Request.CreateResponse(HttpStatusCode.OK);

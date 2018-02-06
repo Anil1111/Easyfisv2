@@ -486,7 +486,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockDisbursement.IsLocked)
                                     {
-                                        journal.insertCVJournal(Convert.ToInt32(id));
+                                        journal.InsertCashVoucherJournal(Convert.ToInt32(id));
                                         UpdateAccountsPayable(Convert.ToInt32(id));
                                     }
 
@@ -571,7 +571,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockDisbursement.IsLocked)
                                     {
-                                        journal.deleteCVJournal(Convert.ToInt32(id));
+                                        journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
                                         UpdateAccountsPayable(Convert.ToInt32(id));
                                     }
 

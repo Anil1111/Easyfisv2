@@ -404,7 +404,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockCollection.IsLocked)
                                     {
-                                        journal.insertORJournal(Convert.ToInt32(id));
+                                        journal.InsertOfficialReceiptJournal(Convert.ToInt32(id));
                                         UpdateAccountsReceivable(Convert.ToInt32(id));
                                     }
 
@@ -489,7 +489,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockCollection.IsLocked)
                                     {
-                                        journal.deleteORJournal(Convert.ToInt32(id));
+                                        journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
                                         UpdateAccountsReceivable(Convert.ToInt32(id));
                                     }
 

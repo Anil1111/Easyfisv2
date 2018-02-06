@@ -341,7 +341,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    journal.insertORJournal(Convert.ToInt32(id));
+                    journal.InsertOfficialReceiptJournal(Convert.ToInt32(id));
                     UpdateARCollection(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -378,7 +378,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    journal.deleteORJournal(Convert.ToInt32(id));
+                    journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
                     UpdateARCollection(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);

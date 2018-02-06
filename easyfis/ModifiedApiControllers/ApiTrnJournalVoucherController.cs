@@ -404,7 +404,7 @@ namespace easyfis.ModifiedApiControllers
 
                                         if (lockJournalVoucher.IsLocked)
                                         {
-                                            journal.insertJVJournal(Convert.ToInt32(id));
+                                            journal.InsertJournalVoucherJournal(Convert.ToInt32(id));
                                             UpdateBalances(Convert.ToInt32(id));
                                         }
 
@@ -494,7 +494,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockJournalVoucher.IsLocked)
                                     {
-                                        journal.deleteJVJournal(Convert.ToInt32(id));
+                                        journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
                                         UpdateBalances(Convert.ToInt32(id));
                                     }
 

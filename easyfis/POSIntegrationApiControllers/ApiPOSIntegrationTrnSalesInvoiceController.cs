@@ -572,7 +572,7 @@ namespace easyfis.POSIntegrationApiControllers
                                 if (salesInvoiceForBusiness.Any())
                                 {
                                     inventory.InsertSalesInvoiceInventory(Convert.ToInt32(salesInvoiceForBusiness.FirstOrDefault().Id));
-                                    journal.insertSIJournal(Convert.ToInt32(salesInvoiceForBusiness.FirstOrDefault().Id));
+                                    journal.InsertSalesInvoiceJournal(Convert.ToInt32(salesInvoiceForBusiness.FirstOrDefault().Id));
                                 }
 
                                 return Request.CreateResponse(HttpStatusCode.OK, addSalesInvoice.SINumber);

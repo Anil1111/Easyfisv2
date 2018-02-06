@@ -372,7 +372,7 @@ namespace easyfis.Controllers
                     updateJournalVoucher.UpdatedById = userId;
                     updateJournalVoucher.UpdatedDateTime = DateTime.Now;
 
-                    postJournal.insertJVJournal(Convert.ToInt32(id));
+                    postJournal.InsertJournalVoucherJournal(Convert.ToInt32(id));
                     db.SubmitChanges();
 
                     updateBalances(Convert.ToInt32(id));
@@ -408,7 +408,7 @@ namespace easyfis.Controllers
                     updateJournalVoucher.UpdatedById = userId;
                     updateJournalVoucher.UpdatedDateTime = DateTime.Now;
 
-                    postJournal.deleteJVJournal(Convert.ToInt32(id));
+                    postJournal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
                     db.SubmitChanges();
 
                     updateBalances(Convert.ToInt32(id));

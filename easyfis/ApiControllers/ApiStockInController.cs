@@ -284,7 +284,7 @@ namespace easyfis.Controllers
                     db.SubmitChanges();
 
                     inventory.InsertStockInInventory(Convert.ToInt32(id));
-                    journal.insertINJournal(Convert.ToInt32(id));
+                    journal.InsertStockInJournal(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
@@ -321,7 +321,7 @@ namespace easyfis.Controllers
                     db.SubmitChanges();
 
                     inventory.DeleteStockInInventory(Convert.ToInt32(id));
-                    journal.deleteINJournal(Convert.ToInt32(id));
+                    journal.DeleteStockInJournal(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
