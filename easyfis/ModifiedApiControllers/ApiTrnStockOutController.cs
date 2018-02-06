@@ -406,7 +406,7 @@ namespace easyfis.ModifiedApiControllers
                                     if (lockStockOut.IsLocked)
                                     {
                                         journal.insertOTJournal(Convert.ToInt32(id));
-                                        inventory.InsertOTInventory(Convert.ToInt32(id));
+                                        inventory.InsertStockOutInventory(Convert.ToInt32(id));
                                     }
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -492,7 +492,7 @@ namespace easyfis.ModifiedApiControllers
                                     if (!unlockStockOut.IsLocked)
                                     {
                                         journal.deleteOTJournal(Convert.ToInt32(id));
-                                        inventory.deleteOTInventory(Convert.ToInt32(id));
+                                        inventory.DeleteStockOutInventory(Convert.ToInt32(id));
                                     }
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

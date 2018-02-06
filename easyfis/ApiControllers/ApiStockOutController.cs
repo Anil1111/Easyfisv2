@@ -270,7 +270,7 @@ namespace easyfis.Controllers
                     updateStockOut.UpdatedDateTime = DateTime.Now;
                     db.SubmitChanges();
 
-                    inventory.InsertOTInventory(Convert.ToInt32(id));
+                    inventory.InsertStockOutInventory(Convert.ToInt32(id));
                     journal.insertOTJournal(Convert.ToInt32(id));
 
                     // Check for negative inventory
@@ -303,7 +303,7 @@ namespace easyfis.Controllers
                     }
                     else
                     {
-                        inventory.deleteOTInventory(Convert.ToInt32(id));
+                        inventory.DeleteStockOutInventory(Convert.ToInt32(id));
                         journal.deleteOTJournal(Convert.ToInt32(id));
 
                         updateStockOut.IsLocked = false;
@@ -344,7 +344,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    inventory.deleteOTInventory(Convert.ToInt32(id));
+                    inventory.DeleteStockOutInventory(Convert.ToInt32(id));
                     journal.deleteOTJournal(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);

@@ -268,7 +268,7 @@ namespace easyfis.Controllers
                     updateStockTransfer.UpdatedDateTime = DateTime.Now;
                     db.SubmitChanges();
 
-                    inventory.InsertSTInventory(Convert.ToInt32(id));
+                    inventory.InsertStockTransferInventory(Convert.ToInt32(id));
                     journal.insertSTJournal(Convert.ToInt32(id));
 
                     // Check for negative inventory
@@ -301,7 +301,7 @@ namespace easyfis.Controllers
                     }
                     else
                     {
-                        inventory.deleteSTInventory(Convert.ToInt32(id));
+                        inventory.DeleteStockTransferInventory(Convert.ToInt32(id));
                         journal.deleteSTJournal(Convert.ToInt32(id));
 
                         updateStockTransfer.IsLocked = false;
@@ -343,7 +343,7 @@ namespace easyfis.Controllers
 
                     db.SubmitChanges();
 
-                    inventory.deleteSTInventory(Convert.ToInt32(id));
+                    inventory.DeleteStockTransferInventory(Convert.ToInt32(id));
                     journal.deleteSTJournal(Convert.ToInt32(id));
 
                     return Request.CreateResponse(HttpStatusCode.OK);
