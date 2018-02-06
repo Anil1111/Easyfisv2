@@ -435,7 +435,7 @@ namespace easyfis.Controllers
                     updateSalesInvoice.UpdatedDateTime = DateTime.Now;
                     db.SubmitChanges();
 
-                    inventory.InsertSIInventory(Convert.ToInt32(id));
+                    inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
                     journal.insertSIJournal(Convert.ToInt32(id));
 
                     // Check for negative inventory
@@ -468,7 +468,7 @@ namespace easyfis.Controllers
                     }
                     else
                     {
-                        inventory.deleteSIInventory(Convert.ToInt32(id));
+                        inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
                         journal.deleteSIJournal(Convert.ToInt32(id));
 
                         updateSalesInvoice.IsLocked = false;
@@ -512,12 +512,12 @@ namespace easyfis.Controllers
 
                     if (updateSalesInvoice.IsLocked == true)
                     {
-                        inventory.InsertSIInventory(Convert.ToInt32(id));
+                        inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
                         journal.insertSIJournal(Convert.ToInt32(id));
                     }
                     else
                     {
-                        inventory.deleteSIInventory(Convert.ToInt32(id));
+                        inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
                         journal.deleteSIJournal(Convert.ToInt32(id));
                     }
 

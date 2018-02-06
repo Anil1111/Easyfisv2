@@ -247,6 +247,11 @@ namespace easyfis.Controllers
                 secretKey = "6LfHv0AUAAAAAASIFWnsD9ZdkN3f-bNWQ7XMGLPJ";
             }
 
+            if (host.Equals("arterra.easyfis.com"))
+            {
+                secretKey = "6LezWEQUAAAAAAn52pEfyFxPWnAcAOPgMGbBFw5D";
+            }
+
             var client = new System.Net.WebClient();
             var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
             var verificationResult = JsonConvert.DeserializeObject<CaptchaVerificationResult>(verificationResultJson);

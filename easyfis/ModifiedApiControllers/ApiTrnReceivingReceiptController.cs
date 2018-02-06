@@ -418,7 +418,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockReceivingReceipt.IsLocked)
                                     {
-                                        inventory.InsertRRInventory(Convert.ToInt32(id));
+                                        inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
                                         journal.insertRRJournal(Convert.ToInt32(id));
                                     }
 
@@ -504,7 +504,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockReceivingReceipt.IsLocked)
                                     {
-                                        inventory.deleteRRInventory(Convert.ToInt32(id));
+                                        inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                                         journal.deleteRRJournal(Convert.ToInt32(id));
                                     }
 

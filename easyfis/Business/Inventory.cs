@@ -9,6 +9,9 @@ namespace easyfis.Business
 {
     public class Inventory
     {
+        // ============
+        // Data Context
+        // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
         // =========================
@@ -16,15 +19,13 @@ namespace easyfis.Business
         // =========================
         public void UpdateArticleInventory(Int32 ArticleInventoryId, String InventoryType)
         {
-
-            // retrieve inventories
             var inventories = from d in db.TrnInventories
                               where d.ArticleInventoryId == ArticleInventoryId
                               group d by new
                               {
                                   ArticleInventoryId = d.ArticleInventoryId
                               } into g
-                              select new Models.TrnInventory
+                              select new
                               {
                                   ArticleInventoryId = g.Key.ArticleInventoryId,
                                   Quantity = g.Sum(d => d.Quantity),
@@ -37,34 +38,38 @@ namespace easyfis.Business
             {
                 if (InventoryType.Equals("Moving Average"))
                 {
-                    // moving average
+                    // ==============
+                    // Moving Average
+                    // ==============
                     var updateArticleInventories = from d in db.MstArticleInventories
                                                    where d.Id == ArticleInventoryId
                                                    select d;
 
                     if (updateArticleInventories.Any())
                     {
-                        var updateArticleInventory = updateArticleInventories.FirstOrDefault();
-
-                        updateArticleInventory.Quantity = inventories.FirstOrDefault().Quantity;
+                        Decimal cost = inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity;
+                        Decimal amount = (inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity) * inventories.FirstOrDefault().Quantity;
 
                         if (inventories.FirstOrDefault().PositiveQuantity == 0)
                         {
-                            updateArticleInventory.Cost = 0;
-                            updateArticleInventory.Amount = 0;
+                            cost = 0;
+                            amount = 0;
                         }
-                        else
-                        {
-                            updateArticleInventory.Cost = inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity;
-                            updateArticleInventory.Amount = (inventories.FirstOrDefault().PositiveAmount / inventories.FirstOrDefault().PositiveQuantity) * inventories.FirstOrDefault().Quantity;
-                        }
+
+                        var updateArticleInventory = updateArticleInventories.FirstOrDefault();
+
+                        updateArticleInventory.Quantity = inventories.FirstOrDefault().Quantity;
+                        updateArticleInventory.Cost = cost;
+                        updateArticleInventory.Amount = amount;
 
                         db.SubmitChanges();
                     }
                 }
                 else
                 {
-                    // specific identification
+                    // =======================
+                    // Specific Identification
+                    // =======================
                     var updateArticleInventories = from d in db.MstArticleInventories
                                                    where d.Id == ArticleInventoryId
                                                    select d;
@@ -96,6 +101,370 @@ namespace easyfis.Business
 
                     db.SubmitChanges();
                 }
+            }
+        }
+
+        // ==================================
+        // Insert Receiving Receipt Inventory
+        // ==================================
+        public void InsertReceivingReceiptInventory(Int32 RRId)
+        {
+            try
+            {
+                var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                            where d.RRId == RRId
+                                            && d.MstArticle.IsInventory == true
+                                            select new
+                                            {
+                                                RRId = d.RRId,
+                                                RRNumber = d.TrnReceivingReceipt.RRNumber,
+                                                RRDate = d.TrnReceivingReceipt.RRDate,
+                                                ItemId = d.ItemId,
+                                                Particulars = d.Particulars,
+                                                Quantity = d.Quantity,
+                                                Cost = d.Cost,
+                                                Amount = d.Amount,
+                                                VATAmount = d.VATAmount,
+                                                WTAXAmount = d.WTAXAmount,
+                                                BranchId = d.BranchId,
+                                                BranchCode = d.MstBranch.BranchCode,
+                                                BaseQuantity = d.BaseQuantity,
+                                                BaseCost = d.BaseCost,
+                                                InventoryType = d.TrnReceivingReceipt.MstUser5.InventoryType
+                                            };
+
+                if (receivingReceiptItems.Any())
+                {
+                    foreach (var receivingReceiptItem in receivingReceiptItems)
+                    {
+                        if (receivingReceiptItem.InventoryType.Equals("Moving Average"))
+                        {
+                            var articleInventories = from d in db.MstArticleInventories
+                                                     where d.BranchId == receivingReceiptItem.BranchId
+                                                     && d.ArticleId == receivingReceiptItem.ItemId
+                                                     select d;
+
+                            if (receivingReceiptItem.BaseQuantity > 0)
+                            {
+                                if (articleInventories.Any())
+                                {
+                                    Data.TrnInventory newInventory = new Data.TrnInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        InventoryDate = receivingReceiptItem.RRDate,
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        ArticleInventoryId = articleInventories.FirstOrDefault().Id,
+                                        RRId = receivingReceiptItem.RRId,
+                                        QuantityIn = receivingReceiptItem.BaseQuantity,
+                                        QuantityOut = 0,
+                                        Quantity = receivingReceiptItem.BaseQuantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = receivingReceiptItem.Particulars
+                                    };
+
+                                    db.TrnInventories.InsertOnSubmit(newInventory);
+                                    db.SubmitChanges();
+
+                                    UpdateArticleInventory(articleInventories.FirstOrDefault().Id, "Moving Average");
+                                }
+                                else
+                                {
+                                    Data.MstArticleInventory newArticleInventory = new Data.MstArticleInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        InventoryCode = "RR-" + receivingReceiptItem.BranchCode + "-" + receivingReceiptItem.RRNumber,
+                                        Quantity = receivingReceiptItem.Quantity,
+                                        Cost = (receivingReceiptItem.Amount - receivingReceiptItem.VATAmount) / receivingReceiptItem.Quantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = "MOVING AVERAGE"
+                                    };
+
+                                    db.MstArticleInventories.InsertOnSubmit(newArticleInventory);
+                                    db.SubmitChanges();
+
+                                    Data.TrnInventory newInventory = new Data.TrnInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        InventoryDate = receivingReceiptItem.RRDate,
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        ArticleInventoryId = newArticleInventory.Id,
+                                        RRId = RRId,
+                                        QuantityIn = receivingReceiptItem.BaseQuantity,
+                                        QuantityOut = 0,
+                                        Quantity = receivingReceiptItem.BaseQuantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = receivingReceiptItem.Particulars
+                                    };
+
+                                    db.TrnInventories.InsertOnSubmit(newInventory);
+                                    db.SubmitChanges();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var articleInventories = from d in db.MstArticleInventories
+                                                     where d.BranchId == receivingReceiptItem.BranchId
+                                                     && d.ArticleId == receivingReceiptItem.ItemId
+                                                     && d.InventoryCode.Equals("RR-" + receivingReceiptItem.BranchCode + "-" + receivingReceiptItem.RRNumber)
+                                                     select new
+                                                     {
+                                                         Id = d.Id,
+                                                         BranchId = d.BranchId,
+                                                         ArticleId = d.ArticleId,
+                                                         InventoryCode = d.InventoryCode,
+                                                         Quantity = d.Quantity,
+                                                         Cost = d.Cost,
+                                                         Amount = d.Amount,
+                                                         Particulars = d.Particulars
+                                                     };
+
+                            if (receivingReceiptItem.BaseQuantity > 0)
+                            {
+                                if (articleInventories.Any())
+                                {
+                                    Data.TrnInventory newInventory = new Data.TrnInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        InventoryDate = Convert.ToDateTime(receivingReceiptItem.RRDate),
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        ArticleInventoryId = articleInventories.FirstOrDefault().Id,
+                                        RRId = RRId,
+                                        QuantityIn = receivingReceiptItem.BaseQuantity,
+                                        QuantityOut = 0,
+                                        Quantity = receivingReceiptItem.BaseQuantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = receivingReceiptItem.Particulars
+                                    };
+
+                                    db.TrnInventories.InsertOnSubmit(newInventory);
+                                    db.SubmitChanges();
+
+                                    UpdateArticleInventory(articleInventories.FirstOrDefault().Id, "");
+                                }
+                                else
+                                {
+                                    Data.MstArticleInventory newArticleInventory = new Data.MstArticleInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        InventoryCode = "RR-" + receivingReceiptItem.BranchCode + "-" + receivingReceiptItem.RRNumber,
+                                        Quantity = receivingReceiptItem.Quantity,
+                                        Cost = (receivingReceiptItem.Amount - receivingReceiptItem.VATAmount) / receivingReceiptItem.Quantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = "SPECIFIC IDENTIFICATION"
+                                    };
+
+                                    db.MstArticleInventories.InsertOnSubmit(newArticleInventory);
+                                    db.SubmitChanges();
+
+                                    Data.TrnInventory newInventory = new Data.TrnInventory
+                                    {
+                                        BranchId = receivingReceiptItem.BranchId,
+                                        InventoryDate = Convert.ToDateTime(receivingReceiptItem.RRDate),
+                                        ArticleId = receivingReceiptItem.ItemId,
+                                        ArticleInventoryId = newArticleInventory.Id,
+                                        RRId = RRId,
+                                        QuantityIn = receivingReceiptItem.BaseQuantity,
+                                        QuantityOut = 0,
+                                        Quantity = receivingReceiptItem.BaseQuantity,
+                                        Amount = receivingReceiptItem.Amount - receivingReceiptItem.VATAmount,
+                                        Particulars = receivingReceiptItem.Particulars
+                                    };
+
+                                    db.TrnInventories.InsertOnSubmit(newInventory);
+                                    db.SubmitChanges();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        // ==================================
+        // Delete Receiving Receipt Inventory
+        // ==================================
+        public void DeleteReceivingReceiptInventory(Int32 RRId)
+        {
+            try
+            {
+                // ==================
+                // Delete Inventories
+                // ==================
+                var inventories = from d in db.TrnInventories
+                                  where d.RRId == RRId
+                                  select d;
+
+                if (inventories.Any())
+                {
+                    db.TrnInventories.DeleteAllOnSubmit(inventories);
+                    db.SubmitChanges();
+                }
+
+                var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                            where d.RRId == RRId
+                                            && d.MstArticle.IsInventory == true
+                                            select new
+                                            {
+                                                ItemId = d.ItemId,
+                                                BranchId = d.BranchId
+                                            };
+
+                if (receivingReceiptItems.Any())
+                {
+                    foreach (var receivingReceiptItem in receivingReceiptItems)
+                    {
+                        // ==========================
+                        // Update Article Inventories
+                        // ==========================
+                        var articleInventories = from d in db.MstArticleInventories
+                                                 where d.BranchId == receivingReceiptItem.BranchId
+                                                 && d.ArticleId == receivingReceiptItem.ItemId
+                                                 select new
+                                                 {
+                                                     Id = d.Id
+                                                 };
+
+                        if (articleInventories.Any())
+                        {
+                            foreach (var articleInventory in articleInventories)
+                            {
+                                UpdateArticleInventory(articleInventory.Id, "");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        // =======================
+        // Sales Invoice Inventory
+        // =======================
+        public void InsertSalesInvoiceInventory(Int32 SIId)
+        {
+            try
+            {
+                var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                        where d.SIId == SIId
+                                        && d.MstArticle.IsInventory == true
+                                        select new
+                                        {
+                                            SIId = d.SIId,
+                                            SINumber = d.TrnSalesInvoice.SINumber,
+                                            SIDate = d.TrnSalesInvoice.SIDate,
+                                            BranchId = d.TrnSalesInvoice.BranchId,
+                                            ItemId = d.ItemId,
+                                            ItemInventoryId = d.ItemInventoryId,
+                                            Particulars = d.Particulars,
+                                            Quantity = d.Quantity,
+                                            BaseQuantity = d.BaseQuantity,
+                                            Cost = d.MstArticleInventory.Cost
+                                        };
+
+                if (salesInvoiceItems.Any())
+                {
+                    foreach (var salesInvoiceItem in salesInvoiceItems)
+                    {
+                        if (salesInvoiceItem.ItemInventoryId != null)
+                        {
+                            if (salesInvoiceItem.BaseQuantity > 0)
+                            {
+                                Data.TrnInventory newInventory = new Data.TrnInventory
+                                {
+                                    BranchId = salesInvoiceItem.BranchId,
+                                    InventoryDate = salesInvoiceItem.SIDate,
+                                    ArticleId = salesInvoiceItem.ItemId,
+                                    ArticleInventoryId = Convert.ToInt32(salesInvoiceItem.ItemInventoryId),
+                                    SIId = SIId,
+                                    QuantityIn = 0,
+                                    QuantityOut = salesInvoiceItem.BaseQuantity,
+                                    Quantity = salesInvoiceItem.BaseQuantity * -1,
+                                    Amount = (salesInvoiceItem.Cost * salesInvoiceItem.BaseQuantity) * -1,
+                                    Particulars = salesInvoiceItem.Particulars
+                                };
+
+                                db.TrnInventories.InsertOnSubmit(newInventory);
+                                db.SubmitChanges();
+
+                                UpdateArticleInventory(Convert.ToInt32(salesInvoiceItem.ItemInventoryId), "");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        // ==============================
+        // Delete Sales Invoice Inventory
+        // ==============================
+        public void DeleteSalesInvoiceInventory(Int32 SIId)
+        {
+            try
+            {
+                // ==================
+                // Delete Inventories
+                // ==================
+                var inventories = from d in db.TrnInventories
+                                  where d.SIId == SIId
+                                  select d;
+
+                if (inventories.Any())
+                {
+                    db.TrnInventories.DeleteAllOnSubmit(inventories);
+                    db.SubmitChanges();
+                }
+
+                var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                        where d.SIId == SIId
+                                        select new
+                                        {
+                                            BranchId = d.TrnSalesInvoice.BranchId,
+                                            ItemId = d.ItemId,
+                                        };
+
+                if (salesInvoiceItems.Any())
+                {
+                    foreach (var salesInvoiceItem in salesInvoiceItems)
+                    {
+                        // ==========================
+                        // Update Article Inventories
+                        // ==========================
+                        var articleInventories = from d in db.MstArticleInventories
+                                                 where d.BranchId == salesInvoiceItem.BranchId
+                                                 && d.ArticleId == salesInvoiceItem.ItemId
+                                                 select new
+                                                 {
+                                                     Id = d.Id
+                                                 };
+
+                        if (articleInventories.Any())
+                        {
+                            foreach (var articleInventory in articleInventories)
+                            {
+                                UpdateArticleInventory(articleInventory.Id, "");
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
             }
         }
 
@@ -697,537 +1066,6 @@ namespace easyfis.Business
                             {
                                 UpdateArticleInventory(articleInventoryId, stockIns.FirstOrDefault().MstUser4.InventoryType);
                             }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-        }
-
-        // =======================
-        // Sales Invoice Inventory
-        // =======================
-        public void InsertSIInventory(Int32 SIId)
-        {
-            String InventoryDate = "";
-            Int32 BranchId = 0;
-            String BranchCode = "";
-
-            var salesInvoiceHeader = from d in db.TrnSalesInvoices
-                                     where d.Id == SIId
-                                     select new Models.TrnSalesInvoice
-                                     {
-                                         Id = d.Id,
-                                         BranchId = d.BranchId,
-                                         Branch = d.MstBranch.Branch,
-                                         BranchCode = d.MstBranch.BranchCode,
-                                         SINumber = d.SINumber,
-                                         SIDate = d.SIDate.ToShortDateString(),
-                                     };
-
-            // Sales invoice items
-            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
-                                    where d.SIId == SIId
-                                    && d.MstArticle.IsInventory == true
-                                    select new Models.TrnSalesInvoiceItem
-                                    {
-                                        Id = d.Id,
-                                        SIId = d.SIId,
-                                        SI = d.TrnSalesInvoice.SINumber,
-                                        ItemId = d.ItemId,
-                                        ItemCode = d.MstArticle.ManualArticleCode,
-                                        Item = d.MstArticle.Article,
-                                        ItemInventoryId = d.ItemInventoryId,
-                                        ItemInventory = d.MstArticleInventory.InventoryCode,
-                                        Particulars = d.Particulars,
-                                        UnitId = d.UnitId,
-                                        Unit = d.MstUnit.Unit,
-                                        Quantity = d.Quantity,
-                                        Price = d.Price,
-                                        DiscountId = d.DiscountId,
-                                        Discount = d.MstDiscount.Discount,
-                                        DiscountRate = d.DiscountRate,
-                                        DiscountAmount = d.DiscountAmount,
-                                        NetPrice = d.NetPrice,
-                                        Amount = d.Amount,
-                                        VATId = d.VATId,
-                                        VAT = d.MstTaxType.TaxType,
-                                        VATPercentage = d.VATPercentage,
-                                        VATAmount = d.VATAmount,
-                                        BaseUnitId = d.BaseUnitId,
-                                        BaseUnit = d.MstUnit1.Unit,
-                                        BaseQuantity = d.BaseQuantity,
-                                        BasePrice = d.BasePrice,
-                                        Cost = d.MstArticleInventory.Cost
-                                    };
-
-            try
-            {
-                // header details in Sales
-                foreach (var si in salesInvoiceHeader)
-                {
-                    InventoryDate = si.SIDate;
-                    BranchId = si.BranchId;
-                    BranchCode = si.BranchCode;
-                }
-
-                // Sale Item - (Line)
-                if (salesInvoiceItems.Any())
-                {
-                    foreach (var SIItems in salesInvoiceItems)
-                    {
-                        if (SIItems.Quantity > 0)
-                        {
-                            Data.TrnInventory newInventory = new Data.TrnInventory();
-
-                            newInventory.BranchId = BranchId;
-                            newInventory.InventoryDate = Convert.ToDateTime(InventoryDate);
-                            newInventory.ArticleId = SIItems.ItemId;
-                            newInventory.ArticleInventoryId = Convert.ToInt32(SIItems.ItemInventoryId);
-                            newInventory.RRId = null;
-                            newInventory.SIId = SIId;
-                            newInventory.INId = null;
-                            newInventory.OTId = null;
-                            newInventory.STId = null;
-                            newInventory.QuantityIn = 0;
-                            newInventory.QuantityOut = SIItems.BaseQuantity;
-                            newInventory.Quantity = SIItems.BaseQuantity * -1;
-                            newInventory.Amount = SIItems.Cost * SIItems.BaseQuantity * -1;
-                            newInventory.Particulars = "Sold Items";
-
-                            db.TrnInventories.InsertOnSubmit(newInventory);
-                            db.SubmitChanges();
-
-                            UpdateArticleInventory(Convert.ToInt32(SIItems.ItemInventoryId), "");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-        }
-
-        // Delete Sales Invoice Inventory
-        public void deleteSIInventory(Int32 SIId)
-        {
-            String InventoryDate = "";
-            Int32 BranchId = 0;
-            String BranchCode = "";
-
-            var salesInvoiceHeader = from d in db.TrnSalesInvoices
-                                     where d.Id == SIId
-                                     select new Models.TrnSalesInvoice
-                                     {
-                                         Id = d.Id,
-                                         BranchId = d.BranchId,
-                                         Branch = d.MstBranch.Branch,
-                                         BranchCode = d.MstBranch.BranchCode,
-                                         SINumber = d.SINumber,
-                                         SIDate = d.SIDate.ToShortDateString(),
-                                     };
-
-            // Sales invoice items
-            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
-                                    where d.SIId == SIId
-                                    select new Models.TrnSalesInvoiceItem
-                                    {
-                                        Id = d.Id,
-                                        SIId = d.SIId,
-                                        SI = d.TrnSalesInvoice.SINumber,
-                                        ItemId = d.ItemId,
-                                        ItemCode = d.MstArticle.ManualArticleCode,
-                                        Item = d.MstArticle.Article,
-                                        ItemInventoryId = d.ItemInventoryId,
-                                        ItemInventory = d.MstArticleInventory.InventoryCode,
-                                        Particulars = d.Particulars,
-                                        UnitId = d.UnitId,
-                                        Unit = d.MstUnit.Unit,
-                                        Quantity = d.Quantity,
-                                        Price = d.Price,
-                                        DiscountId = d.DiscountId,
-                                        Discount = d.MstDiscount.Discount,
-                                        DiscountRate = d.DiscountRate,
-                                        DiscountAmount = d.DiscountAmount,
-                                        NetPrice = d.NetPrice,
-                                        Amount = d.Amount,
-                                        VATId = d.VATId,
-                                        VAT = d.MstTaxType.TaxType,
-                                        VATPercentage = d.VATPercentage,
-                                        VATAmount = d.VATAmount,
-                                        BaseUnitId = d.BaseUnitId,
-                                        BaseUnit = d.MstUnit1.Unit,
-                                        BaseQuantity = d.BaseQuantity,
-                                        BasePrice = d.BasePrice
-                                    };
-
-            try
-            {
-                // Delete Inventory - SI
-                var SIInventories = db.TrnInventories.Where(d => d.SIId == SIId).ToList();
-                foreach (var SIInventory in SIInventories)
-                {
-                    db.TrnInventories.DeleteOnSubmit(SIInventory);
-                    db.SubmitChanges();
-                }
-
-                foreach (var si in salesInvoiceHeader)
-                {
-                    InventoryDate = si.SIDate;
-                    BranchId = si.BranchId;
-                    BranchCode = si.BranchCode;
-                }
-
-                if (salesInvoiceItems.Any())
-                {
-                    foreach (var SIItems in salesInvoiceItems)
-                    {
-                        if (SIItems.Quantity > 0)
-                        {
-                            // retrieve Artticle Inventory
-                            var articleInventories = from d in db.MstArticleInventories
-                                                     where d.BranchId == BranchId && d.ArticleId == SIItems.ItemId
-                                                     select new Models.MstArticleInventory
-                                                     {
-                                                         Id = d.Id,
-                                                         BranchId = d.BranchId,
-                                                         ArticleId = d.ArticleId,
-                                                         InventoryCode = d.InventoryCode,
-                                                         Quantity = d.Quantity,
-                                                         Cost = d.Cost,
-                                                         Amount = d.Amount,
-                                                         Particulars = d.Particulars
-                                                     };
-
-                            foreach (var articleInventory in articleInventories)
-                            {
-                                UpdateArticleInventory(articleInventory.Id, "");
-                            }
-                        }
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-        }
-
-        // ===========================
-        // Receiving Receipt Inventory
-        // ===========================
-        public void InsertRRInventory(Int32 RRId)
-        {
-            // retrieve Receiving Receipt Items IsInventory == TRUE
-            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
-                                        where d.RRId == RRId && d.MstArticle.IsInventory == true
-                                        select new Models.TrnReceivingReceiptItem
-                                        {
-                                            Id = d.Id,
-                                            RRId = d.RRId,
-                                            RR = d.TrnReceivingReceipt.RRNumber,
-                                            RRDate = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
-                                            POId = d.POId,
-                                            PO = d.TrnPurchaseOrder.PONumber,
-                                            ItemId = d.ItemId,
-                                            Item = d.MstArticle.Article,
-                                            ItemCode = d.MstArticle.ManualArticleCode,
-                                            Particulars = d.Particulars,
-                                            UnitId = d.UnitId,
-                                            Unit = d.MstUnit.Unit,
-                                            Quantity = d.Quantity,
-                                            Cost = d.Cost,
-                                            Amount = d.Amount,
-                                            VATId = d.VATId,
-                                            VAT = d.MstTaxType.TaxType,
-                                            VATPercentage = d.VATPercentage,
-                                            VATAmount = d.VATAmount,
-                                            WTAXId = d.WTAXId,
-                                            WTAX = d.MstTaxType1.TaxType,
-                                            WTAXPercentage = d.WTAXPercentage,
-                                            WTAXAmount = d.WTAXAmount,
-                                            BranchId = d.BranchId,
-                                            Branch = d.MstBranch.Branch,
-                                            BranchCode = d.MstBranch.BranchCode,
-                                            BaseUnitId = d.BaseUnitId,
-                                            BaseUnit = d.MstUnit1.Unit,
-                                            BaseQuantity = d.BaseQuantity,
-                                            BaseCost = d.BaseCost,
-                                            UpdatedByUserId = d.TrnReceivingReceipt.UpdatedById,
-                                            InventoryType = d.TrnReceivingReceipt.MstUser5.InventoryType
-                                        };
-
-            try
-            {
-                if (receivingReceiptItems.Any())
-                {
-                    foreach (var RRItems in receivingReceiptItems)
-                    {
-                        if (RRItems.InventoryType.Equals("Moving Average"))
-                        {
-                            var articleInventories = from d in db.MstArticleInventories
-                                                     where d.BranchId == RRItems.BranchId
-                                                     && d.ArticleId == RRItems.ItemId
-                                                     select new Models.MstArticleInventory
-                                                     {
-                                                         Id = d.Id,
-                                                         BranchId = d.BranchId,
-                                                         ArticleId = d.ArticleId,
-                                                         InventoryCode = d.InventoryCode,
-                                                         Quantity = d.Quantity,
-                                                         Cost = d.Cost,
-                                                         Amount = d.Amount,
-                                                         Particulars = d.Particulars
-                                                     };
-
-                            Data.TrnInventory newInventory = new Data.TrnInventory();
-
-                            if (RRItems.BaseQuantity > 0)
-                            {
-                                if (articleInventories.Any())
-                                {
-                                    Int32 articleInventoryId = articleInventories.FirstOrDefault().Id;
-
-                                    newInventory.BranchId = RRItems.BranchId;
-                                    newInventory.InventoryDate = Convert.ToDateTime(RRItems.RRDate);
-                                    newInventory.ArticleId = RRItems.ItemId;
-                                    newInventory.ArticleInventoryId = articleInventoryId;
-                                    newInventory.RRId = RRId;
-                                    newInventory.SIId = null;
-                                    newInventory.INId = null;
-                                    newInventory.OTId = null;
-                                    newInventory.STId = null;
-                                    newInventory.QuantityIn = RRItems.BaseQuantity;
-                                    newInventory.QuantityOut = 0;
-                                    newInventory.Quantity = RRItems.BaseQuantity;
-                                    newInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newInventory.Particulars = "NA";
-
-                                    db.TrnInventories.InsertOnSubmit(newInventory);
-                                    db.SubmitChanges();
-
-                                    UpdateArticleInventory(articleInventoryId, "Moving Average");
-                                }
-                                else
-                                {
-                                    // InsertRRInventory article Inventory
-                                    Data.MstArticleInventory newArticleInventory = new Data.MstArticleInventory();
-
-                                    newArticleInventory.BranchId = RRItems.BranchId;
-                                    newArticleInventory.ArticleId = RRItems.ItemId;
-                                    newArticleInventory.InventoryCode = "RR-" + RRItems.BranchCode + "-" + RRItems.RR;
-                                    newArticleInventory.Quantity = RRItems.Quantity;
-                                    newArticleInventory.Cost = (RRItems.Amount - RRItems.VATAmount) / RRItems.Quantity;
-                                    newArticleInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newArticleInventory.Particulars = RRItems.Particulars;
-
-                                    db.MstArticleInventories.InsertOnSubmit(newArticleInventory);
-                                    db.SubmitChanges();
-
-                                    //// retrieve Artticle Inventory - Id
-                                    //var newArticleInventoryId = (from d in db.MstArticleInventories
-                                    //                             where d.BranchId == RRItems.BranchId
-                                    //                             && d.ArticleId == RRItems.ItemId
-                                    //                             && d.InventoryCode == "RR-" + RRItems.BranchCode + "-" + RRItems.RR
-                                    //                             select d.Id).SingleOrDefault();
-
-                                    newInventory.BranchId = RRItems.BranchId;
-                                    newInventory.InventoryDate = Convert.ToDateTime(RRItems.RRDate);
-                                    newInventory.ArticleId = RRItems.ItemId;
-                                    newInventory.ArticleInventoryId = newArticleInventory.Id;
-                                    newInventory.RRId = RRId;
-                                    newInventory.SIId = null;
-                                    newInventory.INId = null;
-                                    newInventory.OTId = null;
-                                    newInventory.STId = null;
-                                    newInventory.QuantityIn = RRItems.BaseQuantity;
-                                    newInventory.QuantityOut = 0;
-                                    newInventory.Quantity = RRItems.BaseQuantity;
-                                    newInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newInventory.Particulars = "NA";
-
-                                    db.TrnInventories.InsertOnSubmit(newInventory);
-                                    db.SubmitChanges();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // retrieve Artticle Inventory
-                            var articleInventories = from d in db.MstArticleInventories
-                                                     where d.BranchId == RRItems.BranchId
-                                                     && d.ArticleId == RRItems.ItemId
-                                                     && d.InventoryCode == "RR-" + RRItems.BranchCode + "-" + RRItems.RR
-                                                     select new Models.MstArticleInventory
-                                                     {
-                                                         Id = d.Id,
-                                                         BranchId = d.BranchId,
-                                                         ArticleId = d.ArticleId,
-                                                         InventoryCode = d.InventoryCode,
-                                                         Quantity = d.Quantity,
-                                                         Cost = d.Cost,
-                                                         Amount = d.Amount,
-                                                         Particulars = d.Particulars
-                                                     };
-
-                            Data.TrnInventory newInventory = new Data.TrnInventory();
-
-                            if (RRItems.BaseQuantity > 0)
-                            {
-                                if (articleInventories.Any())
-                                {
-                                    Int32 articleInventoryId = articleInventories.FirstOrDefault().Id;
-
-                                    newInventory.BranchId = RRItems.BranchId;
-                                    newInventory.InventoryDate = Convert.ToDateTime(RRItems.RRDate);
-                                    newInventory.ArticleId = RRItems.ItemId;
-                                    newInventory.ArticleInventoryId = articleInventoryId;
-                                    newInventory.RRId = RRId;
-                                    newInventory.SIId = null;
-                                    newInventory.INId = null;
-                                    newInventory.OTId = null;
-                                    newInventory.STId = null;
-                                    newInventory.QuantityIn = RRItems.BaseQuantity;
-                                    newInventory.QuantityOut = 0;
-                                    newInventory.Quantity = RRItems.BaseQuantity;
-                                    newInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newInventory.Particulars = "NA";
-
-                                    db.TrnInventories.InsertOnSubmit(newInventory);
-                                    db.SubmitChanges();
-
-                                    UpdateArticleInventory(articleInventoryId, "");
-                                }
-                                else
-                                {
-                                    // InsertRRInventory article Inventory
-                                    Data.MstArticleInventory newArticleInventory = new Data.MstArticleInventory();
-
-                                    newArticleInventory.BranchId = RRItems.BranchId;
-                                    newArticleInventory.ArticleId = RRItems.ItemId;
-                                    newArticleInventory.InventoryCode = "RR-" + RRItems.BranchCode + "-" + RRItems.RR;
-                                    newArticleInventory.Quantity = RRItems.Quantity;
-                                    newArticleInventory.Cost = (RRItems.Amount - RRItems.VATAmount) / RRItems.Quantity;
-                                    newArticleInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newArticleInventory.Particulars = "SPECIFIC IDENTIFICATION";
-
-                                    db.MstArticleInventories.InsertOnSubmit(newArticleInventory);
-                                    db.SubmitChanges();
-
-                                    // retrieve Artticle Inventory - Id
-                                    var newArticleInventoryId = (from d in db.MstArticleInventories
-                                                                 where d.BranchId == RRItems.BranchId
-                                                                 && d.ArticleId == RRItems.ItemId
-                                                                 && d.InventoryCode == "RR-" + RRItems.BranchCode + "-" + RRItems.RR
-                                                                 select d.Id).SingleOrDefault();
-
-                                    newInventory.BranchId = RRItems.BranchId;
-                                    newInventory.InventoryDate = Convert.ToDateTime(RRItems.RRDate);
-                                    newInventory.ArticleId = RRItems.ItemId;
-                                    newInventory.ArticleInventoryId = newArticleInventoryId;
-                                    newInventory.RRId = RRId;
-                                    newInventory.SIId = null;
-                                    newInventory.INId = null;
-                                    newInventory.OTId = null;
-                                    newInventory.STId = null;
-                                    newInventory.QuantityIn = RRItems.BaseQuantity;
-                                    newInventory.QuantityOut = 0;
-                                    newInventory.Quantity = RRItems.BaseQuantity;
-                                    newInventory.Amount = RRItems.Amount - RRItems.VATAmount;
-                                    newInventory.Particulars = "NA";
-
-                                    db.TrnInventories.InsertOnSubmit(newInventory);
-                                    db.SubmitChanges();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-        }
-
-        // Delete Inventory
-        public void deleteRRInventory(Int32 RRId)
-        {
-            // retrieve Receiving Receipt Items IsInventory == TRUE
-            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
-                                        where d.RRId == RRId && d.MstArticle.IsInventory == true
-                                        select new Models.TrnReceivingReceiptItem
-                                        {
-                                            Id = d.Id,
-                                            RRId = d.RRId,
-                                            RR = d.TrnReceivingReceipt.RRNumber,
-                                            RRDate = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
-                                            POId = d.POId,
-                                            PO = d.TrnPurchaseOrder.PONumber,
-                                            ItemId = d.ItemId,
-                                            Item = d.MstArticle.Article,
-                                            ItemCode = d.MstArticle.ManualArticleCode,
-                                            Particulars = d.Particulars,
-                                            UnitId = d.UnitId,
-                                            Unit = d.MstUnit.Unit,
-                                            Quantity = d.Quantity,
-                                            Cost = d.Cost,
-                                            Amount = d.Amount,
-                                            VATId = d.VATId,
-                                            VAT = d.MstTaxType.TaxType,
-                                            VATPercentage = d.VATPercentage,
-                                            VATAmount = d.VATAmount,
-                                            WTAXId = d.WTAXId,
-                                            WTAX = d.MstTaxType1.TaxType,
-                                            WTAXPercentage = d.WTAXPercentage,
-                                            WTAXAmount = d.WTAXAmount,
-                                            BranchId = d.BranchId,
-                                            Branch = d.MstBranch.Branch,
-                                            BranchCode = d.MstBranch.BranchCode,
-                                            BaseUnitId = d.BaseUnitId,
-                                            BaseUnit = d.MstUnit1.Unit,
-                                            BaseQuantity = d.BaseQuantity,
-                                            BaseCost = d.BaseCost
-                                        };
-
-            try
-            {
-                var RRInventories = db.TrnInventories.Where(d => d.RRId == RRId).ToList();
-                foreach (var RRInventory in RRInventories)
-                {
-                    db.TrnInventories.DeleteOnSubmit(RRInventory);
-                    db.SubmitChanges();
-                }
-
-                if (receivingReceiptItems.Any())
-                {
-                    foreach (var RRItems in receivingReceiptItems)
-                    {
-                        // retrieve Artticle Inventory
-                        var articleInventories = from d in db.MstArticleInventories
-                                                 where d.BranchId == RRItems.BranchId
-                                                 && d.ArticleId == RRItems.ItemId
-                                                 //&& d.InventoryCode == "RR-" + RRItems.BranchCode + "-" + RRItems.RR
-                                                 select new Models.MstArticleInventory
-                                                 {
-                                                     Id = d.Id,
-                                                     BranchId = d.BranchId,
-                                                     ArticleId = d.ArticleId,
-                                                     InventoryCode = d.InventoryCode,
-                                                     Quantity = d.Quantity,
-                                                     Cost = d.Cost,
-                                                     Amount = d.Amount,
-                                                     Particulars = d.Particulars
-                                                 };
-
-                        foreach (var articleInventory in articleInventories)
-                        {
-                            UpdateArticleInventory(articleInventory.Id, "");
                         }
                     }
                 }

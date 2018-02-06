@@ -457,12 +457,12 @@ namespace easyfis.Controllers
 
                     if (updatereceivingReceipt.IsLocked == true)
                     {
-                        inventory.InsertRRInventory(Convert.ToInt32(id));
+                        inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
                         journal.insertRRJournal(Convert.ToInt32(id));
                     }
                     else
                     {
-                        inventory.deleteRRInventory(Convert.ToInt32(id));
+                        inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                         journal.deleteRRJournal(Convert.ToInt32(id));
                     }
 
@@ -502,12 +502,12 @@ namespace easyfis.Controllers
 
                     if (updatereceivingReceipt.IsLocked == true)
                     {
-                        inventory.InsertRRInventory(Convert.ToInt32(id));
+                        inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
                         journal.insertRRJournal(Convert.ToInt32(id));
                     }
                     else
                     {
-                        inventory.deleteRRInventory(Convert.ToInt32(id));
+                        inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                         journal.deleteRRJournal(Convert.ToInt32(id));
                     }
 

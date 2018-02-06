@@ -424,7 +424,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockSalesInvoice.IsLocked)
                                     {
-                                        inventory.InsertSIInventory(Convert.ToInt32(id));
+                                        inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
                                         journal.insertSIJournal(Convert.ToInt32(id));
                                     }
 
@@ -510,7 +510,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (!unlockSalesInvoice.IsLocked)
                                     {
-                                        inventory.deleteSIInventory(Convert.ToInt32(id));
+                                        inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
                                         journal.deleteSIJournal(Convert.ToInt32(id));
                                     }
 
