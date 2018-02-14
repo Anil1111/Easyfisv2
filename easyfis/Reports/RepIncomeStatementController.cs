@@ -19,7 +19,7 @@ namespace easyfis.Reports
         // Income Statement PDF Report
         // ===========================  
         [Authorize]
-        public ActionResult IncomeStatement(String StartDate, String EndDate, Int32 CompanyId)
+        public ActionResult IncomeStatement(String StartDate, String EndDate, Int32 CompanyId, Int32 BranchId)
         {
             // ============
             // PDF Settings
@@ -40,6 +40,7 @@ namespace easyfis.Reports
             Font fontArial10Bold = FontFactory.GetFont("Arial", 10, Font.BOLD);
             Font fontArial10 = FontFactory.GetFont("Arial", 10);
             Font fontArial11Bold = FontFactory.GetFont("Arial", 11, Font.BOLD);
+            Font fontArial12Bold = FontFactory.GetFont("Arial", 12, Font.BOLD);
 
             Paragraph line = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(0.0F, 100.0F, BaseColor.BLACK, Element.ALIGN_LEFT, 4.5F)));
 
@@ -49,6 +50,7 @@ namespace easyfis.Reports
             var companyName = (from d in db.MstCompanies where d.Id == CompanyId select d.Company).SingleOrDefault();
             var address = (from d in db.MstCompanies where d.Id == CompanyId select d.Address).SingleOrDefault();
             var contactNo = (from d in db.MstCompanies where d.Id == CompanyId select d.ContactNumber).SingleOrDefault();
+            var branch = (from d in db.MstBranches where d.Id == BranchId select d.Branch).SingleOrDefault();
 
             // ======
             // Header
@@ -66,16 +68,6 @@ namespace easyfis.Reports
             document.Add(header);
             document.Add(line);
 
-            // =====
-            // Space
-            // =====
-            PdfPTable spaceTable = new PdfPTable(1);
-            float[] widthCellsSpaceTable = new float[] { 100f };
-            spaceTable.SetWidths(widthCellsSpaceTable);
-            spaceTable.WidthPercentage = 100;
-            spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
-            document.Add(spaceTable);
-
             Decimal totalOverallIncomes = 0;
             Decimal totalOverallExpenses = 0;
 
@@ -87,6 +79,7 @@ namespace easyfis.Reports
                           && d.JournalDate <= Convert.ToDateTime(EndDate)
                           && d.MstAccount.MstAccountType.MstAccountCategory.Id == 5
                           && d.MstBranch.CompanyId == CompanyId
+                          && d.BranchId == BranchId
                           group d by d.MstAccount into g
                           select new Models.TrnJournal
                           {
@@ -105,6 +98,17 @@ namespace easyfis.Reports
 
             if (incomes.Any())
             {
+                // ============
+                // Branch Title
+                // ============
+                PdfPTable branchTitle = new PdfPTable(1);
+                float[] widthCellsBranchTitle = new float[] { 100f };
+                branchTitle.SetWidths(widthCellsBranchTitle);
+                branchTitle.WidthPercentage = 100;
+                PdfPCell branchHeaderColspan = (new PdfPCell(new Phrase(branch, fontArial12Bold)) { HorizontalAlignment = 0, PaddingTop = 10f, PaddingBottom = 14f, Border = 0 });
+                branchTitle.AddCell(branchHeaderColspan);
+                document.Add(branchTitle);
+
                 // ===============================
                 // Income Sub Category Description
                 // ===============================
@@ -244,6 +248,7 @@ namespace easyfis.Reports
                            && d.JournalDate <= Convert.ToDateTime(EndDate)
                            && d.MstAccount.MstAccountType.MstAccountCategory.Id == 6
                            && d.MstBranch.CompanyId == CompanyId
+                           && d.BranchId == BranchId
                            group d by d.MstAccount into g
                            select new Models.TrnJournal
                            {

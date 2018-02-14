@@ -122,12 +122,12 @@
                                                                 <div class="comboBox-wide" id="cboIncomeStatementCompany"></div>
                                                             </div>
                                                         </div>
-                                                        @*<div class="form-group">
-                                                                <label class="control-label col-sm-4">Branch</label>
-                                                                <div class="col-sm-8">
-                                                                    <div class="comboBox-wide" id="cboIncomeStatementBranch"></div>
-                                                                </div>
-                                                            </div>*@
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Branch</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="comboBox-wide" id="cboIncomeStatementBranch"></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </form>
@@ -665,7 +665,7 @@
         var cboIncomeStatementStartDate = new wijmo.input.InputDate('#cboIncomeStatementStartDate');
         var cboIncomeStatementEndDate = new wijmo.input.InputDate('#cboIncomeStatementEndDate');
         var cboIncomeStatementCompany = new wijmo.input.ComboBox('#cboIncomeStatementCompany');
-        //var cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch');
+        var cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch');
         var cboCashFlowStartDate = new wijmo.input.InputDate('#cboCashFlowStartDate');
         var cboCashFlowEndDate = new wijmo.input.InputDate('#cboCashFlowEndDate');
         var cboCashFlowCompany = new wijmo.input.ComboBox('#cboCashFlowCompany');
@@ -1227,16 +1227,16 @@
                         //    });
                         //}
 
-                        //if (isCboIncomeStatementCompanySelected) {
-                        //    cboIncomeStatementBranch.dispose();
-                        //    cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch', {
-                        //        disabled: disabled,
-                        //        isEditable: false,
-                        //        itemsSource: branchObservableArray,
-                        //        displayMemberPath: "Branch",
-                        //        selectedValuePath: "Id"
-                        //    });
-                        //}
+                        if (isCboIncomeStatementCompanySelected) {
+                            cboIncomeStatementBranch.dispose();
+                            cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch', {
+                                disabled: disabled,
+                                isEditable: false,
+                                itemsSource: branchObservableArray,
+                                displayMemberPath: "Branch",
+                                selectedValuePath: "Id"
+                            });
+                        }
 
                         //if (isCboCashFlowCompanySelected) {
                         //    cboCashFlowBranch.dispose();
@@ -1387,12 +1387,12 @@
                 //    itemsSource: branchObservableArray,
                 //});
 
-                //cboIncomeStatementBranch.dispose();
-                //cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch', {
-                //    disabled: true,
-                //    isEditable: false,
-                //    itemsSource: branchObservableArray,
-                //});
+                cboIncomeStatementBranch.dispose();
+                cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch', {
+                    disabled: true,
+                    isEditable: false,
+                    itemsSource: branchObservableArray,
+                });
 
                 //cboCashFlowBranch.dispose();
                 //cboCashFlowBranch = new wijmo.input.ComboBox('#cboCashFlowBranch', {
@@ -1558,16 +1558,16 @@
         // ==========================
         function btnIncomeStatementPDFOnclick() {
             if (cboIncomeStatementCompany.selectedValue != null) {
-                //if (cboIncomeStatementBranch.selectedValue != null) {
-                var startDate = cboIncomeStatementStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                var endDate = cboIncomeStatementEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                var companyId = cboIncomeStatementCompany.selectedValue;
-                //var branchId = cboIncomeStatementBranch.selectedValue;
+                if (cboIncomeStatementBranch.selectedValue != null) {
+                    var startDate = cboIncomeStatementStartDate.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboIncomeStatementEndDate.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboIncomeStatementCompany.selectedValue;
+                    var branchId = cboIncomeStatementBranch.selectedValue;
 
-                window.location.href = '/RepIncomeStatement/IncomeStatement?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId;
-                //} else {
-                //    toastr.error("Lacking Information");
-                //}
+                    window.location.href = '/RepIncomeStatement/IncomeStatement?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
+                } else {
+                    toastr.error("Lacking Information");
+                }
             } else {
                 toastr.error("Lacking Information");
             }
