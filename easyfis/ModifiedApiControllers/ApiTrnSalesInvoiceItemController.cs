@@ -374,162 +374,139 @@ namespace easyfis.ModifiedApiControllers
                                                         basePrice = amount / baseQuantity;
                                                     }
 
-                                                    Boolean canInsertSalesInvoiceItem = false;
-                                                    String inventoryErrorMessage = "";
-                                                    Int32? inventoryId = null;
-
-                                                    if (item.FirstOrDefault().IsInventory)
+                                                    Int32? itemInventoryId = null;
+                                                    if (objSalesInvoiceItem.ItemInventoryId != null)
                                                     {
-                                                        if (objSalesInvoiceItem.ItemInventoryId != null)
-                                                        {
-                                                            canInsertSalesInvoiceItem = true;
-                                                            inventoryId = objSalesInvoiceItem.ItemInventoryId;
-                                                        }
-                                                        else
-                                                        {
-                                                            inventoryErrorMessage = "The selected inventory item has no inventory code.";
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        canInsertSalesInvoiceItem = true;
+                                                        itemInventoryId = objSalesInvoiceItem.ItemInventoryId;
                                                     }
 
-                                                    if (canInsertSalesInvoiceItem)
+                                                    Data.TrnSalesInvoiceItem newSalesInvoiceItem = new Data.TrnSalesInvoiceItem
                                                     {
-                                                        Data.TrnSalesInvoiceItem newSalesInvoiceItem = new Data.TrnSalesInvoiceItem
+                                                        SIId = Convert.ToInt32(SIId),
+                                                        ItemId = objSalesInvoiceItem.ItemId,
+                                                        ItemInventoryId = itemInventoryId,
+                                                        Particulars = objSalesInvoiceItem.Particulars,
+                                                        UnitId = objSalesInvoiceItem.UnitId,
+                                                        Quantity = objSalesInvoiceItem.Quantity,
+                                                        Price = objSalesInvoiceItem.Price,
+                                                        DiscountId = objSalesInvoiceItem.DiscountId,
+                                                        DiscountRate = objSalesInvoiceItem.DiscountRate,
+                                                        DiscountAmount = discountAmount,
+                                                        NetPrice = netPrice,
+                                                        Amount = amount,
+                                                        VATId = objSalesInvoiceItem.VATId,
+                                                        VATPercentage = objSalesInvoiceItem.VATPercentage,
+                                                        VATAmount = VATAmount,
+                                                        BaseUnitId = item.FirstOrDefault().UnitId,
+                                                        BaseQuantity = baseQuantity,
+                                                        BasePrice = basePrice,
+                                                        SalesItemTimeStamp = DateTime.Now
+                                                    };
+
+                                                    db.TrnSalesInvoiceItems.InsertOnSubmit(newSalesInvoiceItem);
+                                                    db.SubmitChanges();
+
+                                                    var itemComponents = from d in db.MstArticleComponents
+                                                                         where d.ArticleId == objSalesInvoiceItem.ItemId
+                                                                         select new
+                                                                         {
+                                                                             ComponentArticleId = d.ComponentArticleId,
+                                                                             Quantity = d.Quantity,
+                                                                             UnitId = d.MstArticle1.UnitId,
+                                                                             Cost = Convert.ToDecimal(d.MstArticle1.Cost),
+                                                                             Price = d.MstArticle1.Price,
+                                                                             ComponentArticleInventoryId = GetComponentItemArticleInventoryId(d.ComponentArticleId),
+                                                                             Amount = d.Quantity * Convert.ToDecimal(d.MstArticle1.Cost),
+                                                                             Particulars = d.Particulars
+                                                                         };
+
+                                                    if (itemComponents.Any())
+                                                    {
+                                                        if (item.FirstOrDefault().Kitting == 2)
                                                         {
-                                                            SIId = Convert.ToInt32(SIId),
-                                                            ItemId = objSalesInvoiceItem.ItemId,
-                                                            ItemInventoryId = inventoryId,
-                                                            Particulars = objSalesInvoiceItem.Particulars,
-                                                            UnitId = objSalesInvoiceItem.UnitId,
-                                                            Quantity = objSalesInvoiceItem.Quantity,
-                                                            Price = objSalesInvoiceItem.Price,
-                                                            DiscountId = objSalesInvoiceItem.DiscountId,
-                                                            DiscountRate = objSalesInvoiceItem.DiscountRate,
-                                                            DiscountAmount = discountAmount,
-                                                            NetPrice = netPrice,
-                                                            Amount = amount,
-                                                            VATId = objSalesInvoiceItem.VATId,
-                                                            VATPercentage = objSalesInvoiceItem.VATPercentage,
-                                                            VATAmount = VATAmount,
-                                                            BaseUnitId = item.FirstOrDefault().UnitId,
-                                                            BaseQuantity = baseQuantity,
-                                                            BasePrice = basePrice,
-                                                            SalesItemTimeStamp = DateTime.Now
-                                                        };
-
-                                                        db.TrnSalesInvoiceItems.InsertOnSubmit(newSalesInvoiceItem);
-                                                        db.SubmitChanges();
-
-                                                        var itemComponents = from d in db.MstArticleComponents
-                                                                             where d.ArticleId == objSalesInvoiceItem.ItemId
-                                                                             select new
-                                                                             {
-                                                                                 ComponentArticleId = d.ComponentArticleId,
-                                                                                 Quantity = d.Quantity,
-                                                                                 UnitId = d.MstArticle1.UnitId,
-                                                                                 Cost = Convert.ToDecimal(d.MstArticle1.Cost),
-                                                                                 Price = d.MstArticle1.Price,
-                                                                                 ComponentArticleInventoryId = GetComponentItemArticleInventoryId(d.ComponentArticleId),
-                                                                                 Amount = d.Quantity * Convert.ToDecimal(d.MstArticle1.Cost),
-                                                                                 Particulars = d.Particulars
-                                                                             };
-
-                                                        if (itemComponents.Any())
-                                                        {
-                                                            if (item.FirstOrDefault().Kitting == 2)
+                                                            foreach (var itemComponent in itemComponents)
                                                             {
-                                                                foreach (var itemComponent in itemComponents)
+                                                                var componentItemConversionUnit = from d in db.MstArticleUnits
+                                                                                                  where d.ArticleId == itemComponent.ComponentArticleId
+                                                                                                  && d.UnitId == itemComponent.UnitId
+                                                                                                  && d.MstArticle.IsLocked == true
+                                                                                                  select d;
+
+                                                                if (componentItemConversionUnit.Any())
                                                                 {
-                                                                    var componentItemConversionUnit = from d in db.MstArticleUnits
-                                                                                                      where d.ArticleId == itemComponent.ComponentArticleId
-                                                                                                      && d.UnitId == itemComponent.UnitId
-                                                                                                      && d.MstArticle.IsLocked == true
-                                                                                                      select d;
+                                                                    Decimal itemComponentDiscountAmount = 0 * (objSalesInvoiceItem.DiscountRate / 100);
+                                                                    Decimal itemComponentNetPrice = 0 - itemComponentDiscountAmount;
 
-                                                                    if (componentItemConversionUnit.Any())
+                                                                    if (discounts.FirstOrDefault().IsInclusive)
                                                                     {
-                                                                        Decimal itemComponentDiscountAmount = 0 * (objSalesInvoiceItem.DiscountRate / 100);
-                                                                        Decimal itemComponentNetPrice = 0 - itemComponentDiscountAmount;
+                                                                        Decimal price = 0 / (1 + (objSalesInvoiceItem.VATPercentage / 100));
 
-                                                                        if (discounts.FirstOrDefault().IsInclusive)
-                                                                        {
-                                                                            Decimal price = 0 / (1 + (objSalesInvoiceItem.VATPercentage / 100));
-
-                                                                            itemComponentDiscountAmount = price * (objSalesInvoiceItem.DiscountRate / 100);
-                                                                            itemComponentNetPrice = price - itemComponentDiscountAmount;
-                                                                        }
-
-                                                                        Decimal itemComponentQuantity = itemComponent.Quantity * objSalesInvoiceItem.Quantity;
-                                                                        Decimal itemComponentAmount = itemComponentNetPrice * itemComponentQuantity;
-                                                                        Decimal itemComponentVATAmount = itemComponentAmount * (objSalesInvoiceItem.VATPercentage / 100);
-
-                                                                        if (taxTypes.FirstOrDefault().IsInclusive)
-                                                                        {
-                                                                            itemComponentVATAmount = itemComponentAmount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
-                                                                        }
-
-                                                                        Decimal componentItemBaseQuantity = itemComponentQuantity * 1;
-                                                                        if (componentItemConversionUnit.FirstOrDefault().Multiplier > 0)
-                                                                        {
-                                                                            componentItemBaseQuantity = itemComponentQuantity * (1 / componentItemConversionUnit.FirstOrDefault().Multiplier);
-                                                                        }
-
-                                                                        Decimal componentItemBasePrice = itemComponentAmount;
-                                                                        if (baseQuantity > 0)
-                                                                        {
-                                                                            componentItemBasePrice = itemComponentAmount / componentItemBaseQuantity;
-                                                                        }
-
-                                                                        Data.TrnSalesInvoiceItem newComponentSalesInvoiceItem = new Data.TrnSalesInvoiceItem
-                                                                        {
-                                                                            SIId = Convert.ToInt32(SIId),
-                                                                            ItemId = itemComponent.ComponentArticleId,
-                                                                            ItemInventoryId = itemComponent.ComponentArticleInventoryId,
-                                                                            Particulars = itemComponent.Particulars,
-                                                                            UnitId = itemComponent.UnitId,
-                                                                            Quantity = itemComponentQuantity,
-                                                                            Price = 0,
-                                                                            DiscountId = objSalesInvoiceItem.DiscountId,
-                                                                            DiscountRate = objSalesInvoiceItem.DiscountRate,
-                                                                            DiscountAmount = discountAmount,
-                                                                            NetPrice = itemComponentNetPrice,
-                                                                            Amount = itemComponentAmount,
-                                                                            VATId = objSalesInvoiceItem.VATId,
-                                                                            VATPercentage = objSalesInvoiceItem.VATPercentage,
-                                                                            VATAmount = itemComponentVATAmount,
-                                                                            BaseUnitId = itemComponent.UnitId,
-                                                                            BaseQuantity = componentItemBaseQuantity,
-                                                                            BasePrice = componentItemBasePrice,
-                                                                            SalesItemTimeStamp = DateTime.Now
-                                                                        };
-
-                                                                        db.TrnSalesInvoiceItems.InsertOnSubmit(newComponentSalesInvoiceItem);
-                                                                        db.SubmitChanges();
+                                                                        itemComponentDiscountAmount = price * (objSalesInvoiceItem.DiscountRate / 100);
+                                                                        itemComponentNetPrice = price - itemComponentDiscountAmount;
                                                                     }
+
+                                                                    Decimal itemComponentQuantity = itemComponent.Quantity * objSalesInvoiceItem.Quantity;
+                                                                    Decimal itemComponentAmount = itemComponentNetPrice * itemComponentQuantity;
+                                                                    Decimal itemComponentVATAmount = itemComponentAmount * (objSalesInvoiceItem.VATPercentage / 100);
+
+                                                                    if (taxTypes.FirstOrDefault().IsInclusive)
+                                                                    {
+                                                                        itemComponentVATAmount = itemComponentAmount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
+                                                                    }
+
+                                                                    Decimal componentItemBaseQuantity = itemComponentQuantity * 1;
+                                                                    if (componentItemConversionUnit.FirstOrDefault().Multiplier > 0)
+                                                                    {
+                                                                        componentItemBaseQuantity = itemComponentQuantity * (1 / componentItemConversionUnit.FirstOrDefault().Multiplier);
+                                                                    }
+
+                                                                    Decimal componentItemBasePrice = itemComponentAmount;
+                                                                    if (baseQuantity > 0)
+                                                                    {
+                                                                        componentItemBasePrice = itemComponentAmount / componentItemBaseQuantity;
+                                                                    }
+
+                                                                    Data.TrnSalesInvoiceItem newComponentSalesInvoiceItem = new Data.TrnSalesInvoiceItem
+                                                                    {
+                                                                        SIId = Convert.ToInt32(SIId),
+                                                                        ItemId = itemComponent.ComponentArticleId,
+                                                                        ItemInventoryId = itemComponent.ComponentArticleInventoryId,
+                                                                        Particulars = itemComponent.Particulars,
+                                                                        UnitId = itemComponent.UnitId,
+                                                                        Quantity = itemComponentQuantity,
+                                                                        Price = 0,
+                                                                        DiscountId = objSalesInvoiceItem.DiscountId,
+                                                                        DiscountRate = objSalesInvoiceItem.DiscountRate,
+                                                                        DiscountAmount = discountAmount,
+                                                                        NetPrice = itemComponentNetPrice,
+                                                                        Amount = itemComponentAmount,
+                                                                        VATId = objSalesInvoiceItem.VATId,
+                                                                        VATPercentage = objSalesInvoiceItem.VATPercentage,
+                                                                        VATAmount = itemComponentVATAmount,
+                                                                        BaseUnitId = itemComponent.UnitId,
+                                                                        BaseQuantity = componentItemBaseQuantity,
+                                                                        BasePrice = componentItemBasePrice,
+                                                                        SalesItemTimeStamp = DateTime.Now
+                                                                    };
+
+                                                                    db.TrnSalesInvoiceItems.InsertOnSubmit(newComponentSalesInvoiceItem);
+                                                                    db.SubmitChanges();
                                                                 }
                                                             }
                                                         }
-
-                                                        Decimal salesInvoiceItemTotalAmount = 0;
-
-                                                        if (salesInvoice.FirstOrDefault().TrnSalesInvoiceItems.Any())
-                                                        {
-                                                            salesInvoiceItemTotalAmount = salesInvoice.FirstOrDefault().TrnSalesInvoiceItems.Sum(d => d.Amount);
-                                                        }
-
-                                                        var updateSalesInvoiceAmount = salesInvoice.FirstOrDefault();
-                                                        updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
-                                                        db.SubmitChanges();
-
-                                                        return Request.CreateResponse(HttpStatusCode.OK);
                                                     }
-                                                    else
+
+                                                    Decimal salesInvoiceItemTotalAmount = 0;
+                                                    if (salesInvoice.FirstOrDefault().TrnSalesInvoiceItems.Any())
                                                     {
-                                                        return Request.CreateResponse(HttpStatusCode.BadRequest, inventoryErrorMessage);
+                                                        salesInvoiceItemTotalAmount = salesInvoice.FirstOrDefault().TrnSalesInvoiceItems.Sum(d => d.Amount);
                                                     }
+
+                                                    var updateSalesInvoiceAmount = salesInvoice.FirstOrDefault();
+                                                    updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
+                                                    db.SubmitChanges();
+
+                                                    return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
                                                 else
                                                 {
