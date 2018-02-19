@@ -233,6 +233,24 @@ namespace easyfis.Controllers
             return UserRights("ChartOfAccounts");
         }
 
+        // ================
+        // Purchase Request
+        // ================
+        [Authorize]
+        public ActionResult PurchaseRequest()
+        {
+            return UserRights("PurchaseRequestList");
+        }
+
+        // =======================
+        // Purchase Request Detail
+        // =======================
+        [Authorize]
+        public ActionResult PurchaseRequestDetail()
+        {
+            return UserRights("PurchaseRequestDetail");
+        }
+
         // ==============
         // Purchase Order
         // ==============

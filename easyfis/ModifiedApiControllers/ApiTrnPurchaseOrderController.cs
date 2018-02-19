@@ -56,7 +56,7 @@ namespace easyfis.ModifiedApiControllers
                                      Id = d.Id,
                                      PONumber = d.PONumber,
                                      PODate = d.PODate.ToShortDateString(),
-                                     ManualRequestNumber = d.ManualRequestNumber,
+                                     ManualPONumber = d.ManualPONumber,
                                      Supplier = d.MstArticle.Article,
                                      Remarks = d.Remarks,
                                      Amount = GetPurchaseOrderAmount(d.Id),
