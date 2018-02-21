@@ -572,5 +572,123 @@ namespace easyfis.ModifiedApiControllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
             }
         }
+
+        // =====================
+        // Load Purchase Request
+        // =====================
+        [Authorize, HttpPost, Route("api/purchaseOrder/load/purchaseRequest/{POId}/{PRId}")]
+        public HttpResponseMessage LoadPurchaseRequest(String POId, String PRId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("PurchaseOrderDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanAdd)
+                        {
+                            var purchaseOrder = from d in db.TrnPurchaseOrders
+                                                where d.Id == Convert.ToInt32(POId)
+                                                select d;
+
+                            if (purchaseOrder.Any())
+                            {
+                                var purchaseRequest = from d in db.TrnPurchaseRequests
+                                                      where d.Id == Convert.ToInt32(PRId)
+                                                      && d.IsLocked == true
+                                                      select d;
+
+                                if (purchaseRequest.Any())
+                                {
+                                    var updatePurchaseOrder = purchaseOrder.FirstOrDefault();
+                                    updatePurchaseOrder.PODate = purchaseRequest.FirstOrDefault().PRDate;
+                                    updatePurchaseOrder.SupplierId = purchaseRequest.FirstOrDefault().SupplierId;
+                                    updatePurchaseOrder.TermId = purchaseRequest.FirstOrDefault().TermId;
+                                    updatePurchaseOrder.ManualRequestNumber = purchaseRequest.FirstOrDefault().ManualPRNumber;
+                                    updatePurchaseOrder.ManualPONumber = purchaseRequest.FirstOrDefault().ManualPRNumber;
+                                    updatePurchaseOrder.DateNeeded = purchaseRequest.FirstOrDefault().DateNeeded;
+                                    updatePurchaseOrder.Remarks = purchaseRequest.FirstOrDefault().Remarks;
+                                    updatePurchaseOrder.IsClose = purchaseRequest.FirstOrDefault().IsClose;
+                                    updatePurchaseOrder.RequestedById = purchaseRequest.FirstOrDefault().RequestedById;
+                                    updatePurchaseOrder.CheckedById = purchaseRequest.FirstOrDefault().CheckedById;
+                                    updatePurchaseOrder.ApprovedById = purchaseRequest.FirstOrDefault().ApprovedById;
+                                    updatePurchaseOrder.UpdatedById = currentUserId;
+                                    updatePurchaseOrder.UpdatedDateTime = DateTime.Now;
+                                    db.SubmitChanges();
+
+                                    var purchaseRequestItems = from d in db.TrnPurchaseRequestItems
+                                                               where d.PRId == purchaseRequest.FirstOrDefault().Id
+                                                               select d;
+
+                                    if (purchaseRequestItems.Any())
+                                    {
+                                        foreach (var purchaseRequestItem in purchaseRequestItems)
+                                        {
+                                            Data.TrnPurchaseOrderItem newPurchaseOrderItem = new Data.TrnPurchaseOrderItem()
+                                            {
+                                                ItemId = purchaseRequestItem.ItemId,
+                                                Particulars = purchaseRequestItem.Particulars,
+                                                UnitId = purchaseRequestItem.UnitId,
+                                                Quantity = purchaseRequestItem.Quantity,
+                                                Cost = purchaseRequestItem.Cost,
+                                                Amount = purchaseRequestItem.Amount,
+                                                BaseUnitId = purchaseRequestItem.BaseUnitId,
+                                                BaseQuantity = purchaseRequestItem.BaseQuantity,
+                                                BaseCost = purchaseRequestItem.BaseCost,
+                                            };
+                                            db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
+                                        }
+
+                                        db.SubmitChanges();
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. There are no purchase request items found in the server.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. There are no purchase requests found in the server.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These purchase order details are not found in the server.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to load purchase request.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this purchase order page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
     }
 }
