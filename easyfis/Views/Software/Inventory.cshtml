@@ -128,7 +128,17 @@
                                                 <div class="form-group">
                                                     <label class="control-label col-sm-4">Item</label>
                                                     <div class="col-sm-8">
-                                                        <div class="comboBox-wide" id="cboStockCardItem"></div>
+                                                        <table style="width: 100%" border="0">
+                                                            <tr>
+                                                                <td style="width: 30%">
+                                                                    <div class="comboBox-wide" id="cboStockCardItemCode"></div>
+                                                                </td>
+                                                                <td style="width: 1%"></td>
+                                                                <td style="width: 69%">
+                                                                    <div class="comboBox-wide" id="cboStockCardItem"></div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </form>
@@ -394,6 +404,7 @@
         var cboStockCardEndDate = new wijmo.input.InputDate('#cboStockCardEndDate');
         var cboStockCardCompany = new wijmo.input.ComboBox('#cboStockCardCompany');
         var cboStockCardBranch = new wijmo.input.ComboBox('#cboStockCardBranch');
+        var cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode');
         var cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem');
         var cboStockInDetailStartDate = new wijmo.input.InputDate('#cboStockInDetailStartDate');
         var cboStockInDetailEndDate = new wijmo.input.InputDate('#cboStockInDetailEndDate');
@@ -852,6 +863,7 @@
                         for (i = 0; i < Results.length; i++) {
                             itemsObservableArray.push({
                                 Id: Results[i]["Id"],
+                                ManualArticleCode: Results[i]["ManualArticleCode"],
                                 Article: Results[i]["Article"]
                             });
                         }
@@ -863,6 +875,15 @@
                     } else {
 
                     }
+
+                    cboStockCardItemCode.dispose();
+                    cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: itemsObservableArray,
+                        displayMemberPath: "ManualArticleCode",
+                        selectedValuePath: "Id"
+                    });
 
                     cboStockCardItem.dispose();
                     cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem', {

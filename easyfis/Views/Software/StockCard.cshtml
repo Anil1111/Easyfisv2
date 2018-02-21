@@ -90,13 +90,20 @@
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
+                                <td style="width: 24%">
+                                    <div class="input-group ">
+                                        <span class="input-group-addon"><b>Manual Code</b></span>
+                                        <div class="comboBox-wide" id="cboStockCardItemCode"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
-                                        <span class="input-group-addon"><b>Item</b></span>
+                                        <span class="input-group-addon"><b>Item Description</b></span>
                                         <div class="comboBox-wide" id="cboStockCardItem"></div>
                                     </div>
                                 </td>
-                                <td style="width: 50.5%"></td>
+                                <td style="width: 25.5%"></td>
                             </tr>
                         </table>
                     </div>
@@ -178,6 +185,7 @@
         var stockCardReportCollections;
         var stockCardReportGrid;
         var isStockCardReportCompanySelected = false;
+        var cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode');
         var cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem');
         var isStockCardReportBranchSelected = false;
         var cboStockCardReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStockCardReportShowNumberOfRows');
@@ -368,6 +376,7 @@
                         for (i = 0; i < Results.length; i++) {
                             itemsObservableArray.push({
                                 Id: Results[i]["Id"],
+                                ManualArticleCode: Results[i]["ManualArticleCode"],
                                 Article: Results[i]["Article"]
                             });
                         }
@@ -380,6 +389,19 @@
 
                     }
 
+                    cboStockCardItemCode.dispose();
+                    cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: itemsObservableArray,
+                        displayMemberPath: "ManualArticleCode",
+                        selectedValuePath: "Id",
+                        selectedValue: getParam("ItemId"),
+                        onSelectedIndexChanged: function () {
+                            cboStockCardItem.selectedValue = this.selectedValue;
+                        }
+                    });
+
                     cboStockCardItem.dispose();
                     cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem', {
                         disabled: disabled,
@@ -390,6 +412,7 @@
                         selectedValue: getParam("ItemId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
+                            cboStockCardItemCode.selectedValue = this.selectedValue;
                             refreshStockCardReportFlexGrid();
                         }
                     });
