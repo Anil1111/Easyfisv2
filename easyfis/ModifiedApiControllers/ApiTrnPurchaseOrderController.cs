@@ -573,11 +573,71 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
+        // ==================================
+        // Dropdown List - PR Branch (Filter)
+        // ==================================
+        [Authorize, HttpGet, Route("api/purchaseOrder/purchaseRequest/dropdown/list/branch")]
+        public List<Entities.MstBranch> DropdownListPurchaseOrderPurchaseRequestBranch()
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // ===========================
+        // Get Purchase Request Amount
+        // ===========================
+        public Decimal GetPurchaseRequestAmount(Int32 PRId)
+        {
+            var purchaseRequestItems = from d in db.TrnPurchaseRequestItems
+                                       where d.PRId == PRId
+                                       select d;
+
+            if (purchaseRequestItems.Any())
+            {
+                return purchaseRequestItems.Sum(d => d.Amount);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        // ==============================================
+        // List Purchase Request (Purchase Request Query)
+        // ==============================================
+        [Authorize, HttpGet, Route("api/purchaseOrder/purchaseRequest/list/{startDate}/{endDate}/{branchId}")]
+        public List<Entities.TrnPurchaseRequest> ListPurchaseOrderPurchaseRequest(String startDate, String endDate, String branchId)
+        {
+            var purchaseRequests = from d in db.TrnPurchaseRequests.OrderByDescending(d => d.Id)
+                                   where d.BranchId == Convert.ToInt32(branchId)
+                                   && d.PRDate >= Convert.ToDateTime(startDate)
+                                   && d.PRDate <= Convert.ToDateTime(endDate)
+                                   select new Entities.TrnPurchaseRequest
+                                   {
+                                       Id = d.Id,
+                                       PRNumber = d.PRNumber,
+                                       PRDate = d.PRDate.ToShortDateString(),
+                                       ManualPRNumber = d.ManualPRNumber,
+                                       Supplier = d.MstArticle.Article,
+                                       Remarks = d.Remarks,
+                                       Amount = GetPurchaseRequestAmount(d.Id),
+                                       IsClose = d.IsClose,
+                                   };
+
+            return purchaseRequests.ToList();
+        }
+
         // =====================
         // Load Purchase Request
         // =====================
         [Authorize, HttpPost, Route("api/purchaseOrder/load/purchaseRequest/{POId}/{PRId}")]
-        public HttpResponseMessage LoadPurchaseRequest(String POId, String PRId)
+        public HttpResponseMessage LoadPurchaseOrderPurchaseRequest(String POId, String PRId)
         {
             try
             {
@@ -627,6 +687,16 @@ namespace easyfis.ModifiedApiControllers
                                     updatePurchaseOrder.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
 
+                                    var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
+                                                             where d.POId == purchaseOrder.FirstOrDefault().Id
+                                                             select d;
+
+                                    if (purchaseOrderItems.Any())
+                                    {
+                                        db.TrnPurchaseOrderItems.DeleteAllOnSubmit(purchaseOrderItems);
+                                        db.SubmitChanges();
+                                    }
+
                                     var purchaseRequestItems = from d in db.TrnPurchaseRequestItems
                                                                where d.PRId == purchaseRequest.FirstOrDefault().Id
                                                                select d;
@@ -637,6 +707,7 @@ namespace easyfis.ModifiedApiControllers
                                         {
                                             Data.TrnPurchaseOrderItem newPurchaseOrderItem = new Data.TrnPurchaseOrderItem()
                                             {
+                                                POId = purchaseOrder.FirstOrDefault().Id,
                                                 ItemId = purchaseRequestItem.ItemId,
                                                 Particulars = purchaseRequestItem.Particulars,
                                                 UnitId = purchaseRequestItem.UnitId,

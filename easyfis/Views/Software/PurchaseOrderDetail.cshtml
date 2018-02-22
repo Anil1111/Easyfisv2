@@ -117,7 +117,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control requiredPO" id="PORequestNumber" placeholder="Request Number">
                                                 <div class="input-group-btn">
-                                                    <button type="button" class=" btn btn-primary" id="btnManualRequestNo" onclick="ManualRequestNoClick()"><i>PR</i></button>
+                                                    <button type="button" class=" btn btn-primary" id="btnManualRequestNo" onclick="ManualRequestNoOnclick()">PR</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -379,7 +379,7 @@
 
     <!-- Modal for Manual Request No -->
     <div class="modal fade" id="ManualRequestNo" role="dialog">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Purchase Request</h4>
@@ -391,6 +391,12 @@
                     <div id="ManualRequestNoPanel">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <div class="input-group ">
+                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    <input type="text" class="form-control" id="InputPRFilter" placeholder="Search...">
+                                </div>
+                            </div>
+                            <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 24%">
@@ -399,16 +405,18 @@
                                                 <div class="comboBox-wide" id="cboPurchaseRequestStartDate"></div>
                                             </div>
                                         </td>
+                                        <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>End Date</b></span>
                                                 <div class="comboBox-wide" id="cboPurchaseRequestEndDate"></div>
                                             </div>
                                         </td>
-                                        <td style="width: 24%">
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 50%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>Branch</b></span>
-                                                <div class="comboBox-wide" id="cboBranchList"></div>
+                                                <div class="comboBox-wide" id="cboPRBranchList"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -419,28 +427,28 @@
                             </div>
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridPR">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridPR">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridPR">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridPR"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridPR">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridPR">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
@@ -454,16 +462,15 @@
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    APPLY PURCHASE REQUEST?
+                    Apply Purchase Request?
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="cmdConfirmPickPRLines" onclick="cmdPRLinesConfirmPicButton_OnClick()"><i class="fa fa-apply"></i> APPLY</button>
+                    <button class="btn btn-primary" id="cmdConfirmPickPRLines" onclick="cmdPRLinesConfirmPicButton_OnClick()"><i class="fa fa-check"></i> Apply</button>
                     <button id="cmdConfirmPickPRLinesCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- POLines Delete Modal Confirmation -->
     <div class="modal fade" id="deletePOLinesConfirm" role="dialog">
@@ -518,16 +525,21 @@
         var btnMoveToLastPageGridItemQuery = document.getElementById('btnMoveToLastPageGridItemQuery');
         var btnCurrentPageGridItemQuery = document.getElementById('btnCurrentPageGridItemQuery');
         var isItemQueryClicked = false;
-
-        //akoa
         var cboPurchaseRequestStartDate = new wijmo.input.InputDate('#cboPurchaseRequestStartDate');
         var cboPurchaseRequestEndDate = new wijmo.input.InputDate('#cboPurchaseRequestEndDate');
         var isStartDateFirstSelect = true;
         var isEndDateFirstSelect = true;
-        var cboBranchList = new wijmo.input.ComboBox('#cboBranchList');
-        var PRGrid = new wijmo.grid.FlexGrid('#PRGrid');
+
+        var cboPRBranchList = new wijmo.input.ComboBox('#cboPRBranchList');
         var purchaseRequestCollectionView;
-        var purchaseRequestFlexGrid2;
+        var PRGrid = new wijmo.grid.FlexGrid('#PRGrid');
+        var isPRClicked = false;
+
+        var btnFirstPageGridPR = document.getElementById('btnMoveToFirstPageGridPR');
+        var btnPreviousPageGridPR = document.getElementById('btnMoveToPreviousPageGridPR');
+        var btnNextPageGridPR = document.getElementById('btnMoveToNextPageGridPR');
+        var btnLastPageGridPR = document.getElementById('btnMoveToLastPageGridPR');
+        var btnCurrentPageGridPR = document.getElementById('btnCurrentPageGridPR');
 
         // =======================
         // Get URL Parameter Value
@@ -546,29 +558,27 @@
             }
         }
 
-        // ====================
-        // Purchase Request No Modal AKO
-        // ====================
-
-        function ManualRequestNoClick() {
+        // ==================================
+        // Manual Purchase Request No - Click
+        // ==================================
+        function ManualRequestNoOnclick() {
             $('#ManualRequestNo').modal({
                 show: true,
                 backdrop: 'static'
             });
 
+            $("#ManualRequestNoPanel").hide();
+            document.getElementById("loadingManualRequestNo").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
             $("#loadingManualRequestNo").show();
 
             setTimeout(function () {
-
                 cboPurchaseRequestDateFilters();
-                createItemQueryFlexGrid();
             }, 500);
-            //document.getElementById("loadingManualRequestNo").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
         }
 
-        // ===========
-        // Date Filter AKOA
-        // ===========
+        // ==============
+        // PR Date Filter
+        // ==============
         function cboPurchaseRequestDateFilters() {
             cboPurchaseRequestStartDate.dispose();
             cboPurchaseRequestStartDate = new wijmo.input.InputDate('#cboPurchaseRequestStartDate', {
@@ -576,7 +586,7 @@
                 value: new Date(),
                 onValueChanged: function () {
                     if (!isStartDateFirstSelect) {
-                        refreshPurchaseRequestFlexGrid();
+                        createPurchaseRequestFlexGrid();
                     } else {
                         isStartDateFirstSelect = false;
                     }
@@ -589,27 +599,111 @@
                 value: new Date(),
                 onValueChanged: function () {
                     if (!isStartDateFirstSelect) {
-                        refreshPurchaseRequestFlexGrid();
+                        createPurchaseRequestFlexGrid();
                     } else {
                         isEndDateFirstSelect = false;
                     }
                 }
             });
 
-            createPurchaseRequestFlexGrid();
-            getBranchesPRForComboBox();
+            createCboPurchaseRequestBranch();
         }
 
-        // =======================
-        // Purchase Request FlexGrid Akoa
-        // =======================
+        // ===============
+        // CBO PR - Branch
+        // ===============
+        function createCboPurchaseRequestBranch() {
+            var branchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/purchaseOrder/purchaseRequest/dropdown/list/branch',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            branchesObservableArray.push({
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    cboPRBranchList.dispose();
+                    cboPRBranchList = new wijmo.input.ComboBox('#cboPRBranchList', {
+                        isEditable: false,
+                        placeholder: "Select Branch",
+                        itemsSource: branchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "Id",
+                        selectedValue: cboPOBranch.selectedValue,
+                        onSelectedIndexChanged: function () {
+                            createPurchaseRequestFlexGrid();
+                        }
+                    });
+
+                    createPurchaseRequestFlexGrid();
+                }
+            });
+        }
+
+        // ====================
+        // GET Purchase Request
+        // ====================
+        function getPurchaseRequestFilterByDates() {
+            NProgress.start();
+            var startDate = cboPurchaseRequestStartDate.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboPurchaseRequestEndDate.value.toLocaleDateString().replace(/\//g, '-');
+
+            var purchaseRequestObservableArray = new wijmo.collections.ObservableArray;
+            if (cboPRBranchList.selectedValue != null) {
+                var branchId = cboPRBranchList.selectedValue;
+                $.ajax({
+                    url: '/api/purchaseOrder/purchaseRequest/list/' + startDate + '/' + endDate + '/' + branchId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var PRDateResult = new Date(results[i]["PRDate"])
+                                var PRDate = ('0' + (PRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + PRDateResult.getDate()).slice(-2) + '-' + PRDateResult.getFullYear();
+
+                                purchaseRequestObservableArray.push({
+                                    Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyPROnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                    Id: results[i]["Id"],
+                                    PRNumber: results[i]["PRNumber"],
+                                    PRDate: PRDate,
+                                    ManualPRNumber: results[i]["ManualPRNumber"],
+                                    Supplier: results[i]["Supplier"],
+                                    Remarks: results[i]["Remarks"],
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                });
+                            }
+                        }
+
+                        $("#loadingManualRequestNo").hide();
+                        $("#ManualRequestNoPanel").show();
+                        NProgress.done();
+                    }
+                });
+            }
+
+            return purchaseRequestObservableArray;
+        }
+
+        // =========================
+        // Purchase Request FlexGrid
+        // =========================
         function createPurchaseRequestFlexGrid() {
             purchaseRequestCollectionView = new wijmo.collections.CollectionView(getPurchaseRequestFilterByDates());
             purchaseRequestCollectionView.canFilter = true;
-            purchaseRequestCollectionView.pageSize = 15;
+            purchaseRequestCollectionView.pageSize = 7;
 
             var filterText = '';
-            $('#cboBranchList').keyup(function () {
+            $('#InputPRFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 purchaseRequestCollectionView.refresh();
             });
@@ -623,10 +717,6 @@
 
             purchaseRequestCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsPR();
-            });
-
-            purchaseRequestCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
             });
 
             PRGrid.dispose();
@@ -690,160 +780,131 @@
 
             PRGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            btnFirstPageGridPR = document.getElementById('btnMoveToFirstPageGridPR');
+            btnPreviousPageGridPR = document.getElementById('btnMoveToPreviousPageGridPR');
+            btnNextPageGridPR = document.getElementById('btnMoveToNextPageGridPR');
+            btnLastPageGridPR = document.getElementById('btnMoveToLastPageGridPR');
+            btnCurrentPageGridPR = document.getElementById('btnCurrentPageGridPR');
 
-            updateNavigateButtonsPR();
-
-            btnFirstPageGrid.addEventListener('click', function () {
-                purchaseRequestCollectionView.moveToFirstPage();
+            if (!isPRClicked) {
                 updateNavigateButtonsPR();
-            });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                purchaseRequestCollectionView.moveToPreviousPage();
-                updateNavigateButtonsPR();
-            });
+                btnFirstPageGridPR.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToFirstPage();
+                    updateNavigateButtonsPR();
+                });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                purchaseRequestCollectionView.moveToNextPage();
-                updateNavigateButtonsPR();
-            });
+                btnPreviousPageGridPR.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToPreviousPage();
+                    updateNavigateButtonsPR();
+                });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                purchaseRequestCollectionView.moveToLastPage();
-                updateNavigateButtonsPR();
-            });
-        }
+                btnNextPageGridPR.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToNextPage();
+                    updateNavigateButtonsPR();
+                });
 
-        // ==========================
-        // GET Purchase Request Akoa
-        // ==========================
+                btnLastPageGridPR.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToLastPage();
+                    updateNavigateButtonsPR();
+                });
 
-        function getPurchaseRequestFilterByDates() {
-            NProgress.start();
-            var startDate = cboPurchaseRequestStartDate.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboPurchaseRequestEndDate.value.toLocaleDateString().replace(/\//g, '-');
-
-            var purchaseRequestObservableArray = new wijmo.collections.ObservableArray;
-
-
-            $.ajax({
-                url: '/api/purchaseRequest/list/' + startDate + '/' + endDate + '/',
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (results) {
-                    if (results.length > 0) {
-                        for (i = 0; i < results.length; i++) {
-                            var PRDateResult = new Date(results[i]["PRDate"])
-                            var PRDate = ('0' + (PRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + PRDateResult.getDate()).slice(-2) + '-' + PRDateResult.getFullYear();
-
-                            purchaseRequestObservableArray.push({
-                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyPROnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
-                                Id: results[i]["Id"],
-                                PRNumber: results[i]["PRNumber"],
-                                PRDate: PRDate,
-                                ManualPRNumber: results[i]["ManualPRNumber"],
-                                Supplier: results[i]["Supplier"],
-                                Remarks: results[i]["Remarks"],
-                                Amount: results[i]["Amount"],
-                                AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                            });
-                        }
-                    }
-
-                    NProgress.done();
-                }
-            });
-
-            return purchaseRequestObservableArray;
-        }
-
-        // ===============================
-        // Refresh Purchase Request FlexGrid Akoa
-        // ===============================
-        function refreshPurchaseRequestFlexGrid() {
-            purchaseRequestCollectionView = new wijmo.collections.CollectionView(getPurchaseRequestFilterByDates());
-            purchaseRequestCollectionView.canFilter = true;
-            purchaseRequestCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#cdoBranchList').keyup(function () {
-                filterText = this.value.toLowerCase();
-                purchaseRequestCollectionView.refresh();
-            });
-
-            purchaseRequestCollectionView.filter = function (item) {
-                return !filterText || (item.PRNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualPRNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Supplier.toLowerCase().indexOf(filterText) > -1);
+                isPRClicked = true;
             }
-
-            purchaseRequestCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsPR();
-            });
-
-            purchaseRequestCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-            PRGrid.itemsSource = purchaseRequestCollectionView;
-            PRGrid.trackChanges = true;
         }
 
-
-        // ===================
-        // FlexGrid Selection Akoa
-        // ===================
-        function updateDetails() {
-            var item = purchaseRequestCollectionView.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // ===============================
-        // Navigation Buttons for Comapany Akoa
-        // ===============================
+        // =====================
+        // Navigation Buttons PR
+        // =====================
         function updateNavigateButtonsPR() {
             if (purchaseRequestCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                document.getElementById('naviagtionPageGridPR').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            document.getElementById('naviagtionPageGridPR').style.display = 'block';
             if (purchaseRequestCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
+                btnFirstPageGridPR.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridPR.setAttribute('disabled', 'disabled');
+                btnNextPageGridPR.removeAttribute('disabled');
+                btnLastPageGridPR.removeAttribute('disabled');
             } else if (purchaseRequestCollectionView.pageIndex === (purchaseRequestCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
+                btnFirstPageGridPR.removeAttribute('disabled');
+                btnPreviousPageGridPR.removeAttribute('disabled');
+                btnLastPageGridPR.setAttribute('disabled', 'disabled');
+                btnNextPageGridPR.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
+                btnFirstPageGridPR.removeAttribute('disabled');
+                btnPreviousPageGridPR.removeAttribute('disabled');
+                btnNextPageGridPR.removeAttribute('disabled');
+                btnLastPageGridPR.removeAttribute('disabled');
             }
-            btnCurrentPageGrid.innerHTML = (purchaseRequestCollectionView.pageIndex + 1) + ' / ' + purchaseRequestCollectionView.pageCount;
+            btnCurrentPageGridPR.innerHTML = (purchaseRequestCollectionView.pageIndex + 1) + ' / ' + purchaseRequestCollectionView.pageCount;
         }
 
+        // ============================
+        // Purchase Request - Pick Item
+        // ============================
+        function pickToApplyPROnClick() {
+            $('#pickPRLinesConfirm').modal({ show: true, backdrop: 'static' });
+
+            document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-apply'></i> Apply";
+            $("#cmdConfirmPickPRLines").prop("disabled", false);
+            $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
+        }
+
+        // ================================
+        // Confirm Pick Purchase Order Item
+        // ================================
+        function cmdPRLinesConfirmPicButton_OnClick() {
+            document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Applying...";
+            $("#cmdConfirmPickPRLines").prop("disabled", true);
+            $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", true);
+
+            purchaseRequestCollectionView.editItem(purchaseRequestCollectionView.currentItem);
+            var PRId = purchaseRequestCollectionView.currentEditItem.Id;
+            var POId = getParam('id');
+
+            $.ajax({
+                type: "POST",
+                url: '/api/purchaseOrder/load/purchaseRequest/' + POId + '/' + PRId,
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        toastr.success("Apply Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-apply'></i> Apply";
+                        $("#cmdConfirmPickPRLines").prop("disabled", false);
+                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-apply'></i> Apply";
+                        $("#cmdConfirmPickPRLines").prop("disabled", false);
+                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-apply'></i> Apply";
+                        $("#cmdConfirmPickPRLines").prop("disabled", false);
+                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
+                    }
+                }
+            });
+        }
 
         // ========================
-        // GET Branch for Combo Box Akoa
+        // GET Branch for Combo Box
         // ========================
-        function getBranchesPRForComboBox() {
-            //NProgress.start();
+        function getBranchesForComboBox() {
+            NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/purchaseRequest/dropdown/list/branch',
+                url: '/api/purchaseOrder/dropdown/list/branch',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
@@ -858,84 +919,18 @@
                         }
                     }
 
-                    cboBranchList.dispose();
-                    cboBranchList = new wijmo.input.ComboBox('#cboBranchList', {
-                        disabled: false,
-                        isEditable: true,
+                    cboPOBranch.dispose();
+                    cboPOBranch = new wijmo.input.ComboBox('#cboPOBranch', {
+                        disabled: true,
+                        isEditable: false,
                         placeholder: "Select Branch",
                         itemsSource: branchesObservableArray,
                         displayMemberPath: "Branch",
-                        selectedValuePath: getParam("BranchId"),
-                        onSelectedIndexChanged: function () {
-                          refreshPurchaseRequestFlexGrid();
-                        }
-
+                        selectedValuePath: "Id"
                     });
-
+                    getSupplierForComboBox();
                 }
             });
-        }
-
-     
-
-        // ==================================
-        // Purchase Request - Pick Item Akoa
-        // ==================================
-        function pickToApplyPROnClick() {
-
-            $('#pickPRLinesConfirm').modal({ show: true, backdrop: 'static' });
-
-            document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-apply'></i> Apply";
-            document.getElementById('cmdConfirmPickPRLinesCloseButton').innerHTML = "<i class='fa fa-close'></i> Cancel";
-            $("#cmdConfirmPickPRLines").prop("disabled", false);
-            $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
-           // cmdPRLinesConfirmPicButton_OnClick();
-        }
-
-        // ==================================
-        // Confirm Pick Purchase Order Item Akoa
-        // ==================================
-        function cmdPRLinesConfirmPicButton_OnClick() {
-           
-        }
-
-     
-
-        // ========================
-        // GET Branch for Combo Box
-        // ========================
-        function getBranchesForComboBox() {
-            NProgress.start();
-            var branchesObservableArray = new wijmo.collections.ObservableArray();
-
-                $.ajax({
-                    url: '/api/purchaseOrder/dropdown/list/branch',
-                    cache: false,
-                    type: 'GET',
-                    contentType: 'application/json; charset=utf-8',
-                    data: {},
-                    success: function (results) {
-                        if (results.length > 0) {
-                            for (i = 0; i < results.length; i++) {
-                                branchesObservableArray.push({
-                                    Id: results[i]["Id"],
-                                    Branch: results[i]["Branch"]
-                                });
-                            }
-                        }
-
-                        cboPOBranch.dispose();
-                        cboPOBranch = new wijmo.input.ComboBox('#cboPOBranch', {
-                            disabled: true,
-                            isEditable: false,
-                            placeholder: "Select Branch",
-                            itemsSource: branchesObservableArray,
-                            displayMemberPath: "Branch",
-                            selectedValuePath: "Id"
-                        });
-                        getSupplierForComboBox();
-                    }
-                });
         }
 
         // ==========================

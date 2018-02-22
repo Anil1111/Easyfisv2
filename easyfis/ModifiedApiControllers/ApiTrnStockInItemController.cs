@@ -92,6 +92,12 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/stockInItem/dropdown/list/item")]
         public List<Entities.MstArticle> DropdownListStockInItemListItem()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var items = from d in db.MstArticles.OrderBy(d => d.Article)
                         where d.ArticleTypeId == 1
                         && d.IsInventory == true
@@ -102,7 +108,8 @@ namespace easyfis.ModifiedApiControllers
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
-                            Cost = GetItemInventoryCost(d.Id)
+                            Cost = d.MstArticleComponents.Sum(a => a.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(o => o.Cost).FirstOrDefault().Cost * a.Quantity)
+                            //Cost = d.MstArticleInventories.Where(c => c.BranchId == branchId).Any() ? d.MstArticleInventories.Where(c => c.BranchId == branchId).FirstOrDefault().Cost : 0
                         };
 
             return items.ToList();
@@ -133,6 +140,12 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/stockInItem/popUp/list/itemQuery")]
         public List<Entities.MstArticle> PopUpListStockInItemListItemQuery()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var items = from d in db.MstArticles
                         where d.ArticleTypeId == 1
                         && d.IsInventory == true
@@ -144,7 +157,8 @@ namespace easyfis.ModifiedApiControllers
                             Article = d.Article,
                             Particulars = d.Particulars,
                             Price = d.Price,
-                            Cost = GetItemInventoryCost(d.Id)
+                            Cost = d.MstArticleComponents.Sum(a => a.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(o => o.Cost).FirstOrDefault().Cost * a.Quantity)
+                            //Cost = d.MstArticleInventories.Where(c => c.BranchId == branchId).Any() ? d.MstArticleInventories.Where(c => c.BranchId == branchId).FirstOrDefault().Cost : 0
                         };
 
             return items.ToList();
