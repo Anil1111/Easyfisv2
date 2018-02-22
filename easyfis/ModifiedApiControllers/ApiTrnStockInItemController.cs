@@ -108,8 +108,7 @@ namespace easyfis.ModifiedApiControllers
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
-                            Cost = d.MstArticleComponents.Sum(a => a.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(o => o.Cost).FirstOrDefault().Cost * a.Quantity)
-                            //Cost = d.MstArticleInventories.Where(c => c.BranchId == branchId).Any() ? d.MstArticleInventories.Where(c => c.BranchId == branchId).FirstOrDefault().Cost : 0
+                            Cost = GetItemInventoryCost(d.Id)
                         };
 
             return items.ToList();
@@ -157,8 +156,7 @@ namespace easyfis.ModifiedApiControllers
                             Article = d.Article,
                             Particulars = d.Particulars,
                             Price = d.Price,
-                            Cost = d.MstArticleComponents.Sum(a => a.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(o => o.Cost).FirstOrDefault().Cost * a.Quantity)
-                            //Cost = d.MstArticleInventories.Where(c => c.BranchId == branchId).Any() ? d.MstArticleInventories.Where(c => c.BranchId == branchId).FirstOrDefault().Cost : 0
+                            Cost = GetItemInventoryCost(d.Id)
                         };
 
             return items.ToList();
