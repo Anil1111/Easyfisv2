@@ -46,10 +46,11 @@ namespace easyfis.ModifiedApiControllers
             return stockInItems.ToList();
         }
 
-        // =======================
-        // Get Item Inventory Cost
-        // =======================
-        public Decimal GetItemInventoryCost(Int32 itemId)
+        // ======================================
+        // Get Item Inventory Cost - Cost (Field)
+        // ======================================
+        [Authorize, HttpGet, Route("api/stockInItem/getItemInventoryCost/{itemId}")]
+        public Decimal GetItemInventoryCost(String itemId)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -58,7 +59,7 @@ namespace easyfis.ModifiedApiControllers
             var branchId = currentUser.FirstOrDefault().BranchId;
 
             var itemComponents = from d in db.MstArticleComponents
-                                 where d.ArticleId == itemId
+                                 where d.ArticleId == Convert.ToInt32(itemId)
                                  select d;
 
             if (itemComponents.Any())
@@ -107,8 +108,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
-                            Article = d.Article,
-                            Cost = GetItemInventoryCost(d.Id)
+                            Article = d.Article
                         };
 
             return items.ToList();
@@ -155,8 +155,7 @@ namespace easyfis.ModifiedApiControllers
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
                             Particulars = d.Particulars,
-                            Price = d.Price,
-                            Cost = GetItemInventoryCost(d.Id)
+                            Price = d.Price
                         };
 
             return items.ToList();

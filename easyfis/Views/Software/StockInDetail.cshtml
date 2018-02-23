@@ -1521,8 +1521,7 @@
                             articleItemsObservableArray.push({
                                 Id: results[i]["Id"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
-                                ItemDescription: results[i]["Article"],
-                                Cost: results[i]["Cost"]
+                                ItemDescription: results[i]["Article"]
                             });
                         }
                     }
@@ -1561,29 +1560,37 @@
                             getStockInItemUnitForComboBox(unitId);
 
                             if (document.getElementById("StockIn_Produce").checked) {
-                                if (this.selectedItem["Cost"] != null) {
-                                    document.getElementById('stockInItem_Cost').value = formatDecimalValues(this.selectedItem["Cost"]);
-                                } else {
-                                    document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
-                                }
-
-                                computeAmount();
+                                getProducedItemInventoryCost();
                             }
-
                         }
                     });
 
                     if (document.getElementById("StockIn_Produce").checked) {
-                        if (cboINItemDescription.selectedItem["Cost"] != null) {
-                            document.getElementById('stockInItem_Cost').value = formatDecimalValues(cboINItemDescription.selectedItem["Cost"]);
-                        } else {
-                            document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
-                        }
-
-                        computeAmount();
+                        getProducedItemInventoryCost();
                     }
 
                     getStockInItemUnitForComboBox(unitId);
+                }
+            });
+        }
+
+        // ================================================
+        // Get Item Inventory Cost if IsProduced is Checked
+        // ================================================
+        function getProducedItemInventoryCost() {
+            $.ajax({
+                url: '/api/stockInItem/getItemInventoryCost/' + cboINItemDescription.selectedItem["Id"],
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results > 0) {
+                        document.getElementById('stockInItem_Cost').value = formatDecimalValues(results);
+                    } else {
+                        document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
+                    }
+
+                    computeAmount();
                 }
             });
         }
@@ -1781,7 +1788,6 @@
                 toastr.error("Invalid Entry");
             }
         }
-
 
         // ==================
         // Edit Stock In Item
@@ -2246,8 +2252,6 @@
                                 Particulars: results[i]["Particulars"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Cost: results[i]["Cost"],
-                                CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyOnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
                             });
                         }

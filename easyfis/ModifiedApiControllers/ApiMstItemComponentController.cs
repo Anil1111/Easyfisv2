@@ -61,6 +61,12 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/itemComponent/list/{itemId}")]
         public List<Entities.MstArticleComponent> ListItemComponent(String itemId)
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var itemComponents = from d in db.MstArticleComponents
                                  where d.ArticleId == Convert.ToInt32(itemId)
                                  select new Entities.MstArticleComponent
@@ -71,8 +77,8 @@ namespace easyfis.ModifiedApiControllers
                                      ComponentArticle = d.MstArticle1.Article,
                                      Quantity = d.Quantity,
                                      Unit = d.MstArticle1.MstUnit.Unit,
-                                     Cost = d.MstArticle1.MstArticleInventories.Any() ? d.MstArticle1.MstArticleInventories.OrderByDescending(c => c.Cost).FirstOrDefault().Cost : 0,
-                                     Amount = d.MstArticle1.MstArticleInventories.Any() ? d.MstArticle1.MstArticleInventories.OrderByDescending(c => c.Cost).FirstOrDefault().Cost * d.Quantity : 0,
+                                     Cost = d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).Any() ? d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(c => c.Cost).FirstOrDefault().Cost : 0,
+                                     Amount = d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).Any() ? d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(c => c.Cost).FirstOrDefault().Cost * d.Quantity : 0,
                                      Particulars = d.Particulars
                                  };
 
