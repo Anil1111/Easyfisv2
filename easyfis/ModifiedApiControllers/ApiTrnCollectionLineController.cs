@@ -229,6 +229,34 @@ namespace easyfis.ModifiedApiControllers
             return salesInvoices.ToList();
         }
 
+        // ===============================================
+        // Pop-Up List - Sales Invoice Status (Per Branch)
+        // ===============================================
+        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perBranch/{branchId}/{startDate}/{endDate}")]
+        public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatusPerBranch(String branchId, String startDate, String endDate)
+        {
+            var salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.Id)
+                                where d.SIDate >= Convert.ToDateTime(startDate)
+                                && d.SIDate <= Convert.ToDateTime(endDate)
+                                && d.BranchId == Convert.ToInt32(branchId)
+                                && d.BalanceAmount > 0
+                                && d.IsLocked == true
+                                select new Entities.TrnSalesInvoice
+                                {
+                                    Id = d.Id,
+                                    SINumber = d.SINumber,
+                                    SIDate = d.SIDate.ToShortDateString(),
+                                    ManualSINumber = d.ManualSINumber,
+                                    Remarks = d.Remarks,
+                                    Amount = d.Amount,
+                                    PaidAmount = d.PaidAmount,
+                                    AdjustmentAmount = d.AdjustmentAmount,
+                                    BalanceAmount = d.BalanceAmount
+                                };
+
+            return salesInvoices.ToList();
+        }
+
         // =======================================================
         // Apply (Download) Collection Line - Sales Invoice Status
         // =======================================================
@@ -244,7 +272,6 @@ namespace easyfis.ModifiedApiControllers
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
-                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
@@ -267,7 +294,6 @@ namespace easyfis.ModifiedApiControllers
                                     {
                                         var salesInvoice = from d in db.TrnSalesInvoices
                                                            where d.Id == objCollectionLine.SIId
-                                                           && d.BranchId == currentBranchId
                                                            && d.IsLocked == true
                                                            select d;
 
@@ -365,13 +391,13 @@ namespace easyfis.ModifiedApiControllers
                            && d.BranchId == branchId
                            group d by new
                            {
-                               BranchId = d.BranchId,
-                               Branch = d.MstBranch.Branch,
-                               AccountId = d.AccountId,
-                               Account = d.MstAccount.Account,
-                               AccountCode = d.MstAccount.AccountCode,
-                               ArticleId = d.ArticleId,
-                               Article = d.MstArticle.Article
+                               d.BranchId,
+                               d.MstBranch.Branch,
+                               d.AccountId,
+                               d.MstAccount.Account,
+                               d.MstAccount.AccountCode,
+                               d.ArticleId,
+                               d.MstArticle.Article
                            } into g
                            select new Entities.TrnJournal
                            {
@@ -430,15 +456,15 @@ namespace easyfis.ModifiedApiControllers
                                                    && d.BranchId == currentBranchId
                                                    group d by new
                                                    {
-                                                       BranchId = d.BranchId,
-                                                       AccountId = d.AccountId,
-                                                       ArticleId = d.ArticleId,
+                                                       d.BranchId,
+                                                       d.AccountId,
+                                                       d.ArticleId,
                                                    } into g
                                                    select new
                                                    {
-                                                       BranchId = g.Key.BranchId,
-                                                       AccountId = g.Key.AccountId,
-                                                       ArticleId = g.Key.ArticleId,
+                                                       g.Key.BranchId,
+                                                       g.Key.AccountId,
+                                                       g.Key.ArticleId,
                                                        DebitAmount = g.Sum(d => d.DebitAmount),
                                                        CreditAmount = g.Sum(d => d.CreditAmount),
                                                        BalanceAmount = g.Sum(d => d.CreditAmount) - g.Sum(d => d.DebitAmount)
@@ -449,12 +475,12 @@ namespace easyfis.ModifiedApiControllers
                                         var advances = from d in journals.ToList()
                                                        select new
                                                        {
-                                                           BranchId = d.BranchId,
-                                                           AccountId = d.AccountId,
-                                                           ArticleId = d.ArticleId,
-                                                           DebitAmount = d.DebitAmount,
-                                                           CreditAmount = d.CreditAmount,
-                                                           BalanceAmount = d.BalanceAmount
+                                                           d.BranchId,
+                                                           d.AccountId,
+                                                           d.ArticleId,
+                                                           d.DebitAmount,
+                                                           d.CreditAmount,
+                                                           d.BalanceAmount
                                                        };
 
                                         if (advances.Any())
