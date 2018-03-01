@@ -232,13 +232,19 @@ namespace easyfis.ModifiedApiControllers
         // ===============================================
         // Pop-Up List - Sales Invoice Status (Per Branch)
         // ===============================================
-        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perBranch/{branchId}/{startDate}/{endDate}")]
-        public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatusPerBranch(String branchId, String startDate, String endDate)
+        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perCurrentBranch/{startDate}/{endDate}")]
+        public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatusPerCurrentBranch(String startDate, String endDate)
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
             var salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.Id)
                                 where d.SIDate >= Convert.ToDateTime(startDate)
                                 && d.SIDate <= Convert.ToDateTime(endDate)
-                                && d.BranchId == Convert.ToInt32(branchId)
+                                && d.BranchId == branchId
                                 && d.BalanceAmount > 0
                                 && d.IsLocked == true
                                 select new Entities.TrnSalesInvoice
@@ -247,7 +253,7 @@ namespace easyfis.ModifiedApiControllers
                                     SINumber = d.SINumber,
                                     SIDate = d.SIDate.ToShortDateString(),
                                     ManualSINumber = d.ManualSINumber,
-                                    Remarks = d.Remarks,
+                                    Customer = d.MstArticle.Article,
                                     Amount = d.Amount,
                                     PaidAmount = d.PaidAmount,
                                     AdjustmentAmount = d.AdjustmentAmount,
@@ -255,6 +261,29 @@ namespace easyfis.ModifiedApiControllers
                                 };
 
             return salesInvoices.ToList();
+        }
+
+        // ==============================
+        // Dropdown List - Branch (Filter)
+        // ==============================
+        [Authorize, HttpGet, Route("api/collectionLine/salesInvoiceStatus/perBranch/dropdown/filter/list/branch")]
+        public List<Entities.MstBranch> DropdownListCollectionLineSalesInvoiceStatusFilterBranch()
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.Id == branchId
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
 
         // =======================================================

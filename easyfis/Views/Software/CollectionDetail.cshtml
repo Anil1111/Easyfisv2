@@ -378,8 +378,9 @@
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs" role="tablist" id="myTab">
-                        <li role="presentation" class="active"><a data-toggle="tab" href="#SIStatussalesInvoice" id="SIStatussalesInvoicetab">Sales Invoice</a></li>
-                        <li role="presentation"><a data-toggle="tab" href="#SIStatuspayType" id="SIStatuspayTypestatus">Pay Type</a></li>
+                        <li role="presentation" class="active"><a data-toggle="tab" href="#SIStatussalesInvoice" id="SIStatussalesInvoicetab">Sales Invoice - Customer</a></li>
+                        <li role="presentation"><a data-toggle="tab" href="#SIStatussalesInvoiceBranch" id="SIStatussalesInvoiceBranchtab">Sales Invoice - Branch</a></li>
+                        <li role="presentation"><a data-toggle="tab" href="#SIStatuspayType" id="SIStatuspayTypestatusTab">Pay Type</a></li>
                     </ul>
                     <br />
                     <div class="tab-content">
@@ -442,6 +443,70 @@
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b>Total Amount</b></span>
                                                 <input type="text" class="form-control numberField" id="totalSIAmount" placeholder="0.00" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="SIStatussalesInvoiceBranch" class="tab-pane">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <table style="width: 100%" border="0">
+                                        <tr>
+                                            <td style="width: 40%">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                    <input type="text" class="form-control " id="SIStatusFilterBranch" placeholder="Search">
+                                                </div>
+                                            </td>
+                                            <td style="width: 1%"></td>
+                                            <td style="width: 29%">
+                                                <div class="input-group ">
+                                                    <span class="input-group-addon"><b>Start Date</b></span>
+                                                    <div id="cboStartDateSIFilterBranch"></div>
+                                                </div>
+                                            </td>
+                                            <td style="width: 1%"></td>
+                                            <td style="width: 29%">
+                                                <div class="input-group ">
+                                                    <span class="input-group-addon"><b>End Date</b></span>
+                                                    <div id="cboEndDateSIFilterBranch"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="panel-body">
+                                    <center>
+                                        <span id="loadingSIStatusBranch"></span>
+                                    </center>
+                                    <div id="statusGridBranch">
+                                        <div id="salesInvoiceStatusGridBranch"></div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    <div class="row">
+                                        <div class="btn-group col-md-7" id="naviagtionPageGridSIStatusBranch">
+                                            <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridSIStatusBranch">
+                                                <span class="glyphicon glyphicon-fast-backward"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridSIStatusBranch">
+                                                <span class="glyphicon glyphicon-step-backward"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridSIStatusBranch"></button>
+                                            <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridSIStatusBranch">
+                                                <span class="glyphicon glyphicon-step-forward"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridSIStatusBranch">
+                                                <span class="glyphicon glyphicon-fast-forward"></span>
+                                            </button>
+                                        </div>
+                                        <div class="col-md-1"></div>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b>Total Amount</b></span>
+                                                <input type="text" class="form-control numberField" id="totalSIAmountBranch" placeholder="0.00" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -593,6 +658,29 @@
         </div>
     </div>
 
+    <!-- RR Picked Amount -->
+    <div class="modal fade" id="pickBalanceAmountModalBranch" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pick</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="collectionLineDetailForm">
+                        <dl class="">
+                            <dt>Amount</dt>
+                            <dd><input class="form-control  numberField  requiredPickedAmountBranch" id="pickAmountBranch" placeholder="0.00" /></dd>
+                        </dl>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="savePickAmountBranch" class="btn btn-primary" onclick="btnSavePickAmountBranchOnclick()"><i class="fa fa-arrow-right"></i> Continue</button>
+                    <button id="closePickAmountModalBranch" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ================
@@ -642,10 +730,26 @@
         var isStartDateSIFirstSelect = true;
         var isEndDateSIFirstSelect = true;
         var currentSIStatusPageIndex = 0;
+        var currentSIStatusPageIndexBranch = 0;
         var cboSIStatusPayType = new wijmo.input.ComboBox('#cboSIStatusPayType');
         var cboSIStatusCheckDate = new wijmo.input.InputDate('#cboSIStatusCheckDate');
         var cboSIStatusDepositoryBank = new wijmo.input.ComboBox('#cboSIStatusDepositoryBank');
         var isARPayTypeClicked = false;
+        var cboStartDateSIFilterBranch = new wijmo.input.InputDate('#cboStartDateSIFilterBranch');
+        var cboEndDateSIFilterBranch = new wijmo.input.InputDate('#cboEndDateSIFilterBranch');
+        var isStartDateSIFirstSelectBranch = true;
+        var isEndDateSIFirstSelectBranch = true;
+        var isSIStatusCustomerSelected = true;
+        var isSIStatusBranchSelected = false;
+        var saleInvoiceStatusBranch;
+        var SIStatusGridBranch = new wijmo.grid.FlexGrid('#salesInvoiceStatusGridBranch');
+        var btnFirstPageGridSIStatusBranch = document.getElementById('btnMoveToFirstPageGridSIStatusBranch');
+        var btnPreviousPageGridSIStatusBranch = document.getElementById('btnMoveToPreviousPageGridSIStatusBranch');
+        var btnNextPageGridSIStatusBranch = document.getElementById('btnMoveToNextPageGridSIStatusBranch');
+        var btnLastPageGridSIStatusBranch = document.getElementById('btnMoveToLastPageGridSIStatusBranch');
+        var btnCurrentPageGridSIStatusBranch = document.getElementById('btnCurrentPageGridSIStatusBranch');
+        var isARClicked = false;
+        var isARClickedBranch = false;
 
         // =======================
         // Get URL Parameter Value
@@ -2119,6 +2223,46 @@
                     }
                 }
             });
+
+            cboStartDateSIFilterBranch.dispose();
+            cboStartDateSIFilterBranch = new wijmo.input.InputDate('#cboStartDateSIFilterBranch', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isStartDateSIFirstSelectBranch) {
+                        $('#loadingSIStatusBranch').show();
+                        document.getElementById("loadingSIStatusBranch").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                        $('#statusGridBranch').hide();
+                        $('#btnIdApplyAllSI').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createSalesInvoiceStatusFlexGridBranch();
+                        }, 500);
+                    } else {
+                        isStartDateSIFirstSelectBranch = false;
+                    }
+                }
+            });
+
+            cboEndDateSIFilterBranch.dispose();
+            cboEndDateSIFilterBranch = new wijmo.input.InputDate('#cboEndDateSIFilterBranch', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isEndDateSIFirstSelectBranch) {
+                        $('#loadingSIStatusBranch').show();
+                        document.getElementById("loadingSIStatusBranch").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                        $('#statusGridBranch').hide();
+                        $('#btnIdApplyAllSI').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createSalesInvoiceStatusFlexGridBranch();
+                        }, 500);
+                    } else {
+                        isEndDateSIFirstSelectBranch = false;
+                    }
+                }
+            });
         }
 
         // ==========
@@ -2133,19 +2277,318 @@
                 backdrop: 'static'
             });
 
-            $('#loadingSIStatus').show();
-            document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-            $('#statusGrid').hide();
-            $('#btnIdApplyAllSI').prop("disabled", true);
+            if (isSIStatusCustomerSelected) {
+                $('#loadingSIStatus').show();
+                document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                $('#statusGrid').hide();
+                $('#btnIdApplyAllSI').prop("disabled", true);
 
-            setTimeout(function () {
-                createSalesInvoiceStatusFlexGrid();
-                getCollectionPayTypeForComboBox(0, new Date(), 0);
-            }, 500);
+                setTimeout(function () {
+                    createSalesInvoiceStatusFlexGrid();
+                    getCollectionPayTypeForComboBox(0, new Date(), 0);
+                }, 500);
+            } else {
+                if (isSIStatusBranchSelected) {
+                    $('#loadingSIStatusBranch').show();
+                    document.getElementById("loadingSIStatusBranch").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+                    $('#statusGridBranch').hide();
+                    $('#btnIdApplyAllSI').prop("disabled", true);
+
+                    setTimeout(function () {
+                        createSalesInvoiceStatusFlexGridBranch();
+                        getCollectionPayTypeForComboBox(0, new Date(), 0);
+                    }, 500);
+                }
+            }
 
             document.getElementById("SIStatus_checkNo").value = "NA";
             document.getElementById("SIStatus_checkBank").value = "NA";
             document.getElementById("SIStatus_Clear").checked = false;
+        }
+
+        function getSalesInvoiceByCustomerByBalanceBranch() {
+            var saleInvoiceStatus = new wijmo.collections.ObservableArray;
+
+            var startDate = cboStartDateSIFilterBranch.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboEndDateSIFilterBranch.value.toLocaleDateString().replace(/\//g, '-');
+
+            $.ajax({
+                url: '/api/collectionLine/popUp/list/salesInvoiceStatus/perCurrentBranch/' + startDate + '/' + endDate,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    $('#btnIdApplyAllSI').prop("disabled", false);
+                    var totalSIAmount = 0;
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+
+                            var SIDateResult = new Date(results[i]["SIDate"])
+                            var SIDate = ('0' + (SIDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + SIDateResult.getDate()).slice(-2) + '-' + SIDateResult.getFullYear();
+
+                            saleInvoiceStatus.push({
+                                Id: results[i]["Id"],
+                                BranchId: results[i]["BranchId"],
+                                Branch: results[i]["Branch"],
+                                SINumber: results[i]["SINumber"],
+                                SIDate: SIDate,
+                                ManualSINumber: results[i]["ManualSINumber"],
+                                Customer: results[i]["Customer"],
+                                Amount: results[i]["Amount"],
+                                AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                PaidAmount: results[i]["PaidAmount"],
+                                PaidAmountDisplay: parseFloat(results[i]["PaidAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                AdjustmentAmount: results[i]["AdjustmentAmount"],
+                                AdjustmentAmountDisplay: parseFloat(results[i]["AdjustmentAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                BalanceAmount: results[i]["BalanceAmount"],
+                                BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                Balance: results[i]["BalanceAmount"],
+                                BalanceDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPickBranchAmount()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                Unpick: "<button class='btn btn-danger btn-xs btn-block' onclick='btnUnpickBranchAmountReverse()'><i class='fa fa-hand-o-left'></i> Unpick</button>"
+                            });
+
+                            totalSIAmount += results[i]["BalanceAmount"];
+                        }
+                    } else {
+                        $('#btnIdApplyAllSI').prop("disabled", true);
+                    }
+
+                    document.getElementById("totalSIAmountBranch").value = parseFloat(totalSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    $('#loadingSIStatusBranch').hide();
+                    $('#statusGridBranch').show();
+                }
+            });
+
+            return saleInvoiceStatus;
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsSIStatusBranch() {
+            if (saleInvoiceStatusBranch.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridSIStatusBranch').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridSIStatusBranch').style.display = 'block';
+            if (saleInvoiceStatusBranch.pageIndex === 0) {
+                btnFirstPageGridSIStatusBranch.setAttribute('disabled', 'disabled');
+                btnPreviousPageGridSIStatusBranch.setAttribute('disabled', 'disabled');
+                btnNextPageGridSIStatusBranch.removeAttribute('disabled');
+                btnLastPageGridSIStatusBranch.removeAttribute('disabled');
+            } else if (saleInvoiceStatusBranch.pageIndex === (saleInvoiceStatusBranch.pageCount - 1)) {
+                btnFirstPageGridSIStatusBranch.removeAttribute('disabled');
+                btnPreviousPageGridSIStatusBranch.removeAttribute('disabled');
+                btnNextPageGridSIStatusBranch.setAttribute('disabled', 'disabled');
+                btnLastPageGridSIStatusBranch.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGridSIStatusBranch.removeAttribute('disabled');
+                btnPreviousPageGridSIStatusBranch.removeAttribute('disabled');
+                btnNextPageGridSIStatusBranch.removeAttribute('disabled');
+                btnLastPageGridSIStatusBranch.removeAttribute('disabled');
+            }
+            btnCurrentPageGridSIStatusBranch.innerHTML = (saleInvoiceStatusBranch.pageIndex + 1) + ' / ' + saleInvoiceStatusBranch.pageCount;
+        }
+
+        // =========================
+        // Sales Invoice Status Grid
+        // =========================
+        function createSalesInvoiceStatusFlexGridBranch() {
+            saleInvoiceStatusBranch = new wijmo.collections.CollectionView(getSalesInvoiceByCustomerByBalanceBranch());
+            saleInvoiceStatusBranch.canFilter = true;
+            saleInvoiceStatusBranch.pageSize = 10;
+
+            var filterText = '';
+            $('#SIStatusFilterBranch').keyup(function () {
+                filterText = this.value.toLowerCase();
+
+                setTimeout(function () {
+                    var totalALLSIAmount = 0
+                    saleInvoiceStatusBranch.moveToFirstPage();
+                    for (var p = 1; p <= saleInvoiceStatusBranch.pageCount; p++) {
+                        var totalCurrentPageSIAmount = 0
+                        for (var i = 0; i < saleInvoiceStatusBranch.items.length; i++) {
+                            totalCurrentPageSIAmount += parseFloat(saleInvoiceStatusBranch.items[i].Balance);
+                        }
+
+                        totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                        saleInvoiceStatusBranch.moveToNextPage();
+                        if (p == saleInvoiceStatusBranch.pageCount) {
+                            saleInvoiceStatusBranch.moveToPage(currentSIStatusPageIndexBranch - 1);
+                        }
+                    }
+
+                    document.getElementById("totalSIAmountBranch").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    $('#pickBalanceAmountModalBranch').modal('hide');
+                }, 300);
+
+                saleInvoiceStatusBranch.refresh();
+            });
+
+            saleInvoiceStatusBranch.filter = function (item) {
+                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Customer.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            saleInvoiceStatusBranch.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsSIStatusBranch();
+            });
+
+            SIStatusGridBranch.dispose();
+            SIStatusGridBranch = new wijmo.grid.FlexGrid('#salesInvoiceStatusGridBranch');
+            SIStatusGridBranch.initialize({
+                columns: [
+                    {
+                        "header": "SI Number",
+                        "binding": "SINumber",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "1.5*"
+                    },
+                    {
+                        "header": "Date",
+                        "binding": "SIDate",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "1.5*"
+                    },
+                    {
+                        "header": "Customer",
+                        "binding": "Customer",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "SI Amount",
+                        "binding": "AmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Payments",
+                        "binding": "PaidAmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Adjustments",
+                        "binding": "AdjustmentAmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Balance",
+                        "binding": "BalanceAmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Pick",
+                        "binding": "Pick",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": 60,
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Unpick",
+                        "binding": "Unpick",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": 75,
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "BalanceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: saleInvoiceStatusBranch,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            SIStatusGridBranch.trackChanges = true;
+
+            var hr = new wijmo.grid.Row();
+            SIStatusGridBranch.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            SIStatusGridBranch.columnHeaders.rows.push(hr);
+            SIStatusGridBranch.columnHeaders.rows[0].allowMerging = true;
+
+            SIStatusGridBranch.columnHeaders.columns[0].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 0, 'SI Number');
+
+            SIStatusGridBranch.columnHeaders.columns[1].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 1, 'Date');
+
+            SIStatusGridBranch.columnHeaders.columns[2].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 2, 'Customer');
+
+            for (var columnQuantityTopAssigned = 3; columnQuantityTopAssigned <= 6; columnQuantityTopAssigned++) {
+                SIStatusGridBranch.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Amount');
+            }
+
+            SIStatusGridBranch.columnHeaders.columns[7].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 7, 'Pick');
+
+            SIStatusGridBranch.columnHeaders.columns[8].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 8, 'Unpick');
+
+            SIStatusGridBranch.columnHeaders.columns[9].allowMerging = true;
+            SIStatusGridBranch.columnHeaders.setCellData(0, 9, 'Amount');
+
+            if (!isARClickedBranch) {
+                updateNavigateButtonsSIStatusBranch();
+
+                btnFirstPageGridSIStatusBranch.addEventListener('click', function () {
+                    saleInvoiceStatusBranch.moveToFirstPage();
+                    currentSIStatusPageIndexBranch = saleInvoiceStatusBranch.pageIndex + 1;
+                    updateNavigateButtonsSIStatusBranch();
+                });
+
+                btnPreviousPageGridSIStatusBranch.addEventListener('click', function () {
+                    saleInvoiceStatusBranch.moveToPreviousPage();
+                    currentSIStatusPageIndexBranch = saleInvoiceStatusBranch.pageIndex + 1;
+                    updateNavigateButtonsSIStatusBranch();
+                });
+
+                btnNextPageGridSIStatusBranch.addEventListener('click', function () {
+                    saleInvoiceStatusBranch.moveToNextPage();
+                    currentSIStatusPageIndexBranch = saleInvoiceStatusBranch.pageIndex + 1;
+                    updateNavigateButtonsSIStatusBranch();
+                });
+
+                btnLastPageGridSIStatusBranch.addEventListener('click', function () {
+                    saleInvoiceStatusBranch.moveToLastPage();
+                    currentSIStatusPageIndexBranch = saleInvoiceStatusBranch.pageIndex + 1;
+                    updateNavigateButtonsSIStatusBranch();
+                });
+
+                isARClickedBranch = true;
+            }
         }
 
         function getSalesInvoiceByCustomerByBalance() {
@@ -2206,116 +2649,6 @@
             return saleInvoiceStatus;
         }
 
-        // =============
-        // PICK quantity
-        // =============
-        function btnPickAmount() {
-            $('#pickBalanceAmountModal').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $("#savePickAmount").prop("disabled", false);
-            $("#closePickAmountModal").prop("disabled", false);
-
-            saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
-            var saleInvoice = saleInvoiceStatus.currentEditItem;
-            var balance = saleInvoice.Amount - saleInvoice.PaidAmount;
-            document.getElementById("pickAmount").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-
-        function btnSavePickAmountOnclick() {
-            $("#savePickAmount").prop("disabled", true);
-            $("#closePickAmountModal").prop("disabled", true);
-
-            var isValid = true;
-            $('.requiredPickedAmount').each(function () {
-                if ($.trim($(this).val()) == '') {
-                    isValid = false;
-                    $(this).css({
-                        "border": "1px solid red"
-                    });
-                } else {
-                    $(this).css({
-                        "border": "",
-                    });
-                }
-            });
-
-            if (isValid) {
-                saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
-                var saleInvoice = saleInvoiceStatus.currentEditItem;
-                var balance = document.getElementById("pickAmount").value.split(",").join("");
-                if (isNaN(balance)) {
-                    toastr.error("Invalid Entry");
-
-                    $("#savePickAmount").prop("disabled", false);
-                    $("#closePickAmountModal").prop("disabled", false);
-                } else {
-                    saleInvoice.Balance = balance;
-                    saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    
-                    setTimeout(function () {
-                        var totalALLSIAmount = 0
-                        saleInvoiceStatus.moveToFirstPage();
-                        for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
-                            var totalCurrentPageSIAmount = 0
-                            for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
-                                totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
-                            }
-
-                            totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
-                            saleInvoiceStatus.moveToNextPage();
-                            if (p == saleInvoiceStatus.pageCount) {
-                                saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
-                            }
-                        }
-
-                        document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        $('#pickBalanceAmountModal').modal('hide');
-                    }, 100);
-
-                    saleInvoiceStatus.refresh();
-                    SIStatusGrid.refresh();
-                }
-            } else {
-                toastr.error("Invalid Entry");
-            }
-        }
-
-        // ===============
-        // REPICK quantity
-        // ===============
-        function btnUnpickAmountReverse() {
-            saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
-            var saleInvoice = saleInvoiceStatus.currentEditItem;
-            saleInvoice.Balance = 0;
-            saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-            setTimeout(function () {
-                var totalALLSIAmount = 0
-                saleInvoiceStatus.moveToFirstPage();
-                for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
-                    var totalCurrentPageSIAmount = 0
-                    for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
-                        totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
-                    }
-
-                    totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
-                    saleInvoiceStatus.moveToNextPage();
-                    if (p == saleInvoiceStatus.pageCount) {
-                        saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
-                    }
-                }
-
-                document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                $('#pickBalanceAmountModal').modal('hide');
-            }, 100);
-
-            saleInvoiceStatus.refresh();
-            SIStatusGrid.refresh();
-        }
-
         // =========================
         // Update Navigation Buttons
         // =========================
@@ -2343,8 +2676,6 @@
             }
             btnCurrentPageGridSIStatus.innerHTML = (saleInvoiceStatus.pageIndex + 1) + ' / ' + saleInvoiceStatus.pageCount;
         }
-
-        var isARClicked = false;
 
         // =========================
         // Sales Invoice Status Grid
@@ -2545,6 +2876,227 @@
             }
         }
 
+        function btnPickBranchAmount() {
+            $('#pickBalanceAmountModalBranch').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#savePickAmountBranch").prop("disabled", false);
+            $("#closePickAmountModalBranch").prop("disabled", false);
+
+            saleInvoiceStatusBranch.editItem(saleInvoiceStatusBranch.currentItem);
+            var saleInvoice = saleInvoiceStatusBranch.currentEditItem;
+            var balance = saleInvoice.Amount - saleInvoice.PaidAmount;
+            document.getElementById("pickAmountBranch").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function btnSavePickAmountBranchOnclick() {
+            $("#savePickAmountBranch").prop("disabled", true);
+            $("#closePickAmountModalBranch").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmountBranch').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                saleInvoiceStatusBranch.editItem(saleInvoiceStatusBranch.currentItem);
+                var saleInvoice = saleInvoiceStatusBranch.currentEditItem;
+                var balance = document.getElementById("pickAmountBranch").value.split(",").join("");
+
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#savePickAmountBranch").prop("disabled", false);
+                    $("#closePickAmountModalBranch").prop("disabled", false);
+                } else {
+                    saleInvoice.Balance = balance;
+                    saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    setTimeout(function () {
+                        var totalALLSIAmount = 0
+                        saleInvoiceStatusBranch.moveToFirstPage();
+                        for (var p = 1; p <= saleInvoiceStatusBranch.pageCount; p++) {
+                            var totalCurrentPageSIAmount = 0
+                            for (var i = 0; i < saleInvoiceStatusBranch.items.length; i++) {
+                                totalCurrentPageSIAmount += parseFloat(saleInvoiceStatusBranch.items[i].Balance);
+                            }
+
+                            totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                            saleInvoiceStatusBranch.moveToNextPage();
+                            if (p == saleInvoiceStatusBranch.pageCount) {
+                                saleInvoiceStatusBranch.moveToPage(currentSIStatusPageIndexBranch - 1);
+                            }
+                        }
+
+                        document.getElementById("totalSIAmountBranch").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        $('#pickBalanceAmountModalBranch').modal('hide');
+                    }, 100);
+
+                    saleInvoiceStatusBranch.refresh();
+                    SIStatusGridBranch.refresh();
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ===============
+        // REPICK quantity
+        // ===============
+        function btnUnpickBranchAmountReverse() {
+            saleInvoiceStatusBranch.editItem(saleInvoiceStatusBranch.currentItem);
+            var saleInvoice = saleInvoiceStatusBranch.currentEditItem;
+            saleInvoice.Balance = 0;
+            saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            setTimeout(function () {
+                var totalALLSIAmount = 0
+                saleInvoiceStatusBranch.moveToFirstPage();
+                for (var p = 1; p <= saleInvoiceStatusBranch.pageCount; p++) {
+                    var totalCurrentPageSIAmount = 0
+                    for (var i = 0; i < saleInvoiceStatusBranch.items.length; i++) {
+                        totalCurrentPageSIAmount += parseFloat(saleInvoiceStatusBranch.items[i].Balance);
+                    }
+
+                    totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                    saleInvoiceStatusBranch.moveToNextPage();
+                    if (p == saleInvoiceStatusBranch.pageCount) {
+                        saleInvoiceStatusBranch.moveToPage(currentSIStatusPageIndexBranch - 1);
+                    }
+                }
+
+                document.getElementById("totalSIAmountBranch").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                $('#pickBalanceAmountModal').modal('hide');
+            }, 100);
+
+            saleInvoiceStatusBranch.refresh();
+            SIStatusGridBranch.refresh();
+        }
+
+        // =============
+        // PICK quantity
+        // =============
+        function btnPickAmount() {
+            $('#pickBalanceAmountModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#savePickAmount").prop("disabled", false);
+            $("#closePickAmountModal").prop("disabled", false);
+
+            saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
+            var saleInvoice = saleInvoiceStatus.currentEditItem;
+            var balance = saleInvoice.Amount - saleInvoice.PaidAmount;
+            document.getElementById("pickAmount").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function btnSavePickAmountOnclick() {
+            $("#savePickAmount").prop("disabled", true);
+            $("#closePickAmountModal").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmount').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
+                var saleInvoice = saleInvoiceStatus.currentEditItem;
+                var balance = document.getElementById("pickAmount").value.split(",").join("");
+
+
+
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#savePickAmount").prop("disabled", false);
+                    $("#closePickAmountModal").prop("disabled", false);
+                } else {
+                    saleInvoice.Balance = balance;
+                    saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    setTimeout(function () {
+                        var totalALLSIAmount = 0
+                        saleInvoiceStatus.moveToFirstPage();
+                        for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                            var totalCurrentPageSIAmount = 0
+                            for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                                totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
+                            }
+
+                            totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                            saleInvoiceStatus.moveToNextPage();
+                            if (p == saleInvoiceStatus.pageCount) {
+                                saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                            }
+                        }
+
+                        document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        $('#pickBalanceAmountModal').modal('hide');
+                    }, 100);
+
+                    saleInvoiceStatus.refresh();
+                    SIStatusGrid.refresh();
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ===============
+        // REPICK quantity
+        // ===============
+        function btnUnpickAmountReverse() {
+            saleInvoiceStatus.editItem(saleInvoiceStatus.currentItem);
+            var saleInvoice = saleInvoiceStatus.currentEditItem;
+            saleInvoice.Balance = 0;
+            saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            setTimeout(function () {
+                var totalALLSIAmount = 0
+                saleInvoiceStatus.moveToFirstPage();
+                for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                    var totalCurrentPageSIAmount = 0
+                    for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                        totalCurrentPageSIAmount += parseFloat(saleInvoiceStatus.items[i].Balance);
+                    }
+
+                    totalALLSIAmount += parseFloat(totalCurrentPageSIAmount);
+                    saleInvoiceStatus.moveToNextPage();
+                    if (p == saleInvoiceStatus.pageCount) {
+                        saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                    }
+                }
+
+                document.getElementById("totalSIAmount").value = parseFloat(totalALLSIAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                $('#pickBalanceAmountModal').modal('hide');
+            }, 100);
+
+            saleInvoiceStatus.refresh();
+            SIStatusGrid.refresh();
+        }
+
         function btnOnclickApplyAllSI() {
             $('#applyAllAmount').modal({
                 show: true,
@@ -2563,28 +3115,57 @@
 
             var saleInvoiceArrays = new Array();
 
-            saleInvoiceStatus.moveToFirstPage();
+            if (isSIStatusCustomerSelected) {
+                saleInvoiceStatus.moveToFirstPage();
 
-            for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
-                for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
-                    var item = saleInvoiceStatus.items[i];
-                    if (item.Balance > 0) {
-                        saleInvoiceArrays.push({
-                            SIId: item.Id,
-                            Amount: item.Balance,
-                            PayTypeId: cboSIStatusPayType.selectedValue,
-                            CheckNumber: document.getElementById("SIStatus_checkNo").value,
-                            CheckDate: cboSIStatusCheckDate.value,
-                            CheckBank: document.getElementById("SIStatus_checkBank").value,
-                            DepositoryBankId: cboSIStatusDepositoryBank.selectedValue,
-                            IsClear: document.getElementById("SIStatus_Clear").checked
-                        });
+                for (var p = 1; p <= saleInvoiceStatus.pageCount; p++) {
+                    for (var i = 0; i < saleInvoiceStatus.items.length; i++) {
+                        var item = saleInvoiceStatus.items[i];
+                        if (item.Balance > 0) {
+                            saleInvoiceArrays.push({
+                                SIId: item.Id,
+                                Amount: item.Balance,
+                                PayTypeId: cboSIStatusPayType.selectedValue,
+                                CheckNumber: document.getElementById("SIStatus_checkNo").value,
+                                CheckDate: cboSIStatusCheckDate.value,
+                                CheckBank: document.getElementById("SIStatus_checkBank").value,
+                                DepositoryBankId: cboSIStatusDepositoryBank.selectedValue,
+                                IsClear: document.getElementById("SIStatus_Clear").checked
+                            });
+                        }
+                    }
+
+                    saleInvoiceStatus.moveToNextPage();
+                    if (p == saleInvoiceStatus.pageCount) {
+                        saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
                     }
                 }
+            } else {
+                if (isSIStatusBranchSelected) {
+                    saleInvoiceStatusBranch.moveToFirstPage();
 
-                saleInvoiceStatus.moveToNextPage();
-                if (p == saleInvoiceStatus.pageCount) {
-                    saleInvoiceStatus.moveToPage(currentSIStatusPageIndex - 1);
+                    for (var p = 1; p <= saleInvoiceStatusBranch.pageCount; p++) {
+                        for (var i = 0; i < saleInvoiceStatusBranch.items.length; i++) {
+                            var item = saleInvoiceStatusBranch.items[i];
+                            if (item.Balance > 0) {
+                                saleInvoiceArrays.push({
+                                    SIId: item.Id,
+                                    Amount: item.Balance,
+                                    PayTypeId: cboSIStatusPayType.selectedValue,
+                                    CheckNumber: document.getElementById("SIStatus_checkNo").value,
+                                    CheckDate: cboSIStatusCheckDate.value,
+                                    CheckBank: document.getElementById("SIStatus_checkBank").value,
+                                    DepositoryBankId: cboSIStatusDepositoryBank.selectedValue,
+                                    IsClear: document.getElementById("SIStatus_Clear").checked
+                                });
+                            }
+                        }
+
+                        saleInvoiceStatusBranch.moveToNextPage();
+                        if (p == saleInvoiceStatusBranch.pageCount) {
+                            saleInvoiceStatusBranch.moveToPage(currentSIStatusPageIndexBranch - 1);
+                        }
+                    }
                 }
             }
 
@@ -2892,6 +3473,53 @@
                 }
             });
         }
+
+        $('#SIStatussalesInvoicetab').click(function () {
+            isSIStatusCustomerSelected = true;
+            isSIStatusBranchSelected = false;
+
+            $('#SIStatussalesInvoice').show();
+            $('#SIStatussalesInvoiceBranch').hide();
+            $('#SIStatuspayType').hide();
+
+            $('#loadingSIStatus').show();
+            document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+            $('#statusGrid').hide();
+            $('#btnIdApplyAllSI').prop("disabled", true);
+
+            setTimeout(function () {
+                createSalesInvoiceStatusFlexGrid();
+                getCollectionPayTypeForComboBox(0, new Date(), 0);
+            }, 500);
+        });
+
+        $('#SIStatussalesInvoiceBranchtab').click(function () {
+            isSIStatusCustomerSelected = false;
+            isSIStatusBranchSelected = true;
+
+            $('#loadingSIStatusBranch').show();
+            document.getElementById("loadingSIStatusBranch").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+            $('#statusGridBranch').hide();
+            $('#btnIdApplyAllSI').prop("disabled", true);
+
+            setTimeout(function () {
+                createSalesInvoiceStatusFlexGridBranch();
+                getCollectionPayTypeForComboBox(0, new Date(), 0);
+            }, 500);
+
+            $('#SIStatussalesInvoice').hide();
+            $('#SIStatussalesInvoiceBranch').show();
+            $('#SIStatuspayType').hide();
+        });
+
+        $('#SIStatuspayTypestatusTab').click(function () {
+            isSIStatusCustomerSelected = false;
+            isSIStatusBranchSelected = false;
+
+            $('#SIStatussalesInvoice').hide();
+            $('#SIStatussalesInvoiceBranch').hide();
+            $('#SIStatuspayType').show();
+        });
 
         // ===========
         // OnLoad Page
