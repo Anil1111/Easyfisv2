@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Accounts Receivable Report</title>
+
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
@@ -25,77 +26,101 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ========================================
+                        Input Filters and Display Number of Rows
+                        ========================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="filterAccountsReceivableReport" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpAccountsReceivableReportSeachFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboAccountsReceivableReportNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboAccountsReceivableReportDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnAccountsReceivableReportCSVOnclick()" id="btnAccountsReceivableReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnAccountsReceivableReportPDFOnclick()" id="btnAccountsReceivableReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnAccountsReceivableReportDownloadCSVOnclick()" id="btnAccountsReceivableReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnAccountsReceivableReportPrintPDFOnclick()" id="btnAccountsReceivableReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========================================
+                        Date, Company, Branch amd Account Filters
+                        =========================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Date as of</b></span>
-                                        <div class="comboBox-wide" id="cboAccountsReceivableReportDateAsOf" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsReceivableReportDateAsOfFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboAccountsReceivableReportCompany" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsReceivableReportCompanyFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboAccountsReceivableReportBranch" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsReceivableReportBranchFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Account</b></span>
-                                        <div class="comboBox-wide" id="cboAccountsReceivableReportAccount" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboAccountsReceivableReportAccountFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
                         <div id="accountsReceivableReportFlexGrid" style="font-size: 11.5px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="navigationPageGrid">
+                            <div class="btn-group col-md-7" id="accountsReceivableReportNavigationPageGrid">
                                 <button type="button" class="btn btn-default border-custom" id="btnAccountsReceivableReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
                                 <button type="button" class="btn btn-default border-custom" id="btnAccountsReceivableReportMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnAccountsReceivableReportMoveToCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnAccountsReceivableReportCurrentPageGrid"></button>
                                 <button type="button" class="btn btn-default border-custom" id="btnAccountsReceivableReportMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
@@ -106,6 +131,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======================================
+                    Accounts Receivable Report Totals (Aging)
+                    ======================================
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -116,37 +147,37 @@
                                         <b>Total Balance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalBalance" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalBalance" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Current Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalCurrentAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalCurrentAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 30 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount30Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount30Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 60 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount60Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount60Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 90 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount90Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount90Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount Over 120 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmountOver120Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmountOver120Days" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -162,36 +193,50 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboAccountsReceivableReportDateAsOf = new wijmo.input.InputDate('#cboAccountsReceivableReportDateAsOf');
-        var isDateAsOfSelected = true;
+        // ===========
+        // Filter Date
+        // ===========
+        var cboAccountsReceivableReportDateAsOfFilter = new wijmo.input.InputDate('#cboAccountsReceivableReportDateAsOfFilter');
+        var isCboDateAsOfFilterSelected = true;
 
-        var cboAccountsReceivableReportCompany = new wijmo.input.ComboBox('#cboAccountsReceivableReportCompany');
-        var isCompanySelected = false;
+        // ==============
+        // Filter Company
+        // ==============
+        var cboAccountsReceivableReportCompanyFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportCompanyFilter');
+        var isCboCompanyFilterSelected = false;
 
-        var cboAccountsReceivableReportBranch = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranch');
-        var cboAccountsReceivableReportAccount = new wijmo.input.ComboBox('#cboAccountsReceivableReportAccount');
+        // =============
+        // Filter Branch
+        // =============
+        var cboAccountsReceivableReportBranchFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranchFilter');
 
+        // ==============
+        // Filter Account
+        // ==============
+        var cboAccountsReceivableReportAccountFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportAccountFilter');
+
+        // =================================================
+        // Accounts Receivable Collection View and Flex Grid
+        // =================================================
         var accountsReceivableReportCollectionView;
         var accountsReceivableReportFlexGrid;
-        var accountHasData = false;
+        var cboAccountsReceivableReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboAccountsReceivableReportDisplayNumberOfRows');
+        var ifAccountsReceivableReportHasData = false;
 
-        var cboAccountsReceivableReportNumberOfRows = new wijmo.input.ComboBox('#cboAccountsReceivableReportNumberOfRows');
-
+        // =================
+        // Navigation Button
+        // =================
         var btnAccountsReceivableReportMoveToFirstPageGrid = document.getElementById('btnAccountsReceivableReportMoveToFirstPageGrid');
         var btnAccountsReceivableReportMoveToPreviousPageGrid = document.getElementById('btnAccountsReceivableReportMoveToPreviousPageGrid');
         var btnAccountsReceivableReportMoveToNextPageGrid = document.getElementById('btnAccountsReceivableReportMoveToNextPageGrid');
         var btnAccountsReceivableReportMoveToLastPageGrid = document.getElementById('btnAccountsReceivableReportMoveToLastPageGrid');
-        var btnAccountsReceivableReportMoveToCurrentPageGrid = document.getElementById('btnAccountsReceivableReportMoveToCurrentPageGrid');
+        var btnAccountsReceivableReportCurrentPageGrid = document.getElementById('btnAccountsReceivableReportCurrentPageGrid');
+        var accountsReceivableReportCurrentPageIndex = 0;
 
-        var currentPageIndex = 0;
-
-        // =================
-        // Get URL Parameter
-        // =================
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -206,22 +251,22 @@
             }
         }
 
-        // ======================================
-        // Accounts Receivable Report Date Filter
-        // ======================================
-        function createCboAccountsReceivableReportDateFilter() {
+        // ==============================
+        // Create Combo Date As of Filter
+        // ==============================
+        function createCboAccountsReceivableReportDateAsOfFilter() {
             NProgress.start();
 
-            cboAccountsReceivableReportDateAsOf.dispose();
-            cboAccountsReceivableReportDateAsOf = new wijmo.input.InputDate('#cboAccountsReceivableReportDateAsOf', {
+            cboAccountsReceivableReportDateAsOfFilter.dispose();
+            cboAccountsReceivableReportDateAsOfFilter = new wijmo.input.InputDate('#cboAccountsReceivableReportDateAsOfFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("DateAsOf")),
+                value: new Date(getURLParameterValue("DateAsOf")),
                 onValueChanged: function () {
-                    if (isDateAsOfSelected) {
+                    if (isCboDateAsOfFilterSelected) {
                         NProgress.start();
                         refreshAccountsReceivableReportFlexGrid();
                     } else {
-                        isDateAsOfSelected = false;
+                        isCboDateAsOfFilterSelected = false;
                     }
                 }
             });
@@ -229,9 +274,9 @@
             createCboAccountsReceivableReportCompanyFilter();
         }
 
-        // =========================================
-        // Accounts Receivable Report Company Filter
-        // =========================================
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
         function createCboAccountsReceivableReportCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
 
@@ -254,27 +299,27 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnAccountsReceivableReportCSV").prop("disabled", true);
-                        $("#btnAccountsReceivableReportPDF").prop("disabled", true);
+                        $("#btnAccountsReceivableReportDownloadCSV").prop("disabled", true);
+                        $("#btnAccountsReceivableReportPrintPDF").prop("disabled", true);
                     }
 
-                    cboAccountsReceivableReportCompany.dispose();
-                    cboAccountsReceivableReportCompany = new wijmo.input.ComboBox('#cboAccountsReceivableReportCompany', {
+                    cboAccountsReceivableReportCompanyFilter.dispose();
+                    cboAccountsReceivableReportCompanyFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
 
-                            if (accountHasData) {
-                                $("#btnAccountsReceivableReportCSV").prop("disabled", false);
-                                $("#btnAccountsReceivableReportPDF").prop("disabled", false);
+                            if (ifAccountsReceivableReportHasData) {
+                                $("#btnAccountsReceivableReportDownloadCSV").prop("disabled", false);
+                                $("#btnAccountsReceivableReportPrintPDF").prop("disabled", false);
                             }
 
-                            isCompanySelected = true;
+                            isCboCompanyFilterSelected = true;
                             createCboAccountsReceivableReportBranchFilter();
                         }
                     });
@@ -284,14 +329,14 @@
             });
         }
 
-        // ========================================
-        // Accounts Receivable Report Branch Filter
-        // ========================================
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
         function createCboAccountsReceivableReportBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
 
-            if (cboAccountsReceivableReportCompany.selectedValue != null) {
-                var companyId = cboAccountsReceivableReportCompany.selectedValue;
+            if (cboAccountsReceivableReportCompanyFilter.selectedValue != null) {
+                var companyId = cboAccountsReceivableReportCompanyFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/accountsReceivable/dropdown/list/branch/' + companyId,
@@ -312,25 +357,25 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnAccountsReceivableReportCSV").prop("disabled", true);
-                            $("#btnAccountsReceivableReportPDF").prop("disabled", true);
+                            $("#btnAccountsReceivableReportDownloadCSV").prop("disabled", true);
+                            $("#btnAccountsReceivableReportPrintPDF").prop("disabled", true);
                         }
 
-                        cboAccountsReceivableReportBranch.dispose();
-                        cboAccountsReceivableReportBranch = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranch', {
+                        cboAccountsReceivableReportBranchFilter.dispose();
+                        cboAccountsReceivableReportBranchFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshAccountsReceivableReportFlexGrid();
                             }
                         });
 
-                        if (!isCompanySelected) {
+                        if (!isCboCompanyFilterSelected) {
                             createCboAccountsReceivableReportAccountFilter();
                         } else {
                             refreshAccountsReceivableReportFlexGrid();
@@ -338,8 +383,8 @@
                     }
                 });
             } else {
-                cboAccountsReceivableReportBranch.dispose();
-                cboAccountsReceivableReportBranch = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranch', {
+                cboAccountsReceivableReportBranchFilter.dispose();
+                cboAccountsReceivableReportBranchFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportBranchFilter', {
                     disabled: true,
                     itemsSource: branchObservableArray
                 });
@@ -348,9 +393,9 @@
             }
         }
 
-        // =========================================
-        // Accounts Receivable Report Account Filter
-        // =========================================
+        // ===========================
+        // Create Combo Account Filter
+        // ===========================
         function createCboAccountsReceivableReportAccountFilter() {
             var accountObservableArray = new wijmo.collections.ObservableArray();
 
@@ -372,35 +417,35 @@
                     var disabled = true;
                     if (results.length > 0) {
                         disabled = false;
-                        accountHasData = true;
+                        ifAccountsReceivableReportHasData = true;
                     } else {
-                        $("#btnAccountsReceivableReportCSV").prop("disabled", true);
-                        $("#btnAccountsReceivableReportPDF").prop("disabled", true);
+                        $("#btnAccountsReceivableReportDownloadCSV").prop("disabled", true);
+                        $("#btnAccountsReceivableReportPrintPDF").prop("disabled", true);
                     }
 
-                    cboAccountsReceivableReportAccount.dispose();
-                    cboAccountsReceivableReportAccount = new wijmo.input.ComboBox('#cboAccountsReceivableReportAccount', {
+                    cboAccountsReceivableReportAccountFilter.dispose();
+                    cboAccountsReceivableReportAccountFilter = new wijmo.input.ComboBox('#cboAccountsReceivableReportAccountFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: accountObservableArray,
                         displayMemberPath: "Account",
                         selectedValuePath: "AccountId",
-                        selectedValue: getURLParameter("AccountId"),
+                        selectedValue: getURLParameterValue("AccountId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
                             refreshAccountsReceivableReportFlexGrid();
                         }
                     });
 
-                    createCboAccountsReceivableReportShowNumberOfRows();
+                    createCboAccountsReceivableReportDisplayNumberOfRows();
                 }
             });
         }
 
-        // ==============================================
-        // Accounts Receivable Report Show Number Of Rows
-        // ==============================================
-        function createCboAccountsReceivableReportShowNumberOfRows() {
+        // =============================
+        // Create Display Number of Rows
+        // =============================
+        function createCboAccountsReceivableReportDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -430,8 +475,8 @@
                 });
             }
 
-            cboAccountsReceivableReportNumberOfRows.dispose();
-            cboAccountsReceivableReportNumberOfRows = new wijmo.input.ComboBox('#cboAccountsReceivableReportNumberOfRows', {
+            cboAccountsReceivableReportDisplayNumberOfRows.dispose();
+            cboAccountsReceivableReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboAccountsReceivableReportDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -441,7 +486,7 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboAccountsReceivableReportNumberOfRows.selectedValue;
+                        var numberOfRows = cboAccountsReceivableReportDisplayNumberOfRows.selectedValue;
                         accountsReceivableReportCollectionView.pageSize = parseInt(numberOfRows);
                         accountsReceivableReportCollectionView.refresh();
                         accountsReceivableReportFlexGrid.refresh();
@@ -453,21 +498,21 @@
 
             createAccounstReceivableReportFlexGrid();
         }
-        
-        // ==============================
-        // Get Accounts Receivable Report
-        // ==============================
-        function getAccountsReceivableReport() {
+
+        // ===================================
+        // Get Accounts Receivable Report Data
+        // ===================================
+        function getAccountsReceivableReportData() {
             var accountsReceivableObservableArray = new wijmo.collections.ObservableArray;
 
-            if (cboAccountsReceivableReportCompany.selectedValue != null) {
-                if (cboAccountsReceivableReportBranch.selectedValue != null) {
-                    if (cboAccountsReceivableReportAccount.selectedValue != null) {
+            if (cboAccountsReceivableReportCompanyFilter.selectedValue != null) {
+                if (cboAccountsReceivableReportBranchFilter.selectedValue != null) {
+                    if (cboAccountsReceivableReportAccountFilter.selectedValue != null) {
 
-                        var dateAsOf = cboAccountsReceivableReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboAccountsReceivableReportCompany.selectedValue;
-                        var branchId = cboAccountsReceivableReportBranch.selectedValue;
-                        var accountId = cboAccountsReceivableReportAccount.selectedValue;
+                        var dateAsOf = cboAccountsReceivableReportDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboAccountsReceivableReportCompanyFilter.selectedValue;
+                        var branchId = cboAccountsReceivableReportBranchFilter.selectedValue;
+                        var accountId = cboAccountsReceivableReportAccountFilter.selectedValue;
 
                         $.ajax({
                             url: '/api/accountsReceivable/list/' + dateAsOf + "/" + companyId + "/" + branchId + "/" + accountId,
@@ -475,8 +520,8 @@
                             type: 'GET',
                             contentType: 'application/json; charset=utf-8',
                             success: function (results) {
-                                var totalBalance = 0;
-                                var totalCurrentAmount = 0;
+                                var inpTotalBalance = 0;
+                                var inpTotalCurrentAmount = 0;
                                 var totalAge30Amount = 0;
                                 var totalAge60Amount = 0;
                                 var totalAge90Amount = 0;
@@ -484,10 +529,10 @@
 
                                 if (results.length > 0) {
                                     for (i = 0; i < results.length; i++) {
-                                        var docLink = "/Software/SalesDetail?id=" + results[i]["SIId"];
+                                        var docLink = "/Software/SalesInvoiceDetail?id=" + results[i]["SIId"];
 
-                                        totalBalance = totalBalance + results[i]["BalanceAmount"];
-                                        totalCurrentAmount = totalCurrentAmount + results[i]["CurrentAmount"];
+                                        inpTotalBalance = inpTotalBalance + results[i]["BalanceAmount"];
+                                        inpTotalCurrentAmount = inpTotalCurrentAmount + results[i]["CurrentAmount"];
                                         totalAge30Amount = totalAge30Amount + results[i]["Age30Amount"];
                                         totalAge60Amount = totalAge60Amount + results[i]["Age60Amount"];
                                         totalAge90Amount = totalAge90Amount + results[i]["Age90Amount"];
@@ -525,87 +570,56 @@
                                     }
                                 }
 
-                                document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalBalance").value = parseFloat(inpTotalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalCurrentAmount").value = parseFloat(inpTotalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 NProgress.done();
                             }
                         });
                     } else {
-                        document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
                     }
                 } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return accountsReceivableObservableArray;
         }
 
-        // ====================================================
-        // Update Accounst Receivable Report Navigation Buttons
-        // ====================================================
-        function updateAccountsReceivableReportNavigateButtons() {
-            if (accountsReceivableReportCollectionView.pageSize <= 0) {
-                document.getElementById('navigationPageGrid').style.display = 'none';
-                return;
-            }
-
-            document.getElementById('navigationPageGrid').style.display = 'block';
-
-            if (accountsReceivableReportCollectionView.pageIndex === 0) {
-                btnAccountsReceivableReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnAccountsReceivableReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnAccountsReceivableReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (accountsReceivableReportCollectionView.pageIndex === (accountsReceivableReportCollectionView.pageCount - 1)) {
-                btnAccountsReceivableReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnAccountsReceivableReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnAccountsReceivableReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnAccountsReceivableReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-
-            btnAccountsReceivableReportMoveToCurrentPageGrid.innerHTML = (accountsReceivableReportCollectionView.pageIndex + 1) + ' / ' + accountsReceivableReportCollectionView.pageCount;
-        }
-
         // ===========================================
         // Create Accounts Receivable Report Flex Grid
         // ===========================================
         function createAccounstReceivableReportFlexGrid() {
-            accountsReceivableReportCollectionView = new wijmo.collections.CollectionView(getAccountsReceivableReport());
+            accountsReceivableReportCollectionView = new wijmo.collections.CollectionView(getAccountsReceivableReportData());
             accountsReceivableReportCollectionView.canFilter = true;
-            accountsReceivableReportCollectionView.pageSize = cboAccountsReceivableReportNumberOfRows.selectedValue;
+            accountsReceivableReportCollectionView.pageSize = cboAccountsReceivableReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#filterAccountsReceivableReport').keyup(function () {
+            $('#inpAccountsReceivableReportSeachFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 accountsReceivableReportCollectionView.refresh();
             });
@@ -716,25 +730,25 @@
 
             btnAccountsReceivableReportMoveToFirstPageGrid.addEventListener('click', function () {
                 accountsReceivableReportCollectionView.moveToFirstPage();
-                currentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
+                accountsReceivableReportCurrentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
                 updateAccountsReceivableReportNavigateButtons();
             });
 
             btnAccountsReceivableReportMoveToPreviousPageGrid.addEventListener('click', function () {
                 accountsReceivableReportCollectionView.moveToPreviousPage();
-                currentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
+                accountsReceivableReportCurrentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
                 updateAccountsReceivableReportNavigateButtons();
             });
 
             btnAccountsReceivableReportMoveToNextPageGrid.addEventListener('click', function () {
                 accountsReceivableReportCollectionView.moveToNextPage();
-                currentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
+                accountsReceivableReportCurrentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
                 updateAccountsReceivableReportNavigateButtons();
             });
 
             btnAccountsReceivableReportMoveToLastPageGrid.addEventListener('click', function () {
                 accountsReceivableReportCollectionView.moveToLastPage();
-                currentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
+                accountsReceivableReportCurrentPageIndex = accountsReceivableReportCollectionView.pageIndex + 1;
                 updateAccountsReceivableReportNavigateButtons();
             });
         }
@@ -743,12 +757,12 @@
         // Refresh Accounts Receivable Report Flex Grid
         // ============================================
         function refreshAccountsReceivableReportFlexGrid() {
-            accountsReceivableReportCollectionView = new wijmo.collections.CollectionView(getAccountsReceivableReport());
+            accountsReceivableReportCollectionView = new wijmo.collections.CollectionView(getAccountsReceivableReportData());
             accountsReceivableReportCollectionView.canFilter = true;
-            accountsReceivableReportCollectionView.pageSize = cboAccountsReceivableReportNumberOfRows.selectedValue;
+            accountsReceivableReportCollectionView.pageSize = cboAccountsReceivableReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#filterAccountsReceivableReport').keyup(function () {
+            $('#inpAccountsReceivableReportSeachFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 accountsReceivableReportCollectionView.refresh();
             });
@@ -767,10 +781,41 @@
             accountsReceivableReportFlexGrid.trackChanges = true;
         }
 
-        // ============
-        // Download CSV
-        // ============
-        function btnAccountsReceivableReportCSVOnclick() {
+        // ====================================================
+        // Update Accounst Receivable Report Navigation Buttons
+        // ====================================================
+        function updateAccountsReceivableReportNavigateButtons() {
+            if (accountsReceivableReportCollectionView.pageSize <= 0) {
+                document.getElementById('accountsReceivableReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('accountsReceivableReportNavigationPageGrid').style.display = 'block';
+
+            if (accountsReceivableReportCollectionView.pageIndex === 0) {
+                btnAccountsReceivableReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsReceivableReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsReceivableReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (accountsReceivableReportCollectionView.pageIndex === (accountsReceivableReportCollectionView.pageCount - 1)) {
+                btnAccountsReceivableReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountsReceivableReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnAccountsReceivableReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountsReceivableReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+
+            btnAccountsReceivableReportCurrentPageGrid.innerHTML = (accountsReceivableReportCollectionView.pageIndex + 1) + ' / ' + accountsReceivableReportCollectionView.pageCount;
+        }
+
+        // =======================================
+        // Download Accounts Receivable Report CSV
+        // =======================================
+        function btnAccountsReceivableReportDownloadCSVOnclick() {
             var CSV = '';
             var accountReceivables = [];
             var fileName = 'AccountsReceivableReport.CSV';
@@ -798,7 +843,7 @@
 
                 accountsReceivableReportCollectionView.moveToNextPage();
                 if (p == accountsReceivableReportCollectionView.pageCount) {
-                    accountsReceivableReportCollectionView.moveToPage(currentPageIndex - 1);
+                    accountsReceivableReportCollectionView.moveToPage(accountsReceivableReportCurrentPageIndex - 1);
                 }
             }
 
@@ -863,17 +908,17 @@
             }
         }
 
-        // =========
-        // Print PDF
-        // =========
-        function btnAccountsReceivableReportPDFOnclick() {
-            if (cboAccountsReceivableReportCompany.selectedValue != null) {
-                if (cboAccountsReceivableReportBranch.selectedValue != null) {
-                    if (cboAccountsReceivableReportAccount.selectedValue != null) {
-                        var dateAsOf = cboAccountsReceivableReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboAccountsReceivableReportCompany.selectedValue;
-                        var branchId = cboAccountsReceivableReportBranch.selectedValue;
-                        var accountId = cboAccountsReceivableReportAccount.selectedValue;
+        // ====================================
+        // Print Accounts Receivable Report PDF
+        // ====================================
+        function btnAccountsReceivableReportPrintPDFOnclick() {
+            if (cboAccountsReceivableReportCompanyFilter.selectedValue != null) {
+                if (cboAccountsReceivableReportBranchFilter.selectedValue != null) {
+                    if (cboAccountsReceivableReportAccountFilter.selectedValue != null) {
+                        var dateAsOf = cboAccountsReceivableReportDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboAccountsReceivableReportCompanyFilter.selectedValue;
+                        var branchId = cboAccountsReceivableReportBranchFilter.selectedValue;
+                        var accountId = cboAccountsReceivableReportAccountFilter.selectedValue;
 
                         window.location.href = '/RepAccountsReceivable/AccountsReceivableReport?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&AccountId=' + accountId;
                     } else {
@@ -887,15 +932,22 @@
             }
         }
 
-        // ============
-        // On load Page
-        // ============
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            createCboAccountsReceivableReportDateFilter();
+            createCboAccountsReceivableReportDateAsOfFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -942,6 +994,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -981,6 +1036,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
