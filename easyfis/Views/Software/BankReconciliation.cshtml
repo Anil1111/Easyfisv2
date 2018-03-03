@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Bank Reconciliation</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,14 +38,26 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ============
+                        Download CSV
+                        ============
+                    -->
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                <button class="btn btn-success" id="" onclick="btnDownloadCSVFile()"><i class="fa fa-file-excel-o"></i> CSV</button>
-                                <button class="btn btn-danger" id="" onclick="btnBankReconciliationClose_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                <button class="btn btn-success" id="" onclick="btnBankReconciliationDownloadCSVOnclick()"><i class="fa fa-file-excel-o"></i> CSV</button>
+                                <button class="btn btn-danger" id="" onclick="btnBankReconciliationCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
+
+                    <!--
+                        =================
+                        Filters (Headers)
+                        =================
+                    -->
                     <div class="panel-body">
                         <form class="form-horizontal" role="form">
                             <div class="row">
@@ -56,19 +65,19 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Bank</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="bankReconciliationBank"></div>
+                                            <div class="comboBox-wide" id="cboBankReconciliationBankFilterReconciliationBankFilter"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Date Start</label>
                                         <div class="col-sm-8">
-                                            <div class="" id="bankReconciliationStartDate"></div>
+                                            <div class="" id="cboBankReconciliationBankFilterReconciliationStartDateFilter"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Date End</label>
                                         <div class="col-sm-8">
-                                            <div class="" id="bankReconciliationEndDate"></div>
+                                            <div class="" id="cboBankReconciliationBankFilterReconciliationEndDateFilter"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -76,31 +85,31 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Ending Balance as per Bank</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationEndingBalanceAsPerBank" placeholder="0.00" />
+                                            <input type="text" class="form-control  numberField " id="inpBankReconciliationEndingBalanceAsPerBank" placeholder="0.00" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Total Deposit in Transit</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationTotalDepositInTransit" disabled />
+                                            <input type="text" class="form-control  numberField " id="inpBankReconciliationTotalDepositInTransit" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Total Outstanding Withdrawals</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationTotalOutstandingWithdrawals" disabled />
+                                            <input type="text" class="form-control  numberField " id="inpBankReconciliationTotalOutstandingWithdrawals" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Total Adjustments</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationTotalAdjustments" disabled />
+                                            <input type="text" class="form-control  numberField " id="inpBankReconciliationTotalAdjustments" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-6">Adjusted Ending Balance as per Bank</label>
                                         <div class="col-sm-6">
-                                            <input type="text" class="form-control  numberField " id="bankReconciliationAdjustedEndingBalanceAsPerBank" disabled />
+                                            <input type="text" class="form-control  numberField " id="inpBankReconciliationAdjustedEndingBalanceAsPerBank" disabled />
                                         </div>
                                     </div>
                                 </div>
@@ -109,14 +118,26 @@
                         </form>
                     </div>
                 </div>
+                
+                <!--
+                    ========================
+                    Tabs (Bank Transactions)
+                    ========================
+                -->
                 <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
-                    <li role="presentation" class="active"><a data-toggle="tab" href="#deposits" id="depositsCollection">Deposits (Collection)</a></li>
-                    <li role="presentation"><a data-toggle="tab" href="#withdrwals" id="withdrwalsDisbursment">Withdrawals (Disbursement)</a></li>
-                    <li role="presentation"><a data-toggle="tab" href="#adjustments" id="adjustmentsJournalVoucher">Adjustments (Journal Voucher)</a></li>
+                    <li role="presentation" class="active"><a data-toggle="tab" href="#tabCollectionDeposits" id="collectionDeposits">Deposits (Collection)</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#tabDisbursementWithdrawals" id="disbursementWithdrawals">Withdrawals (Disbursement)</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#tabJournalVoucherAdjustments" id="journalVoucherAdjustments">Adjustments (Journal Voucher)</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
-                    <div id="deposits" class="tab-pane active">
+
+                    <!--
+                        ================================
+                        Tab Content: Collection Deposits
+                        ================================
+                    -->
+                    <div id="tabCollectionDeposits" class="tab-pane active">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
@@ -124,14 +145,14 @@
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="DepositsInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpCollectionDepositsSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboDepositsShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboCollectionDepositsDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -140,22 +161,22 @@
                                 </table>
                             </div>
                             <div class="panel-body">
-                                <div id="collectionLineGrid"></div>
+                                <div id="collectionDepositsFlexGrid"></div>
                             </div>
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridDeposits">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridDeposits">
+                                    <div class="btn-group col-md-7" id="collectionDepositsNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnCollectionDepositsMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridDeposits">
+                                        <button type="button" class="btn btn-default border-custom" id="btnCollectionDepositsMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridDeposits"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridDeposits">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCollectionDepositsCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnCollectionDepositsMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridDeposits">
+                                        <button type="button" class="btn btn-default border-custom" id="btnCollectionDepositsMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -172,7 +193,7 @@
                                                 <b>Total</b>
                                             </dt>
                                             <dd>
-                                                <input type="text" class="form-control numberField" id="totalInTransit" placeholder="0.00" disabled />
+                                                <input type="text" class="form-control numberField" id="inpCollectionDepositsTotalInTransit" placeholder="0.00" disabled />
                                             </dd>
                                         </dl>
                                     </div>
@@ -180,7 +201,13 @@
                             </div>
                         </div>
                     </div>
-                    <div id="withdrwals" class="tab-pane">
+                    
+                    <!--
+                        ======================================
+                        Tab Content: Disubursement Withdrawals
+                        ======================================
+                    -->
+                    <div id="tabDisbursementWithdrawals" class="tab-pane">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
@@ -188,14 +215,14 @@
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="WithdrawalsInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpDisbursementWithdrawalsSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboWithdrawalsShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboDisbursementWithdrawalsDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -204,22 +231,22 @@
                                 </table>
                             </div>
                             <div class="panel-body">
-                                <div id="disbursementGrid"></div>
+                                <div id="disbursementWithdrawalsFlexGrid"></div>
                             </div>
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridWithdrawals">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridWithdrawals">
+                                    <div class="btn-group col-md-7" id="disbursementWithdrawalsNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementWithdrawalsMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridWithdrawals">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementWithdrawalsMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridWithdrawals"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridWithdrawals">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnDisbursementWithdrawalsCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementWithdrawalsMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridWithdrawals">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementWithdrawalsMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -236,7 +263,7 @@
                                                 <b>Total</b>
                                             </dt>
                                             <dd>
-                                                <input type="text" class="form-control numberField" id="totalOutstanding" placeholder="0.00" disabled />
+                                                <input type="text" class="form-control numberField" id="inpDisbursementWithdrawalsTotalOutstanding" placeholder="0.00" disabled />
                                             </dd>
                                         </dl>
                                     </div>
@@ -244,7 +271,13 @@
                             </div>
                         </div>
                     </div>
-                    <div id="adjustments" class="tab-pane">
+                    
+                    <!--
+                        ========================================
+                        Tab Content: Journal Voucher Adjustments
+                        ========================================
+                    -->
+                    <div id="tabJournalVoucherAdjustments" class="tab-pane">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
@@ -252,14 +285,14 @@
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="AdjustmentsInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpJournalVoucherAdjustmentsSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboAdjustmentsShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboJournalVoucherAdjustmentsDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -268,22 +301,22 @@
                                 </table>
                             </div>
                             <div class="panel-body">
-                                <div id="adjustmentGrid"></div>
+                                <div id="journalVoucherAdjustmentsFlexGrid"></div>
                             </div>
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridAdjustments">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridAdjustments">
+                                    <div class="btn-group col-md-7" id="journalVoucherAdjustmentsNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalVoucherAdjustmentsMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridAdjustments">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalVoucherAdjustmentsMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridAdjustments"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridAdjustments">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnJournalVoucherAdjustmentsCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalVoucherAdjustmentMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridAdjustments">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalVoucherAdjustmentMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -300,7 +333,7 @@
                                                 <b>Total</b>
                                             </dt>
                                             <dd>
-                                                <input type="text" class="form-control numberField" id="totalAdjustments" placeholder="0.00" disabled />
+                                                <input type="text" class="form-control numberField" id="inpJournalVoucherAdjustmentTotalAdjustments" placeholder="0.00" disabled />
                                             </dd>
                                         </dl>
                                     </div>
@@ -310,6 +343,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -317,50 +351,71 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboBank = new wijmo.input.ComboBox('#bankReconciliationBank');
-        var bankReconciliationStartDate = new wijmo.input.InputDate('#bankReconciliationStartDate');
-        var bankReconciliationEndDate = new wijmo.input.InputDate('#bankReconciliationEndDate');
-        var collectionLines;
-        var collectionLineGrid = new wijmo.grid.FlexGrid('#collectionLineGrid');
-        var disbursements;
-        var disbursementGrid = new wijmo.grid.FlexGrid('#disbursementGrid');
-        var journalVoucherLines;
-        var journalVoucherLineGrid = new wijmo.grid.FlexGrid('#adjustmentGrid');
-        var isStartDateSelected = false;
-        var isEndDateSelected = false;
-        var cboDepositsShowNumberOfRows = new wijmo.input.ComboBox('#cboDepositsShowNumberOfRows');
-        var btnFirstPageGridDeposits = document.getElementById('btnMoveToFirstPageGridDeposits');
-        var btnPreviousPageGridDeposits = document.getElementById('btnMoveToPreviousPageGridDeposits');
-        var btnNextPageGridDeposits = document.getElementById('btnMoveToNextPageGridDeposits');
-        var btnLastPageGridDeposits = document.getElementById('btnMoveToLastPageGridDeposits');
-        var btnCurrentPageGridDeposits = document.getElementById('btnCurrentPageGridDeposits');
-        var cboWithdrawalsShowNumberOfRows = new wijmo.input.ComboBox('#cboWithdrawalsShowNumberOfRows');
-        var btnFirstPageGridWithdrawals = document.getElementById('btnMoveToFirstPageGridWithdrawals');
-        var btnPreviousPageGridWithdrawals = document.getElementById('btnMoveToPreviousPageGridWithdrawals');
-        var btnNextPageGridWithdrawals = document.getElementById('btnMoveToNextPageGridWithdrawals');
-        var btnLastPageGridWithdrawals = document.getElementById('btnMoveToLastPageGridWithdrawals');
-        var btnCurrentPageGridWithdrawals = document.getElementById('btnCurrentPageGridWithdrawals');
-        var cboAdjustmentsShowNumberOfRows = new wijmo.input.ComboBox('#cboAdjustmentsShowNumberOfRows');
-        var btnFirstPageGridAdjustments = document.getElementById('btnMoveToFirstPageGridAdjustments');
-        var btnPreviousPageGridAdjustments = document.getElementById('btnMoveToPreviousPageGridAdjustments');
-        var btnNextPageGridAdjustments = document.getElementById('btnMoveToNextPageGridAdjustments');
-        var btnLastPageGridAdjustments = document.getElementById('btnMoveToLastPageGridAdjustments');
-        var btnCurrentPageGridAdjustments = document.getElementById('btnCurrentPageGridAdjustments');
-        var isDepositsTabClicked = false;
-        var isWithdrawalsTabClicked = false;
-        var isAdjustmentsTabClicked = false;
-        var collectionLinesDepositCurrentPageIndex = 0;
-        var disbursementWithdrawalsDepositCurrentPageIndex = 0;
-        var journalVoucherLineAdjustmentsCurrentPageIndex = 0;
+        // ===============================================
+        // Bank Reconciliation Header Dropdowns and Filter
+        // ===============================================
+        var cboBankReconciliationBankFilter = new wijmo.input.ComboBox('#cboBankReconciliationBankFilterReconciliationBankFilter');
+        var cboBankReconciliationBankFilterReconciliationStartDateFilter = new wijmo.input.InputDate('#cboBankReconciliationBankFilterReconciliationStartDateFilter');
+        var cboBankReconciliationBankFilterReconciliationEndDateFilter = new wijmo.input.InputDate('#cboBankReconciliationBankFilterReconciliationEndDateFilter');
+        var isCboBankReconciliationBankFilterReconciliationStartDateFilterSelected = false;
+        var isCboBankReconciliationBankFilterReconciliationEndDateFilterSelected = false;
 
-        // ========
-        // Get Bank
-        // ========
-        function getBank() {
+        // =========================================================================
+        // Collection (Deposits) - Collection View, Flex Grid and Navigation Buttons
+        // =========================================================================
+        var collectionDepositsCollectionView;
+        var collectionDepositsFlexGrid = new wijmo.grid.FlexGrid('#collectionDepositsFlexGrid');
+        var cboCollectionDepositsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDepositsDisplayNumberOfRows');
+        var btnCollectionDepositsMoveToFirstPageGrid = document.getElementById('btnCollectionDepositsMoveToFirstPageGrid');
+        var btnCollectionDepositsMoveToPreviousPageGrid = document.getElementById('btnCollectionDepositsMoveToPreviousPageGrid');
+        var btnCollectionDepositsMoveToNextPageGrid = document.getElementById('btnCollectionDepositsMoveToNextPageGrid');
+        var btnCollectionDepositsMoveToLastPageGrid = document.getElementById('btnCollectionDepositsMoveToLastPageGrid');
+        var btnCollectionDepositsCurrentPageGrid = document.getElementById('btnCollectionDepositsCurrentPageGrid');
+
+        // ==============================================================================
+        // Disbursement (Withdrawals) - Collection View, Flex Grid and Navigation Buttons
+        // ==============================================================================
+        var disbursementWithdrawalsCollectionView;
+        var disbursementWithdrawalsFlexGrid = new wijmo.grid.FlexGrid('#disbursementWithdrawalsFlexGrid');
+        var cboDisbursementWithdrawalsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementWithdrawalsDisplayNumberOfRows');
+        var btnDisbursementWithdrawalsMoveToFirstPageGrid = document.getElementById('btnDisbursementWithdrawalsMoveToFirstPageGrid');
+        var btnDisbursementWithdrawalsMoveToPreviousPageGrid = document.getElementById('btnDisbursementWithdrawalsMoveToPreviousPageGrid');
+        var btnDisbursementWithdrawalsMoveToNextPageGrid = document.getElementById('btnDisbursementWithdrawalsMoveToNextPageGrid');
+        var btnDisbursementWithdrawalsMoveToLastPageGrid = document.getElementById('btnDisbursementWithdrawalsMoveToLastPageGrid');
+        var btnDisbursementWithdrawalsCurrentPageGrid = document.getElementById('btnDisbursementWithdrawalsCurrentPageGrid');
+
+        // =================================================================================
+        // Journal Voucher (Adjustments) - Collection View, Flex Grid and Navigation Buttons
+        // =================================================================================
+        var journalVoucherAdjustmentsCollectionView;
+        var journalVoucherLineGrid = new wijmo.grid.FlexGrid('#journalVoucherAdjustmentsFlexGrid');
+        var cboJournalVoucherAdjustmentsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboJournalVoucherAdjustmentsDisplayNumberOfRows');
+        var btnJournalVoucherAdjustmentsMoveToFirstPageGrid = document.getElementById('btnJournalVoucherAdjustmentsMoveToFirstPageGrid');
+        var btnJournalVoucherAdjustmentsMoveToPreviousPageGrid = document.getElementById('btnJournalVoucherAdjustmentsMoveToPreviousPageGrid');
+        var btnJournalVoucherAdjustmentMoveToNextPageGrid = document.getElementById('btnJournalVoucherAdjustmentMoveToNextPageGrid');
+        var btnJournalVoucherAdjustmentMoveToLastPageGrid = document.getElementById('btnJournalVoucherAdjustmentMoveToLastPageGrid');
+        var btnJournalVoucherAdjustmentsCurrentPageGrid = document.getElementById('btnJournalVoucherAdjustmentsCurrentPageGrid');
+
+        // ============
+        // Tab Controls
+        // ============
+        var isCollectionDepositsTabClicked = false;
+        var isDisbursementWithdrawalsTabClicked = false;
+        var isJournalVoucherAdjustmentsTabClicked = false;
+
+        // ==================
+        // Current Page Index
+        // ==================
+        var collectionDepositsCurrentPageIndex = 0;
+        var disbursementWithdrawalsCurrentPageIndex = 0;
+        var journalVoucherAdjustmentsCurrentPageGrid = 0;
+
+        // ========================
+        // Create Combo Bank Filter
+        // ========================
+        function createCboBankFilter() {
             var banksObservableArray = new wijmo.collections.ObservableArray;
+
             $.ajax({
                 url: '/api/bankReconciliation/dropdown/list/bank',
                 cache: false,
@@ -376,8 +431,8 @@
                         }
                     }
 
-                    cboBank.dispose();
-                    cboBank = new wijmo.input.ComboBox('#bankReconciliationBank', {
+                    cboBankReconciliationBankFilter.dispose();
+                    cboBankReconciliationBankFilter = new wijmo.input.ComboBox('#cboBankReconciliationBankFilterReconciliationBankFilter', {
                         isEditable: false,
                         itemsSource: banksObservableArray,
                         displayMemberPath: "Article",
@@ -387,48 +442,48 @@
                         }
                     });
 
-                    bankReconciliationDate();
+                    createCboDateRangedFilter();
                 }
             });
         }
 
-        // ==========
-        // Date Range
-        // ==========
-        function bankReconciliationDate() {
-            bankReconciliationStartDate.dispose();
-            bankReconciliationStartDate = new wijmo.input.InputDate('#bankReconciliationStartDate', {
+        // ==============================
+        // Create Combo Date Range Filter
+        // ==============================
+        function createCboDateRangedFilter() {
+            cboBankReconciliationBankFilterReconciliationStartDateFilter.dispose();
+            cboBankReconciliationBankFilterReconciliationStartDateFilter = new wijmo.input.InputDate('#cboBankReconciliationBankFilterReconciliationStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (isStartDateSelected) {
+                    if (isCboBankReconciliationBankFilterReconciliationStartDateFilterSelected) {
                         createCollectionLineFlexGrid();
                     } else {
-                        isStartDateSelected = true;
+                        isCboBankReconciliationBankFilterReconciliationStartDateFilterSelected = true;
                     }
                 }
             });
 
-            bankReconciliationEndDate.dispose();
-            bankReconciliationEndDate = new wijmo.input.InputDate('#bankReconciliationEndDate', {
+            cboBankReconciliationBankFilterReconciliationEndDateFilter.dispose();
+            cboBankReconciliationBankFilterReconciliationEndDateFilter = new wijmo.input.InputDate('#cboBankReconciliationBankFilterReconciliationEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (isEndDateSelected) {
+                    if (isCboBankReconciliationBankFilterReconciliationEndDateFilterSelected) {
                         createCollectionLineFlexGrid();
                     } else {
-                        isEndDateSelected = true;
+                        isCboBankReconciliationBankFilterReconciliationEndDateFilterSelected = true;
                     }
                 }
             });
 
-            createCboShowRows();
+            createCboDisplayNumberOfTableRows();
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // =========================================
+        // Create Combo Display Number of Table Rows - Stopped Here....
+        // =========================================
+        function createCboDisplayNumberOfTableRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -458,8 +513,8 @@
                 });
             }
 
-            cboDepositsShowNumberOfRows.dispose();
-            cboDepositsShowNumberOfRows = new wijmo.input.ComboBox('#cboDepositsShowNumberOfRows', {
+            cboCollectionDepositsDisplayNumberOfRows.dispose();
+            cboCollectionDepositsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDepositsDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -469,18 +524,18 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboDepositsShowNumberOfRows.selectedValue;
-                        collectionLines.pageSize = parseInt(numberOfRows);
-                        collectionLines.refresh();
-                        collectionLineGrid.refresh();
+                        var numberOfRows = cboCollectionDepositsDisplayNumberOfRows.selectedValue;
+                        collectionDepositsCollectionView.pageSize = parseInt(numberOfRows);
+                        collectionDepositsCollectionView.refresh();
+                        collectionDepositsFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            cboWithdrawalsShowNumberOfRows.dispose();
-            cboWithdrawalsShowNumberOfRows = new wijmo.input.ComboBox('#cboWithdrawalsShowNumberOfRows', {
+            cboDisbursementWithdrawalsDisplayNumberOfRows.dispose();
+            cboDisbursementWithdrawalsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementWithdrawalsDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -490,18 +545,18 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboWithdrawalsShowNumberOfRows.selectedValue;
-                        disbursements.pageSize = parseInt(numberOfRows);
-                        disbursements.refresh();
-                        disbursementGrid.refresh();
+                        var numberOfRows = cboDisbursementWithdrawalsDisplayNumberOfRows.selectedValue;
+                        disbursementWithdrawalsCollectionView.pageSize = parseInt(numberOfRows);
+                        disbursementWithdrawalsCollectionView.refresh();
+                        disbursementWithdrawalsFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            cboAdjustmentsShowNumberOfRows.dispose();
-            cboAdjustmentsShowNumberOfRows = new wijmo.input.ComboBox('#cboAdjustmentsShowNumberOfRows', {
+            cboJournalVoucherAdjustmentsDisplayNumberOfRows.dispose();
+            cboJournalVoucherAdjustmentsDisplayNumberOfRows = new wijmo.input.ComboBox('#cboJournalVoucherAdjustmentsDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -511,9 +566,9 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboAdjustmentsShowNumberOfRows.selectedValue;
-                        journalVoucherLines.pageSize = parseInt(numberOfRows);
-                        journalVoucherLines.refresh();
+                        var numberOfRows = cboJournalVoucherAdjustmentsDisplayNumberOfRows.selectedValue;
+                        journalVoucherAdjustmentsCollectionView.pageSize = parseInt(numberOfRows);
+                        journalVoucherAdjustmentsCollectionView.refresh();
                         journalVoucherLineGrid.refresh();
 
                         NProgress.done();
@@ -525,17 +580,17 @@
         }
 
         // ========================
-        // GET Collection Line List
+        // GET Collection Line List - Begin Here...
         // ========================
         function getCollectionLines() {
             NProgress.start();
-            var collectionLinesObservableArray = new wijmo.collections.ObservableArray;
+            var collectionDepositsCollectionViewObservableArray = new wijmo.collections.ObservableArray;
 
-            var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboBankReconciliationBankFilterReconciliationStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboBankReconciliationBankFilterReconciliationEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
-            if (cboBank.selectedValue != null) {
-                var depositoryBankId = cboBank.selectedValue;
+            if (cboBankReconciliationBankFilter.selectedValue != null) {
+                var depositoryBankId = cboBankReconciliationBankFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/bankReconciliation/collectionLine/list/' + depositoryBankId + "/" + startDate + "/" + endDate,
@@ -543,7 +598,7 @@
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
-                        var totalInTransitAmount = 0;
+                        var inpCollectionDepositsTotalInTransitAmount = 0;
                         if (results.length > 0) {
                             for (i = 0; i < results.length; i++) {
                                 var inTransitAmount = results[i]["Amount"];
@@ -552,7 +607,7 @@
                                     inTransitAmount = 0;
                                 }
 
-                                totalInTransitAmount += inTransitAmount;
+                                inpCollectionDepositsTotalInTransitAmount += inTransitAmount;
 
                                 var ORDateResult = new Date(results[i]["ORDate"])
                                 var ORDate = ('0' + (ORDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + ORDateResult.getDate()).slice(-2) + '-' + ORDateResult.getFullYear();
@@ -560,7 +615,7 @@
                                 var CheckDateResult = new Date(results[i]["CheckDate"])
                                 var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
 
-                                collectionLinesObservableArray.push({
+                                collectionDepositsCollectionViewObservableArray.push({
                                     Id: results[i]["Id"],
                                     ORNumber: results[i]["ORNumber"],
                                     ORDate: ORDate,
@@ -578,8 +633,8 @@
                             }
                         }
 
-                        document.getElementById("totalInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalDepositInTransit").value = parseFloat(totalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpCollectionDepositsTotalInTransit").value = parseFloat(inpCollectionDepositsTotalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalDepositInTransit").value = parseFloat(inpCollectionDepositsTotalInTransitAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
 
                         createDisbursementFlexGrid();
@@ -587,65 +642,65 @@
                 });
             }
 
-            return collectionLinesObservableArray;
+            return collectionDepositsCollectionViewObservableArray;
         }
 
         // =========================
         // Update Navigation Buttons
         // =========================
         function updateNavigateButtonsDeposits() {
-            if (collectionLines.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridDeposits').style.display = 'none';
+            if (collectionDepositsCollectionView.pageSize <= 0) {
+                document.getElementById('collectionDepositsNavigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGridDeposits').style.display = 'block';
-            if (collectionLines.pageIndex === 0) {
-                btnFirstPageGridDeposits.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridDeposits.setAttribute('disabled', 'disabled');
-                btnNextPageGridDeposits.removeAttribute('disabled');
-                btnLastPageGridDeposits.removeAttribute('disabled');
-            } else if (collectionLines.pageIndex === (collectionLines.pageCount - 1)) {
-                btnFirstPageGridDeposits.removeAttribute('disabled');
-                btnPreviousPageGridDeposits.removeAttribute('disabled');
-                btnLastPageGridDeposits.setAttribute('disabled', 'disabled');
-                btnNextPageGridDeposits.setAttribute('disabled', 'disabled');
+            document.getElementById('collectionDepositsNavigationPageGrid').style.display = 'block';
+            if (collectionDepositsCollectionView.pageIndex === 0) {
+                btnCollectionDepositsMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDepositsMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDepositsMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (collectionDepositsCollectionView.pageIndex === (collectionDepositsCollectionView.pageCount - 1)) {
+                btnCollectionDepositsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDepositsMoveToNextPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGridDeposits.removeAttribute('disabled');
-                btnPreviousPageGridDeposits.removeAttribute('disabled');
-                btnNextPageGridDeposits.removeAttribute('disabled');
-                btnLastPageGridDeposits.removeAttribute('disabled');
+                btnCollectionDepositsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionDepositsMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGridDeposits.innerHTML = (collectionLines.pageIndex + 1) + ' / ' + collectionLines.pageCount;
+            btnCollectionDepositsCurrentPageGrid.innerHTML = (collectionDepositsCollectionView.pageIndex + 1) + ' / ' + collectionDepositsCollectionView.pageCount;
         }
 
         // =========================
         // collection line flex Grid
         // =========================
         function createCollectionLineFlexGrid() {
-            collectionLines = new wijmo.collections.CollectionView(getCollectionLines());
-            collectionLines.canFilter = true;
-            collectionLines.pageSize = cboDepositsShowNumberOfRows.selectedValue;
+            collectionDepositsCollectionView = new wijmo.collections.CollectionView(getCollectionLines());
+            collectionDepositsCollectionView.canFilter = true;
+            collectionDepositsCollectionView.pageSize = cboCollectionDepositsDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#DepositsInputFilter').keyup(function () {
+            $('#inpCollectionDepositsSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                collectionLines.refresh();
+                collectionDepositsCollectionView.refresh();
             });
 
-            collectionLines.filter = function (item) {
+            collectionDepositsCollectionView.filter = function (item) {
                 return !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            collectionLines.collectionChanged.addHandler(function (sender, args) {
+            collectionDepositsCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsDeposits();
             });
 
-            collectionLineGrid.dispose();
-            collectionLineGrid = new wijmo.grid.FlexGrid('#collectionLineGrid');
-            collectionLineGrid.initialize({
+            collectionDepositsFlexGrid.dispose();
+            collectionDepositsFlexGrid = new wijmo.grid.FlexGrid('#collectionDepositsFlexGrid');
+            collectionDepositsFlexGrid.initialize({
                     columns: [
                         {
                             "header": "OR Number",
@@ -730,42 +785,42 @@
                         },
                     ],
                 autoGenerateColumns: false,
-                itemsSource: collectionLines,
+                itemsSource: collectionDepositsCollectionView,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            collectionLineGrid.trackChanges = true;
+            collectionDepositsFlexGrid.trackChanges = true;
 
-            if (!isDepositsTabClicked) {
+            if (!isCollectionDepositsTabClicked) {
                 updateNavigateButtonsDeposits();
 
-                btnFirstPageGridDeposits.addEventListener('click', function () {
-                    collectionLines.moveToFirstPage();
-                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
+                btnCollectionDepositsMoveToFirstPageGrid.addEventListener('click', function () {
+                    collectionDepositsCollectionView.moveToFirstPage();
+                    collectionDepositsCurrentPageIndex = collectionDepositsCollectionView.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
-                btnPreviousPageGridDeposits.addEventListener('click', function () {
-                    collectionLines.moveToPreviousPage();
-                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
+                btnCollectionDepositsMoveToPreviousPageGrid.addEventListener('click', function () {
+                    collectionDepositsCollectionView.moveToPreviousPage();
+                    collectionDepositsCurrentPageIndex = collectionDepositsCollectionView.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
-                btnNextPageGridDeposits.addEventListener('click', function () {
-                    collectionLines.moveToNextPage();
-                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
+                btnCollectionDepositsMoveToNextPageGrid.addEventListener('click', function () {
+                    collectionDepositsCollectionView.moveToNextPage();
+                    collectionDepositsCurrentPageIndex = collectionDepositsCollectionView.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
-                btnLastPageGridDeposits.addEventListener('click', function () {
-                    collectionLines.moveToLastPage();
-                    collectionLinesDepositCurrentPageIndex = collectionLines.pageIndex + 1;
+                btnCollectionDepositsMoveToLastPageGrid.addEventListener('click', function () {
+                    collectionDepositsCollectionView.moveToLastPage();
+                    collectionDepositsCurrentPageIndex = collectionDepositsCollectionView.pageIndex + 1;
                     updateNavigateButtonsDeposits();
                 });
 
-                isDepositsTabClicked = true
+                isCollectionDepositsTabClicked = true
             }
         }
 
@@ -773,8 +828,8 @@
         // Clear Amount - Intransit
         // ========================
         function clearAmountIntransit() {
-            collectionLines.editItem(collectionLines.currentItem);
-            var collectionLineItem = collectionLines.currentEditItem;
+            collectionDepositsCollectionView.editItem(collectionDepositsCollectionView.currentItem);
+            var collectionLineItem = collectionDepositsCollectionView.currentEditItem;
             $.ajax({
                 url: '/api/bankReconciliation/collectionLine/update/isClearField/' + collectionLineItem.Id,
                 type: "PUT",
@@ -798,25 +853,25 @@
                             collectionLineItem.IsClear = false;
                         }
 
-                        collectionLines.refresh();
-                        collectionLineGrid.refresh();
+                        collectionDepositsCollectionView.refresh();
+                        collectionDepositsFlexGrid.refresh();
 
-                        var totalInTransitValue = 0;
+                        var inpCollectionDepositsTotalInTransitValue = 0;
 
-                        collectionLines.moveToFirstPage();
-                        for (var p = 1; p <= collectionLines.pageCount; p++) {
-                            for (i = 0; i < collectionLines.items.length; i++) {
-                                totalInTransitValue += parseFloat(collectionLines.items[i]["InTransit"]);
+                        collectionDepositsCollectionView.moveToFirstPage();
+                        for (var p = 1; p <= collectionDepositsCollectionView.pageCount; p++) {
+                            for (i = 0; i < collectionDepositsCollectionView.items.length; i++) {
+                                inpCollectionDepositsTotalInTransitValue += parseFloat(collectionDepositsCollectionView.items[i]["InTransit"]);
                             }
 
-                            collectionLines.moveToNextPage();
-                            if (p == collectionLines.pageCount) {
-                                collectionLines.moveToPage(collectionLinesDepositCurrentPageIndex - 1);
+                            collectionDepositsCollectionView.moveToNextPage();
+                            if (p == collectionDepositsCollectionView.pageCount) {
+                                collectionDepositsCollectionView.moveToPage(collectionDepositsCurrentPageIndex - 1);
                             }
                         }
 
-                        document.getElementById("totalInTransit").value = parseFloat(totalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalDepositInTransit").value = parseFloat(totalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpCollectionDepositsTotalInTransit").value = parseFloat(inpCollectionDepositsTotalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalDepositInTransit").value = parseFloat(inpCollectionDepositsTotalInTransitValue).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                         computeEndingBalancePerBank();
                     },
@@ -838,13 +893,13 @@
         // ================
         function getDisbursement() {
             NProgress.start();
-            var disbursementsObservableArray = new wijmo.collections.ObservableArray;
+            var disbursementWithdrawalsCollectionViewObservableArray = new wijmo.collections.ObservableArray;
 
-            var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboBankReconciliationBankFilterReconciliationStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboBankReconciliationBankFilterReconciliationEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
-            if (cboBank.selectedValue != null) {
-                var bankId = cboBank.selectedValue;
+            if (cboBankReconciliationBankFilter.selectedValue != null) {
+                var bankId = cboBankReconciliationBankFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/bankReconciliation/disbursement/list/' + bankId + '/' + startDate + '/' + endDate,
@@ -869,7 +924,7 @@
                                 var CheckDateResult = new Date(results[i]["CheckDate"])
                                 var CheckDate = ('0' + (CheckDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CheckDateResult.getDate()).slice(-2) + '-' + CheckDateResult.getFullYear();
 
-                                disbursementsObservableArray.push({
+                                disbursementWithdrawalsCollectionViewObservableArray.push({
                                     Id: results[i]["Id"],
                                     CVNumber: results[i]["CVNumber"],
                                     CVDate: CVDate,
@@ -887,8 +942,8 @@
                             }
                         }
 
-                        document.getElementById("totalOutstanding").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpDisbursementWithdrawalsTotalOutstanding").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStanding).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
 
                         createJournalVoucherFlexGrid();
@@ -896,65 +951,65 @@
                 });
             }
 
-            return disbursementsObservableArray;
+            return disbursementWithdrawalsCollectionViewObservableArray;
         }
 
         // =========================
         // Update Navigation Buttons
         // =========================
         function updateNavigateButtonsWithdrawals() {
-            if (disbursements.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridWithdrawals').style.display = 'none';
+            if (disbursementWithdrawalsCollectionView.pageSize <= 0) {
+                document.getElementById('disbursementWithdrawalsNavigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGridWithdrawals').style.display = 'block';
-            if (disbursements.pageIndex === 0) {
-                btnFirstPageGridWithdrawals.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridWithdrawals.setAttribute('disabled', 'disabled');
-                btnNextPageGridWithdrawals.removeAttribute('disabled');
-                btnLastPageGridWithdrawals.removeAttribute('disabled');
-            } else if (disbursements.pageIndex === (disbursements.pageCount - 1)) {
-                btnFirstPageGridWithdrawals.removeAttribute('disabled');
-                btnPreviousPageGridWithdrawals.removeAttribute('disabled');
-                btnLastPageGridWithdrawals.setAttribute('disabled', 'disabled');
-                btnNextPageGridWithdrawals.setAttribute('disabled', 'disabled');
+            document.getElementById('disbursementWithdrawalsNavigationPageGrid').style.display = 'block';
+            if (disbursementWithdrawalsCollectionView.pageIndex === 0) {
+                btnDisbursementWithdrawalsMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementWithdrawalsMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementWithdrawalsMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (disbursementWithdrawalsCollectionView.pageIndex === (disbursementWithdrawalsCollectionView.pageCount - 1)) {
+                btnDisbursementWithdrawalsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementWithdrawalsMoveToNextPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGridWithdrawals.removeAttribute('disabled');
-                btnPreviousPageGridWithdrawals.removeAttribute('disabled');
-                btnNextPageGridWithdrawals.removeAttribute('disabled');
-                btnLastPageGridWithdrawals.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementWithdrawalsMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGridWithdrawals.innerHTML = (disbursements.pageIndex + 1) + ' / ' + disbursements.pageCount;
+            btnDisbursementWithdrawalsCurrentPageGrid.innerHTML = (disbursementWithdrawalsCollectionView.pageIndex + 1) + ' / ' + disbursementWithdrawalsCollectionView.pageCount;
         }
 
         // ======================
         // Disbursement flex grid
         // ======================
         function createDisbursementFlexGrid() {
-            disbursements = new wijmo.collections.CollectionView(getDisbursement());
-            disbursements.canFilter = true;
-            disbursements.pageSize = cboWithdrawalsShowNumberOfRows.selectedValue;
+            disbursementWithdrawalsCollectionView = new wijmo.collections.CollectionView(getDisbursement());
+            disbursementWithdrawalsCollectionView.canFilter = true;
+            disbursementWithdrawalsCollectionView.pageSize = cboDisbursementWithdrawalsDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#WithdrawalsInputFilter').keyup(function () {
+            $('#inpDisbursementWithdrawalsSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                disbursements.refresh();
+                disbursementWithdrawalsCollectionView.refresh();
             });
 
-            disbursements.filter = function (item) {
+            disbursementWithdrawalsCollectionView.filter = function (item) {
                 return !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            disbursements.collectionChanged.addHandler(function (sender, args) {
+            disbursementWithdrawalsCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsWithdrawals();
             });
 
-            disbursementGrid.dispose();
-            disbursementGrid = new wijmo.grid.FlexGrid('#disbursementGrid');
-            disbursementGrid.initialize({
+            disbursementWithdrawalsFlexGrid.dispose();
+            disbursementWithdrawalsFlexGrid = new wijmo.grid.FlexGrid('#disbursementWithdrawalsFlexGrid');
+            disbursementWithdrawalsFlexGrid.initialize({
                     columns: [
                         {
                             "header": "CV Number",
@@ -1039,42 +1094,42 @@
                         },
                     ],
                 autoGenerateColumns: false,
-                itemsSource: disbursements,
+                itemsSource: disbursementWithdrawalsCollectionView,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            disbursementGrid.trackChanges = true;
+            disbursementWithdrawalsFlexGrid.trackChanges = true;
 
-            if (!isWithdrawalsTabClicked) {
+            if (!isDisbursementWithdrawalsTabClicked) {
                 updateNavigateButtonsWithdrawals();
 
-                btnFirstPageGridWithdrawals.addEventListener('click', function () {
-                    disbursements.moveToFirstPage();
-                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
+                btnDisbursementWithdrawalsMoveToFirstPageGrid.addEventListener('click', function () {
+                    disbursementWithdrawalsCollectionView.moveToFirstPage();
+                    disbursementWithdrawalsCurrentPageIndex = disbursementWithdrawalsCollectionView.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
-                btnPreviousPageGridWithdrawals.addEventListener('click', function () {
-                    disbursements.moveToPreviousPage();
-                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
+                btnDisbursementWithdrawalsMoveToPreviousPageGrid.addEventListener('click', function () {
+                    disbursementWithdrawalsCollectionView.moveToPreviousPage();
+                    disbursementWithdrawalsCurrentPageIndex = disbursementWithdrawalsCollectionView.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
-                btnNextPageGridWithdrawals.addEventListener('click', function () {
-                    disbursements.moveToNextPage();
-                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
+                btnDisbursementWithdrawalsMoveToNextPageGrid.addEventListener('click', function () {
+                    disbursementWithdrawalsCollectionView.moveToNextPage();
+                    disbursementWithdrawalsCurrentPageIndex = disbursementWithdrawalsCollectionView.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
-                btnLastPageGridWithdrawals.addEventListener('click', function () {
-                    disbursements.moveToLastPage();
-                    disbursementWithdrawalsDepositCurrentPageIndex = disbursements.pageIndex + 1;
+                btnDisbursementWithdrawalsMoveToLastPageGrid.addEventListener('click', function () {
+                    disbursementWithdrawalsCollectionView.moveToLastPage();
+                    disbursementWithdrawalsCurrentPageIndex = disbursementWithdrawalsCollectionView.pageIndex + 1;
                     updateNavigateButtonsWithdrawals();
                 });
 
-                isWithdrawalsTabClicked = true
+                isDisbursementWithdrawalsTabClicked = true
             }
         }
 
@@ -1082,8 +1137,8 @@
         // Clear Outstanding Amount
         // ========================
         function clearAmountOutstanding() {
-            disbursements.editItem(disbursements.currentItem);
-            var disbursementItem = disbursements.currentEditItem;
+            disbursementWithdrawalsCollectionView.editItem(disbursementWithdrawalsCollectionView.currentItem);
+            var disbursementItem = disbursementWithdrawalsCollectionView.currentEditItem;
             $.ajax({
                 url: '/api/bankReconciliation/disbursement/update/isClearField/' + disbursementItem.Id,
                 type: "PUT",
@@ -1107,25 +1162,25 @@
                             disbursementItem.IsClear = false;
                         }
 
-                        disbursements.refresh();
-                        disbursementGrid.refresh();
+                        disbursementWithdrawalsCollectionView.refresh();
+                        disbursementWithdrawalsFlexGrid.refresh();
 
                         var totalOutStandingAmount = 0;
 
-                        disbursements.moveToFirstPage();
-                        for (var p = 1; p <= disbursements.pageCount; p++) {
-                            for (i = 0; i < disbursements.items.length; i++) {
-                                totalOutStandingAmount += parseFloat(disbursements.items[i]["OutstandingAmount"]);
+                        disbursementWithdrawalsCollectionView.moveToFirstPage();
+                        for (var p = 1; p <= disbursementWithdrawalsCollectionView.pageCount; p++) {
+                            for (i = 0; i < disbursementWithdrawalsCollectionView.items.length; i++) {
+                                totalOutStandingAmount += parseFloat(disbursementWithdrawalsCollectionView.items[i]["OutstandingAmount"]);
                             }
 
-                            disbursements.moveToNextPage();
-                            if (p == disbursements.pageCount) {
-                                disbursements.moveToPage(disbursementWithdrawalsDepositCurrentPageIndex - 1);
+                            disbursementWithdrawalsCollectionView.moveToNextPage();
+                            if (p == disbursementWithdrawalsCollectionView.pageCount) {
+                                disbursementWithdrawalsCollectionView.moveToPage(disbursementWithdrawalsCurrentPageIndex - 1);
                             }
                         }
 
-                        document.getElementById("totalOutstanding").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpDisbursementWithdrawalsTotalOutstanding").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalOutstandingWithdrawals").value = parseFloat(totalOutStandingAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                         computeEndingBalancePerBank();
                     },
@@ -1147,13 +1202,13 @@
         // ========================
         function getJournalVoucherLine() {
             NProgress.start();
-            var journalVoucherLinesObservableArray = new wijmo.collections.ObservableArray;
+            var journalVoucherAdjustmentsCollectionViewObservableArray = new wijmo.collections.ObservableArray;
 
-            var startDate = bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboBankReconciliationBankFilterReconciliationStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboBankReconciliationBankFilterReconciliationEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
-            if (cboBank.selectedValue != null) {
-                var articleId = cboBank.selectedValue;
+            if (cboBankReconciliationBankFilter.selectedValue != null) {
+                var articleId = cboBankReconciliationBankFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/bankReconciliation/journalVoucherLine/list/' + articleId + '/' + startDate + '/' + endDate,
@@ -1161,7 +1216,7 @@
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
-                        var totalAdjustmentsAmount = 0;
+                        var inpJournalVoucherAdjustmentTotalAdjustmentsAmount = 0;
                         if (results.length > 0) {
                             for (i = 0; i < results.length; i++) {
                                 var balance = results[i]["DebitAmount"] - results[i]["CreditAmount"]
@@ -1170,12 +1225,12 @@
                                     adjusmentAmount = 0;
                                 }
 
-                                totalAdjustmentsAmount += adjusmentAmount;
+                                inpJournalVoucherAdjustmentTotalAdjustmentsAmount += adjusmentAmount;
 
                                 var JVDateResult = new Date(results[i]["JVDate"])
                                 var JVDate = ('0' + (JVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + JVDateResult.getDate()).slice(-2) + '-' + JVDateResult.getFullYear();
 
-                                journalVoucherLinesObservableArray.push({
+                                journalVoucherAdjustmentsCollectionViewObservableArray.push({
                                     Id: results[i]["Id"],
                                     JVNumber: results[i]["JVNumber"],
                                     JVDate: JVDate,
@@ -1194,8 +1249,8 @@
                             }
                         }
 
-                        document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpJournalVoucherAdjustmentTotalAdjustments").value = parseFloat(inpJournalVoucherAdjustmentTotalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalAdjustments").value = parseFloat(inpJournalVoucherAdjustmentTotalAdjustmentsAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         computeEndingBalancePerBank();
                         NProgress.done();
                     }
@@ -1203,62 +1258,62 @@
 
             }
 
-            return journalVoucherLinesObservableArray;
+            return journalVoucherAdjustmentsCollectionViewObservableArray;
         }
 
         // =========================
         // Update Navigation Buttons
         // =========================
         function updateNavigateButtonsAdjustments() {
-            if (journalVoucherLines.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridAdjustments').style.display = 'none';
+            if (journalVoucherAdjustmentsCollectionView.pageSize <= 0) {
+                document.getElementById('journalVoucherAdjustmentsNavigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGridAdjustments').style.display = 'block';
-            if (journalVoucherLines.pageIndex === 0) {
-                btnFirstPageGridAdjustments.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridAdjustments.setAttribute('disabled', 'disabled');
-                btnNextPageGridAdjustments.removeAttribute('disabled');
-                btnLastPageGridAdjustments.removeAttribute('disabled');
-            } else if (journalVoucherLines.pageIndex === (journalVoucherLines.pageCount - 1)) {
-                btnFirstPageGridAdjustments.removeAttribute('disabled');
-                btnPreviousPageGridAdjustments.removeAttribute('disabled');
-                btnLastPageGridAdjustments.setAttribute('disabled', 'disabled');
-                btnNextPageGridAdjustments.setAttribute('disabled', 'disabled');
+            document.getElementById('journalVoucherAdjustmentsNavigationPageGrid').style.display = 'block';
+            if (journalVoucherAdjustmentsCollectionView.pageIndex === 0) {
+                btnJournalVoucherAdjustmentsMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalVoucherAdjustmentsMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalVoucherAdjustmentMoveToNextPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (journalVoucherAdjustmentsCollectionView.pageIndex === (journalVoucherAdjustmentsCollectionView.pageCount - 1)) {
+                btnJournalVoucherAdjustmentsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalVoucherAdjustmentMoveToNextPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGridAdjustments.removeAttribute('disabled');
-                btnPreviousPageGridAdjustments.removeAttribute('disabled');
-                btnNextPageGridAdjustments.removeAttribute('disabled');
-                btnLastPageGridAdjustments.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentMoveToNextPageGrid.removeAttribute('disabled');
+                btnJournalVoucherAdjustmentMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGridAdjustments.innerHTML = (journalVoucherLines.pageIndex + 1) + ' / ' + journalVoucherLines.pageCount;
+            btnJournalVoucherAdjustmentsCurrentPageGrid.innerHTML = (journalVoucherAdjustmentsCollectionView.pageIndex + 1) + ' / ' + journalVoucherAdjustmentsCollectionView.pageCount;
         }
 
         // =========================
         // Journal Voucher Flex Grid
         // =========================
         function createJournalVoucherFlexGrid() {
-            journalVoucherLines = new wijmo.collections.CollectionView(getJournalVoucherLine());
-            journalVoucherLines.canFilter = true;
-            journalVoucherLines.pageSize = cboAdjustmentsShowNumberOfRows.selectedValue;
+            journalVoucherAdjustmentsCollectionView = new wijmo.collections.CollectionView(getJournalVoucherLine());
+            journalVoucherAdjustmentsCollectionView.canFilter = true;
+            journalVoucherAdjustmentsCollectionView.pageSize = cboJournalVoucherAdjustmentsDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#AdjustmentsInputFilter').keyup(function () {
+            $('#inpJournalVoucherAdjustmentsSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                journalVoucherLines.refresh();
+                journalVoucherAdjustmentsCollectionView.refresh();
             });
 
-            journalVoucherLines.filter = function (item) {
+            journalVoucherAdjustmentsCollectionView.filter = function (item) {
                 return !filterText || (item.JVNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
 
-            journalVoucherLines.collectionChanged.addHandler(function (sender, args) {
+            journalVoucherAdjustmentsCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsAdjustments();
             });
 
             journalVoucherLineGrid.dispose();
-            journalVoucherLineGrid = new wijmo.grid.FlexGrid('#adjustmentGrid');
+            journalVoucherLineGrid = new wijmo.grid.FlexGrid('#journalVoucherAdjustmentsFlexGrid');
             journalVoucherLineGrid.initialize({
                 columns: [
                     {
@@ -1339,7 +1394,7 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: journalVoucherLines,
+                itemsSource: journalVoucherAdjustmentsCollectionView,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
@@ -1347,34 +1402,34 @@
 
             journalVoucherLineGrid.trackChanges = true;
 
-            if (!isAdjustmentsTabClicked) {
+            if (!isJournalVoucherAdjustmentsTabClicked) {
                 updateNavigateButtonsAdjustments();
 
-                btnFirstPageGridAdjustments.addEventListener('click', function () {
-                    journalVoucherLines.moveToFirstPage();
-                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
+                btnJournalVoucherAdjustmentsMoveToFirstPageGrid.addEventListener('click', function () {
+                    journalVoucherAdjustmentsCollectionView.moveToFirstPage();
+                    journalVoucherAdjustmentsCurrentPageGrid = btnJournalVoucherAdjustmentsMoveToFirstPageGrid.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
-                btnPreviousPageGridAdjustments.addEventListener('click', function () {
-                    journalVoucherLines.moveToPreviousPage();
-                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
+                btnJournalVoucherAdjustmentsMoveToPreviousPageGrid.addEventListener('click', function () {
+                    journalVoucherAdjustmentsCollectionView.moveToPreviousPage();
+                    journalVoucherAdjustmentsCurrentPageGrid = btnJournalVoucherAdjustmentsMoveToFirstPageGrid.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
-                btnNextPageGridAdjustments.addEventListener('click', function () {
-                    journalVoucherLines.moveToNextPage();
-                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
+                btnJournalVoucherAdjustmentMoveToNextPageGrid.addEventListener('click', function () {
+                    journalVoucherAdjustmentsCollectionView.moveToNextPage();
+                    journalVoucherAdjustmentsCurrentPageGrid = btnJournalVoucherAdjustmentsMoveToFirstPageGrid.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
-                btnLastPageGridAdjustments.addEventListener('click', function () {
-                    journalVoucherLines.moveToLastPage();
-                    journalVoucherLineAdjustmentsCurrentPageIndex = btnFirstPageGridAdjustments.pageIndex + 1;
+                btnJournalVoucherAdjustmentMoveToLastPageGrid.addEventListener('click', function () {
+                    journalVoucherAdjustmentsCollectionView.moveToLastPage();
+                    journalVoucherAdjustmentsCurrentPageGrid = btnJournalVoucherAdjustmentsMoveToFirstPageGrid.pageIndex + 1;
                     updateNavigateButtonsAdjustments();
                 });
 
-                isAdjustmentsTabClicked = true
+                isJournalVoucherAdjustmentsTabClicked = true
             }
         }
 
@@ -1382,8 +1437,8 @@
         // Clear Balance Amount
         // ====================
         function clearAmountBalance() {
-            journalVoucherLines.editItem(journalVoucherLines.currentItem);
-            var journalVoucherLineItem = journalVoucherLines.currentEditItem;
+            journalVoucherAdjustmentsCollectionView.editItem(journalVoucherAdjustmentsCollectionView.currentItem);
+            var journalVoucherLineItem = journalVoucherAdjustmentsCollectionView.currentEditItem;
             $.ajax({
                 url: '/api/bankReconciliation/journalVoucherLine/update/isClearField/' + journalVoucherLineItem.Id,
                 type: "PUT",
@@ -1407,25 +1462,25 @@
                             journalVoucherLineItem.IsClear = false;
                         }
 
-                        journalVoucherLines.refresh();
+                        journalVoucherAdjustmentsCollectionView.refresh();
                         journalVoucherLineGrid.refresh();
 
                         var totalAdjustmentAmount = 0;
 
-                        journalVoucherLines.moveToFirstPage();
-                        for (var p = 1; p <= journalVoucherLines.pageCount; p++) {
-                            for (i = 0; i < journalVoucherLines.items.length; i++) {
-                                totalAdjustmentAmount += parseFloat(journalVoucherLines.items[i]["Adjustments"]);
+                        journalVoucherAdjustmentsCollectionView.moveToFirstPage();
+                        for (var p = 1; p <= journalVoucherAdjustmentsCollectionView.pageCount; p++) {
+                            for (i = 0; i < journalVoucherAdjustmentsCollectionView.items.length; i++) {
+                                totalAdjustmentAmount += parseFloat(journalVoucherAdjustmentsCollectionView.items[i]["Adjustments"]);
                             }
 
-                            journalVoucherLines.moveToNextPage();
-                            if (p == journalVoucherLines.pageCount) {
-                                journalVoucherLines.moveToPage(journalVoucherLineAdjustmentsCurrentPageIndex - 1);
+                            journalVoucherAdjustmentsCollectionView.moveToNextPage();
+                            if (p == journalVoucherAdjustmentsCollectionView.pageCount) {
+                                journalVoucherAdjustmentsCollectionView.moveToPage(journalVoucherAdjustmentsCurrentPageGrid - 1);
                             }
                         }
 
-                        document.getElementById("totalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("bankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpJournalVoucherAdjustmentTotalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBankReconciliationTotalAdjustments").value = parseFloat(totalAdjustmentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                         computeEndingBalancePerBank();
                     },
@@ -1447,10 +1502,10 @@
         // ===============================
         function computeEndingBalancePerBank() {
             // default values for computation
-            var endingbalance = document.getElementById('bankReconciliationEndingBalanceAsPerBank').value;
-            var deposit = document.getElementById('bankReconciliationTotalDepositInTransit').value;
-            var withdrawal = document.getElementById('bankReconciliationTotalOutstandingWithdrawals').value;
-            var adjustment = document.getElementById('bankReconciliationTotalAdjustments').value;
+            var endingbalance = document.getElementById('inpBankReconciliationEndingBalanceAsPerBank').value;
+            var deposit = document.getElementById('inpBankReconciliationTotalDepositInTransit').value;
+            var withdrawal = document.getElementById('inpBankReconciliationTotalOutstandingWithdrawals').value;
+            var adjustment = document.getElementById('inpBankReconciliationTotalAdjustments').value;
 
             // parse and remove comma strings
             var replaceEndingBalance = parseFloat(endingbalance.replace(/\,/g, ''));
@@ -1460,48 +1515,48 @@
 
             var adjustedEndingBalance = parseFloat(((replaceEndingBalance - replaceDeposit) + replaceWithdrawal) - replaceAdjustment).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-            document.getElementById("bankReconciliationAdjustedEndingBalanceAsPerBank").value = adjustedEndingBalance;
+            document.getElementById("inpBankReconciliationAdjustedEndingBalanceAsPerBank").value = adjustedEndingBalance;
         }
 
-        $('#bankReconciliationEndingBalanceAsPerBank').keyup(function () {
+        $('#inpBankReconciliationEndingBalanceAsPerBank').keyup(function () {
             computeEndingBalancePerBank();
         });
 
         // ================================
         // Bank Reconciliation Close Button
         // ================================
-        function btnBankReconciliationClose_OnClick() {
+        function btnBankReconciliationCloseOnclick() {
             window.location = '/Software';
         }
 
         // ====
         // Tabs
         // ====
-        $('#depositsCollection').click(function () {
-            $('#deposits').show();
-            $('#withdrwals').hide();
-            $('#adjustments').hide();
+        $('#collectionDeposits').click(function () {
+            $('#tabCollectionDeposits').show();
+            $('#tabDisbursementWithdrawals').hide();
+            $('#tabJournalVoucherAdjustments').hide();
             createCollectionLineFlexGrid();
         });
 
-        $('#withdrwalsDisbursment').click(function () {
-            $('#deposits').hide();
-            $('#withdrwals').show();
-            $('#adjustments').hide();
+        $('#disbursementWithdrawals').click(function () {
+            $('#tabCollectionDeposits').hide();
+            $('#tabDisbursementWithdrawals').show();
+            $('#tabJournalVoucherAdjustments').hide();
             createDisbursementFlexGrid();
         });
 
-        $('#adjustmentsJournalVoucher').click(function () {
-            $('#deposits').hide();
-            $('#withdrwals').hide();
-            $('#adjustments').show();
+        $('#journalVoucherAdjustments').click(function () {
+            $('#tabCollectionDeposits').hide();
+            $('#tabDisbursementWithdrawals').hide();
+            $('#tabJournalVoucherAdjustments').show();
             createJournalVoucherFlexGrid();
         });
 
         // =================
         // Download CSV File
         // =================
-        function btnDownloadCSVFile() {
+        function btnBankReconciliationDownloadCSVOnclick() {
             var CSV = '';
 
             var bankReconciliationHeaderValues = [];
@@ -1521,17 +1576,17 @@
                 bankReconciliationHeader += '"' + bankReconciliationHeaderValues[0][bh] + '",';
             }
 
-            var EndingBalanceAsPerBankData = document.getElementById("bankReconciliationEndingBalanceAsPerBank").value;
-            var TotalDepositInTransitData = document.getElementById("bankReconciliationTotalDepositInTransit").value;
-            var TotalOutstandingWithdrawalsData = document.getElementById("bankReconciliationTotalOutstandingWithdrawals").value;
-            var TotalAdjustmentsData = document.getElementById("bankReconciliationTotalAdjustments").value;
-            var AdjustedEndingBalanceAsPerBankData = document.getElementById("bankReconciliationAdjustedEndingBalanceAsPerBank").value;
+            var EndingBalanceAsPerBankData = document.getElementById("inpBankReconciliationEndingBalanceAsPerBank").value;
+            var TotalDepositInTransitData = document.getElementById("inpBankReconciliationTotalDepositInTransit").value;
+            var TotalOutstandingWithdrawalsData = document.getElementById("inpBankReconciliationTotalOutstandingWithdrawals").value;
+            var TotalAdjustmentsData = document.getElementById("inpBankReconciliationTotalAdjustments").value;
+            var AdjustedEndingBalanceAsPerBankData = document.getElementById("inpBankReconciliationAdjustedEndingBalanceAsPerBank").value;
 
             var bankReconciliationData = [];
             bankReconciliationData.push({
-                Bank: cboBank.selectedItem["Article"],
-                DateStart: bankReconciliationStartDate.value.toLocaleDateString().replace(/\//g, '-'),
-                DateEnd: bankReconciliationEndDate.value.toLocaleDateString().replace(/\//g, '-'),
+                Bank: cboBankReconciliationBankFilter.selectedItem["Article"],
+                DateStart: cboBankReconciliationBankFilterReconciliationStartDateFilter.value.toLocaleDateString().replace(/\//g, '-'),
+                DateEnd: cboBankReconciliationBankFilterReconciliationEndDateFilter.value.toLocaleDateString().replace(/\//g, '-'),
                 EndingBalanceAsPerBank: EndingBalanceAsPerBankData,
                 TotalDepositInTransit: TotalDepositInTransitData,
                 TotalOutstandingWithdrawals: TotalOutstandingWithdrawalsData,
@@ -1570,40 +1625,40 @@
                 collectionLineHeader += '"' + collectionLineHeaderValues[0][ch] + '",';
             }
 
-            var collectionLinesDepositReport = [];
+            var collectionDepositsCollectionViewDepositReport = [];
 
-            collectionLines.moveToFirstPage();
-            for (var p = 1; p <= collectionLines.pageCount; p++) {
-                for (i = 0; i < collectionLines.items.length; i++) {;
+            collectionDepositsCollectionView.moveToFirstPage();
+            for (var p = 1; p <= collectionDepositsCollectionView.pageCount; p++) {
+                for (i = 0; i < collectionDepositsCollectionView.items.length; i++) {;
                     var isClearValue = "Not Cleared";
-                    if (collectionLines.items[i].IsClear) {
+                    if (collectionDepositsCollectionView.items[i].IsClear) {
                         var isClearValue = "Cleared";
                     }
 
-                    collectionLinesDepositReport.push({
-                        ORNumber: "OR-" + collectionLines.items[i].ORNumber,
-                        ORDate: collectionLines.items[i].ORDate,
-                        Customer: collectionLines.items[i].Customer,
-                        PayType: collectionLines.items[i].PayType,
-                        CheckNumber: collectionLines.items[i].CheckNumber,
-                        CheckDate: collectionLines.items[i].CheckDate,
-                        Amount: collectionLines.items[i].Amount,
+                    collectionDepositsCollectionViewDepositReport.push({
+                        ORNumber: "OR-" + collectionDepositsCollectionView.items[i].ORNumber,
+                        ORDate: collectionDepositsCollectionView.items[i].ORDate,
+                        Customer: collectionDepositsCollectionView.items[i].Customer,
+                        PayType: collectionDepositsCollectionView.items[i].PayType,
+                        CheckNumber: collectionDepositsCollectionView.items[i].CheckNumber,
+                        CheckDate: collectionDepositsCollectionView.items[i].CheckDate,
+                        Amount: collectionDepositsCollectionView.items[i].Amount,
                         IsClear: isClearValue,
-                        InTransit: collectionLines.items[i].InTransit
+                        InTransit: collectionDepositsCollectionView.items[i].InTransit
                     });
                 }
 
-                collectionLines.moveToNextPage();
-                if (p == collectionLines.pageCount) {
-                    collectionLines.moveToPage(collectionLinesDepositCurrentPageIndex - 1);
+                collectionDepositsCollectionView.moveToNextPage();
+                if (p == collectionDepositsCollectionView.pageCount) {
+                    collectionDepositsCollectionView.moveToPage(collectionDepositsCurrentPageIndex - 1);
                 }
             }
 
             CSV += collectionLineHeader + '\r\n';
-            for (var i = 0; i < collectionLinesDepositReport.length; i++) {
+            for (var i = 0; i < collectionDepositsCollectionViewDepositReport.length; i++) {
                 var row = '';
-                for (var data in collectionLinesDepositReport[i]) {
-                    row += '"' + collectionLinesDepositReport[i][data] + '",';
+                for (var data in collectionDepositsCollectionViewDepositReport[i]) {
+                    row += '"' + collectionDepositsCollectionViewDepositReport[i][data] + '",';
                 }
 
                 row.slice(0, row.length - 1);
@@ -1632,30 +1687,30 @@
 
             var disbursemenWithdrawalsReport = [];
 
-            disbursements.moveToFirstPage();
-            for (var p = 1; p <= disbursements.pageCount; p++) {
-                for (i = 0; i < disbursements.items.length; i++) {
+            disbursementWithdrawalsCollectionView.moveToFirstPage();
+            for (var p = 1; p <= disbursementWithdrawalsCollectionView.pageCount; p++) {
+                for (i = 0; i < disbursementWithdrawalsCollectionView.items.length; i++) {
                     var isClearValue = "Not Cleared";
-                    if (disbursements.items[i].IsClear) {
+                    if (disbursementWithdrawalsCollectionView.items[i].IsClear) {
                         var isClearValue = "Cleared";
                     }
 
                     disbursemenWithdrawalsReport.push({
-                        CVNumber: "CV-" + disbursements.items[i].CVNumber,
-                        CVDate: disbursements.items[i].CVDate,
-                        Payee: disbursements.items[i].Payee,
-                        PayType: disbursements.items[i].PayType,
-                        CheckNumber: disbursements.items[i].CheckNumber,
-                        CheckDate: disbursements.items[i].CheckDate,
-                        Amount: disbursements.items[i].Amount,
+                        CVNumber: "CV-" + disbursementWithdrawalsCollectionView.items[i].CVNumber,
+                        CVDate: disbursementWithdrawalsCollectionView.items[i].CVDate,
+                        Payee: disbursementWithdrawalsCollectionView.items[i].Payee,
+                        PayType: disbursementWithdrawalsCollectionView.items[i].PayType,
+                        CheckNumber: disbursementWithdrawalsCollectionView.items[i].CheckNumber,
+                        CheckDate: disbursementWithdrawalsCollectionView.items[i].CheckDate,
+                        Amount: disbursementWithdrawalsCollectionView.items[i].Amount,
                         IsClear: isClearValue,
-                        OutstandingAmount: disbursements.items[i].OutstandingAmount
+                        OutstandingAmount: disbursementWithdrawalsCollectionView.items[i].OutstandingAmount
                     });
                 }
 
-                disbursements.moveToNextPage();
-                if (p == disbursements.pageCount) {
-                    disbursements.moveToPage(disbursementWithdrawalsDepositCurrentPageIndex - 1);
+                disbursementWithdrawalsCollectionView.moveToNextPage();
+                if (p == disbursementWithdrawalsCollectionView.pageCount) {
+                    disbursementWithdrawalsCollectionView.moveToPage(disbursementWithdrawalsCurrentPageIndex - 1);
                 }
             }
 
@@ -1691,29 +1746,29 @@
 
             var journalVoucherLineAdjustmentsReport = [];
 
-            journalVoucherLines.moveToFirstPage();
-            for (var p = 1; p <= journalVoucherLines.pageCount; p++) {
-                for (i = 0; i < journalVoucherLines.items.length; i++) {
+            journalVoucherAdjustmentsCollectionView.moveToFirstPage();
+            for (var p = 1; p <= journalVoucherAdjustmentsCollectionView.pageCount; p++) {
+                for (i = 0; i < journalVoucherAdjustmentsCollectionView.items.length; i++) {
                     var isClearValue = "Not Cleared";
-                    if (journalVoucherLines.items[i].IsClear) {
+                    if (journalVoucherAdjustmentsCollectionView.items[i].IsClear) {
                         var isClearValue = "Cleared";
                     }
 
                     journalVoucherLineAdjustmentsReport.push({
-                        JVNumber: "JV-" + journalVoucherLines.items[i].JVNumber,
-                        JVDate: journalVoucherLines.items[i].JVDate,
-                        Particulars: journalVoucherLines.items[i].Particulars,
-                        DebitAmount: journalVoucherLines.items[i].DebitAmount,
-                        CreditAmount: journalVoucherLines.items[i].CreditAmount,
-                        BalanceAmount: journalVoucherLines.items[i].BalanceAmount,
+                        JVNumber: "JV-" + journalVoucherAdjustmentsCollectionView.items[i].JVNumber,
+                        JVDate: journalVoucherAdjustmentsCollectionView.items[i].JVDate,
+                        Particulars: journalVoucherAdjustmentsCollectionView.items[i].Particulars,
+                        DebitAmount: journalVoucherAdjustmentsCollectionView.items[i].DebitAmount,
+                        CreditAmount: journalVoucherAdjustmentsCollectionView.items[i].CreditAmount,
+                        BalanceAmount: journalVoucherAdjustmentsCollectionView.items[i].BalanceAmount,
                         IsClear: isClearValue,
-                        Adjustments: journalVoucherLines.items[i].Adjustments
+                        Adjustments: journalVoucherAdjustmentsCollectionView.items[i].Adjustments
                     });
                 }
 
-                journalVoucherLines.moveToNextPage();
-                if (p == journalVoucherLines.pageCount) {
-                    journalVoucherLines.moveToPage(journalVoucherLineAdjustmentsCurrentPageIndex - 1);
+                journalVoucherAdjustmentsCollectionView.moveToNextPage();
+                if (p == journalVoucherAdjustmentsCollectionView.pageCount) {
+                    journalVoucherAdjustmentsCollectionView.moveToPage(journalVoucherAdjustmentsCurrentPageGrid - 1);
                 }
             }
 
@@ -1728,7 +1783,7 @@
                 CSV += row + '\r\n';
             }
 
-            var fileName = cboBank.selectedItem["Article"] + '_BankReconciliation.CSV';
+            var fileName = cboBankReconciliationBankFilter.selectedItem["Article"] + '_BankReconciliation.CSV';
             if (CSV == '') {
                 toastr.error("No data.");
             } else {
@@ -1762,11 +1817,11 @@
         // On load page
         // ============
         $(document).ready(function () {
-            document.getElementById('bankReconciliationEndingBalanceAsPerBank').value = formatDecimalValues(0);
-            getBank();
-            $('#deposits').show();
-            $('#withdrwals').hide();
-            $('#adjustments').hide();
+            document.getElementById('inpBankReconciliationEndingBalanceAsPerBank').value = formatDecimalValues(0);
+            createCboBankFilter();
+            $('#tabCollectionDeposits').show();
+            $('#tabDisbursementWithdrawals').hide();
+            $('#tabJournalVoucherAdjustments').hide();
         });
     </script>
     <script type="text/javascript">
