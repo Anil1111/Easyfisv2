@@ -46,8 +46,8 @@
                 <ul class="nav nav-tabs pill-custom" role="tablist" id="myTab">
                     <li role="presentation" class="active"><a data-toggle="tab" href="#Account" id="tabAccount">Account</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#AccountType" id="createAccountTypeFlexGridId">Account Type</a></li>
-                    <li role="presentation"><a data-toggle="tab" href="#AccountCashFlow" id="accountCashFlowTabId">Account Cash Flow</a></li>
-                    <li role="presentation"><a data-toggle="tab" href="#AccountCategory" id="accountCategoryTabId">Account Category</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#AccountCashFlow" id="createAccountCashFlowFlexGridId">Account Cash Flow</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#AccountCategory" id="createAccountCategoryFlexGridId">Account Category</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
@@ -735,7 +735,7 @@
         // Create Combo Account Cash Flow
         // ==============================
         function createComboAccountCashFlow(accountCashFlowId) {
-            var accountCashFlowsObservableArray = new wijmo.collections.ObservableArray();
+            var accountCashFlowsCollectionViewObservableArray = new wijmo.collections.ObservableArray();
 
             $.ajax({
                 url: '/api/chartOfAccounts/account/dropdown/list/accountCashFlow',
@@ -745,7 +745,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCashFlowsObservableArray.push({
+                            accountCashFlowsCollectionViewObservableArray.push({
                                 Id: results[i]["Id"],
                                 AccountCashFlow: results[i]["AccountCashFlow"]
                             });
@@ -761,7 +761,7 @@
                     cboAccountCashFlow = new wijmo.input.ComboBox('#cboAccountCashFlow', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: accountCashFlowsObservableArray,
+                        itemsSource: accountCashFlowsCollectionViewObservableArray,
                         displayMemberPath: "AccountCashFlow",
                         selectedValuePath: "Id",
                         selectedValue: accountCashFlowId
@@ -1692,7 +1692,7 @@
         // Create Combo Account Category
         // =============================
         function createCboAccountCategory(accountCategoryId) {
-            var accountCategoriesObservableArray = new wijmo.collections.ObservableArray();
+            var accountCategoriesCollectionViewObservableArray = new wijmo.collections.ObservableArray();
 
             $.ajax({
                 url: '/api/chartOfAccounts/accountType/dropdown/list/accountCategory',
@@ -1703,7 +1703,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCategoriesObservableArray.push({
+                            accountCategoriesCollectionViewObservableArray.push({
                                 Id: results[i]["Id"],
                                 AccountCategory: results[i]["AccountCategory"]
                             });
@@ -1719,7 +1719,7 @@
                     cboAccountCategory = new wijmo.input.ComboBox('#cboAccountCategory', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: accountCategoriesObservableArray,
+                        itemsSource: accountCategoriesCollectionViewObservableArray,
                         displayMemberPath: "AccountCategory",
                         selectedValuePath: "Id",
                         selectedValue: accountCategoryId
@@ -2247,23 +2247,28 @@
     <!-- Account Cash Flow Scripts -->
     <!-- ========================= -->
     <script type="text/javascript">
-        // ================
-        // GLOBAL Variables
-        // ================
-        var accountCashFlows;
+        // ====================================================================
+        // Account Cash Flows Collection View, Flex Grid and Navigation Buttons
+        // ====================================================================
+        var accountCashFlowsCollectionView;
         var accountCashFlowFlexGrid = new wijmo.grid.FlexGrid('#accountCashFlowFlexGrid');
-        var btnAccountMoveToFirstPageGridCashFlow;
-        var btnAccountMoveToPreviousPageGridCashFlow;
-        var btnAccountMoveToNextPageGridCashFlow;
-        var btnAccountMoveToLastPageGridCashFlow;
-        var btnAccountCashFlowCurrentPageGrid;
+        var btnAccountCashFlowMoveToFirstPageGrid = document.getElementById('btnAccountCashFlowMoveToFirstPageGrid');
+        var btnAccountCashFlowMoveToPreviousPageGrid = document.getElementById('btnAccountCashFlowMoveToPreviousPageGrid');
+        var btnAccountCashFlowMoveToNextPageGrid = document.getElementById('btnAccountCashFlowMoveToNextPageGrid');
+        var btnAccountCashFlowMoveToLastPageGrid = document.getElementById('btnAccountCashFlowMoveToLastPageGrid');
+        var btnAccountCashFlowCurrentPageGrid = document.getElementById('btnAccountCashFlowCurrentPageGrid');
+
+        // ====================
+        // Account Cash Flow Id
+        // ====================
         var accountCashFlowId = 0;
 
         // ==========================
-        // GET Account Cash Flow List
+        // Get Account Cash Flow Data
         // ==========================
-        function getAccountDataCashFlow() {
+        function getAccountCashFlowData() {
             var accountCashFlowsObservableArray = new wijmo.collections.ObservableArray;
+
             NProgress.start();
             $.ajax({
                 url: '/api/chartOfAccounts/accountCashFlow/list',
@@ -2274,8 +2279,8 @@
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
                             accountCashFlowsObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='cmdAccountCashFlowEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdAccountCashFlowDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnAccountCashFlowEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnAccountCashFlowDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 AccountCashFlowCode: results[i]["AccountCashFlowCode"],
                                 AccountCashFlow: results[i]["AccountCashFlow"],
@@ -2298,350 +2303,29 @@
         }
 
         // ==================================
-        // Account cash flow entry validation
+        // Create Account Cash Flow Flex Grid
         // ==================================
-        function accountCashFlowEntryValidation() {
-            var isValid = true;
-            $('.requiredAccountCashFlow').each(function () {
-                if ($.trim($(this).val()) == '') {
-                    isValid = false;
-                    $(this).css({
-                        "border": "1px solid red"
-                    });
-                } else {
-                    $(this).css({
-                        "border": "",
-                    });
-                }
-            });
-
-            return isValid;
-        }
-
-        // =========================
-        // ADD New Account Cash Flow
-        // =========================
-        function btnAccountCashFlowAddOnclick() {
-            $('#accountCashFlowFormDetailModal').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('.requiredAccountCashFlow').each(function () {
-                $(this).css({
-                    "border": "",
-                });
-            });
-
-            $("#accountCashFlowLoadingFormDetail").show();
-            document.getElementById("accountCashFlowLoadingFormDetail").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#accountCashFlowFormDetail").hide();
-
-            document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#btnAccountCashFlowSave").prop("disabled", false);
-            $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-
-            accountCashFlowId = 0;
-            document.getElementById('inpAccountCashFlowCode').value = "NA";
-            document.getElementById('inpAccountCashFlow').value = "NA";
-
-            document.getElementById('inpAccountCashFlowCode').disabled = false;
-            document.getElementById('inpAccountCashFlow').disabled = false;
-
-            setTimeout(function () {
-                $("#accountCashFlowLoadingFormDetail").hide();
-                $("#accountCashFlowFormDetail").show();
-            }, 500);
-        }
-
-        // =============================
-        // EDIT Account Cash FLow Button
-        // =============================
-        function cmdAccountCashFlowEditButton_OnClick() {
-            $('#accountCashFlowFormDetailModal').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('.requiredAccountCashFlow').each(function () {
-                $(this).css({
-                    "border": "",
-                });
-            });
-
-            $("#accountCashFlowLoadingFormDetail").show();
-            document.getElementById("accountCashFlowLoadingFormDetail").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#accountCashFlowFormDetail").hide();
-
-            document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#btnAccountCashFlowSave").prop("disabled", false);
-            $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-
-            accountCashFlows.editItem(accountCashFlows.currentItem);
-            var accountCashFlow = accountCashFlows.currentEditItem;
-            accountCashFlowId = accountCashFlow.Id;
-            document.getElementById('inpAccountCashFlowCode').value = accountCashFlow.AccountCashFlowCode;
-            document.getElementById('inpAccountCashFlow').value = accountCashFlow.AccountCashFlow;
-
-            document.getElementById('inpAccountCashFlowCode').disabled = false;
-            document.getElementById('inpAccountCashFlow').disabled = false;
-
-            setTimeout(function () {
-                $("#accountCashFlowLoadingFormDetail").hide();
-                $("#accountCashFlowFormDetail").show();
-            }, 500);
-        }
-
-        // =============================
-        // Save Account Cash Flow Button
-        // =============================
-        function btnAccountCashFlowSaveOnclick() {
-            var accountCashFlowObject = new Object();
-            accountCashFlowObject.AccountCashFlowCode = document.getElementById('inpAccountCashFlowCode').value;
-            accountCashFlowObject.AccountCashFlow = document.getElementById('inpAccountCashFlow').value;
-            var data = JSON.stringify(accountCashFlowObject);
-
-            if (accountCashFlowEntryValidation()) {
-                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $("#btnAccountCashFlowSave").prop("disabled", true);
-                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", true);
-
-                if (accountCashFlowId == 0) {
-                    $.ajax({
-                        type: "POST",
-                        url: '/api/chartOfAccounts/accountCashFlow/add',
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        data: data,
-                        statusCode: {
-                            200: function () {
-                                toastr.success("Save Successful");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                refreshCashFlowFlexGrid();
-                            },
-                            404: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            },
-                            400: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            },
-                            500: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            }
-                        }
-                    });
-                } else {
-                    $.ajax({
-                        type: "PUT",
-                        url: '/api/chartOfAccounts/accountCashFlow/update/' + accountCashFlowId,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        data: data,
-                        statusCode: {
-                            200: function () {
-                                toastr.success("Update Successful");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                refreshCashFlowFlexGrid();
-                            },
-                            404: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            },
-                            400: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            },
-                            500: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#accountCashFlowFormDetailModal').modal('hide');
-                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#btnAccountCashFlowSave").prop("disabled", false);
-                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
-                            }
-                        }
-                    });
-                }
-            } else {
-                toastr.error("Invalid Entry");
-            }
-        }
-
-        // ==============================
-        // Close Account Cash Flow Button
-        // ==============================
-        function btnAccountCashFlowCloseOnclick() {
-            window.location = '/Software';
-        }
-
-        // ================================
-        // DELETE Account Cash Flow Buttons
-        // ================================
-        function cmdAccountCashFlowDeleteButton_OnClick() {
-            accountCashFlows.editItem(accountCashFlows.currentItem);
-            var accountCashFlow = accountCashFlows.currentEditItem;
-
-            $('#accountCashFlowConfirmDeleteModal').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
-            $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
-        }
-
-        // Account Cash Flow Confirm Delete Button
-        function btnAccountCashFlowConfirmDeleteOnclick() {
-            document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#btnAccountCashFlowConfirmDelete").prop("disabled", true);
-            $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", true);
-
-            accountCashFlows.editItem(accountCashFlows.currentItem);
-            var accountCashFlowId = accountCashFlows.currentEditItem.Id;
-            $.ajax({
-                url: '/api/chartOfAccounts/accountCashFlow/delete/' + accountCashFlowId,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
-                        refreshCashFlowFlexGrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
-                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
-                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
-                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
-                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
-                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
-                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
-                    }
-                }
-            });
-        }
-
-        // ===================================
-        // FlexGrid Selection for Account Type
-        // ===================================
-        function updateAccountFlexGridSelectionCashFlow() {
-            var item = accountCashFlows.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // ========================================
-        // Navigation Buttons for Account Cash Flow
-        // ========================================
-        function updateAccountNavigationButtonsCashFlow() {
-            if (accountCashFlows.pageSize <= 0) {
-                document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'block';
-            if (accountCashFlows.pageIndex === 0) {
-                btnAccountMoveToFirstPageGridCashFlow.setAttribute('disabled', 'disabled');
-                btnAccountMoveToPreviousPageGridCashFlow.setAttribute('disabled', 'disabled');
-                btnAccountMoveToNextPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCashFlow.removeAttribute('disabled');
-            } else if (accountCashFlows.pageIndex === (accountCashFlows.pageCount - 1)) {
-                btnAccountMoveToFirstPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToPreviousPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCashFlow.setAttribute('disabled', 'disabled');
-                btnAccountMoveToNextPageGridCashFlow.setAttribute('disabled', 'disabled');
-            } else {
-                btnAccountMoveToFirstPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToPreviousPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToNextPageGridCashFlow.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCashFlow.removeAttribute('disabled');
-            }
-            btnAccountCashFlowCurrentPageGrid.innerHTML = (accountCashFlows.pageIndex + 1) + ' / ' + accountCashFlows.pageCount;
-        }
-
-        function refreshCashFlowFlexGrid() {
-            accountCashFlows = new wijmo.collections.CollectionView(getAccountDataCashFlow());
-            accountCashFlows.canFilter = true;
-            accountCashFlows.pageSize = 15;
+        function createAccountCashFlowFlexGrid() {
+            accountCashFlowsCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
+            accountCashFlowsCollectionView.canFilter = true;
+            accountCashFlowsCollectionView.pageSize = 15;
 
             var filterTextAccountCashFlow = '';
             $('#inpAccountCashFlowSearchFilter').keyup(function () {
                 filterTextAccountCashFlow = this.value.toLowerCase();
-                accountCashFlows.refresh();
+                accountCashFlowsCollectionView.refresh();
             });
-            accountCashFlows.filter = function (item) {
-                return !filterTextAccountCashFlow || (item.AccountCashFlowCode.toLowerCase().indexOf(filterTextAccountCashFlow) > -1)
-                    || (item.AccountCashFlow.toLowerCase().indexOf(filterTextAccountCashFlow) > -1);
-            }
-            accountCashFlows.collectionChanged.addHandler(function (sender, args) {
-                updateAccountNavigationButtonsCashFlow();
-            });
-            accountCashFlows.currentChanged.addHandler(function (sender, args) {
-                updateAccountFlexGridSelectionCashFlow();
-            });
-
-            // Flex Grid for Account Cash Flow
-            accountCashFlowFlexGrid.itemsSource = accountCashFlows;
-            accountCashFlowFlexGrid.trackChanges = true;
-        }
-
-        // ===================================
-        // On Page Load for Account Cash Flows
-        // ===================================
-        function accountCashFlowTab() {
-            accountCashFlows = new wijmo.collections.CollectionView(getAccountDataCashFlow());
-            accountCashFlows.canFilter = true;
-            accountCashFlows.pageSize = 15;
-
-            var filterTextAccountCashFlow = '';
-            $('#inpAccountCashFlowSearchFilter').keyup(function () {
-                filterTextAccountCashFlow = this.value.toLowerCase();
-                accountCashFlows.refresh();
-            });
-            accountCashFlows.filter = function (item) {
+            accountCashFlowsCollectionView.filter = function (item) {
                 return !filterTextAccountCashFlow || (item.AccountCashFlowCode.toLowerCase().indexOf(filterTextAccountCashFlow) > -1)
                                                   || (item.AccountCashFlow.toLowerCase().indexOf(filterTextAccountCashFlow) > -1);
             }
-            accountCashFlows.collectionChanged.addHandler(function (sender, args) {
-                updateAccountNavigationButtonsCashFlow();
+            accountCashFlowsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountCashFlowNavigationButtons();
             });
-            accountCashFlows.currentChanged.addHandler(function (sender, args) {
-                updateAccountFlexGridSelectionCashFlow();
+            accountCashFlowsCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateAccountCashFlowFlexGridSelection();
             });
 
-            // Flex Grid for Account Cash Flow
             accountCashFlowFlexGrid.dispose();
             accountCashFlowFlexGrid = new wijmo.grid.FlexGrid('#accountCashFlowFlexGrid');
             accountCashFlowFlexGrid.initialize({
@@ -2690,7 +2374,7 @@
                             }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: accountCashFlows,
+                itemsSource: accountCashFlowsCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -2699,48 +2383,371 @@
 
             accountCashFlowFlexGrid.trackChanges = true;
 
-            // Navigation button for account cash flow
-            btnAccountMoveToFirstPageGridCashFlow = document.getElementById('btnAccountCashFlowMoveToFirstPageGrid');
-            btnAccountMoveToPreviousPageGridCashFlow = document.getElementById('btnAccountCashFlowMoveToPreviousPageGrid');
-            btnAccountMoveToNextPageGridCashFlow = document.getElementById('btnAccountCashFlowMoveToNextPageGrid');
-            btnAccountMoveToLastPageGridCashFlow = document.getElementById('btnAccountCashFlowMoveToLastPageGrid');
-            btnAccountCashFlowCurrentPageGrid = document.getElementById('btnAccountCashFlowCurrentPageGrid');
+            updateAccountCashFlowNavigationButtons();
 
-            updateAccountNavigationButtonsCashFlow();
-
-            btnAccountMoveToFirstPageGridCashFlow.addEventListener('click', function () {
-                accountCashFlows.moveToFirstPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToPreviousPageGridCashFlow.addEventListener('click', function () {
-                accountCashFlows.moveToPreviousPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToNextPageGridCashFlow.addEventListener('click', function () {
-                accountCashFlows.moveToNextPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToLastPageGridCashFlow.addEventListener('click', function () {
-                accountCashFlows.moveToLastPage();
-                updateAccountNavigationButtonsCashFlow();
+            btnAccountCashFlowMoveToFirstPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToFirstPage();
+                updateAccountCashFlowNavigationButtons();
             });
 
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAccountCashFlowAdd").prop("disabled", true);
+            btnAccountCashFlowMoveToPreviousPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToPreviousPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            btnAccountCashFlowMoveToNextPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToNextPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            btnAccountCashFlowMoveToLastPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToLastPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+        }
+
+        // ============================================
+        // Update Account Cash Flow Flex Grid Selection
+        // ============================================
+        function updateAccountCashFlowFlexGridSelection() {
+            var item = accountCashFlowsCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ===========================================
+        // Update Account Cash Flow Navigation Buttons
+        // ===========================================
+        function updateAccountCashFlowNavigationButtons() {
+            if (accountCashFlowsCollectionView.pageSize <= 0) {
+                document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'block';
+            if (accountCashFlowsCollectionView.pageIndex === 0) {
+                btnAccountCashFlowMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCashFlowMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCashFlowMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (accountCashFlowsCollectionView.pageIndex === (accountCashFlowsCollectionView.pageCount - 1)) {
+                btnAccountCashFlowMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCashFlowMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnAccountCashFlowMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountCashFlowMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnAccountCashFlowCurrentPageGrid.innerHTML = (accountCashFlowsCollectionView.pageIndex + 1) + ' / ' + accountCashFlowsCollectionView.pageCount;
+        }
+
+        // ===================================
+        // Refresh Account Cash Flow Flex Grid
+        // ===================================
+        function refreshAccountCashFlowFlexGrid() {
+            accountCashFlowsCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
+            accountCashFlowsCollectionView.canFilter = true;
+            accountCashFlowsCollectionView.pageSize = 15;
+
+            var filterTextAccountCashFlow = '';
+            $('#inpAccountCashFlowSearchFilter').keyup(function () {
+                filterTextAccountCashFlow = this.value.toLowerCase();
+                accountCashFlowsCollectionView.refresh();
+            });
+
+            accountCashFlowsCollectionView.filter = function (item) {
+                return !filterTextAccountCashFlow || (item.AccountCashFlowCode.toLowerCase().indexOf(filterTextAccountCashFlow) > -1)
+                    || (item.AccountCashFlow.toLowerCase().indexOf(filterTextAccountCashFlow) > -1);
+            }
+
+            accountCashFlowsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            accountCashFlowsCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateAccountCashFlowFlexGridSelection();
+            });
+
+            accountCashFlowFlexGrid.itemsSource = accountCashFlowsCollectionView;
+            accountCashFlowFlexGrid.trackChanges = true;
+        }
+
+        // ==================================
+        // Account Cash Flow Entry Validation
+        // ==================================
+        function accountCashFlowEntryValidation() {
+            var isValid = true;
+            $('.requiredAccountCashFlow').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            return isValid;
+        }
+
+        // =====================
+        // Add Account Cash Flow
+        // =====================
+        function btnAccountCashFlowAddOnclick() {
+            $('#accountCashFlowFormDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredAccountCashFlow').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            document.getElementById("accountCashFlowModalTitle").innerHTML = 'Add Account Cash Flow';
+            $("#accountCashFlowLoadingFormDetail").show();
+            document.getElementById("accountCashFlowLoadingFormDetail").innerHTML = 'Loading...';
+            $("#accountCashFlowFormDetail").hide();
+
+            document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnAccountCashFlowSave").prop("disabled", false);
+            $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+
+            accountCashFlowId = 0;
+            document.getElementById('inpAccountCashFlowCode').value = "NA";
+            document.getElementById('inpAccountCashFlow').value = "NA";
+
+            document.getElementById('inpAccountCashFlowCode').disabled = false;
+            document.getElementById('inpAccountCashFlow').disabled = false;
+
+            setTimeout(function () {
+                $("#accountCashFlowLoadingFormDetail").hide();
+                $("#accountCashFlowFormDetail").show();
+            }, 500);
+        }
+
+        // ======================
+        // Edit Account Cash FLow
+        // ======================
+        function btnAccountCashFlowEditOnclick() {
+            $('#accountCashFlowFormDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredAccountCashFlow').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            document.getElementById("accountCashFlowModalTitle").innerHTML = 'Edit Account Cash Flow';
+            $("#accountCashFlowLoadingFormDetail").show();
+            document.getElementById("accountCashFlowLoadingFormDetail").innerHTML = 'Loading...';
+            $("#accountCashFlowFormDetail").hide();
+
+            document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnAccountCashFlowSave").prop("disabled", false);
+            $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+
+            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
+            var accountCashFlow = accountCashFlowsCollectionView.currentEditItem;
+            accountCashFlowId = accountCashFlow.Id;
+            document.getElementById('inpAccountCashFlowCode').value = accountCashFlow.AccountCashFlowCode;
+            document.getElementById('inpAccountCashFlow').value = accountCashFlow.AccountCashFlow;
+
+            document.getElementById('inpAccountCashFlowCode').disabled = false;
+            document.getElementById('inpAccountCashFlow').disabled = false;
+
+            setTimeout(function () {
+                $("#accountCashFlowLoadingFormDetail").hide();
+                $("#accountCashFlowFormDetail").show();
+            }, 500);
+        }
+
+        // =============================
+        // Save Account Cash Flow Button
+        // =============================
+        function btnAccountCashFlowSaveOnclick() {
+            var accountCashFlowObject = new Object();
+            accountCashFlowObject.AccountCashFlowCode = document.getElementById('inpAccountCashFlowCode').value;
+            accountCashFlowObject.AccountCashFlow = document.getElementById('inpAccountCashFlow').value;
+            var data = JSON.stringify(accountCashFlowObject);
+
+            if (accountCashFlowEntryValidation()) {
+                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnAccountCashFlowSave").prop("disabled", true);
+                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", true);
+
+                if (accountCashFlowId == 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/api/chartOfAccounts/accountCashFlow/add',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: data,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Save Successful");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                refreshAccountCashFlowFlexGrid();
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            }
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: "PUT",
+                        url: '/api/chartOfAccounts/accountCashFlow/update/' + accountCashFlowId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: data,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Update Successful");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                refreshAccountCashFlowFlexGrid();
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                $('#accountCashFlowFormDetailModal').modal('hide');
+                                document.getElementById('btnAccountCashFlowSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnAccountCashFlowSave").prop("disabled", false);
+                                $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
+                            }
+                        }
+                    });
+                }
+            } else {
+                toastr.error("Invalid Entry");
             }
         }
 
-        $('#accountCashFlowTabId').click(function () {
+        // ========================
+        // Delete Account Cash Flow
+        // ========================
+        function btnAccountCashFlowDeleteOnclick() {
+            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
+            var accountCashFlow = accountCashFlowsCollectionView.currentEditItem;
+
+            $('#accountCashFlowConfirmDeleteModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
+            $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
+        }
+
+        // ================================
+        // Confirm Delete Account Cash Flow
+        // ================================
+        function btnAccountCashFlowConfirmDeleteOnclick() {
+            document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnAccountCashFlowConfirmDelete").prop("disabled", true);
+            $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", true);
+
+            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
+            var accountCashFlowId = accountCashFlowsCollectionView.currentEditItem.Id;
+            $.ajax({
+                url: '/api/chartOfAccounts/accountCashFlow/delete/' + accountCashFlowId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
+                        refreshAccountCashFlowFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
+                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
+                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#accountCashFlowConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnAccountCashFlowConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnAccountCashFlowConfirmDelete").prop("disabled", false);
+                        $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ==============================
+        // Close Account Cash Flow Button
+        // ==============================
+        function btnAccountCashFlowCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // ============
+        // Tab Controls
+        // ============
+        $('#createAccountCashFlowFlexGridId').click(function () {
             $('#Account').hide();
             $('#AccountType').hide();
             $('#AccountCashFlow').show();
             $('#AccountCategory').hide();
-            accountCashFlowTab();
-            window.accountCashFlowTab = function () {
+            createAccountCashFlowFlexGrid();
+            window.createAccountCashFlowFlexGrid = function () {
                 return true;
             }
-            refreshCashFlowFlexGrid();
+            refreshAccountCashFlowFlexGrid();
         });
     </script>
 
@@ -2748,23 +2755,28 @@
     <!-- Account Category Scripts -->
     <!-- ======================== -->
     <script type="text/javascript">
-        // ================
-        // GLOBAL Variables
-        // ================
-        var accountCategories;
+        // ====================================================================
+        // Account Categories Collection View, Flex Grid and Navigation Buttons
+        // ====================================================================
+        var accountCategoriesCollectionView;
         var accountCategoryFlexGrid = new wijmo.grid.FlexGrid('#accountCategoryFlexGrid');
-        var btnAccountMoveToFirstPageGridCategory;
-        var btnAccountMoveToPreviousPageGridCategory;
-        var btnAccountMoveToNextPageGridCategory;
-        var btnAccountMoveToLastPageGridCategory;
-        var btnAccountCategoryCurrentPageGrid;
+        var btnAccountCategoryMoveToFirstPageGrid = document.getElementById('btnAccountCategoryMoveToFirstPageGrid');
+        var btnAccountCategoryMoveToPreviousPageGrid = document.getElementById('btnAccountCategoryMoveToPreviousPageGrid');
+        var btnAccountCategoryMoveToNextPageGrid = document.getElementById('btnAccountCategoryMoveToNextPageGrid');
+        var btnAccountCategoryMoveToLastPageGrid = document.getElementById('btnAccountCategoryMoveToLastPageGrid');
+        var btnAccountCategoryCurrentPageGrid = document.getElementById('btnAccountCategoryCurrentPageGrid');
+
+        // ===================
+        // Account Category Id
+        // ===================
         var accountCategoryId = 0;
 
         // ==========================
-        // GET Account Category List
+        // Get Account Category Data
         // ==========================
-        function getAccountDataCategory() {
+        function getAccountCategoryData() {
             var accountCategoriesObservableArray = new wijmo.collections.ObservableArray;
+
             NProgress.start();
             $.ajax({
                 url: '/api/chartOfAccounts/accountCategory/list',
@@ -2776,8 +2788,8 @@
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
                             accountCategoriesObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='cmdAccountCategoryEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdAccountCategoryDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnAccountCategoryEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnAccountCategoryDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 AccountCategoryCode: results[i]["AccountCategoryCode"],
                                 AccountCategory: results[i]["AccountCategory"],
@@ -2797,6 +2809,183 @@
             });
 
             return accountCategoriesObservableArray;
+        }
+
+        // =================================
+        // Create Account Category Flex Grid
+        // =================================
+        function createAccountCategoryFlexGrid() {
+            accountCategoriesCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
+            accountCategoriesCollectionView.canFilter = true;
+            accountCategoriesCollectionView.pageSize = 15;
+
+            var filterTextAccountCategory = '';
+            $('#inpAccountCategorySearchFilter').keyup(function () {
+                filterTextAccountCategory = this.value.toLowerCase();
+                accountCategoriesCollectionView.refresh();
+            });
+
+            accountCategoriesCollectionView.filter = function (item) {
+                return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
+                                                  || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
+            }
+
+            accountCategoriesCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountCategoryNavigationButtons();
+            });
+
+            accountCategoriesCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateAccountCategoryFlexGridSelection();
+            });
+
+            accountCategoryFlexGrid.dispose();
+            accountCategoryFlexGrid = new wijmo.grid.FlexGrid('#accountCategoryFlexGrid');
+            accountCategoryFlexGrid.initialize({
+                columns: [
+                            @{
+                                if (canEdit)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Edit",
+                                            "binding": "EditId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                                if (canDelete)
+                                {
+                                    <text>
+                                        {
+                                            "header": "Delete",
+                                            "binding": "DeleteId",
+                                            "width": 70,
+                                            "align": "center",
+                                            "allowResizing": false,
+                                            "allowSorting": false,
+                                            "isContentHtml": true
+                                        },
+                                    </text>
+                                }
+                            }
+                            {
+                                "header": "Code",
+                                "binding": "AccountCategoryCode",
+                                "allowSorting": true,
+                                "width": 100
+                            },
+                            {
+                                "header": "Account Category",
+                                "binding": "AccountCategory",
+                                "allowSorting": true,
+                                "width": "5*"
+                            }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: accountCategoriesCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            accountCategoryFlexGrid.trackChanges = true;
+
+            updateAccountCategoryNavigationButtons();
+
+            btnAccountCategoryMoveToFirstPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToFirstPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            btnAccountCategoryMoveToPreviousPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToPreviousPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            btnAccountCategoryMoveToNextPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToNextPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+
+            btnAccountCategoryMoveToLastPageGrid.addEventListener('click', function () {
+                accountCashFlowsCollectionView.moveToLastPage();
+                updateAccountCashFlowNavigationButtons();
+            });
+        }
+
+        // ===========================================
+        // Update Account Category Flex Grid Selection
+        // ===========================================
+        function updateAccountCategoryFlexGridSelection() {
+            var item = accountCategoriesCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ==========================================
+        // Update Account Category Navigation Buttons
+        // ==========================================
+        function updateAccountCategoryNavigationButtons() {
+            if (accountCategoriesCollectionView.pageSize <= 0) {
+                document.getElementById('accountCategoryNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('accountCategoryNavigationPageGrid').style.display = 'block';
+            if (accountCategoriesCollectionView.pageIndex === 0) {
+                btnAccountCategoryMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCategoryMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCategoryMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountCategoryMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (accountCategoriesCollectionView.pageIndex === (accountCategoriesCollectionView.pageCount - 1)) {
+                btnAccountCategoryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnAccountCategoryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountCategoryMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnAccountCategoryMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnAccountCategoryMoveToFirstPageGridw.removeAttribute('disabled');
+                btnAccountCategoryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnAccountCategoryMoveToNextPageGrid.removeAttribute('disabled');
+                btnAccountCategoryMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnAccountCategoryCurrentPageGrid.innerHTML = (accountCategoriesCollectionView.pageIndex + 1) + ' / ' + accountCategoriesCollectionView.pageCount;
+        }
+
+        // ========================
+        // Refresh Account Category
+        // ========================
+        function refreshAccountCategory() {
+            accountCategoriesCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
+            accountCategoriesCollectionView.canFilter = true;
+            accountCategoriesCollectionView.pageSize = 15;
+
+            var filterTextAccountCategory = '';
+            $('#inpAccountCategorySearchFilter').keyup(function () {
+                filterTextAccountCategory = this.value.toLowerCase();
+                accountCategoriesCollectionView.refresh();
+            });
+
+            accountCategoriesCollectionView.filter = function (item) {
+                return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
+                    || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
+            }
+
+            accountCategoriesCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateAccountCategoryNavigationButtons();
+            });
+
+            accountCategoriesCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateAccountCategoryFlexGridSelection();
+            });
+
+            accountCategoryFlexGrid.itemsSource = accountCategoriesCollectionView;
+            accountCategoryFlexGrid.trackChanges = true;
         }
 
         // =================================
@@ -2820,9 +3009,9 @@
             return isValid;
         }
 
-        // ========================
-        // ADD New Account Category
-        // ========================
+        // ====================
+        // Add Account Category
+        // ====================
         function btnAccountCategoryAddOnclick() {
             $('#accountCategoryFormDetailModal').modal({
                 show: true,
@@ -2835,8 +3024,9 @@
                 });
             });
 
+            document.getElementById("accountCategoryModalTitle").innerHTML = 'Add Account Category';
             $("#accountCategoryLoadingFormDetail").show();
-            document.getElementById("accountCategoryLoadingFormDetail").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById("accountCategoryLoadingFormDetail").innerHTML = 'Loading...';
             $("#accountCategoryFormDetail").hide();
 
             document.getElementById('btnAccountCategorySave').innerHTML = "<i class='fa fa-save'></i> Save";
@@ -2856,10 +3046,10 @@
             }, 500);
         }
 
-        // ============================
-        // EDIT Account Category Button
-        // ============================
-        function cmdAccountCategoryEditButton_OnClick() {
+        // =====================
+        // Edit Account Category
+        // =====================
+        function btnAccountCategoryEditOnclick() {
             $('#accountCategoryFormDetailModal').modal({
                 show: true,
                 backdrop: 'static'
@@ -2871,16 +3061,17 @@
                 });
             });
 
+            document.getElementById("accountCategoryModalTitle").innerHTML = 'Edit Account Category';
             $("#accountCategoryLoadingFormDetail").show();
-            document.getElementById("accountCategoryLoadingFormDetail").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById("accountCategoryLoadingFormDetail").innerHTML = 'Loading...';
             $("#accountCategoryFormDetail").hide();
 
             document.getElementById('btnAccountCategorySave').innerHTML = "<i class='fa fa-save'></i> Save";
             $("#btnAccountCategorySave").prop("disabled", false);
             $("#btnAccountCategoryCloseFormDetailModal").prop("disabled", false);
 
-            accountCategories.editItem(accountCategories.currentItem);
-            var accountCategory = accountCategories.currentEditItem;
+            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
+            var accountCategory = accountCategoriesCollectionView.currentEditItem;
             accountCategoryId = accountCategory.Id;
             document.getElementById('inpAccountCategoryCode').value = accountCategory.AccountCategoryCode;
             document.getElementById('inpAccountCategory').value = accountCategory.AccountCategory;
@@ -2894,9 +3085,9 @@
             }, 500);
         }
 
-        // ============================
-        // Save Account Category Button
-        // ============================
+        // =====================
+        // Save Account Category
+        // =====================
         function btnAccountCategorySaveOnclick() {
             var accountCategoryObject = new Object();
             accountCategoryObject.AccountCategoryCode = document.getElementById('inpAccountCategoryCode').value;
@@ -2904,7 +3095,7 @@
             var data = JSON.stringify(accountCategoryObject);
 
             if (accountCategoryEntryValidation()) {
-                document.getElementById('btnAccountCategorySave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                document.getElementById('btnAccountCategorySave').innerHTML = "<i class='fa fa-save'></i> Saving...";
                 $("#btnAccountCategorySave").prop("disabled", true);
                 $("#btnAccountCategoryCloseFormDetailModal").prop("disabled", true);
 
@@ -2986,19 +3177,12 @@
             }
         }
 
-        // =============================
-        // Close Account Category Button
-        // =============================
-        function btnAccountCategoryCloseOnclick() {
-            window.location = '/Software';
-        }
-
-        // ===============================
-        // DELETE Account Category Buttons
-        // ===============================
-        function cmdAccountCategoryDeleteButton_OnClick() {
-            accountCategories.editItem(accountCategories.currentItem);
-            var accountCategory = accountCategories.currentEditItem;
+        // =======================
+        // Delete Account Category
+        // =======================
+        function btnAccountCategoryDeleteOnclick() {
+            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
+            var accountCategory = accountCategoriesCollectionView.currentEditItem;
 
             $('#accountCategoryConfirmDeleteModal').modal({
                 show: true,
@@ -3012,12 +3196,12 @@
 
         // Account Category Confirm Delete Button
         function btnAccountCategoryConfirmDeleteOnclick() {
-            document.getElementById('btnAccountCategoryConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+            document.getElementById('btnAccountCategoryConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
             $("#btnAccountCategoryConfirmDelete").prop("disabled", true);
             $("#btnAccountCategoryCloseConfirmDeleteModal").prop("disabled", true);
 
-            accountCategories.editItem(accountCategories.currentItem);
-            var id = accountCategories.currentEditItem.Id;
+            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
+            var id = accountCategoriesCollectionView.currentEditItem.Id;
             $.ajax({
                 url: '/api/chartOfAccounts/accountCategory/delete/' + id,
                 type: "DELETE",
@@ -3054,196 +3238,31 @@
             });
         }
 
-        // =======================================
-        // FlexGrid Selection for Account Category
-        // =======================================
-        function updateAccountFlexGridSelectionCategory() {
-            var item = accountCategories.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        // =============================
+        // Close Account Category Button
+        // =============================
+        function btnAccountCategoryCloseOnclick() {
+            window.location = '/Software';
         }
 
-        // ========================================
-        // Navigation Buttons for Account Category
-        // ========================================
-        function updateAccountNavigationButtonsCategory() {
-            if (accountCategories.pageSize <= 0) {
-                document.getElementById('accountCategoryNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('accountCategoryNavigationPageGrid').style.display = 'block';
-            if (accountCategories.pageIndex === 0) {
-                btnAccountMoveToFirstPageGridCategory.setAttribute('disabled', 'disabled');
-                btnAccountMoveToPreviousPageGridCategory.setAttribute('disabled', 'disabled');
-                btnAccountMoveToNextPageGridCategory.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCategory.removeAttribute('disabled');
-            } else if (accountCategories.pageIndex === (accountCategories.pageCount - 1)) {
-                btnAccountMoveToFirstPageGridCategory.removeAttribute('disabled');
-                btnAccountMoveToPreviousPageGridCategory.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCategory.setAttribute('disabled', 'disabled');
-                btnAccountMoveToNextPageGridCategory.setAttribute('disabled', 'disabled');
-            } else {
-                btnAccountMoveToFirstPageGridCategoryw.removeAttribute('disabled');
-                btnAccountMoveToPreviousPageGridCategory.removeAttribute('disabled');
-                btnAccountMoveToNextPageGridCategory.removeAttribute('disabled');
-                btnAccountMoveToLastPageGridCategory.removeAttribute('disabled');
-            }
-            btnAccountCategoryCurrentPageGrid.innerHTML = (accountCategories.pageIndex + 1) + ' / ' + accountCategories.pageCount;
-        }
-
-        function refreshAccountCategory() {
-            accountCategories = new wijmo.collections.CollectionView(getAccountDataCategory());
-            accountCategories.canFilter = true;
-            accountCategories.pageSize = 15;
-
-            var filterTextAccountCategory = '';
-            $('#inpAccountCategorySearchFilter').keyup(function () {
-                filterTextAccountCategory = this.value.toLowerCase();
-                accountCategories.refresh();
-            });
-            accountCategories.filter = function (item) {
-                return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
-                    || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
-            }
-            accountCategories.collectionChanged.addHandler(function (sender, args) {
-                updateAccountNavigationButtonsCategory();
-            });
-            accountCategories.currentChanged.addHandler(function (sender, args) {
-                updateAccountFlexGridSelectionCategory();
-            });
-
-            // Flex Grid for Account Category
-            accountCategoryFlexGrid.itemsSource = accountCategories;
-            accountCategoryFlexGrid.trackChanges = true;
-        }
-
-        // =================================
-        // On Page Load for Account Category
-        // =================================
-        function accountCategoryTab() {
-            accountCategories = new wijmo.collections.CollectionView(getAccountDataCategory());
-            accountCategories.canFilter = true;
-            accountCategories.pageSize = 15;
-
-            var filterTextAccountCategory = '';
-            $('#inpAccountCategorySearchFilter').keyup(function () {
-                filterTextAccountCategory = this.value.toLowerCase();
-                accountCategories.refresh();
-            });
-            accountCategories.filter = function (item) {
-                return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
-                                                  || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
-            }
-            accountCategories.collectionChanged.addHandler(function (sender, args) {
-                updateAccountNavigationButtonsCategory();
-            });
-            accountCategories.currentChanged.addHandler(function (sender, args) {
-                updateAccountFlexGridSelectionCategory();
-            });
-
-            // Flex Grid for Account Category
-            accountCategoryFlexGrid.dispose();
-            accountCategoryFlexGrid = new wijmo.grid.FlexGrid('#accountCategoryFlexGrid');
-            accountCategoryFlexGrid.initialize({
-                columns: [
-                            @{
-                                if (canEdit)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Edit",
-                                            "binding": "EditId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                                if (canDelete)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Delete",
-                                            "binding": "DeleteId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                            }
-                            {
-                                "header": "Code",
-                                "binding": "AccountCategoryCode",
-                                "allowSorting": true,
-                                "width": 100
-                            },
-                            {
-                                "header": "Account Category",
-                                "binding": "AccountCategory",
-                                "allowSorting": true,
-                                "width": "5*"
-                            }
-                ],
-                autoGenerateColumns: false,
-                itemsSource: accountCategories,
-                isReadOnly: true,
-                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
-                allowDragging: wijmo.grid.AllowDragging.None,
-                selectionMode: wijmo.grid.SelectionMode.Row
-            });
-
-            accountCategoryFlexGrid.trackChanges = true;
-
-            btnAccountMoveToFirstPageGridCategory = document.getElementById('btnAccountCategoryMoveToFirstPageGrid');
-            btnAccountMoveToPreviousPageGridCategory = document.getElementById('btnAccountCategoryMoveToPreviousPageGrid');
-            btnAccountMoveToNextPageGridCategory = document.getElementById('btnAccountCategoryMoveToNextPageGrid');
-            btnAccountMoveToLastPageGridCategory = document.getElementById('btnAccountCategoryMoveToLastPageGrid');
-            btnAccountCategoryCurrentPageGrid = document.getElementById('btnAccountCategoryCurrentPageGrid');
-
-            updateAccountNavigationButtonsCategory();
-
-            btnAccountMoveToFirstPageGridCategory.addEventListener('click', function () {
-                accountCashFlows.moveToFirstPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToPreviousPageGridCategory.addEventListener('click', function () {
-                accountCashFlows.moveToPreviousPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToNextPageGridCategory.addEventListener('click', function () {
-                accountCashFlows.moveToNextPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-            btnAccountMoveToLastPageGridCategory.addEventListener('click', function () {
-                accountCashFlows.moveToLastPage();
-                updateAccountNavigationButtonsCashFlow();
-            });
-
-            var canAdd = "@ViewData["CanAdd"]";
-            if (canAdd == "False") {
-                $("#btnAccountCategoryAdd").prop("disabled", true);
-            }
-        }
-
-        $('#accountCategoryTabId').click(function () {
+        // ============
+        // Tab Controls
+        // ============
+        $('#createAccountCategoryFlexGridId').click(function () {
             $('#Account').hide();
             $('#AccountType').hide();
             $('#AccountCashFlow').hide();
             $('#AccountCategory').show();
-            accountCategoryTab();
-            window.accountCategoryTab = function () {
+            createAccountCategoryFlexGrid();
+            window.createAccountCategoryFlexGrid = function () {
                 return true;
             }
             refreshAccountCategory();
         });
 
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             $('#Account').show();
             $('#AccountType').hide();
@@ -3264,9 +3283,15 @@
             });
         });
     </script>
-
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -3313,6 +3338,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -3352,6 +3380,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
