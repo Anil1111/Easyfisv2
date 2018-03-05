@@ -681,7 +681,7 @@
         // =================================================
         // Account Article Type Collecion View and Flex Grid
         // =================================================
-        var accountArticleTypesCollectionView;
+        var accountArticleTypeCollectionView;
         var accountArticleTypeGrid = new wijmo.grid.FlexGrid('#accountArticleTypeFlexGrid');
 
         // =======================================
@@ -689,6 +689,55 @@
         // =======================================
         var accountArticleTypeId = 0;
         var cboForArticleType = new wijmo.input.ComboBox('#cboArticleType');
+
+        // ==============================================================
+        // Account Tyoe Collection View, Flex Grid and Navigation Buttons
+        // ==============================================================
+        var accountTypeCollectionView;
+        var accountTypeFlexGrid = new wijmo.grid.FlexGrid('#accountTypeFlexGrid');
+        var btnAccountTypeMoveToFirstPageGrid = document.getElementById('btnAccountTypeMoveToFirstPageGrid');
+        var btnAccountTypeMoveToPreviousPageGrid = document.getElementById('btnAccountTypeMoveToPreviousPageGrid');
+        var btnAccountTypeMoveToNextPageGrid = document.getElementById('btnAccountTypeMoveToNextPageGrid');
+        var btnAccountTypeMoveToLastPageGrid = document.getElementById('btnAccountTypeMoveToLastPageGrid');
+        var btnAccountTypeCurrentPageGrid = document.getElementById('btnAccountTypeCurrentPageGrid');
+
+        // ==============================
+        // Account Type Data and Dropdown
+        // ==============================
+        var accountTypeId = 0;
+        var cboAccountCategory = new wijmo.input.ComboBox('#cboAccountCategory');
+
+        // ====================================================================
+        // Account Cash Flows Collection View, Flex Grid and Navigation Buttons
+        // ====================================================================
+        var accountCashFlowCollectionView;
+        var accountCashFlowFlexGrid = new wijmo.grid.FlexGrid('#accountCashFlowFlexGrid');
+        var btnAccountCashFlowMoveToFirstPageGrid = document.getElementById('btnAccountCashFlowMoveToFirstPageGrid');
+        var btnAccountCashFlowMoveToPreviousPageGrid = document.getElementById('btnAccountCashFlowMoveToPreviousPageGrid');
+        var btnAccountCashFlowMoveToNextPageGrid = document.getElementById('btnAccountCashFlowMoveToNextPageGrid');
+        var btnAccountCashFlowMoveToLastPageGrid = document.getElementById('btnAccountCashFlowMoveToLastPageGrid');
+        var btnAccountCashFlowCurrentPageGrid = document.getElementById('btnAccountCashFlowCurrentPageGrid');
+
+        // ====================
+        // Account Cash Flow Id
+        // ====================
+        var accountCashFlowId = 0;
+
+        // ====================================================================
+        // Account Category Collection View, Flex Grid and Navigation Buttons
+        // ====================================================================
+        var accountCategoryCollectionView;
+        var accountCategoryFlexGrid = new wijmo.grid.FlexGrid('#accountCategoryFlexGrid');
+        var btnAccountCategoryMoveToFirstPageGrid = document.getElementById('btnAccountCategoryMoveToFirstPageGrid');
+        var btnAccountCategoryMoveToPreviousPageGrid = document.getElementById('btnAccountCategoryMoveToPreviousPageGrid');
+        var btnAccountCategoryMoveToNextPageGrid = document.getElementById('btnAccountCategoryMoveToNextPageGrid');
+        var btnAccountCategoryMoveToLastPageGrid = document.getElementById('btnAccountCategoryMoveToLastPageGrid');
+        var btnAccountCategoryCurrentPageGrid = document.getElementById('btnAccountCategoryCurrentPageGrid');
+
+        // ===================
+        // Account Category Id
+        // ===================
+        var accountCategoryId = 0;
 
         // =========================
         // Create Combo Account Type
@@ -735,7 +784,7 @@
         // Create Combo Account Cash Flow
         // ==============================
         function createComboAccountCashFlow(accountCashFlowId) {
-            var accountCashFlowsCollectionViewObservableArray = new wijmo.collections.ObservableArray();
+            var accountCashFlowCollectionViewObservableArray = new wijmo.collections.ObservableArray();
 
             $.ajax({
                 url: '/api/chartOfAccounts/account/dropdown/list/accountCashFlow',
@@ -745,7 +794,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCashFlowsCollectionViewObservableArray.push({
+                            accountCashFlowCollectionViewObservableArray.push({
                                 Id: results[i]["Id"],
                                 AccountCashFlow: results[i]["AccountCashFlow"]
                             });
@@ -761,7 +810,7 @@
                     cboAccountCashFlow = new wijmo.input.ComboBox('#cboAccountCashFlow', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: accountCashFlowsCollectionViewObservableArray,
+                        itemsSource: accountCashFlowCollectionViewObservableArray,
                         displayMemberPath: "AccountCashFlow",
                         selectedValuePath: "Id",
                         selectedValue: accountCashFlowId
@@ -1248,7 +1297,7 @@
         // Get Account Article Type Data
         // =============================
         function getAccountArticleTypeData() {
-            var accountArticleTypesObservableArray = new wijmo.collections.ObservableArray;
+            var accountArticleTypeObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
                 url: '/api/chartOfAccounts/accountArticleType/list/' + accountId,
                 cache: false,
@@ -1260,7 +1309,7 @@
                             var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnAccountArticleTypeEditOnclick()'><i class='fa fa-edit'></i> Edit</button>";
                             var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnAccountArticleTypeDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>";
 
-                            accountArticleTypesObservableArray.push({
+                            accountArticleTypeObservableArray.push({
                                 EditId: btnEditId,
                                 DeleteId: btnDeleteId,
                                 Id: results[i]["Id"],
@@ -1277,14 +1326,14 @@
                 }
             });
 
-            return accountArticleTypesObservableArray;
+            return accountArticleTypeObservableArray;
         }
 
         // =====================================
         // Create Account Article Type Flex Grid
         // =====================================
         function createAccountArticleTypeFlexGrid() {
-            accountArticleTypesCollectionView = new wijmo.collections.CollectionView(getAccountArticleTypeData());
+            accountArticleTypeCollectionView = new wijmo.collections.CollectionView(getAccountArticleTypeData());
 
             accountArticleTypeGrid.dispose();
             accountArticleTypeGrid = new wijmo.grid.FlexGrid('#accountArticleTypeFlexGrid');
@@ -1328,7 +1377,7 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: accountArticleTypesCollectionView,
+                itemsSource: accountArticleTypeCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -1374,7 +1423,7 @@
         // Create Combo Account Article Type
         // =================================
         function createCboAccountArticleType(articleTypeId) {
-            var articleTypesObservableArray = new wijmo.collections.ObservableArray();
+            var articleTypeObservableArray = new wijmo.collections.ObservableArray();
 
             $.ajax({
                 url: '/api/chartOfAccounts/accountArticleType/dropdown/list/articleType',
@@ -1385,7 +1434,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            articleTypesObservableArray.push({
+                            articleTypeObservableArray.push({
                                 Id: results[i]["Id"],
                                 ArticleType: results[i]["ArticleType"]
                             });
@@ -1401,7 +1450,7 @@
                     cboForArticleType = new wijmo.input.ComboBox('#cboArticleType', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: articleTypesObservableArray,
+                        itemsSource: articleTypeObservableArray,
                         displayMemberPath: "ArticleType",
                         selectedValuePath: "Id",
                         selectedValue: articleTypeId
@@ -1468,8 +1517,8 @@
             $("#btnAccountArticleTypeSave").prop("disabled", true);
             $("#btnAccountArticleTypeCloseFormDetailModal").prop("disabled", false);
 
-            accountArticleTypesCollectionView.editItem(accountArticleTypesCollectionView.currentItem);
-            var accountArticleType = accountArticleTypesCollectionView.currentEditItem;
+            accountArticleTypeCollectionView.editItem(accountArticleTypeCollectionView.currentItem);
+            var accountArticleType = accountArticleTypeCollectionView.currentEditItem;
             accountArticleTypeId = accountArticleType.Id;
             createCboAccountArticleType(accountArticleType.ArticleTypeId);
         }
@@ -1584,8 +1633,8 @@
             $("#btnAccountArticleTypeConfirmDelete").prop("disabled", true);
             $("#btnAccountArticleTypeCloseConfirmDeleteModal").prop("disabled", true);
 
-            accountArticleTypesCollectionView.editItem(accountArticleTypesCollectionView.currentItem);
-            var accountArticleTypeId = accountArticleTypesCollectionView.currentEditItem.Id;
+            accountArticleTypeCollectionView.editItem(accountArticleTypeCollectionView.currentItem);
+            var accountArticleTypeId = accountArticleTypeCollectionView.currentEditItem.Id;
             $.ajax({
                 url: '/api/chartOfAccounts/accountArticleType/delete/' + accountArticleTypeId,
                 type: "DELETE",
@@ -1665,34 +1714,12 @@
                 }, 500);
             }
         });
-    </script>
-
-    <!-- ==================== -->
-    <!-- Account Type Scripts -->
-    <!-- ==================== -->
-    <script type="text/javascript">
-        // ==============================================================
-        // Account Tyoe Collection View, Flex Grid and Navigation Buttons
-        // ==============================================================
-        var accountTypeCollectionView;
-        var accountTypeFlexGrid = new wijmo.grid.FlexGrid('#accountTypeFlexGrid');
-        var btnAccountTypeMoveToFirstPageGrid = document.getElementById('btnAccountTypeMoveToFirstPageGrid');
-        var btnAccountTypeMoveToPreviousPageGrid = document.getElementById('btnAccountTypeMoveToPreviousPageGrid');
-        var btnAccountTypeMoveToNextPageGrid = document.getElementById('btnAccountTypeMoveToNextPageGrid');
-        var btnAccountTypeMoveToLastPageGrid = document.getElementById('btnAccountTypeMoveToLastPageGrid');
-        var btnAccountTypeCurrentPageGrid = document.getElementById('btnAccountTypeCurrentPageGrid');
-
-        // =========================
-        // Account Data and Dropdown
-        // =========================
-        var accountTypeId = 0;
-        var cboAccountCategory = new wijmo.input.ComboBox('#cboAccountCategory');
 
         // =============================
         // Create Combo Account Category
         // =============================
         function createCboAccountCategory(accountCategoryId) {
-            var accountCategoriesCollectionViewObservableArray = new wijmo.collections.ObservableArray();
+            var accountCategoryCollectionViewObservableArray = new wijmo.collections.ObservableArray();
 
             $.ajax({
                 url: '/api/chartOfAccounts/accountType/dropdown/list/accountCategory',
@@ -1703,7 +1730,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCategoriesCollectionViewObservableArray.push({
+                            accountCategoryCollectionViewObservableArray.push({
                                 Id: results[i]["Id"],
                                 AccountCategory: results[i]["AccountCategory"]
                             });
@@ -1719,7 +1746,7 @@
                     cboAccountCategory = new wijmo.input.ComboBox('#cboAccountCategory', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: accountCategoriesCollectionViewObservableArray,
+                        itemsSource: accountCategoryCollectionViewObservableArray,
                         displayMemberPath: "AccountCategory",
                         selectedValuePath: "Id",
                         selectedValue: accountCategoryId
@@ -2226,48 +2253,11 @@
             });
         }
 
-        // ============
-        // Tab Controls
-        // ============
-        $('#createAccountTypeFlexGridId').click(function () {
-            $('#Account').hide();
-            $('#AccountType').show();
-            $('#AccountCashFlow').hide();
-            $('#AccountCategory').hide();
-            createAccountTypeFlexGrid();
-            window.createAccountTypeFlexGrid = function () {
-                return true;
-            }
-
-            refreshAccountTypeFlexGrid();
-        });
-    </script>
-
-    <!-- ========================= -->
-    <!-- Account Cash Flow Scripts -->
-    <!-- ========================= -->
-    <script type="text/javascript">
-        // ====================================================================
-        // Account Cash Flows Collection View, Flex Grid and Navigation Buttons
-        // ====================================================================
-        var accountCashFlowsCollectionView;
-        var accountCashFlowFlexGrid = new wijmo.grid.FlexGrid('#accountCashFlowFlexGrid');
-        var btnAccountCashFlowMoveToFirstPageGrid = document.getElementById('btnAccountCashFlowMoveToFirstPageGrid');
-        var btnAccountCashFlowMoveToPreviousPageGrid = document.getElementById('btnAccountCashFlowMoveToPreviousPageGrid');
-        var btnAccountCashFlowMoveToNextPageGrid = document.getElementById('btnAccountCashFlowMoveToNextPageGrid');
-        var btnAccountCashFlowMoveToLastPageGrid = document.getElementById('btnAccountCashFlowMoveToLastPageGrid');
-        var btnAccountCashFlowCurrentPageGrid = document.getElementById('btnAccountCashFlowCurrentPageGrid');
-
-        // ====================
-        // Account Cash Flow Id
-        // ====================
-        var accountCashFlowId = 0;
-
         // ==========================
         // Get Account Cash Flow Data
         // ==========================
         function getAccountCashFlowData() {
-            var accountCashFlowsObservableArray = new wijmo.collections.ObservableArray;
+            var accountCashFlowObservableArray = new wijmo.collections.ObservableArray;
 
             NProgress.start();
             $.ajax({
@@ -2278,7 +2268,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCashFlowsObservableArray.push({
+                            accountCashFlowObservableArray.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnAccountCashFlowEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnAccountCashFlowDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
@@ -2299,30 +2289,30 @@
                 }
             });
 
-            return accountCashFlowsObservableArray;
+            return accountCashFlowObservableArray;
         }
 
         // ==================================
         // Create Account Cash Flow Flex Grid
         // ==================================
         function createAccountCashFlowFlexGrid() {
-            accountCashFlowsCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
-            accountCashFlowsCollectionView.canFilter = true;
-            accountCashFlowsCollectionView.pageSize = 15;
+            accountCashFlowCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
+            accountCashFlowCollectionView.canFilter = true;
+            accountCashFlowCollectionView.pageSize = 15;
 
             var filterTextAccountCashFlow = '';
             $('#inpAccountCashFlowSearchFilter').keyup(function () {
                 filterTextAccountCashFlow = this.value.toLowerCase();
-                accountCashFlowsCollectionView.refresh();
+                accountCashFlowCollectionView.refresh();
             });
-            accountCashFlowsCollectionView.filter = function (item) {
+            accountCashFlowCollectionView.filter = function (item) {
                 return !filterTextAccountCashFlow || (item.AccountCashFlowCode.toLowerCase().indexOf(filterTextAccountCashFlow) > -1)
                                                   || (item.AccountCashFlow.toLowerCase().indexOf(filterTextAccountCashFlow) > -1);
             }
-            accountCashFlowsCollectionView.collectionChanged.addHandler(function (sender, args) {
+            accountCashFlowCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateAccountCashFlowNavigationButtons();
             });
-            accountCashFlowsCollectionView.currentChanged.addHandler(function (sender, args) {
+            accountCashFlowCollectionView.currentChanged.addHandler(function (sender, args) {
                 updateAccountCashFlowFlexGridSelection();
             });
 
@@ -2374,7 +2364,7 @@
                             }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: accountCashFlowsCollectionView,
+                itemsSource: accountCashFlowCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -2386,22 +2376,22 @@
             updateAccountCashFlowNavigationButtons();
 
             btnAccountCashFlowMoveToFirstPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToFirstPage();
+                accountCashFlowCollectionView.moveToFirstPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCashFlowMoveToPreviousPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToPreviousPage();
+                accountCashFlowCollectionView.moveToPreviousPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCashFlowMoveToNextPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToNextPage();
+                accountCashFlowCollectionView.moveToNextPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCashFlowMoveToLastPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToLastPage();
+                accountCashFlowCollectionView.moveToLastPage();
                 updateAccountCashFlowNavigationButtons();
             });
         }
@@ -2410,7 +2400,7 @@
         // Update Account Cash Flow Flex Grid Selection
         // ============================================
         function updateAccountCashFlowFlexGridSelection() {
-            var item = accountCashFlowsCollectionView.currentItem;
+            var item = accountCashFlowCollectionView.currentItem;
             document.getElementById('createdBy').innerHTML = item.CreatedBy;
             document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
             document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
@@ -2421,17 +2411,17 @@
         // Update Account Cash Flow Navigation Buttons
         // ===========================================
         function updateAccountCashFlowNavigationButtons() {
-            if (accountCashFlowsCollectionView.pageSize <= 0) {
+            if (accountCashFlowCollectionView.pageSize <= 0) {
                 document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'none';
                 return;
             }
             document.getElementById('accountCashFlowNavigationPageGrid').style.display = 'block';
-            if (accountCashFlowsCollectionView.pageIndex === 0) {
+            if (accountCashFlowCollectionView.pageIndex === 0) {
                 btnAccountCashFlowMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
                 btnAccountCashFlowMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
                 btnAccountCashFlowMoveToNextPageGrid.removeAttribute('disabled');
                 btnAccountCashFlowMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (accountCashFlowsCollectionView.pageIndex === (accountCashFlowsCollectionView.pageCount - 1)) {
+            } else if (accountCashFlowCollectionView.pageIndex === (accountCashFlowCollectionView.pageCount - 1)) {
                 btnAccountCashFlowMoveToFirstPageGrid.removeAttribute('disabled');
                 btnAccountCashFlowMoveToPreviousPageGrid.removeAttribute('disabled');
                 btnAccountCashFlowMoveToLastPageGrid.setAttribute('disabled', 'disabled');
@@ -2442,37 +2432,37 @@
                 btnAccountCashFlowMoveToNextPageGrid.removeAttribute('disabled');
                 btnAccountCashFlowMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnAccountCashFlowCurrentPageGrid.innerHTML = (accountCashFlowsCollectionView.pageIndex + 1) + ' / ' + accountCashFlowsCollectionView.pageCount;
+            btnAccountCashFlowCurrentPageGrid.innerHTML = (accountCashFlowCollectionView.pageIndex + 1) + ' / ' + accountCashFlowCollectionView.pageCount;
         }
 
         // ===================================
         // Refresh Account Cash Flow Flex Grid
         // ===================================
         function refreshAccountCashFlowFlexGrid() {
-            accountCashFlowsCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
-            accountCashFlowsCollectionView.canFilter = true;
-            accountCashFlowsCollectionView.pageSize = 15;
+            accountCashFlowCollectionView = new wijmo.collections.CollectionView(getAccountCashFlowData());
+            accountCashFlowCollectionView.canFilter = true;
+            accountCashFlowCollectionView.pageSize = 15;
 
             var filterTextAccountCashFlow = '';
             $('#inpAccountCashFlowSearchFilter').keyup(function () {
                 filterTextAccountCashFlow = this.value.toLowerCase();
-                accountCashFlowsCollectionView.refresh();
+                accountCashFlowCollectionView.refresh();
             });
 
-            accountCashFlowsCollectionView.filter = function (item) {
+            accountCashFlowCollectionView.filter = function (item) {
                 return !filterTextAccountCashFlow || (item.AccountCashFlowCode.toLowerCase().indexOf(filterTextAccountCashFlow) > -1)
                     || (item.AccountCashFlow.toLowerCase().indexOf(filterTextAccountCashFlow) > -1);
             }
 
-            accountCashFlowsCollectionView.collectionChanged.addHandler(function (sender, args) {
+            accountCashFlowCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateAccountCashFlowNavigationButtons();
             });
 
-            accountCashFlowsCollectionView.currentChanged.addHandler(function (sender, args) {
+            accountCashFlowCollectionView.currentChanged.addHandler(function (sender, args) {
                 updateAccountCashFlowFlexGridSelection();
             });
 
-            accountCashFlowFlexGrid.itemsSource = accountCashFlowsCollectionView;
+            accountCashFlowFlexGrid.itemsSource = accountCashFlowCollectionView;
             accountCashFlowFlexGrid.trackChanges = true;
         }
 
@@ -2558,8 +2548,8 @@
             $("#btnAccountCashFlowSave").prop("disabled", false);
             $("#btnAccountCashFlowCloseFormDetailModal").prop("disabled", false);
 
-            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
-            var accountCashFlow = accountCashFlowsCollectionView.currentEditItem;
+            accountCashFlowCollectionView.editItem(accountCashFlowCollectionView.currentItem);
+            var accountCashFlow = accountCashFlowCollectionView.currentEditItem;
             accountCashFlowId = accountCashFlow.Id;
             document.getElementById('inpAccountCashFlowCode').value = accountCashFlow.AccountCashFlowCode;
             document.getElementById('inpAccountCashFlow').value = accountCashFlow.AccountCashFlow;
@@ -2669,8 +2659,8 @@
         // Delete Account Cash Flow
         // ========================
         function btnAccountCashFlowDeleteOnclick() {
-            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
-            var accountCashFlow = accountCashFlowsCollectionView.currentEditItem;
+            accountCashFlowCollectionView.editItem(accountCashFlowCollectionView.currentItem);
+            var accountCashFlow = accountCashFlowCollectionView.currentEditItem;
 
             $('#accountCashFlowConfirmDeleteModal').modal({
                 show: true,
@@ -2690,8 +2680,8 @@
             $("#btnAccountCashFlowConfirmDelete").prop("disabled", true);
             $("#btnAccountCashFlowCloseConfirmDeleteModal").prop("disabled", true);
 
-            accountCashFlowsCollectionView.editItem(accountCashFlowsCollectionView.currentItem);
-            var accountCashFlowId = accountCashFlowsCollectionView.currentEditItem.Id;
+            accountCashFlowCollectionView.editItem(accountCashFlowCollectionView.currentItem);
+            var accountCashFlowId = accountCashFlowCollectionView.currentEditItem.Id;
             $.ajax({
                 url: '/api/chartOfAccounts/accountCashFlow/delete/' + accountCashFlowId,
                 type: "DELETE",
@@ -2735,47 +2725,11 @@
             window.location = '/Software';
         }
 
-        // ============
-        // Tab Controls
-        // ============
-        $('#createAccountCashFlowFlexGridId').click(function () {
-            $('#Account').hide();
-            $('#AccountType').hide();
-            $('#AccountCashFlow').show();
-            $('#AccountCategory').hide();
-            createAccountCashFlowFlexGrid();
-            window.createAccountCashFlowFlexGrid = function () {
-                return true;
-            }
-            refreshAccountCashFlowFlexGrid();
-        });
-    </script>
-
-    <!-- ======================== -->
-    <!-- Account Category Scripts -->
-    <!-- ======================== -->
-    <script type="text/javascript">
-        // ====================================================================
-        // Account Categories Collection View, Flex Grid and Navigation Buttons
-        // ====================================================================
-        var accountCategoriesCollectionView;
-        var accountCategoryFlexGrid = new wijmo.grid.FlexGrid('#accountCategoryFlexGrid');
-        var btnAccountCategoryMoveToFirstPageGrid = document.getElementById('btnAccountCategoryMoveToFirstPageGrid');
-        var btnAccountCategoryMoveToPreviousPageGrid = document.getElementById('btnAccountCategoryMoveToPreviousPageGrid');
-        var btnAccountCategoryMoveToNextPageGrid = document.getElementById('btnAccountCategoryMoveToNextPageGrid');
-        var btnAccountCategoryMoveToLastPageGrid = document.getElementById('btnAccountCategoryMoveToLastPageGrid');
-        var btnAccountCategoryCurrentPageGrid = document.getElementById('btnAccountCategoryCurrentPageGrid');
-
-        // ===================
-        // Account Category Id
-        // ===================
-        var accountCategoryId = 0;
-
         // ==========================
         // Get Account Category Data
         // ==========================
         function getAccountCategoryData() {
-            var accountCategoriesObservableArray = new wijmo.collections.ObservableArray;
+            var accountCategoryObservableArray = new wijmo.collections.ObservableArray;
 
             NProgress.start();
             $.ajax({
@@ -2787,7 +2741,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            accountCategoriesObservableArray.push({
+                            accountCategoryObservableArray.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnAccountCategoryEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnAccountCategoryDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
@@ -2808,33 +2762,33 @@
                 }
             });
 
-            return accountCategoriesObservableArray;
+            return accountCategoryObservableArray;
         }
 
         // =================================
         // Create Account Category Flex Grid
         // =================================
         function createAccountCategoryFlexGrid() {
-            accountCategoriesCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
-            accountCategoriesCollectionView.canFilter = true;
-            accountCategoriesCollectionView.pageSize = 15;
+            accountCategoryCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
+            accountCategoryCollectionView.canFilter = true;
+            accountCategoryCollectionView.pageSize = 15;
 
             var filterTextAccountCategory = '';
             $('#inpAccountCategorySearchFilter').keyup(function () {
                 filterTextAccountCategory = this.value.toLowerCase();
-                accountCategoriesCollectionView.refresh();
+                accountCategoryCollectionView.refresh();
             });
 
-            accountCategoriesCollectionView.filter = function (item) {
+            accountCategoryCollectionView.filter = function (item) {
                 return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
                                                   || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
             }
 
-            accountCategoriesCollectionView.collectionChanged.addHandler(function (sender, args) {
+            accountCategoryCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateAccountCategoryNavigationButtons();
             });
 
-            accountCategoriesCollectionView.currentChanged.addHandler(function (sender, args) {
+            accountCategoryCollectionView.currentChanged.addHandler(function (sender, args) {
                 updateAccountCategoryFlexGridSelection();
             });
 
@@ -2886,7 +2840,7 @@
                             }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: accountCategoriesCollectionView,
+                itemsSource: accountCategoryCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -2898,22 +2852,22 @@
             updateAccountCategoryNavigationButtons();
 
             btnAccountCategoryMoveToFirstPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToFirstPage();
+                accountCashFlowCollectionView.moveToFirstPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCategoryMoveToPreviousPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToPreviousPage();
+                accountCashFlowCollectionView.moveToPreviousPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCategoryMoveToNextPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToNextPage();
+                accountCashFlowCollectionView.moveToNextPage();
                 updateAccountCashFlowNavigationButtons();
             });
 
             btnAccountCategoryMoveToLastPageGrid.addEventListener('click', function () {
-                accountCashFlowsCollectionView.moveToLastPage();
+                accountCashFlowCollectionView.moveToLastPage();
                 updateAccountCashFlowNavigationButtons();
             });
         }
@@ -2922,7 +2876,7 @@
         // Update Account Category Flex Grid Selection
         // ===========================================
         function updateAccountCategoryFlexGridSelection() {
-            var item = accountCategoriesCollectionView.currentItem;
+            var item = accountCategoryCollectionView.currentItem;
             document.getElementById('createdBy').innerHTML = item.CreatedBy;
             document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
             document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
@@ -2933,17 +2887,17 @@
         // Update Account Category Navigation Buttons
         // ==========================================
         function updateAccountCategoryNavigationButtons() {
-            if (accountCategoriesCollectionView.pageSize <= 0) {
+            if (accountCategoryCollectionView.pageSize <= 0) {
                 document.getElementById('accountCategoryNavigationPageGrid').style.display = 'none';
                 return;
             }
             document.getElementById('accountCategoryNavigationPageGrid').style.display = 'block';
-            if (accountCategoriesCollectionView.pageIndex === 0) {
+            if (accountCategoryCollectionView.pageIndex === 0) {
                 btnAccountCategoryMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
                 btnAccountCategoryMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
                 btnAccountCategoryMoveToNextPageGrid.removeAttribute('disabled');
                 btnAccountCategoryMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (accountCategoriesCollectionView.pageIndex === (accountCategoriesCollectionView.pageCount - 1)) {
+            } else if (accountCategoryCollectionView.pageIndex === (accountCategoryCollectionView.pageCount - 1)) {
                 btnAccountCategoryMoveToFirstPageGrid.removeAttribute('disabled');
                 btnAccountCategoryMoveToPreviousPageGrid.removeAttribute('disabled');
                 btnAccountCategoryMoveToLastPageGrid.setAttribute('disabled', 'disabled');
@@ -2954,37 +2908,37 @@
                 btnAccountCategoryMoveToNextPageGrid.removeAttribute('disabled');
                 btnAccountCategoryMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnAccountCategoryCurrentPageGrid.innerHTML = (accountCategoriesCollectionView.pageIndex + 1) + ' / ' + accountCategoriesCollectionView.pageCount;
+            btnAccountCategoryCurrentPageGrid.innerHTML = (accountCategoryCollectionView.pageIndex + 1) + ' / ' + accountCategoryCollectionView.pageCount;
         }
 
         // ========================
         // Refresh Account Category
         // ========================
         function refreshAccountCategory() {
-            accountCategoriesCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
-            accountCategoriesCollectionView.canFilter = true;
-            accountCategoriesCollectionView.pageSize = 15;
+            accountCategoryCollectionView = new wijmo.collections.CollectionView(getAccountCategoryData());
+            accountCategoryCollectionView.canFilter = true;
+            accountCategoryCollectionView.pageSize = 15;
 
             var filterTextAccountCategory = '';
             $('#inpAccountCategorySearchFilter').keyup(function () {
                 filterTextAccountCategory = this.value.toLowerCase();
-                accountCategoriesCollectionView.refresh();
+                accountCategoryCollectionView.refresh();
             });
 
-            accountCategoriesCollectionView.filter = function (item) {
+            accountCategoryCollectionView.filter = function (item) {
                 return !filterTextAccountCategory || (item.AccountCategoryCode.toLowerCase().indexOf(filterTextAccountCategory) > -1)
                     || (item.AccountCategory.toLowerCase().indexOf(filterTextAccountCategory) > -1);
             }
 
-            accountCategoriesCollectionView.collectionChanged.addHandler(function (sender, args) {
+            accountCategoryCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateAccountCategoryNavigationButtons();
             });
 
-            accountCategoriesCollectionView.currentChanged.addHandler(function (sender, args) {
+            accountCategoryCollectionView.currentChanged.addHandler(function (sender, args) {
                 updateAccountCategoryFlexGridSelection();
             });
 
-            accountCategoryFlexGrid.itemsSource = accountCategoriesCollectionView;
+            accountCategoryFlexGrid.itemsSource = accountCategoryCollectionView;
             accountCategoryFlexGrid.trackChanges = true;
         }
 
@@ -3070,8 +3024,8 @@
             $("#btnAccountCategorySave").prop("disabled", false);
             $("#btnAccountCategoryCloseFormDetailModal").prop("disabled", false);
 
-            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
-            var accountCategory = accountCategoriesCollectionView.currentEditItem;
+            accountCategoryCollectionView.editItem(accountCategoryCollectionView.currentItem);
+            var accountCategory = accountCategoryCollectionView.currentEditItem;
             accountCategoryId = accountCategory.Id;
             document.getElementById('inpAccountCategoryCode').value = accountCategory.AccountCategoryCode;
             document.getElementById('inpAccountCategory').value = accountCategory.AccountCategory;
@@ -3181,8 +3135,8 @@
         // Delete Account Category
         // =======================
         function btnAccountCategoryDeleteOnclick() {
-            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
-            var accountCategory = accountCategoriesCollectionView.currentEditItem;
+            accountCategoryCollectionView.editItem(accountCategoryCollectionView.currentItem);
+            var accountCategory = accountCategoryCollectionView.currentEditItem;
 
             $('#accountCategoryConfirmDeleteModal').modal({
                 show: true,
@@ -3194,14 +3148,16 @@
             $("#btnAccountCategoryCloseConfirmDeleteModal").prop("disabled", false);
         }
 
-        // Account Category Confirm Delete Button
+        // ===============================
+        // Confirm Delete Account Category
+        // ===============================
         function btnAccountCategoryConfirmDeleteOnclick() {
             document.getElementById('btnAccountCategoryConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
             $("#btnAccountCategoryConfirmDelete").prop("disabled", true);
             $("#btnAccountCategoryCloseConfirmDeleteModal").prop("disabled", true);
 
-            accountCategoriesCollectionView.editItem(accountCategoriesCollectionView.currentItem);
-            var id = accountCategoriesCollectionView.currentEditItem.Id;
+            accountCategoryCollectionView.editItem(accountCategoryCollectionView.currentItem);
+            var id = accountCategoryCollectionView.currentEditItem.Id;
             $.ajax({
                 url: '/api/chartOfAccounts/accountCategory/delete/' + id,
                 type: "DELETE",
@@ -3248,6 +3204,31 @@
         // ============
         // Tab Controls
         // ============
+        $('#createAccountTypeFlexGridId').click(function () {
+            $('#Account').hide();
+            $('#AccountType').show();
+            $('#AccountCashFlow').hide();
+            $('#AccountCategory').hide();
+            createAccountTypeFlexGrid();
+            window.createAccountTypeFlexGrid = function () {
+                return true;
+            }
+
+            refreshAccountTypeFlexGrid();
+        });
+
+        $('#createAccountCashFlowFlexGridId').click(function () {
+            $('#Account').hide();
+            $('#AccountType').hide();
+            $('#AccountCashFlow').show();
+            $('#AccountCategory').hide();
+            createAccountCashFlowFlexGrid();
+            window.createAccountCashFlowFlexGrid = function () {
+                return true;
+            }
+            refreshAccountCashFlowFlexGrid();
+        });
+
         $('#createAccountCategoryFlexGridId').click(function () {
             $('#Account').hide();
             $('#AccountType').hide();
