@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Cancelled Sales Summary Report</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,87 +26,116 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCancelledSalesSummaryReportSeacrhFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboARCancelledSalesSummaryReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboCancelledSalesSummaryReportDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnCancelledSalesSummaryReportCSVOnclick()" id="btnCancelledSalesSummaryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    @*<button onclick="btnCancelledSalesSummaryReportPrintPDFOnclick()" id="btnCancelledSalesSummaryReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>*@
+                                    <button class="btn btn-success" onclick="btnCancelledSalesSummaryReportDownloadCSVOnclick()" id="btnCancelledSalesSummaryReportDownloadCSV"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboAPCancelledSalesSummaryReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboCancelledSalesSummaryReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboAPCancelledSalesSummaryReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboCancelledSalesSummaryReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboAPCancelledSalesSummaryReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboCancelledSalesSummaryReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboAPCancelledSalesSummaryReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboCancelledSalesSummaryReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="salesSummaryReportGrid" class="grid"></div>
+                        <div id="cancelledSalesSummaryReportFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="cancelledSalesSummaryReportNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCancelledSalesSummaryReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCancelledSalesSummaryReportMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCancelledSalesSummaryReportCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnCancelledSalesSummaryReportMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCancelledSalesSummaryReportMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -120,14 +146,16 @@
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpCancelledSalesSummaryReportTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -135,30 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboAPCancelledSalesSummaryReportStartDate = new wijmo.input.InputDate('#cboAPCancelledSalesSummaryReportStartDate');
-        var cboAPCancelledSalesSummaryReportEndDate = new wijmo.input.InputDate('#cboAPCancelledSalesSummaryReportEndDate');
-        var isAPCancelledSalesSummaryReportStartDateSelected = false;
-        var isAPCancelledSalesSummaryReportEndDateSelected = false;
-        var cboAPCancelledSalesSummaryReportCompany = new wijmo.input.ComboBox('#cboAPCancelledSalesSummaryReportCompany');
-        var cboAPCancelledSalesSummaryReportBranch = new wijmo.input.ComboBox('#cboAPCancelledSalesSummaryReportBranch');
-        var salesSummaryReportCollections;
-        var salesSummaryReportGrid;
-        var isAPCancelledSalesSummaryReportCompanySelected = false;
-        var cboARCancelledSalesSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboARCancelledSalesSummaryReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // ==================
+        // Data Range Filters
+        // ==================
+        var cboCancelledSalesSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboCancelledSalesSummaryReportStartDateFilter');
+        var cboCancelledSalesSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboCancelledSalesSummaryReportEndDateFilter');
+        var isCboCancelledSalesSummaryReportStartDateFilterSelected = false;
+        var isCboCancelledSalesSummaryReportEndDateFilterSelected = false;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // ==========================
+        // Company and Branch Filters
+        // ==========================
+        var cboCancelledSalesSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportCompanyFilter');
+        var isCboCancelledSalesSummaryReportCompanyFilterSelected = false;
+        var cboCancelledSalesSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportBranchFilter');
+
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var salesSummaryReportCollections;
+        var cancelledSalesSummaryReportFlexGrid;
+        var cboCancelledSalesSummaryReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportDisplayNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnCancelledSalesSummaryReportMoveToFirstPageGrid = document.getElementById('btnCancelledSalesSummaryReportMoveToFirstPageGrid');
+        var btnCancelledSalesSummaryReportMoveToPreviousPageGrid = document.getElementById('btnCancelledSalesSummaryReportMoveToPreviousPageGrid');
+        var btnCancelledSalesSummaryReportMoveToNextPageGrid = document.getElementById('btnCancelledSalesSummaryReportMoveToNextPageGrid');
+        var btnCancelledSalesSummaryReportMoveToLastPageGrid = document.getElementById('btnCancelledSalesSummaryReportMoveToLastPageGrid');
+        var btnCancelledSalesSummaryReportCurrentPageGrid = document.getElementById('btnCancelledSalesSummaryReportCurrentPageGrid');
+        var cancelledSalesSummaryReportCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -172,46 +212,46 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function salesSummaryReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangedFilter() {
             NProgress.start();
-            cboAPCancelledSalesSummaryReportStartDate.dispose();
-            cboAPCancelledSalesSummaryReportStartDate = new wijmo.input.InputDate('#cboAPCancelledSalesSummaryReportStartDate', {
+            cboCancelledSalesSummaryReportStartDateFilter.dispose();
+            cboCancelledSalesSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboCancelledSalesSummaryReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isAPCancelledSalesSummaryReportStartDateSelected) {
+                    if (!isCboCancelledSalesSummaryReportStartDateFilterSelected) {
                         NProgress.start();
                         refreshCancelledSalesSummaryReportFlexGrid();
                     } else {
-                        isAPCancelledSalesSummaryReportStartDateSelected = false;
+                        isCboCancelledSalesSummaryReportStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboAPCancelledSalesSummaryReportEndDate.dispose();
-            cboAPCancelledSalesSummaryReportEndDate = new wijmo.input.InputDate('#cboAPCancelledSalesSummaryReportEndDate', {
+            cboCancelledSalesSummaryReportEndDateFilter.dispose();
+            cboCancelledSalesSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboCancelledSalesSummaryReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isAPCancelledSalesSummaryReportEndDateSelected) {
+                    if (!isCboCancelledSalesSummaryReportEndDateFilterSelected) {
                         NProgress.start();
                         refreshCancelledSalesSummaryReportFlexGrid();
                     } else {
-                        isAPCancelledSalesSummaryReportEndDateSelected = false;
+                        isCboCancelledSalesSummaryReportEndDateFilterSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/cancelledSalesSummaryReport/dropdown/list/company',
@@ -232,40 +272,41 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnCancelledSalesSummaryReportCSV").prop("disabled", true);
+                        $("#btnCancelledSalesSummaryReportDownloadCSV").prop("disabled", true);
                         $("#btnCancelledSalesSummaryReportPrintPDF").prop("disabled", true);
                     }
 
-                    cboAPCancelledSalesSummaryReportCompany.dispose();
-                    cboAPCancelledSalesSummaryReportCompany = new wijmo.input.ComboBox('#cboAPCancelledSalesSummaryReportCompany', {
+                    cboCancelledSalesSummaryReportCompanyFilter.dispose();
+                    cboCancelledSalesSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnCancelledSalesSummaryReportCSV").prop("disabled", false);
+                            $("#btnCancelledSalesSummaryReportDownloadCSV").prop("disabled", false);
                             $("#btnCancelledSalesSummaryReportPrintPDF").prop("disabled", false);
-                            isAPCancelledSalesSummaryReportCompanySelected = true;
-                            createCboBranch();
+                            isCboCancelledSalesSummaryReportCompanyFilterSelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboAPCancelledSalesSummaryReportCompany.selectedValue != null) {
+
+            if (cboCancelledSalesSummaryReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/cancelledSalesSummaryReport/dropdown/list/branch/' + cboAPCancelledSalesSummaryReportCompany.selectedValue,
+                    url: '/api/cancelledSalesSummaryReport/dropdown/list/branch/' + cboCancelledSalesSummaryReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -283,34 +324,34 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnCancelledSalesSummaryReportCSV").prop("disabled", true);
+                            $("#btnCancelledSalesSummaryReportDownloadCSV").prop("disabled", true);
                             $("#btnCancelledSalesSummaryReportPrintPDF").prop("disabled", true);
                         }
 
-                        cboAPCancelledSalesSummaryReportBranch.dispose();
-                        cboAPCancelledSalesSummaryReportBranch = new wijmo.input.ComboBox('#cboAPCancelledSalesSummaryReportBranch', {
+                        cboCancelledSalesSummaryReportBranchFilter.dispose();
+                        cboCancelledSalesSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshCancelledSalesSummaryReportFlexGrid();
                             }
                         });
 
-                        createCboShowRows();
+                        createCboDisplayNumberOfRows();
                     }
                 });
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -340,8 +381,8 @@
                 });
             }
 
-            cboARCancelledSalesSummaryReportShowNumberOfRows.dispose();
-            cboARCancelledSalesSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboARCancelledSalesSummaryReportShowNumberOfRows', {
+            cboCancelledSalesSummaryReportDisplayNumberOfRows.dispose();
+            cboCancelledSalesSummaryReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCancelledSalesSummaryReportDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -351,34 +392,34 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboARCancelledSalesSummaryReportShowNumberOfRows.selectedValue;
+                        var numberOfRows = cboCancelledSalesSummaryReportDisplayNumberOfRows.selectedValue;
                         salesSummaryReportCollections.pageSize = parseInt(numberOfRows);
                         salesSummaryReportCollections.refresh();
-                        salesSummaryReportGrid.refresh();
+                        cancelledSalesSummaryReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isAPCancelledSalesSummaryReportCompanySelected) {
+            if (!isCboCancelledSalesSummaryReportCompanyFilterSelected) {
                 createCancelledSalesSummaryReportFlexGrid();
             } else {
                 refreshCancelledSalesSummaryReportFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Sales Order Summary Data
-        // ===============================
-        function getCancelledSalesSummaryReport() {
+        // =======================================
+        // Get Cancelled Sales Summary Report Data
+        // =======================================
+        function getCancelledSalesSummaryReportData() {
             var salesSummaryReports = new wijmo.collections.ObservableArray;
-            if (cboAPCancelledSalesSummaryReportCompany.selectedValue != null) {
-                if (cboAPCancelledSalesSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboAPCancelledSalesSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboAPCancelledSalesSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboAPCancelledSalesSummaryReportCompany.selectedValue;
-                    var branchId = cboAPCancelledSalesSummaryReportBranch.selectedValue;
+            if (cboCancelledSalesSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboCancelledSalesSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboCancelledSalesSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCancelledSalesSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCancelledSalesSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboCancelledSalesSummaryReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/cancelledSalesSummaryReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -386,7 +427,7 @@
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
                         success: function (salesSummaryReportResult) {
-                            var totalAmount = 0;
+                            var inpCancelledSalesSummaryReportTotalAmount = 0;
                             if (salesSummaryReportResult.length > 0) {
                                 for (i = 0; i < salesSummaryReportResult.length; i++) {
                                     var docLink = "/Software/SalesDetail?id=" + salesSummaryReportResult[i]["Id"];
@@ -409,117 +450,48 @@
                                         AmountDisplay: parseFloat(salesSummaryReportResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                     });
 
-                                    totalAmount += salesSummaryReportResult[i]["Amount"];
+                                    inpCancelledSalesSummaryReportTotalAmount += salesSummaryReportResult[i]["Amount"];
                                 }
                             }
 
-                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(inpCancelledSalesSummaryReportTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return salesSummaryReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (salesSummaryReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (salesSummaryReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (salesSummaryReportCollections.pageIndex === (salesSummaryReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (salesSummaryReportCollections.pageIndex + 1) + ' / ' + salesSummaryReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshCancelledSalesSummaryReportFlexGrid() {
-            salesSummaryReportCollections = new wijmo.collections.CollectionView(getCancelledSalesSummaryReport());
-            salesSummaryReportCollections.canFilter = true;
-            salesSummaryReportCollections.pageSize = cboARCancelledSalesSummaryReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                salesSummaryReportCollections.refresh();
-
-                if (salesSummaryReportCollections.items.length > 0) {
-                    var totalAmount = 0;
-                    for (var i = 0; i < salesSummaryReportCollections.items.length; i++) {
-                        totalAmount += salesSummaryReportCollections.items[i].Amount;
-                    }
-
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
-            });
-
-            salesSummaryReportCollections.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SoldBy.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            salesSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            salesSummaryReportGrid.itemsSource = salesSummaryReportCollections;
-            salesSummaryReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ===============================================
+        // Create Cancelled Sales Summary Report Flex Grid
+        // ===============================================
         function createCancelledSalesSummaryReportFlexGrid() {
-            salesSummaryReportCollections = new wijmo.collections.CollectionView(getCancelledSalesSummaryReport());
+            salesSummaryReportCollections = new wijmo.collections.CollectionView(getCancelledSalesSummaryReportData());
             salesSummaryReportCollections.canFilter = true;
-            salesSummaryReportCollections.pageSize = cboARCancelledSalesSummaryReportShowNumberOfRows.selectedValue;
+            salesSummaryReportCollections.pageSize = cboCancelledSalesSummaryReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCancelledSalesSummaryReportSeacrhFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 salesSummaryReportCollections.refresh();
 
                 if (salesSummaryReportCollections.items.length > 0) {
-                    var totalAmount = 0;
+                    var inpCancelledSalesSummaryReportTotalAmount = 0;
                     for (var i = 0; i < salesSummaryReportCollections.items.length; i++) {
-                        totalAmount += salesSummaryReportCollections.items[i].Amount;
+                        inpCancelledSalesSummaryReportTotalAmount += salesSummaryReportCollections.items[i].Amount;
                     }
 
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(inpCancelledSalesSummaryReportTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
@@ -532,11 +504,11 @@
             }
 
             salesSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updateCancelledSalesSummaryReportNavigationButton();
             });
 
-            salesSummaryReportGrid = new wijmo.grid.FlexGrid('#salesSummaryReportGrid');
-            salesSummaryReportGrid.initialize({
+            cancelledSalesSummaryReportFlexGrid = new wijmo.grid.FlexGrid('#cancelledSalesSummaryReportFlexGrid');
+            cancelledSalesSummaryReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -591,39 +563,108 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            salesSummaryReportGrid.trackChanges = true;
+            cancelledSalesSummaryReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateCancelledSalesSummaryReportNavigationButton();
 
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnCancelledSalesSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
                 salesSummaryReportCollections.moveToFirstPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                cancelledSalesSummaryReportCurrentPageIndex = salesSummaryReportCollections.pageIndex + 1;
+                updateCancelledSalesSummaryReportNavigationButton();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnCancelledSalesSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
                 salesSummaryReportCollections.moveToPreviousPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                cancelledSalesSummaryReportCurrentPageIndex = salesSummaryReportCollections.pageIndex + 1;
+                updateCancelledSalesSummaryReportNavigationButton();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnCancelledSalesSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
                 salesSummaryReportCollections.moveToNextPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                cancelledSalesSummaryReportCurrentPageIndex = salesSummaryReportCollections.pageIndex + 1;
+                updateCancelledSalesSummaryReportNavigationButton();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnCancelledSalesSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
                 salesSummaryReportCollections.moveToLastPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                cancelledSalesSummaryReportCurrentPageIndex = salesSummaryReportCollections.pageIndex + 1;
+                updateCancelledSalesSummaryReportNavigationButton();
             });
+        }
+
+        // ========================================================
+        // Update Cancelled Sales Summary Report Navigation Buttons
+        // ========================================================
+        function updateCancelledSalesSummaryReportNavigationButton() {
+            if (salesSummaryReportCollections.pageSize <= 0) {
+                document.getElementById('cancelledSalesSummaryReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('cancelledSalesSummaryReportNavigationPageGrid').style.display = 'block';
+            if (salesSummaryReportCollections.pageIndex === 0) {
+                btnCancelledSalesSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCancelledSalesSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCancelledSalesSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (salesSummaryReportCollections.pageIndex === (salesSummaryReportCollections.pageCount - 1)) {
+                btnCancelledSalesSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCancelledSalesSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCancelledSalesSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnCancelledSalesSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCancelledSalesSummaryReportCurrentPageGrid.innerHTML = (salesSummaryReportCollections.pageIndex + 1) + ' / ' + salesSummaryReportCollections.pageCount;
+        }
+
+        // ================================================
+        // Refresh Cancelled Sales Summary Report Flex Grid
+        // ================================================
+        function refreshCancelledSalesSummaryReportFlexGrid() {
+            salesSummaryReportCollections = new wijmo.collections.CollectionView(getCancelledSalesSummaryReportData());
+            salesSummaryReportCollections.canFilter = true;
+            salesSummaryReportCollections.pageSize = cboCancelledSalesSummaryReportDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpCancelledSalesSummaryReportSeacrhFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                salesSummaryReportCollections.refresh();
+
+                if (salesSummaryReportCollections.items.length > 0) {
+                    var inpCancelledSalesSummaryReportTotalAmount = 0;
+                    for (var i = 0; i < salesSummaryReportCollections.items.length; i++) {
+                        inpCancelledSalesSummaryReportTotalAmount += salesSummaryReportCollections.items[i].Amount;
+                    }
+
+                    document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(inpCancelledSalesSummaryReportTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    document.getElementById("inpCancelledSalesSummaryReportTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+            });
+
+            salesSummaryReportCollections.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.SoldBy.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            salesSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateCancelledSalesSummaryReportNavigationButton();
+            });
+
+            cancelledSalesSummaryReportFlexGrid.itemsSource = salesSummaryReportCollections;
+            cancelledSalesSummaryReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnCancelledSalesSummaryReportCSVOnclick() {
+        function btnCancelledSalesSummaryReportDownloadCSVOnclick() {
             var CSV = '';
             var salesSummaryReport = [];
             var fileName = 'CancelledSalesSummaryReport.CSV';
@@ -632,12 +673,6 @@
 
             for (var p = 1; p <= salesSummaryReportCollections.pageCount; p++) {
                 for (i = 0; i < salesSummaryReportCollections.items.length; i++) {
-                    var IsClose = salesSummaryReportCollections.items[i].IsClose;
-                    var isPOClose = "Not Closed";
-                    if (IsClose) {
-                        isPOClose = "Closed"
-                    }
-
                     salesSummaryReport.push({
                         Branch: salesSummaryReportCollections.items[i].Branch,
                         SINumber: salesSummaryReportCollections.items[i].SINumberForCSV,
@@ -651,7 +686,7 @@
 
                 salesSummaryReportCollections.moveToNextPage();
                 if (p == salesSummaryReportCollections.pageCount) {
-                    salesSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                    salesSummaryReportCollections.moveToPage(cancelledSalesSummaryReportCurrentPageIndex - 1);
                 }
             }
 
@@ -715,12 +750,12 @@
         // Preview and Print PDF
         // =====================
         function btnCancelledSalesSummaryReportPrintPDFOnclick() {
-            if (cboAPCancelledSalesSummaryReportCompany.selectedValue != null) {
-                if (cboAPCancelledSalesSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboAPCancelledSalesSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboAPCancelledSalesSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboAPCancelledSalesSummaryReportCompany.selectedValue;
-                    var branchId = cboAPCancelledSalesSummaryReportBranch.selectedValue;
+            if (cboCancelledSalesSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboCancelledSalesSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboCancelledSalesSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCancelledSalesSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCancelledSalesSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboCancelledSalesSummaryReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepCancelledSalesSummaryReport/CancelledSalesSummaryReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -731,15 +766,22 @@
             }
         }
 
-        // ============
-        // On Load Page
-        // ============
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            salesSummaryReportDateFilters();
+            createCboDateRangedFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -786,6 +828,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -825,6 +870,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
