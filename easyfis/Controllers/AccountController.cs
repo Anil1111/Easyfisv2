@@ -252,6 +252,11 @@ namespace easyfis.Controllers
                 secretKey = "6LezWEQUAAAAAAn52pEfyFxPWnAcAOPgMGbBFw5D";
             }
 
+            if (host.Equals("kemique.easyfis.com"))
+            {
+                secretKey = "6LcdzEoUAAAAAGuQY0kfg4HdZlbuA2FkDKFy8hAp";
+            }
+
             var client = new System.Net.WebClient();
             var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
             var verificationResult = JsonConvert.DeserializeObject<CaptchaVerificationResult>(verificationResultJson);
