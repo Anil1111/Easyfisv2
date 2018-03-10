@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Collection Book</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,87 +26,117 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+                    
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCollectionBookSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboARCollectionBookShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboCollectionBookDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnCollectionBookCSVOnclick()" id="btnCollectionBookCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnCollectionBookDownloadCSVOnclick()" id="btnCollectionBookDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnCollectionBookPrintPDFOnclick()" id="btnCollectionBookPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+                    
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboARCollectionBookStartDate"></div>
+                                        <div class="comboBox-wide" id="cboCollectionBookStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboARCollectionBookEndDate"></div>
+                                        <div class="comboBox-wide" id="cboCollectionBookEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboARCollectionBookCompany"></div>
+                                        <div class="comboBox-wide" id="cboCollectionBookCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboARCollectionBookBranch"></div>
+                                        <div class="comboBox-wide" id="cboCollectionBookBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+                    
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="collectionBookGrid" class="grid"></div>
+                        <div id="collectionBookFlexGrid" class="grid"></div>
                     </div>
+                    
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="collectionBookNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionBookMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionBookMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCollectionBookCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionBookMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionBookMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -120,19 +147,19 @@
                                         <b>Total Debit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalDebitAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Credit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalCreditAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Balance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalBalanceAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -140,6 +167,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -148,23 +176,26 @@
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ================
-        // Global Variables
+        // Global Variables - Stopped Here...
         // ================
-        var cboARCollectionBookStartDate = new wijmo.input.InputDate('#cboARCollectionBookStartDate');
-        var cboARCollectionBookEndDate = new wijmo.input.InputDate('#cboARCollectionBookEndDate');
+        var cboCollectionBookStartDateFilter = new wijmo.input.InputDate('#cboCollectionBookStartDateFilter');
+        var cboCollectionBookEndDateFilter = new wijmo.input.InputDate('#cboCollectionBookEndDateFilter');
         var isARCollectionBookStartDateSelected = false;
         var isARCollectionBookEndDateSelected = false;
-        var cboARCollectionBookCompany = new wijmo.input.ComboBox('#cboARCollectionBookCompany');
-        var cboARCollectionBookBranch = new wijmo.input.ComboBox('#cboARCollectionBookBranch');
+
+        var cboCollectionBookCompanyFilter = new wijmo.input.ComboBox('#cboCollectionBookCompanyFilter');
+        var cboCollectionBookBranchFilter = new wijmo.input.ComboBox('#cboCollectionBookBranchFilter');
+
         var collectionBookCollections;
-        var collectionBookGrid;
+        var collectionBookFlexGrid;
         var isARCollectionBookCompanySelected = false;
-        var cboARCollectionBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARCollectionBookShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        var cboCollectionBookDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionBookDisplayNumberOfRows');
+
+        var btnFirstPageGrid = document.getElementById('btnCollectionBookMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnCollectionBookMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnCollectionBookMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnCollectionBookMoveToLastPageGrid');
+        var btnCollectionBookCurrentPageGrid = document.getElementById('btnCollectionBookCurrentPageGrid');
         var currentPageIndex = 0;
 
         // ===================
@@ -189,8 +220,8 @@
         // ============
         function collectionBookDateFilters() {
             NProgress.start();
-            cboARCollectionBookStartDate.dispose();
-            cboARCollectionBookStartDate = new wijmo.input.InputDate('#cboARCollectionBookStartDate', {
+            cboCollectionBookStartDateFilter.dispose();
+            cboCollectionBookStartDateFilter = new wijmo.input.InputDate('#cboCollectionBookStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(getParam("StartDate")),
                 onValueChanged: function () {
@@ -203,8 +234,8 @@
                 }
             });
 
-            cboARCollectionBookEndDate.dispose();
-            cboARCollectionBookEndDate = new wijmo.input.InputDate('#cboARCollectionBookEndDate', {
+            cboCollectionBookEndDateFilter.dispose();
+            cboCollectionBookEndDateFilter = new wijmo.input.InputDate('#cboCollectionBookEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(getParam("EndDate")),
                 onValueChanged: function () {
@@ -247,12 +278,12 @@
                     if (companyResults.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnCollectionBookCSV").prop("disabled", true);
+                        $("#btnCollectionBookDownloadCSV").prop("disabled", true);
                         $("#btnCollectionBookPrintPDF").prop("disabled", true);
                     }
 
-                    cboARCollectionBookCompany.dispose();
-                    cboARCollectionBookCompany = new wijmo.input.ComboBox('#cboARCollectionBookCompany', {
+                    cboCollectionBookCompanyFilter.dispose();
+                    cboCollectionBookCompanyFilter = new wijmo.input.ComboBox('#cboCollectionBookCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
@@ -261,7 +292,7 @@
                         selectedValue: getParam("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnCollectionBookCSV").prop("disabled", false);
+                            $("#btnCollectionBookDownloadCSV").prop("disabled", false);
                             $("#btnCollectionBookPrintPDF").prop("disabled", false);
                             isARCollectionBookCompanySelected = true;
                             createCboBranch();
@@ -278,9 +309,9 @@
         // =============
         function createCboBranch() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboARCollectionBookCompany.selectedValue != null) {
+            if (cboCollectionBookCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/branch/byCompanyId/list/locked/' + cboARCollectionBookCompany.selectedValue,
+                    url: '/api/branch/byCompanyId/list/locked/' + cboCollectionBookCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -302,12 +333,12 @@
                         if (branchResults.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnCollectionBookCSV").prop("disabled", true);
+                            $("#btnCollectionBookDownloadCSV").prop("disabled", true);
                             $("#btnCollectionBookPrintPDF").prop("disabled", true);
                         }
 
-                        cboARCollectionBookBranch.dispose();
-                        cboARCollectionBookBranch = new wijmo.input.ComboBox('#cboARCollectionBookBranch', {
+                        cboCollectionBookBranchFilter.dispose();
+                        cboCollectionBookBranchFilter = new wijmo.input.ComboBox('#cboCollectionBookBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
@@ -359,8 +390,8 @@
                 });
             }
 
-            cboARCollectionBookShowNumberOfRows.dispose();
-            cboARCollectionBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARCollectionBookShowNumberOfRows', {
+            cboCollectionBookDisplayNumberOfRows.dispose();
+            cboCollectionBookDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionBookDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -370,10 +401,10 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboARCollectionBookShowNumberOfRows.selectedValue;
+                        var numberOfRows = cboCollectionBookDisplayNumberOfRows.selectedValue;
                         collectionBookCollections.pageSize = parseInt(numberOfRows);
                         collectionBookCollections.refresh();
-                        collectionBookGrid.refresh();
+                        collectionBookFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
@@ -392,12 +423,12 @@
         // ===============================
         function getCollectionBook() {
             var collectionBooks = new wijmo.collections.ObservableArray;
-            if (cboARCollectionBookCompany.selectedValue != null) {
-                if (cboARCollectionBookBranch.selectedValue != null) {
-                    var startDate = cboARCollectionBookStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboARCollectionBookEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboARCollectionBookCompany.selectedValue;
-                    var branchId = cboARCollectionBookBranch.selectedValue;
+            if (cboCollectionBookCompanyFilter.selectedValue != null) {
+                if (cboCollectionBookBranchFilter.selectedValue != null) {
+                    var startDate = cboCollectionBookStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCollectionBookEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCollectionBookCompanyFilter.selectedValue;
+                    var branchId = cboCollectionBookBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/CollectionBook/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -430,22 +461,22 @@
                                 }
                             }
 
-                            document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
@@ -457,10 +488,10 @@
         // =========================
         function updateNavigateButtonsItems() {
             if (collectionBookCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
+                document.getElementById('collectionBookNavigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
+            document.getElementById('collectionBookNavigationPageGrid').style.display = 'block';
             if (collectionBookCollections.pageIndex === 0) {
                 btnFirstPageGrid.setAttribute('disabled', 'disabled');
                 btnPreviousPageGrid.setAttribute('disabled', 'disabled');
@@ -477,7 +508,7 @@
                 btnNextPageGrid.removeAttribute('disabled');
                 btnLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGrid.innerHTML = (collectionBookCollections.pageIndex + 1) + ' / ' + collectionBookCollections.pageCount;
+            btnCollectionBookCurrentPageGrid.innerHTML = (collectionBookCollections.pageIndex + 1) + ' / ' + collectionBookCollections.pageCount;
         }
 
         // =================
@@ -486,10 +517,10 @@
         function refreshCollectionBookFlexGrid() {
             collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
             collectionBookCollections.canFilter = true;
-            collectionBookCollections.pageSize = cboARCollectionBookShowNumberOfRows.selectedValue;
+            collectionBookCollections.pageSize = cboCollectionBookDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCollectionBookSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 collectionBookCollections.refresh();
 
@@ -503,13 +534,13 @@
                         totalBalance += collectionBookCollections.items[i].Balance;
                     }
 
-                    document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
@@ -525,8 +556,8 @@
                 updateNavigateButtonsItems();
             });
 
-            collectionBookGrid.itemsSource = collectionBookCollections;
-            collectionBookGrid.trackChanges = true;
+            collectionBookFlexGrid.itemsSource = collectionBookCollections;
+            collectionBookFlexGrid.trackChanges = true;
         }
 
         // =========
@@ -535,10 +566,10 @@
         function createCollectionBookFlexGrid() {
             collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
             collectionBookCollections.canFilter = true;
-            collectionBookCollections.pageSize = cboARCollectionBookShowNumberOfRows.selectedValue;
+            collectionBookCollections.pageSize = cboCollectionBookDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCollectionBookSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 collectionBookCollections.refresh();
 
@@ -552,13 +583,13 @@
                         totalBalance += collectionBookCollections.items[i].Balance;
                     }
 
-                    document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
@@ -574,8 +605,8 @@
                 updateNavigateButtonsItems();
             });
 
-            collectionBookGrid = new wijmo.grid.FlexGrid('#collectionBookGrid');
-            collectionBookGrid.initialize({
+            collectionBookFlexGrid = new wijmo.grid.FlexGrid('#collectionBookFlexGrid');
+            collectionBookFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Doc Reference",
@@ -638,7 +669,7 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            collectionBookGrid.trackChanges = true;
+            collectionBookFlexGrid.trackChanges = true;
 
             updateNavigateButtonsItems();
 
@@ -670,7 +701,7 @@
         // ============
         // Download CSV
         // ============
-        function btnCollectionBookCSVOnclick() {
+        function btnCollectionBookDownloadCSVOnclick() {
             var CSV = '';
             var collectionBook = [];
             var fileName = 'CollectionBook.CSV';
@@ -764,12 +795,12 @@
         // Preview and Print PDF
         // =====================
         function btnCollectionBookPrintPDFOnclick() {
-            if (cboARCollectionBookCompany.selectedValue != null) {
-                if (cboARCollectionBookBranch.selectedValue != null) {
-                    var startDate = cboARCollectionBookStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboARCollectionBookEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboARCollectionBookCompany.selectedValue;
-                    var branchId = cboARCollectionBookBranch.selectedValue;
+            if (cboCollectionBookCompanyFilter.selectedValue != null) {
+                if (cboCollectionBookBranchFilter.selectedValue != null) {
+                    var startDate = cboCollectionBookStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCollectionBookEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCollectionBookCompanyFilter.selectedValue;
+                    var branchId = cboCollectionBookBranchFilter.selectedValue;
 
                     window.location.href = '/RepCollectionBook/CollectionBook?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {

@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Collection</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCollectionSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,57 +58,81 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddCollection" onclick="btnAddCollection_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnCollectionAdd" onclick="btnCollectionAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseCollection" onclick="btnCloseCollection_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnCollectionClose" onclick="btnCollectionCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 29%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div id="cboStartDateFilter"></div>
+                                        <div id="cboCollectionStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 29%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div id="cboEndDateFilter"></div>
+                                        <div id="cboCollectionEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 41%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="CollectionGrid" class="grid" align="left"></div>
+                        <div id="collectionFlexGrid" class="grid" align="left"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="collectionNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCollectionCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCollectionMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -134,24 +161,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Collecion Delete -->
-    <div class="modal fade" id="deleteCollecionConfirm" role="dialog">
+    <!--
+        =================================
+        Collection Confirm Delete (Modal)
+        =================================
+    -->
+    <div class="modal fade" id="collectionConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this collection?
+                    Delete Collection?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteCollecion" class="btn btn-danger" onclick="cmdCollectionConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button class="btn btn-danger" id="btnCollecionConfirmDelete" onclick="btnCollectionConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button class="btn btn-primary" id="btnCollectionConfirmDeleteCloseModal" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -159,61 +191,70 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var collections;
-        var collectionGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
-        var cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter');
-        var cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter');
-        var isStartDateFirstSelect = true;
-        var isEndDateFirstSelect = true;
+        // =============================
+        // Collection Date Range Filters
+        // =============================
+        var cboCollectionStartDateFilter = new wijmo.input.InputDate('#cboCollectionStartDateFilter');
+        var cboCollectionEndDateFilter = new wijmo.input.InputDate('#cboCollectionEndDateFilter');
+        var isCboCollectionStartDateFilterSelected = true;
+        var isCboCollectionEndDateFilterSelected = true;
 
-        // ===========
-        // Date Filter
-        // ===========
-        function cboDateFilters() {
-            cboStartDateFilter.dispose();
-            cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter', {
+        // ========================================
+        // Collection Collection View and Flex Grid
+        // ========================================
+        var collectionCollectionView;
+        var collectionFlexGrid;
+
+        // =============================
+        // Collection Navigation Buttons
+        // =============================
+        var btnCollectionMoveToFirstPageGrid = document.getElementById('btnCollectionMoveToFirstPageGrid');
+        var btnCollectionMoveToPreviousPageGrid = document.getElementById('btnCollectionMoveToPreviousPageGrid');
+        var btnCollectionMoveToNextPageGrid = document.getElementById('btnCollectionMoveToNextPageGrid');
+        var btnCollectionMoveToLastPageGrid = document.getElementById('btnCollectionMoveToLastPageGrid');
+        var btnCollectionCurrentPageGrid = document.getElementById('btnCollectionCurrentPageGrid');
+
+        // ===============================
+        // Create Combo Date Range Filters
+        // ===============================
+        function createCboDateRangeFilters() {
+            cboCollectionStartDateFilter.dispose();
+            cboCollectionStartDateFilter = new wijmo.input.InputDate('#cboCollectionStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
+                    if (!isCboCollectionStartDateFilterSelected) {
                         refreshCollectionFlexGrid();
                     } else {
-                        isStartDateFirstSelect = false;
+                        isCboCollectionStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboEndDateFilter.dispose();
-            cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter', {
+            cboCollectionEndDateFilter.dispose();
+            cboCollectionEndDateFilter = new wijmo.input.InputDate('#cboCollectionEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isEndDateFirstSelect) {
+                    if (!isCboCollectionEndDateFilterSelected) {
                         refreshCollectionFlexGrid();
                     } else {
-                        isEndDateFirstSelect = false;
+                        isCboCollectionEndDateFilterSelected = false;
                     }
                 }
             });
         }
 
-        // ====================================
-        // GET Collection List Filter by ORDate
-        // ====================================
-        function getCollectionFilterByORDate() {
+        // ===================
+        // Get Collection Data
+        // ===================
+        function getCollectionData() {
             NProgress.start();
-            var startDate = cboStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboCollectionStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboCollectionEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
             var collectionsObservableArray = new wijmo.collections.ObservableArray;
+
             $.ajax({
                 url: '/api/collection/list/' + startDate + '/' + endDate,
                 cache: false,
@@ -226,8 +267,8 @@
                             var ORDate = ('0' + (ORDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + ORDateResult.getDate()).slice(-2) + '-' + ORDateResult.getFullYear();
 
                             collectionsObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='collectionEditButton' onclick='cmdCollectionEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdCollectionDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='collectionEditButton' onclick='btnCollectionEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnCollectionDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 ORNumber: results[i]["ORNumber"],
                                 ORDate: ORDate,
@@ -252,228 +293,39 @@
             return collectionsObservableArray;
         }
 
-        // =====================
-        // Collection Add Button
-        // =====================
-        function btnAddCollection_OnClick() {
-            document.getElementById('btnAddCollection').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddCollection').prop('disabled', true);
-            $('#btnCloseCollection').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/collection/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/CollectionDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddCollection').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCollection').prop('disabled', false);
-                        $('#btnCloseCollection').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddCollection').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCollection').prop('disabled', false);
-                        $('#btnCloseCollection').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddCollection').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCollection').prop('disabled', false);
-                        $('#btnCloseCollection').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // =======================
-        // Collection Close Button
-        // =======================
-        function btnCloseCollection_OnClick() {
-            window.location = '/Software';
-        }
-
-        // ======================
-        // Collection Edit Button
-        // ======================
-        function cmdCollectionEditButton_OnClick() {
-            collections.editItem(collections.currentItem);
-            var collection = collections.currentEditItem;
-            var collectionId = collection.Id;
-            window.location = '/Software/CollectionDetail?id=' + collectionId;
-        }
-
-        // ========================
-        // Collection delete Button
-        // ========================
-        function cmdCollectionDeleteButton_OnClick() {
-            collections.editItem(collections.currentItem);
-            var collection = collections.currentEditItem;
-            if (collection.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteCollecionConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-
-                document.getElementById('cmdConfirmDeleteCollecion').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteCollecion").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-            }
-        }
-
-        // Company Confirm Delete Button
-        function cmdCollectionConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteCollecion').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteCollecion").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
-
-            collections.editItem(collections.currentItem);
-            var id = collections.currentEditItem.Id;
-
-            $.ajax({
-                url: '/api/collection/delete/' + id,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteCollecionConfirm').modal('hide');
-                        refreshCollectionFlexGrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdConfirmDeleteCollecion').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCollecion").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdConfirmDeleteCollecion').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCollecion").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdConfirmDeleteCollecion').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCollecion").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            var item = collections.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // =================================
-        // Navigation Buttons for Collection
-        // =================================
-        function updateNavigateButtonsCollections() {
-            if (collections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (collections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (collections.pageIndex === (collections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (collections.pageIndex + 1) + ' / ' + collections.pageCount;
-        }
-
         // ===========================
-        // Refresh Collection FlexGrid
+        // Create Collection Flex Gird
         // ===========================
-        function refreshCollectionFlexGrid() {
-            collections = new wijmo.collections.CollectionView(getCollectionFilterByORDate());
-            collections.canFilter = true;
-            collections.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                collections.refresh();
-            });
-
-            collections.filter = function (item) {
-                return !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualORNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Customer.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            collections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCollections();
-            });
-
-            collections.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            collectionGrid.itemsSource = collections;
-            collectionGrid.trackChanges = true;
-        }
-
-        // ===================
-        // Collection FlexGrid
-        // ===================
         function createCollectionFlexGrid() {
-            cboDateFilters();
-            collections = new wijmo.collections.CollectionView(getCollectionFilterByORDate());
-            collections.canFilter = true;
-            collections.pageSize = 15;
+            createCboDateRangeFilters();
+
+            collectionCollectionView = new wijmo.collections.CollectionView(getCollectionData());
+            collectionCollectionView.canFilter = true;
+            collectionCollectionView.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCollectionSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                collections.refresh();
+                collectionCollectionView.refresh();
             });
 
-            collections.filter = function (item) {
+            collectionCollectionView.filter = function (item) {
                 return !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
                     || (item.ManualORNumber.toLowerCase().indexOf(filterText) > -1)
                     || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || (item.Customer.toLowerCase().indexOf(filterText) > -1);
             }
 
-            collections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCollections();
+            collectionCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateCollectionNavigationButtons();
             });
 
-            collections.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+            collectionCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateCollectionDetailsFlexGridSelection();
             });
 
-            // Flex Grid
-            collectionGrid = new wijmo.grid.FlexGrid('#CollectionGrid');
-            collectionGrid.initialize({
+            collectionFlexGrid = new wijmo.grid.FlexGrid('#collectionFlexGrid');
+            collectionFlexGrid.initialize({
                 columns: [
                             @{
                                 if (canEdit)
@@ -550,53 +402,245 @@
                             }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: collections,
+                itemsSource: collectionCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            collectionGrid.trackChanges = true;
+            collectionFlexGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            updateCollectionNavigationButtons();
 
-            updateNavigateButtonsCollections();
-
-            btnFirstPageGrid.addEventListener('click', function () {
-                collections.moveToFirstPage();
-                updateNavigateButtonsCollections();
+            btnCollectionMoveToFirstPageGrid.addEventListener('click', function () {
+                collectionCollectionView.moveToFirstPage();
+                updateCollectionNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                collections.moveToPreviousPage();
-                updateNavigateButtonsCollections();
+            btnCollectionMoveToPreviousPageGrid.addEventListener('click', function () {
+                collectionCollectionView.moveToPreviousPage();
+                updateCollectionNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                collections.moveToNextPage();
-                updateNavigateButtonsCollections();
+            btnCollectionMoveToNextPageGrid.addEventListener('click', function () {
+                collectionCollectionView.moveToNextPage();
+                updateCollectionNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                collections.moveToLastPage();
-                updateNavigateButtonsCollections();
+            btnCollectionMoveToLastPageGrid.addEventListener('click', function () {
+                collectionCollectionView.moveToLastPage();
+                updateCollectionNavigationButtons();
             });
         }
 
-        // ===========
-        // Onload Page
-        // ===========
+        // =============================================
+        // Update Collection Details Flex Grid Selection
+        // =============================================
+        function updateCollectionDetailsFlexGridSelection() {
+            var item = collectionCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ====================================
+        // Update Collection Navigation Buttons
+        // ====================================
+        function updateCollectionNavigationButtons() {
+            if (collectionCollectionView.pageSize <= 0) {
+                document.getElementById('collectionNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('collectionNavigationPageGrid').style.display = 'block';
+            if (collectionCollectionView.pageIndex === 0) {
+                btnCollectionMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (collectionCollectionView.pageIndex === (collectionCollectionView.pageCount - 1)) {
+                btnCollectionMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCollectionMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCollectionCurrentPageGrid.innerHTML = (collectionCollectionView.pageIndex + 1) + ' / ' + collectionCollectionView.pageCount;
+        }
+
+        // ============================
+        // Refresh Collection Flex Grid
+        // ============================
+        function refreshCollectionFlexGrid() {
+            collectionCollectionView = new wijmo.collections.CollectionView(getCollectionData());
+            collectionCollectionView.canFilter = true;
+            collectionCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpCollectionSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                collectionCollectionView.refresh();
+            });
+
+            collectionCollectionView.filter = function (item) {
+                return !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualORNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Customer.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            collectionCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateCollectionNavigationButtons();
+            });
+
+            collectionCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateCollectionDetailsFlexGridSelection();
+            });
+
+            collectionFlexGrid.itemsSource = collectionCollectionView;
+            collectionFlexGrid.trackChanges = true;
+        }
+
+        // ==============
+        // Add Collection
+        // ==============
+        function btnCollectionAddOnclick() {
+            document.getElementById('btnCollectionAdd').innerHTML = "<i class='fa fa-plus'></i> Adding...";
+            $('#btnCollectionAdd').prop('disabled', true);
+            $('#btnCollectionClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/collection/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/CollectionDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCollectionAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCollectionAdd').prop('disabled', false);
+                        $('#btnCollectionClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCollectionAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCollectionAdd').prop('disabled', false);
+                        $('#btnCollectionClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCollectionAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCollectionAdd').prop('disabled', false);
+                        $('#btnCollectionClose').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // ===============
+        // Edit Collection
+        // ===============
+        function btnCollectionEditOnclick() {
+            collectionCollectionView.editItem(collectionCollectionView.currentItem);
+            var collection = collectionCollectionView.currentEditItem;
+            var collectionId = collection.Id;
+            window.location = '/Software/CollectionDetail?id=' + collectionId;
+        }
+
+        // =================
+        // Delete Collection
+        // =================
+        function btnCollectionDeleteOnclick() {
+            collectionCollectionView.editItem(collectionCollectionView.currentItem);
+            var collection = collectionCollectionView.currentEditItem;
+            if (collection.IsLocked) {
+                toastr.error("Delete is not allowed when the selected record is locked!");
+            } else {
+                $('#collectionConfirmDeleteModal').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                document.getElementById('btnCollecionConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $("#btnCollecionConfirmDelete").prop("disabled", false);
+                $("#btnCollectionConfirmDeleteCloseModal").prop("disabled", false);
+            }
+        }
+
+        // =========================
+        // Confirm Delete Collection
+        // =========================
+        function btnCollectionConfirmDeleteOnclick() {
+            document.getElementById('btnCollecionConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnCollecionConfirmDelete").prop("disabled", true);
+            $("#btnCollectionConfirmDeleteCloseModal").prop("disabled", true);
+
+            collectionCollectionView.editItem(collectionCollectionView.currentItem);
+            var id = collectionCollectionView.currentEditItem.Id;
+
+            $.ajax({
+                url: '/api/collection/delete/' + id,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#collectionConfirmDeleteModal').modal('hide');
+                        refreshCollectionFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCollecionConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCollecionConfirmDelete").prop("disabled", false);
+                        $("#btnCollectionConfirmDeleteCloseModal").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCollecionConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCollecionConfirmDelete").prop("disabled", false);
+                        $("#btnCollectionConfirmDeleteCloseModal").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCollecionConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCollecionConfirmDelete").prop("disabled", false);
+                        $("#btnCollectionConfirmDeleteCloseModal").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ================
+        // Close Collection
+        // ================
+        function btnCollectionCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             createCollectionFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -614,12 +658,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -643,8 +687,11 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
-            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
+            document.getElementById('updateUserBranch').innerHTML = "Updating";
             $("#updateUserBranch").prop("disabled", true);
             $("#closeUserBranch").prop("disabled", true);
 
@@ -682,6 +729,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
@@ -696,6 +746,5 @@
             slideLeft.open();
         });
     </script>
-
 </body>
 </html>
