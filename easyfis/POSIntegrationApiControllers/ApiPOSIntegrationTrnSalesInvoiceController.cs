@@ -162,7 +162,6 @@ namespace easyfis.POSIntegrationApiControllers
                                         }
                                     }
 
-                                    Debug.WriteLine("c");
                                     if (itemExist)
                                     {
                                         Int32? itemInventoryId = null;
@@ -171,10 +170,8 @@ namespace easyfis.POSIntegrationApiControllers
                                                                && d.ArticleId == items.FirstOrDefault().Id
                                                                select d;
 
-                                        Debug.WriteLine("d");
                                         if (articleInventory.Any())
                                         {
-                                            Debug.WriteLine("e");
                                             itemInventoryId = articleInventory.FirstOrDefault().Id;
                                         }
 
