@@ -197,7 +197,7 @@ namespace easyfis.ModifiedApiControllers
         // ==================================
         // Pop-Up List - Sales Invoice Status
         // ==================================
-        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/{customerId}/{startDate}/{endDate}")]
+        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perCustomer/{customerId}/{startDate}/{endDate}")]
         public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatus(String customerId, String startDate, String endDate)
         {
             var currentUser = from d in db.MstUsers
@@ -232,7 +232,7 @@ namespace easyfis.ModifiedApiControllers
         // ===============================================
         // Pop-Up List - Sales Invoice Status (Per Branch)
         // ===============================================
-        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perCurrentBranch/{startDate}/{endDate}")]
+        [Authorize, HttpGet, Route("api/collectionLine/popUp/list/salesInvoiceStatus/perBranch/{startDate}/{endDate}")]
         public List<Entities.TrnSalesInvoice> PopUpListCollectionLineListSalesInvoiceStatusPerCurrentBranch(String startDate, String endDate)
         {
             var currentUser = from d in db.MstUsers
