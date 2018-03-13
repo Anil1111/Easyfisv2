@@ -26,7 +26,7 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
-                    
+
                     <!--
                         ===============
                         Search / Filter
@@ -57,7 +57,7 @@
                             </tr>
                         </table>
                     </div>
-                    
+
                     <!--
                         ==================
                         Date Range Filters
@@ -96,7 +96,7 @@
                             </tr>
                         </table>
                     </div>
-                    
+
                     <!--
                         =========
                         Flex Grid
@@ -105,7 +105,7 @@
                     <div class="panel-body">
                         <div id="collectionBookFlexGrid" class="grid"></div>
                     </div>
-                    
+
                     <!--
                         ==================
                         Navigation Buttons
@@ -131,7 +131,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!--
                     ======
                     Totals
@@ -175,33 +175,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables - Stopped Here...
-        // ================
+        // =============================
+        // Collection Date Range Filters
+        // =============================
         var cboCollectionBookStartDateFilter = new wijmo.input.InputDate('#cboCollectionBookStartDateFilter');
         var cboCollectionBookEndDateFilter = new wijmo.input.InputDate('#cboCollectionBookEndDateFilter');
-        var isARCollectionBookStartDateSelected = false;
-        var isARCollectionBookEndDateSelected = false;
+        var isCboCollectionBookStartDateFilterSelected = false;
+        var isCboCollectionBookEndDateFilterSelected = false;
 
+        // ==========================
+        // Company and Branch Filters
+        // ==========================
         var cboCollectionBookCompanyFilter = new wijmo.input.ComboBox('#cboCollectionBookCompanyFilter');
+        var isCboCollectionBookCompanyFilterSelected = false;
         var cboCollectionBookBranchFilter = new wijmo.input.ComboBox('#cboCollectionBookBranchFilter');
 
+        // ==========================
+        // Collection View, Flex Grid
+        // ==========================
         var collectionBookCollections;
         var collectionBookFlexGrid;
-        var isARCollectionBookCompanySelected = false;
         var cboCollectionBookDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionBookDisplayNumberOfRows');
 
-        var btnFirstPageGrid = document.getElementById('btnCollectionBookMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnCollectionBookMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnCollectionBookMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnCollectionBookMoveToLastPageGrid');
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnCollectionBookMoveToFirstPageGrid = document.getElementById('btnCollectionBookMoveToFirstPageGrid');
+        var btnCollectionBookMoveToPreviousPageGrid = document.getElementById('btnCollectionBookMoveToPreviousPageGrid');
+        var btnCollectionBookMoveToNextPageGrid = document.getElementById('btnCollectionBookMoveToNextPageGrid');
+        var btnCollectionBookMoveToLastPageGrid = document.getElementById('btnCollectionBookMoveToLastPageGrid');
         var btnCollectionBookCurrentPageGrid = document.getElementById('btnCollectionBookCurrentPageGrid');
-        var currentPageIndex = 0;
+        var collectionBookCurrentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -215,21 +224,21 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function collectionBookDateFilters() {
+        // =========================
+        // Create Combo Date Filters
+        // =========================
+        function createCboCollectionBookDateFilters() {
             NProgress.start();
             cboCollectionBookStartDateFilter.dispose();
             cboCollectionBookStartDateFilter = new wijmo.input.InputDate('#cboCollectionBookStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isARCollectionBookStartDateSelected) {
+                    if (!isCboCollectionBookStartDateFilterSelected) {
                         NProgress.start();
                         refreshCollectionBookFlexGrid();
                     } else {
-                        isARCollectionBookStartDateSelected = false;
+                        isCboCollectionBookStartDateFilterSelected = false;
                     }
                 }
             });
@@ -237,24 +246,24 @@
             cboCollectionBookEndDateFilter.dispose();
             cboCollectionBookEndDateFilter = new wijmo.input.InputDate('#cboCollectionBookEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isARCollectionBookEndDateSelected) {
+                    if (!isCboCollectionBookEndDateFilterSelected) {
                         NProgress.start();
                         refreshCollectionBookFlexGrid();
                     } else {
-                        isARCollectionBookEndDateSelected = false;
+                        isCboCollectionBookEndDateFilterSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCollectionBookCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCollectionBookCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/company/list',
@@ -289,25 +298,25 @@
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
                             $("#btnCollectionBookDownloadCSV").prop("disabled", false);
                             $("#btnCollectionBookPrintPDF").prop("disabled", false);
-                            isARCollectionBookCompanySelected = true;
-                            createCboBranch();
+                            isCboCollectionBookCompanyFilterSelected = true;
+                            createCboCollectionBookBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboCollectionBookBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboCollectionBookBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
             if (cboCollectionBookCompanyFilter.selectedValue != null) {
                 $.ajax({
@@ -344,23 +353,23 @@
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshCollectionBookFlexGrid();
                             }
                         });
 
-                        createCboShowRows();
+                        createCboCollectionBookDisplayNumberOfRows();
                     }
                 });
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // =============================
+        // Create Display Number of Rows
+        // =============================
+        function createCboCollectionBookDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -411,20 +420,21 @@
                 }
             });
 
-            if (!isARCollectionBookCompanySelected) {
+            if (!isCboCollectionBookCompanyFilterSelected) {
                 createCollectionBookFlexGrid();
             } else {
                 refreshCollectionBookFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Receiving Receipt Book Data
-        // ===============================
-        function getCollectionBook() {
+        // ========================
+        // Get Collection Book Data
+        // ========================
+        function getCollecitonBookData() {
             var collectionBooks = new wijmo.collections.ObservableArray;
             if (cboCollectionBookCompanyFilter.selectedValue != null) {
                 if (cboCollectionBookBranchFilter.selectedValue != null) {
+
                     var startDate = cboCollectionBookStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
                     var endDate = cboCollectionBookEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
                     var companyId = cboCollectionBookCompanyFilter.selectedValue;
@@ -435,29 +445,31 @@
                         cache: false,
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
-                        success: function (collectionBookResult) {
+                        success: function (results) {
+
                             var totalDebit = 0;
                             var totalCredit = 0;
                             var totalBalance = 0;
-                            if (collectionBookResult.length > 0) {
-                                for (i = 0; i < collectionBookResult.length; i++) {
+
+                            if (results.length > 0) {
+                                for (i = 0; i < results.length; i++) {
                                     collectionBooks.push({
-                                        DocumentReference: collectionBookResult[i]["DocumentReference"],
-                                        ManualDocumentCode: collectionBookResult[i]["ManualDocumentCode"],
-                                        AccountCode: collectionBookResult[i]["AccountCode"],
-                                        Account: collectionBookResult[i]["Account"],
-                                        Article: collectionBookResult[i]["Article"],
-                                        DebitAmount: collectionBookResult[i]["DebitAmount"],
-                                        DebitAmountDisplay: parseFloat(collectionBookResult[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                        CreditAmount: collectionBookResult[i]["CreditAmount"],
-                                        CreditAmountDisplay: parseFloat(collectionBookResult[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                        Balance: collectionBookResult[i]["DebitAmount"] - collectionBookResult[i]["CreditAmount"],
-                                        BalanceDisplay: parseFloat(collectionBookResult[i]["DebitAmount"] - collectionBookResult[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        DocumentReference: results[i]["DocumentReference"],
+                                        ManualDocumentCode: results[i]["ManualDocumentCode"],
+                                        AccountCode: results[i]["AccountCode"],
+                                        Account: results[i]["Account"],
+                                        Article: results[i]["Article"],
+                                        DebitAmount: results[i]["DebitAmount"],
+                                        DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        CreditAmount: results[i]["CreditAmount"],
+                                        CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Balance: results[i]["DebitAmount"] - results[i]["CreditAmount"],
+                                        BalanceDisplay: parseFloat(results[i]["DebitAmount"] - results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                     });
 
-                                    totalDebit += collectionBookResult[i]["DebitAmount"];
-                                    totalCredit += collectionBookResult[i]["CreditAmount"];
-                                    totalBalance += collectionBookResult[i]["DebitAmount"] - collectionBookResult[i]["CreditAmount"];
+                                    totalDebit += results[i]["DebitAmount"];
+                                    totalCredit += results[i]["CreditAmount"];
+                                    totalBalance += results[i]["DebitAmount"] - results[i]["CreditAmount"];
                                 }
                             }
 
@@ -483,88 +495,11 @@
             return collectionBooks;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (collectionBookCollections.pageSize <= 0) {
-                document.getElementById('collectionBookNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('collectionBookNavigationPageGrid').style.display = 'block';
-            if (collectionBookCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (collectionBookCollections.pageIndex === (collectionBookCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCollectionBookCurrentPageGrid.innerHTML = (collectionBookCollections.pageIndex + 1) + ' / ' + collectionBookCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshCollectionBookFlexGrid() {
-            collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
-            collectionBookCollections.canFilter = true;
-            collectionBookCollections.pageSize = cboCollectionBookDisplayNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#inpCollectionBookSearchFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                collectionBookCollections.refresh();
-
-                if (collectionBookCollections.items.length > 0) {
-                    var totalDebit = 0;
-                    var totalCredit = 0;
-                    var totalBalance = 0;
-                    for (var i = 0; i < collectionBookCollections.items.length; i++) {
-                        totalDebit += collectionBookCollections.items[i].DebitAmount;
-                        totalCredit += collectionBookCollections.items[i].CreditAmount;
-                        totalBalance += collectionBookCollections.items[i].Balance;
-                    }
-
-                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
-            });
-
-            collectionBookCollections.filter = function (item) {
-                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualDocumentCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            collectionBookCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            collectionBookFlexGrid.itemsSource = collectionBookCollections;
-            collectionBookFlexGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ================================
+        // Create Collection Book Flex Grid
+        // ================================
         function createCollectionBookFlexGrid() {
-            collectionBookCollections = new wijmo.collections.CollectionView(getCollectionBook());
+            collectionBookCollections = new wijmo.collections.CollectionView(getCollecitonBookData());
             collectionBookCollections.canFilter = true;
             collectionBookCollections.pageSize = cboCollectionBookDisplayNumberOfRows.selectedValue;
 
@@ -602,7 +537,7 @@
             }
 
             collectionBookCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updateCollectionBookNavigationButtons();
             });
 
             collectionBookFlexGrid = new wijmo.grid.FlexGrid('#collectionBookFlexGrid');
@@ -671,36 +606,113 @@
 
             collectionBookFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateCollectionBookNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnCollectionBookMoveToFirstPageGrid.addEventListener('click', function () {
                 collectionBookCollections.moveToFirstPage();
-                currentPageIndex = collectionBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionBookCurrentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateCollectionBookNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnCollectionBookMoveToPreviousPageGrid.addEventListener('click', function () {
                 collectionBookCollections.moveToPreviousPage();
-                currentPageIndex = collectionBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionBookCurrentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateCollectionBookNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnCollectionBookMoveToNextPageGrid.addEventListener('click', function () {
                 collectionBookCollections.moveToNextPage();
-                currentPageIndex = collectionBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionBookCurrentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateCollectionBookNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnCollectionBookMoveToLastPageGrid.addEventListener('click', function () {
                 collectionBookCollections.moveToLastPage();
-                currentPageIndex = collectionBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionBookCurrentPageIndex = collectionBookCollections.pageIndex + 1;
+                updateCollectionBookNavigationButtons();
             });
         }
 
-        // ============
-        // Download CSV
-        // ============
+        // =================================
+        // Refresh Collection Book Flex Grid
+        // =================================
+        function refreshCollectionBookFlexGrid() {
+            collectionBookCollections = new wijmo.collections.CollectionView(getCollecitonBookData());
+            collectionBookCollections.canFilter = true;
+            collectionBookCollections.pageSize = cboCollectionBookDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpCollectionBookSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                collectionBookCollections.refresh();
+
+                if (collectionBookCollections.items.length > 0) {
+                    var totalDebit = 0;
+                    var totalCredit = 0;
+                    var totalBalance = 0;
+                    for (var i = 0; i < collectionBookCollections.items.length; i++) {
+                        totalDebit += collectionBookCollections.items[i].DebitAmount;
+                        totalCredit += collectionBookCollections.items[i].CreditAmount;
+                        totalBalance += collectionBookCollections.items[i].Balance;
+                    }
+
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+            });
+
+            collectionBookCollections.filter = function (item) {
+                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualDocumentCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            collectionBookCollections.collectionChanged.addHandler(function (sender, args) {
+                updateCollectionBookNavigationButtons();
+            });
+
+            collectionBookFlexGrid.itemsSource = collectionBookCollections;
+            collectionBookFlexGrid.trackChanges = true;
+        }
+
+        // =========================================
+        // Update Collection Book Navigation Buttons
+        // =========================================
+        function updateCollectionBookNavigationButtons() {
+            if (collectionBookCollections.pageSize <= 0) {
+                document.getElementById('collectionBookNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('collectionBookNavigationPageGrid').style.display = 'block';
+            if (collectionBookCollections.pageIndex === 0) {
+                btnCollectionBookMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionBookMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionBookMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (collectionBookCollections.pageIndex === (collectionBookCollections.pageCount - 1)) {
+                btnCollectionBookMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionBookMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCollectionBookMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionBookMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCollectionBookCurrentPageGrid.innerHTML = (collectionBookCollections.pageIndex + 1) + ' / ' + collectionBookCollections.pageCount;
+        }
+
+        // ===================================
+        // Download Collection Book Report CSV
+        // ===================================
         function btnCollectionBookDownloadCSVOnclick() {
             var CSV = '';
             var collectionBook = [];
@@ -730,7 +742,7 @@
 
                 collectionBookCollections.moveToNextPage();
                 if (p == collectionBookCollections.pageCount) {
-                    collectionBookCollections.moveToPage(currentPageIndex - 1);
+                    collectionBookCollections.moveToPage(collectionBookCurrentPageIndex - 1);
                 }
             }
 
@@ -792,7 +804,7 @@
         }
 
         // =====================
-        // Preview and Print PDF
+        // Print Collection Book
         // =====================
         function btnCollectionBookPrintPDFOnclick() {
             if (cboCollectionBookCompanyFilter.selectedValue != null) {
@@ -811,15 +823,22 @@
             }
         }
 
-        // ============
-        // On Load Page
-        // ============
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            collectionBookDateFilters();
+            createCboCollectionBookDateFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -866,6 +885,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -905,6 +927,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
