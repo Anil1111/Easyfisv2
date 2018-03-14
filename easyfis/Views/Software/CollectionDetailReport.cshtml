@@ -26,70 +26,94 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="collectionDetailReportInputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCollectionDetailReportSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboCollectionDetailReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboCollectionDetailReportDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnCollectionDetailReportCSVOnclick()" id="btnCollectionDetailReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnCollectionDetailReportPDFOnclick()" id="btnCollectionDetailReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnCollectionDetailReportDownloadCSVOnclick()" id="btnCollectionDetailReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnCollectionDetailReportPrintPDFOnclick()" id="btnCollectionDetailReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboCollectionDetailReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboCollectionDetailReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboCollectionDetailReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboCollectionDetailReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboCollectionDetailReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboCollectionDetailReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboCollectionDetailReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboCollectionDetailReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="collectionDetailReportGrid" style="font-size: 11.5px;"></div>
+                        <div id="collectionDetailReportFlexGrid" style="font-size: 11.5px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="btnCollectionDetailReportNavigationPageGrid">
+                            <div class="btn-group col-md-7" id="collectionDetailReportNavigationPageGrid">
                                 <button type="button" class="btn btn-default border-custom" id="btnCollectionDetailReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
@@ -107,6 +131,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -117,7 +147,7 @@
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -133,33 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboCollectionDetailReportStartDate = new wijmo.input.InputDate('#cboCollectionDetailReportStartDate');
-        var cboCollectionDetailReportEndDate = new wijmo.input.InputDate('#cboCollectionDetailReportEndDate');
-        var isCollectionDetailReportStartDateSelected = false;
-        var isCollectionDetailReportEndDateSelected = false;
+        // ============
+        // Date Filters
+        // ============
+        var cboCollectionDetailReportStartDateFilter = new wijmo.input.InputDate('#cboCollectionDetailReportStartDateFilter');
+        var cboCollectionDetailReportEndDateFilter = new wijmo.input.InputDate('#cboCollectionDetailReportEndDateFilter');
+        var isCboCollectionDetailReportStartDateFilterSelected = false;
+        var isCboCollectionDetailReporEndDateFilterSelected = false;
 
-        var cboCollectionDetailReportCompany = new wijmo.input.ComboBox('#cboCollectionDetailReportCompany');
-        var cboCollectionDetailReportBranch = new wijmo.input.ComboBox('#cboCollectionDetailReportBranch');
-        var isCollectionDetailReportCompanySelected = false;
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboCollectionDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboCollectionDetailReportCompanyFilter');
+        var isCboCollectionDetailReportCompanyFilterSelected = false;
+        var cboCollectionDetailReportBranchFilter = new wijmo.input.ComboBox('#cboCollectionDetailReportBranchFilter');
 
-        var collectionDetailReportCollections;
-        var collectionDetailReportGrid;
-        var cboCollectionDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDetailReportShowNumberOfRows');
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var collectionDetailReportCollectionView;
+        var collectionDetailReportFlexGrid;
+        var cboCollectionDetailReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDetailReportDisplayNumberOfRows');
 
+        // ==================
+        // Navigation Buttons
+        // ==================
         var btnCollectionDetailReportMoveToFirstPageGrid = document.getElementById('btnCollectionDetailReportMoveToFirstPageGrid');
         var btnCollectionDetailReportMoveToPreviousPageGrid = document.getElementById('btnCollectionDetailReportMoveToPreviousPageGrid');
         var btnCollectionDetailReportMoveToNextPageGrid = document.getElementById('btnCollectionDetailReportMoveToNextPageGrid');
         var btnCollectionDetailReportMoveToLastPageGrid = document.getElementById('btnCollectionDetailReportMoveToLastPageGrid');
         var btnCollectionDetailReportCurrentPageGrid = document.getElementById('btnCollectionDetailReportCurrentPageGrid');
-        var currentPageIndex = 0;
+        var collectionDetailReportCurrentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -173,47 +212,47 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function collectionDetailReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
 
-            cboCollectionDetailReportStartDate.dispose();
-            cboCollectionDetailReportStartDate = new wijmo.input.InputDate('#cboCollectionDetailReportStartDate', {
+            cboCollectionDetailReportStartDateFilter.dispose();
+            cboCollectionDetailReportStartDateFilter = new wijmo.input.InputDate('#cboCollectionDetailReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isCollectionDetailReportStartDateSelected) {
+                    if (!isCboCollectionDetailReportStartDateFilterSelected) {
                         NProgress.start();
                         refreshCollectionDetailReportFlexGrid();
                     } else {
-                        isCollectionDetailReportStartDateSelected = false;
+                        isCboCollectionDetailReportStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboCollectionDetailReportEndDate.dispose();
-            cboCollectionDetailReportEndDate = new wijmo.input.InputDate('#cboCollectionDetailReportEndDate', {
+            cboCollectionDetailReportEndDateFilter.dispose();
+            cboCollectionDetailReportEndDateFilter = new wijmo.input.InputDate('#cboCollectionDetailReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isCollectionDetailReportEndDateSelected) {
+                    if (!isCboCollectionDetailReporEndDateFilterSelected) {
                         NProgress.start();
                         refreshCollectionDetailReportFlexGrid();
                     } else {
-                        isCollectionDetailReportEndDateSelected = false;
+                        isCboCollectionDetailReporEndDateFilterSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/collectionDetailReport/dropdown/list/company',
@@ -234,40 +273,40 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnCollectionDetailReportCSV").prop("disabled", true);
-                        $("#btnCollectionDetailReportPDF").prop("disabled", true);
+                        $("#btnCollectionDetailReportDownloadCSV").prop("disabled", true);
+                        $("#btnCollectionDetailReportPrintPDF").prop("disabled", true);
                     }
 
-                    cboCollectionDetailReportCompany.dispose();
-                    cboCollectionDetailReportCompany = new wijmo.input.ComboBox('#cboCollectionDetailReportCompany', {
+                    cboCollectionDetailReportCompanyFilter.dispose();
+                    cboCollectionDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboCollectionDetailReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnCollectionDetailReportCSV").prop("disabled", false);
-                            $("#btnCollectionDetailReportPDF").prop("disabled", false);
-                            isCollectionDetailReportCompanySelected = true;
-                            createCboBranch();
+                            $("#btnCollectionDetailReportDownloadCSV").prop("disabled", false);
+                            $("#btnCollectionDetailReportPrintPDF").prop("disabled", false);
+                            isCboCollectionDetailReportCompanyFilterSelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboCollectionDetailReportCompany.selectedValue != null) {
+            if (cboCollectionDetailReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/collectionDetailReport/dropdown/list/branch/' + cboCollectionDetailReportCompany.selectedValue,
+                    url: '/api/collectionDetailReport/dropdown/list/branch/' + cboCollectionDetailReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -285,34 +324,34 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnCollectionDetailReportCSV").prop("disabled", true);
-                            $("#btnCollectionDetailReportPDF").prop("disabled", true);
+                            $("#btnCollectionDetailReportDownloadCSV").prop("disabled", true);
+                            $("#btnCollectionDetailReportPrintPDF").prop("disabled", true);
                         }
 
-                        cboCollectionDetailReportBranch.dispose();
-                        cboCollectionDetailReportBranch = new wijmo.input.ComboBox('#cboCollectionDetailReportBranch', {
+                        cboCollectionDetailReportBranchFilter.dispose();
+                        cboCollectionDetailReportBranchFilter = new wijmo.input.ComboBox('#cboCollectionDetailReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshCollectionDetailReportFlexGrid();
                             }
                         });
 
-                        createCboShowRows();
+                        createCboDisplayNumberOfRows();
                     }
                 });
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -342,8 +381,8 @@
                 });
             }
 
-            cboCollectionDetailReportShowNumberOfRows.dispose();
-            cboCollectionDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDetailReportShowNumberOfRows', {
+            cboCollectionDetailReportDisplayNumberOfRows.dispose();
+            cboCollectionDetailReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboCollectionDetailReportDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -353,34 +392,35 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboCollectionDetailReportShowNumberOfRows.selectedValue;
-                        collectionDetailReportCollections.pageSize = parseInt(numberOfRows);
-                        collectionDetailReportCollections.refresh();
-                        collectionDetailReportGrid.refresh();
+                        var numberOfRows = cboCollectionDetailReportDisplayNumberOfRows.selectedValue;
+                        collectionDetailReportCollectionView.pageSize = parseInt(numberOfRows);
+                        collectionDetailReportCollectionView.refresh();
+                        collectionDetailReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isCollectionDetailReportCompanySelected) {
+            if (!isCboCollectionDetailReportCompanyFilterSelected) {
                 createCollectionDetailReportFlexGrid();
             } else {
                 refreshCollectionDetailReportFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Collection Order Detail Data
-        // ===============================
-        function getCollectionDetailReport() {
+        // =================================
+        // Get Collection Detail Report Data
+        // =================================
+        function getCollectionDetailReportData() {
             var collectionDetailReports = new wijmo.collections.ObservableArray;
-            if (cboCollectionDetailReportCompany.selectedValue != null) {
-                if (cboCollectionDetailReportBranch.selectedValue != null) {
-                    var startDate = cboCollectionDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboCollectionDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboCollectionDetailReportCompany.selectedValue;
-                    var branchId = cboCollectionDetailReportBranch.selectedValue;
+            if (cboCollectionDetailReportCompanyFilter.selectedValue != null) {
+                if (cboCollectionDetailReportBranchFilter.selectedValue != null) {
+
+                    var startDate = cboCollectionDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCollectionDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCollectionDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboCollectionDetailReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/collectionDetailReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -388,7 +428,7 @@
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
                         success: function (results) {
-                            var totalAmount = 0;
+                            var inpTotalAmount = 0;
                             if (results.length > 0) {
                                 for (i = 0; i < results.length; i++) {
                                     var docLink = "/Software/CollectionDetail?id=" + results[i]["ORId"];
@@ -419,105 +459,41 @@
                                         AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                     });
 
-                                    totalAmount += results[i]["Amount"];
+                                    inpTotalAmount += results[i]["Amount"];
                                 }
                             }
 
-                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalAmount").value = parseFloat(inpTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return collectionDetailReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (collectionDetailReportCollections.pageSize <= 0) {
-                document.getElementById('btnCollectionDetailReportNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('btnCollectionDetailReportNavigationPageGrid').style.display = 'block';
-            if (collectionDetailReportCollections.pageIndex === 0) {
-                btnCollectionDetailReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnCollectionDetailReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnCollectionDetailReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (collectionDetailReportCollections.pageIndex === (collectionDetailReportCollections.pageCount - 1)) {
-                btnCollectionDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnCollectionDetailReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnCollectionDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnCollectionDetailReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-            btnCollectionDetailReportCurrentPageGrid.innerHTML = (collectionDetailReportCollections.pageIndex + 1) + ' / ' + collectionDetailReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshCollectionDetailReportFlexGrid() {
-            collectionDetailReportCollections = new wijmo.collections.CollectionView(getCollectionDetailReport());
-            collectionDetailReportCollections.canFilter = true;
-            collectionDetailReportCollections.pageSize = cboCollectionDetailReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#collectionDetailReportInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                collectionDetailReportCollections.refresh();
-            });
-
-            collectionDetailReportCollections.filter = function (item) {
-                return !filterText || (item.ORBranch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.DepositoryBank.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.CheckBank.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            collectionDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            collectionDetailReportGrid.itemsSource = collectionDetailReportCollections;
-            collectionDetailReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // =========================================
+        // Create Collection Detail Report Flex Grid
+        // =========================================
         function createCollectionDetailReportFlexGrid() {
-            collectionDetailReportCollections = new wijmo.collections.CollectionView(getCollectionDetailReport());
-            collectionDetailReportCollections.canFilter = true;
-            collectionDetailReportCollections.pageSize = cboCollectionDetailReportShowNumberOfRows.selectedValue;
+            collectionDetailReportCollectionView = new wijmo.collections.CollectionView(getCollectionDetailReportData());
+            collectionDetailReportCollectionView.canFilter = true;
+            collectionDetailReportCollectionView.pageSize = cboCollectionDetailReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#collectionDetailReportInputFilter').keyup(function () {
+            $('#inpCollectionDetailReportSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                collectionDetailReportCollections.refresh();
+                collectionDetailReportCollectionView.refresh();
             });
 
-            collectionDetailReportCollections.filter = function (item) {
+            collectionDetailReportCollectionView.filter = function (item) {
                 return !filterText || (item.ORBranch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
@@ -531,12 +507,12 @@
                     || !filterText || (item.CheckBank.toLowerCase().indexOf(filterText) > -1);
             }
 
-            collectionDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            collectionDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateCollectionDetailReportNavigationButtons();
             });
 
-            collectionDetailReportGrid = new wijmo.grid.FlexGrid('#collectionDetailReportGrid');
-            collectionDetailReportGrid.initialize({
+            collectionDetailReportFlexGrid = new wijmo.grid.FlexGrid('#collectionDetailReportFlexGrid');
+            collectionDetailReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -626,76 +602,140 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: collectionDetailReportCollections,
+                itemsSource: collectionDetailReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            collectionDetailReportGrid.trackChanges = true;
+            collectionDetailReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateCollectionDetailReportNavigationButtons();
 
             btnCollectionDetailReportMoveToFirstPageGrid.addEventListener('click', function () {
-                collectionDetailReportCollections.moveToFirstPage();
-                currentPageIndex = collectionDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionDetailReportCollectionView.moveToFirstPage();
+                collectionDetailReportCurrentPageIndex = collectionDetailReportCollectionView.pageIndex + 1;
+                updateCollectionDetailReportNavigationButtons();
             });
 
             btnCollectionDetailReportMoveToPreviousPageGrid.addEventListener('click', function () {
-                collectionDetailReportCollections.moveToPreviousPage();
-                currentPageIndex = collectionDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionDetailReportCollectionView.moveToPreviousPage();
+                collectionDetailReportCurrentPageIndex = collectionDetailReportCollectionView.pageIndex + 1;
+                updateCollectionDetailReportNavigationButtons();
             });
 
             btnCollectionDetailReportMoveToNextPageGrid.addEventListener('click', function () {
-                collectionDetailReportCollections.moveToNextPage();
-                currentPageIndex = collectionDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionDetailReportCollectionView.moveToNextPage();
+                collectionDetailReportCurrentPageIndex = collectionDetailReportCollectionView.pageIndex + 1;
+                updateCollectionDetailReportNavigationButtons();
             });
 
             btnCollectionDetailReportMoveToLastPageGrid.addEventListener('click', function () {
-                collectionDetailReportCollections.moveToLastPage();
-                currentPageIndex = collectionDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                collectionDetailReportCollectionView.moveToLastPage();
+                collectionDetailReportCurrentPageIndex = collectionDetailReportCollectionView.pageIndex + 1;
+                updateCollectionDetailReportNavigationButtons();
             });
+        }
+
+        // ==================================================
+        // Update Collection Detail Report Navigation Buttons
+        // ==================================================
+        function updateCollectionDetailReportNavigationButtons() {
+            if (collectionDetailReportCollectionView.pageSize <= 0) {
+                document.getElementById('collectionDetailReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('collectionDetailReportNavigationPageGrid').style.display = 'block';
+            if (collectionDetailReportCollectionView.pageIndex === 0) {
+                btnCollectionDetailReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDetailReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (collectionDetailReportCollectionView.pageIndex === (collectionDetailReportCollectionView.pageCount - 1)) {
+                btnCollectionDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCollectionDetailReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCollectionDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnCollectionDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCollectionDetailReportCurrentPageGrid.innerHTML = (collectionDetailReportCollectionView.pageIndex + 1) + ' / ' + collectionDetailReportCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshCollectionDetailReportFlexGrid() {
+            collectionDetailReportCollectionView = new wijmo.collections.CollectionView(getCollectionDetailReportData());
+            collectionDetailReportCollectionView.canFilter = true;
+            collectionDetailReportCollectionView.pageSize = cboCollectionDetailReportDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpCollectionDetailReportSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                collectionDetailReportCollectionView.refresh();
+            });
+
+            collectionDetailReportCollectionView.filter = function (item) {
+                return !filterText || (item.ORBranch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ORNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.PayType.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.DepositoryBank.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckBank.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            collectionDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateCollectionDetailReportNavigationButtons();
+            });
+
+            collectionDetailReportFlexGrid.itemsSource = collectionDetailReportCollectionView;
+            collectionDetailReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnCollectionDetailReportCSVOnclick() {
+        function btnCollectionDetailReportDownloadCSVOnclick() {
             var CSV = '';
             var collectionDetailReport = [];
             var fileName = 'CollectionDetailReport.CSV';
 
-            collectionDetailReportCollections.moveToFirstPage();
+            collectionDetailReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= collectionDetailReportCollections.pageCount; p++) {
-                for (i = 0; i < collectionDetailReportCollections.items.length; i++) {
+            for (var p = 1; p <= collectionDetailReportCollectionView.pageCount; p++) {
+                for (i = 0; i < collectionDetailReportCollectionView.items.length; i++) {
 
                     collectionDetailReport.push({
-                        ORBranch: collectionDetailReportCollections.items[i].ORBranch,
-                        ORNumber: "OR-" + collectionDetailReportCollections.items[i].ORNumber,
-                        ORDate: collectionDetailReportCollections.items[i].ORDate,
-                        Customer: collectionDetailReportCollections.items[i].Customer,
-                        Branch: collectionDetailReportCollections.items[i].Branch,
-                        Account: collectionDetailReportCollections.items[i].Account,
-                        Article: collectionDetailReportCollections.items[i].Article,
-                        PayType: collectionDetailReportCollections.items[i].PayType,
-                        SINumber: "SI-" + collectionDetailReportCollections.items[i].SINumber,
-                        DepositoryBank: collectionDetailReportCollections.items[i].DepositoryBank,
-                        CheckNumber: collectionDetailReportCollections.items[i].CheckNumber,
-                        CheckDate: collectionDetailReportCollections.items[i].CheckDate,
-                        CheckBank: collectionDetailReportCollections.items[i].CheckBank,
-                        Amount: collectionDetailReportCollections.items[i].Amount
+                        ORBranch: collectionDetailReportCollectionView.items[i].ORBranch,
+                        ORNumber: "OR-" + collectionDetailReportCollectionView.items[i].ORNumber,
+                        ORDate: collectionDetailReportCollectionView.items[i].ORDate,
+                        Customer: collectionDetailReportCollectionView.items[i].Customer,
+                        Branch: collectionDetailReportCollectionView.items[i].Branch,
+                        Account: collectionDetailReportCollectionView.items[i].Account,
+                        Article: collectionDetailReportCollectionView.items[i].Article,
+                        PayType: collectionDetailReportCollectionView.items[i].PayType,
+                        SINumber: "SI-" + collectionDetailReportCollectionView.items[i].SINumber,
+                        DepositoryBank: collectionDetailReportCollectionView.items[i].DepositoryBank,
+                        CheckNumber: collectionDetailReportCollectionView.items[i].CheckNumber,
+                        CheckDate: collectionDetailReportCollectionView.items[i].CheckDate,
+                        CheckBank: collectionDetailReportCollectionView.items[i].CheckBank,
+                        Amount: collectionDetailReportCollectionView.items[i].Amount
                     });
                 }
 
-                collectionDetailReportCollections.moveToNextPage();
-                if (p == collectionDetailReportCollections.pageCount) {
-                    collectionDetailReportCollections.moveToPage(currentPageIndex - 1);
+                collectionDetailReportCollectionView.moveToNextPage();
+                if (p == collectionDetailReportCollectionView.pageCount) {
+                    collectionDetailReportCollectionView.moveToPage(collectionDetailReportCurrentPageIndex - 1);
                 }
             }
 
@@ -762,16 +802,16 @@
             }
         }
 
-        // =====================
-        // Preview and Print PDF
-        // =====================
-        function btnCollectionDetailReportPDFOnclick() {
-            if (cboCollectionDetailReportCompany.selectedValue != null) {
-                if (cboCollectionDetailReportBranch.selectedValue != null) {
-                    var startDate = cboCollectionDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboCollectionDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboCollectionDetailReportCompany.selectedValue;
-                    var branchId = cboCollectionDetailReportBranch.selectedValue;
+        // =========
+        // Print PDF
+        // =========
+        function btnCollectionDetailReportPrintPDFOnclick() {
+            if (cboCollectionDetailReportCompanyFilter.selectedValue != null) {
+                if (cboCollectionDetailReportBranchFilter.selectedValue != null) {
+                    var startDate = cboCollectionDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboCollectionDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboCollectionDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboCollectionDetailReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepCollectionDetailReport/CollectionDetailReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -786,11 +826,19 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            collectionDetailReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
+
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -837,6 +885,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -876,6 +927,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
