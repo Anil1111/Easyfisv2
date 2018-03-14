@@ -13,25 +13,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Company</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
-                        Company 
+                        Company
                     </h3>
                     <p>
                         <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCompanySearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,37 +58,55 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddCompany" onclick="btnAddCompany_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnCompanyAdd" onclick="btnCompanyAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseCompany" onclick="btnCloseCompany_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnCompanyClose" onclick="btnCompanyCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="CompanyGrid"></div>
+                        <div id="companyFlexGrid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="companyNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCompanyMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCompanyMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCompanyCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnCompanyMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCompanyMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -114,24 +135,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Company Delete -->
-    <div class="modal fade" id="deleteCompanyConfirm" role="dialog">
+    <!--
+        ==============================
+        Companu Confirm Delete (Modal)
+        ==============================
+    -->
+    <div class="modal fade" id="companyConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this company?
+                    Delete Company?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteCompany" class="btn btn-danger" onclick="cmdCompanyConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnCompanyConfirmDelete" class="btn btn-danger" onclick="btnCompanyConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnCompanyConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -139,46 +165,50 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var companies;
-        var companyGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
+        // =====================================
+        // Company Collection View and Flex Grid
+        // =====================================
+        var companyCollectionView;
+        var companyFlexGrid;
+
+        // ==========================
+        // Company Navigation Buttons
+        // ==========================
+        var btnCompanyMoveToFirstPageGrid = document.getElementById('btnCompanyMoveToFirstPageGrid');
+        var btnCompanyMoveToPreviousPageGrid = document.getElementById('btnCompanyMoveToPreviousPageGrid');
+        var btnCompanyMoveToNextPageGrid = document.getElementById('btnCompanyMoveToNextPageGrid');
+        var btnCompanyMoveToLastPageGrid = document.getElementById('btnCompanyMoveToLastPageGrid');
+        var btnCompanyCurrentPageGrid = document.getElementById('btnCompanyCurrentPageGrid');
 
         // ================
-        // GET Company List
+        // Get Company Data
         // ================
-        function getCompany() {
-            var companies = new wijmo.collections.ObservableArray;
+        function getCompanyData() {
+            var companyObservableArray = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
                 url: '/api/company/list',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (Results) {
-                    if (Results.length > 0) {
-                        for (i = 0; i < Results.length; i++) {
-                            companies.push({
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            companyObservableArray.push({
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' id='companyEditButton' onclick='cmdCompanyEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdCompanyDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: Results[i]["Id"],
-                                Company: Results[i]["Company"],
-                                Address: Results[i]["Address"],
-                                ContactNumber: Results[i]["ContactNumber"],
-                                TaxNumber: Results[i]["TaxNumber"],
-                                IsLocked: Results[i]["IsLocked"],
-                                CreatedById: Results[i]["CreatedById"],
-                                CreatedBy: Results[i]["CreatedBy"],
-                                CreatedDateTime: Results[i]["CreatedDateTime"],
-                                UpdatedById: Results[i]["UpdatedById"],
-                                UpdatedBy: Results[i]["UpdatedBy"],
-                                UpdatedDateTime: Results[i]["UpdatedDateTime"]
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"],
+                                Address: results[i]["Address"],
+                                ContactNumber: results[i]["ContactNumber"],
+                                TaxNumber: results[i]["TaxNumber"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedById: results[i]["CreatedById"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedById: results[i]["UpdatedById"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -187,223 +217,39 @@
                 }
             });
 
-            return companies;
+            return companyObservableArray;
         }
 
-        // ==================
-        // Company Add Button
-        // ==================
-        function btnAddCompany_OnClick() {
-            document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddCompany').prop('disabled', true);
-            $('#btnCloseCompany').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/company/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/CompanyDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCompany').prop('disabled', false);
-                        $('#btnCloseCompany').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCompany').prop('disabled', false);
-                        $('#btnCloseCompany').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddCompany').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCompany').prop('disabled', false);
-                        $('#btnCloseCompany').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // Company Edit Button
-        // ===================
-        function cmdCompanyEditButton_OnClick() {
-            companies.editItem(companies.currentItem);
-            var company = companies.currentEditItem;
-            var companyId = company.Id;
-            window.location = '/Software/CompanyDetail?id=' + companyId;
-        }
-
-        // ====================
-        // Company Close Button
-        // ====================
-        function btnCloseCompany_OnClick() {
-            window.location = '/Software';
-        }
-
-        // =====================
-        // Company delete Button
-        // =====================
-        function cmdCompanyDeleteButton_OnClick() {
-            companies.editItem(companies.currentItem);
-            var company = companies.currentEditItem;
-
-            $('#deleteCompanyConfirm').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $("#cmdConfirmDeleteCompany").prop("disabled", false);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-        }
-
-        // Company Confirm Delete Button
-        function cmdCompanyConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteCompany").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
-
-            companies.editItem(companies.currentItem);
-            var id = companies.currentEditItem.Id;
-
-            $.ajax({
-                url: '/api/company/delete/' + id,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteCompanyConfirm').modal('hide');
-                        refreshCompanyFlexGrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteCompanyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCompany").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteCompanyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCompany").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteCompanyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCompany').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteCompany").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            var item = companies.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // ===============================
-        // Navigation Buttons for Comapany
-        // ===============================
-        function updateNavigateButtonsCompany() {
-            if (companies.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (companies.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (companies.pageIndex === (companies.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (companies.pageIndex + 1) + ' / ' + companies.pageCount;
-        }
-
-        function refreshCompanyFlexGrid() {
-            companies = new wijmo.collections.CollectionView(getCompany());
-            companies.canFilter = true;
-            companies.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                companies.refresh();
-            });
-
-            companies.filter = function (item) {
-                return !filterText || (item.Company.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Address.toLowerCase().indexOf(filterText) > -1)
-                    || (item.TaxNumber.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            companies.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCompany();
-            });
-
-            companies.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            // Flex Grid
-            companyGrid.itemsSource = companies;
-            companyGrid.trackChanges = true;
-        }
-
+        // ========================
+        // Create Company Flex Gird
+        // ========================
         function createCompanyFlexGrid() {
-            companies = new wijmo.collections.CollectionView(getCompany());
-            companies.canFilter = true;
-            companies.pageSize = 15;
+            companyCollectionView = new wijmo.collections.CollectionView(getCompanyData());
+            companyCollectionView.canFilter = true;
+            companyCollectionView.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCompanySearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                companies.refresh();
+                companyCollectionView.refresh();
             });
 
-            companies.filter = function (item) {
+            companyCollectionView.filter = function (item) {
                 return !filterText || (item.Company.toLowerCase().indexOf(filterText) > -1)
                                    || (item.Address.toLowerCase().indexOf(filterText) > -1)
                                    || (item.TaxNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            companies.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCompany();
+            companyCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateColmpanyNavigationButtons();
             });
 
-            companies.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+            companyCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateCompanyDetailsFlexGridSelection();
             });
 
-            // Flex Grid
-            companyGrid = new wijmo.grid.FlexGrid('#CompanyGrid');
-            companyGrid.initialize({
+            companyFlexGrid = new wijmo.grid.FlexGrid('#companyFlexGrid');
+            companyFlexGrid.initialize({
                 columns: [
                     @{
                         if (canEdit)
@@ -461,54 +307,244 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: companies,
+                itemsSource: companyCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            companyGrid.trackChanges = true;
+            companyFlexGrid.trackChanges = true;
 
-            //Navigation button
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            updateColmpanyNavigationButtons();
 
-            updateNavigateButtonsCompany();
-
-            btnFirstPageGrid.addEventListener('click', function () {
-                companies.moveToFirstPage();
-                updateNavigateButtonsCompany();
+            btnCompanyMoveToFirstPageGrid.addEventListener('click', function () {
+                companyCollectionView.moveToFirstPage();
+                updateColmpanyNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                companies.moveToPreviousPage();
-                updateNavigateButtonsCompany();
+            btnCompanyMoveToPreviousPageGrid.addEventListener('click', function () {
+                companyCollectionView.moveToPreviousPage();
+                updateColmpanyNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                companies.moveToNextPage();
-                updateNavigateButtonsCompany();
+            btnCompanyMoveToNextPageGrid.addEventListener('click', function () {
+                companyCollectionView.moveToNextPage();
+                updateColmpanyNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                companies.moveToLastPage();
-                updateNavigateButtonsCompany();
+            btnCompanyMoveToLastPageGrid.addEventListener('click', function () {
+                companyCollectionView.moveToLastPage();
+                updateColmpanyNavigationButtons();
+            });
+        }
+
+        // ==========================================
+        // Update Company Details Flex Grid Selection
+        // ==========================================
+        function updateCompanyDetailsFlexGridSelection() {
+            var item = companyCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // =================================
+        // Update Company Navigation Buttons
+        // =================================
+        function updateColmpanyNavigationButtons() {
+            if (companyCollectionView.pageSize <= 0) {
+                document.getElementById('companyNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('companyNavigationPageGrid').style.display = 'block';
+            if (companyCollectionView.pageIndex === 0) {
+                btnCompanyMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCompanyMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCompanyMoveToNextPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (companyCollectionView.pageIndex === (companyCollectionView.pageCount - 1)) {
+                btnCompanyMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCompanyMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCompanyMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToNextPageGrid.removeAttribute('disabled');
+                btnCompanyMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCompanyCurrentPageGrid.innerHTML = (companyCollectionView.pageIndex + 1) + ' / ' + companyCollectionView.pageCount;
+        }
+
+        // =========================
+        // Refresh Company Flex Grid
+        // =========================
+        function refreshCompanyFlexGrid() {
+            companyCollectionView = new wijmo.collections.CollectionView(getCompanyData());
+            companyCollectionView.canFilter = true;
+            companyCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpCompanySearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                companyCollectionView.refresh();
+            });
+
+            companyCollectionView.filter = function (item) {
+                return !filterText || (item.Company.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Address.toLowerCase().indexOf(filterText) > -1)
+                    || (item.TaxNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            companyCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateColmpanyNavigationButtons();
+            });
+
+            companyCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateCompanyDetailsFlexGridSelection();
+            });
+
+            companyFlexGrid.itemsSource = companyCollectionView;
+            companyFlexGrid.trackChanges = true;
+        }
+
+        // ===========
+        // Add Company
+        // ===========
+        function btnCompanyAddOnclick() {
+            document.getElementById('btnCompanyAdd').innerHTML = "<i class='fa fa-plus'></i> Adding...";
+            $('#btnCompanyAdd').prop('disabled', true);
+            $('#btnCompanyClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/company/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/CompanyDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCompanyAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCompanyAdd').prop('disabled', false);
+                        $('#btnCompanyClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCompanyAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCompanyAdd').prop('disabled', false);
+                        $('#btnCompanyClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCompanyAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCompanyAdd').prop('disabled', false);
+                        $('#btnCompanyClose').prop('disabled', false);
+                    }
+                }
             });
         }
 
         // ============
-        // On Page Load
+        // Edit Company
         // ============
+        function cmdCompanyEditButton_OnClick() {
+            companyCollectionView.editItem(companyCollectionView.currentItem);
+            var company = companyCollectionView.currentEditItem;
+            var companyId = company.Id;
+            window.location = '/Software/CompanyDetail?id=' + companyId;
+        }
+
+        // =============
+        // Close Company
+        // =============
+        function btnCompanyCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // ==============
+        // Delete Company
+        // ==============
+        function cmdCompanyDeleteButton_OnClick() {
+            companyCollectionView.editItem(companyCollectionView.currentItem);
+            var company = companyCollectionView.currentEditItem;
+
+            $('#companyConfirmDeleteModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnCompanyConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#btnCompanyConfirmDelete").prop("disabled", false);
+            $("#btnCompanyConfirmDeleteCloseModal").prop("disabled", false);
+        }
+
+        // ======================
+        // Confirm Delete Company
+        // ======================
+        function btnCompanyConfirmDeleteOnclick() {
+            document.getElementById('btnCompanyConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnCompanyConfirmDelete").prop("disabled", true);
+            $("#btnCompanyConfirmDeleteCloseModal").prop("disabled", true);
+
+            companyCollectionView.editItem(companyCollectionView.currentItem);
+            var id = companyCollectionView.currentEditItem.Id;
+
+            $.ajax({
+                url: '/api/company/delete/' + id,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#companyConfirmDeleteModal').modal('hide');
+                        refreshCompanyFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#companyConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCompanyConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCompanyConfirmDelete").prop("disabled", false);
+                        $("#btnCompanyConfirmDeleteCloseModal").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#companyConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCompanyConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCompanyConfirmDelete").prop("disabled", false);
+                        $("#btnCompanyConfirmDeleteCloseModal").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#companyConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCompanyConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnCompanyConfirmDelete").prop("disabled", false);
+                        $("#btnCompanyConfirmDeleteCloseModal").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             createCompanyFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -555,8 +591,11 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
-            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
+            document.getElementById('updateUserBranch').innerHTML = "Updating";
             $("#updateUserBranch").prop("disabled", true);
             $("#closeUserBranch").prop("disabled", true);
 
@@ -594,6 +633,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
