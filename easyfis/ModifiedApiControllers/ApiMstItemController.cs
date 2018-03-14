@@ -33,6 +33,7 @@ namespace easyfis.ModifiedApiControllers
                             Category = d.Category,
                             Unit = d.MstUnit.Unit,
                             IsInventory = d.IsInventory,
+                            ManualArticleOldCode = d.ManualArticleOldCode,
                             IsLocked = d.IsLocked,
                             CreatedById = d.CreatedById,
                             CreatedBy = d.MstUser.FullName,
