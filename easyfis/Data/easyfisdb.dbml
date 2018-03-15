@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="easyfis" Class="easyfisdbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString1" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AspNetRoles" Member="AspNetRoles">
     <Type Name="AspNetRole">
       <Column Name="Id" Type="System.String" DbType="NVarChar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -229,6 +229,7 @@
       <Association Name="MstArticle_MstArticleInventory" Member="MstArticleInventories" ThisKey="Id" OtherKey="ArticleId" Type="MstArticleInventory" />
       <Association Name="MstArticle_MstArticlePrice" Member="MstArticlePrices" ThisKey="Id" OtherKey="ArticleId" Type="MstArticlePrice" />
       <Association Name="MstArticle_MstArticleUnit" Member="MstArticleUnits" ThisKey="Id" OtherKey="ArticleId" Type="MstArticleUnit" />
+      <Association Name="MstArticle_TrnArticlePriceItem" Member="TrnArticlePriceItems" ThisKey="Id" OtherKey="ItemId" Type="TrnArticlePriceItem" />
       <Association Name="MstArticle_TrnCollection" Member="TrnCollections" ThisKey="Id" OtherKey="CustomerId" Type="TrnCollection" />
       <Association Name="MstArticle_TrnCollectionLine" Member="TrnCollectionLines" ThisKey="Id" OtherKey="ArticleId" Type="TrnCollectionLine" />
       <Association Name="MstArticle_TrnCollectionLine1" Member="TrnCollectionLines1" ThisKey="Id" OtherKey="DepositoryBankId" Type="TrnCollectionLine" />
@@ -408,6 +409,7 @@
       <Association Name="MstBranch_MstArticleInventory" Member="MstArticleInventories" ThisKey="Id" OtherKey="BranchId" Type="MstArticleInventory" />
       <Association Name="MstBranch_MstUser" Member="MstUsers" ThisKey="Id" OtherKey="BranchId" Type="MstUser" />
       <Association Name="MstBranch_MstUserBranch" Member="MstUserBranches" ThisKey="Id" OtherKey="BranchId" Type="MstUserBranch" />
+      <Association Name="MstBranch_TrnArticlePrice" Member="TrnArticlePrices" ThisKey="Id" OtherKey="BranchId" Type="TrnArticlePrice" />
       <Association Name="MstBranch_TrnCollection" Member="TrnCollections" ThisKey="Id" OtherKey="BranchId" Type="TrnCollection" />
       <Association Name="MstBranch_TrnCollectionLine" Member="TrnCollectionLines" ThisKey="Id" OtherKey="BranchId" Type="TrnCollectionLine" />
       <Association Name="MstBranch_TrnDisbursement" Member="TrnDisbursements" ThisKey="Id" OtherKey="BranchId" Type="TrnDisbursement" />
@@ -611,6 +613,11 @@
       <Association Name="MstUser_MstUserBranch" Member="MstUserBranches" ThisKey="Id" OtherKey="UserId" Type="MstUserBranch" />
       <Association Name="MstUser_MstUserForm" Member="MstUserForms" ThisKey="Id" OtherKey="UserId" Type="MstUserForm" />
       <Association Name="MstUser_SysAuditTrail" Member="SysAuditTrails" ThisKey="Id" OtherKey="UserId" Type="SysAuditTrail" />
+      <Association Name="MstUser_TrnArticlePrice" Member="TrnArticlePrices" ThisKey="Id" OtherKey="PreparedById" Type="TrnArticlePrice" />
+      <Association Name="MstUser_TrnArticlePrice1" Member="TrnArticlePrices1" ThisKey="Id" OtherKey="CreatedById" Type="TrnArticlePrice" />
+      <Association Name="MstUser_TrnArticlePrice2" Member="TrnArticlePrices2" ThisKey="Id" OtherKey="ApprovedById" Type="TrnArticlePrice" />
+      <Association Name="MstUser_TrnArticlePrice3" Member="TrnArticlePrices3" ThisKey="Id" OtherKey="CreatedById" Type="TrnArticlePrice" />
+      <Association Name="MstUser_TrnArticlePrice4" Member="TrnArticlePrices4" ThisKey="Id" OtherKey="UpdatedById" Type="TrnArticlePrice" />
       <Association Name="MstUser_TrnCollection" Member="TrnCollections" ThisKey="Id" OtherKey="CheckedById" Type="TrnCollection" />
       <Association Name="MstUser_TrnCollection1" Member="TrnCollections1" ThisKey="Id" OtherKey="ApprovedById" Type="TrnCollection" />
       <Association Name="MstUser_TrnCollection2" Member="TrnCollections2" ThisKey="Id" OtherKey="CreatedById" Type="TrnCollection" />
@@ -745,6 +752,42 @@
       <Column Name="Particulars" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
       <Association Name="SysForm_MstUserForm" Member="MstUserForms" ThisKey="Id" OtherKey="FormId" Type="MstUserForm" />
       <Association Name="SysForm_MstUserRoleForm" Member="MstUserRoleForms" ThisKey="Id" OtherKey="FormId" Type="MstUserRoleForm" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnArticlePrice" Member="TrnArticlePrices">
+    <Type Name="TrnArticlePrice">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BranchId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IPNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="IPDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Particulars" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="ManualIPNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PreparedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CheckedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IsLocked" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="TrnArticlePrice_TrnArticlePriceItem" Member="TrnArticlePriceItems" ThisKey="Id" OtherKey="ArticlePriceId" Type="TrnArticlePriceItem" />
+      <Association Name="MstBranch_TrnArticlePrice" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
+      <Association Name="MstUser_TrnArticlePrice" Member="MstUser" ThisKey="PreparedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnArticlePrice1" Member="MstUser1" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnArticlePrice2" Member="MstUser2" ThisKey="ApprovedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnArticlePrice3" Member="MstUser3" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnArticlePrice4" Member="MstUser4" ThisKey="UpdatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnArticlePriceItem" Member="TrnArticlePriceItems">
+    <Type Name="TrnArticlePriceItem">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ArticlePriceId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Price" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="TriggerQuantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Association Name="MstArticle_TrnArticlePriceItem" Member="MstArticle" ThisKey="ItemId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
+      <Association Name="TrnArticlePrice_TrnArticlePriceItem" Member="TrnArticlePrice" ThisKey="ArticlePriceId" OtherKey="Id" Type="TrnArticlePrice" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.TrnCollection" Member="TrnCollections">
