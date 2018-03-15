@@ -42,5 +42,6 @@ namespace easyfis.Models
         public Decimal Price { get; set; }
 
         public String ItemGroup { get; set; }
+        public String Category { get; set; }
     }
 }
