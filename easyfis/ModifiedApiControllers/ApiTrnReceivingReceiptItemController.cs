@@ -431,7 +431,7 @@ namespace easyfis.ModifiedApiControllers
                                                             WTAXId = item.FirstOrDefault().WTaxTypeId,
                                                             WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
                                                             WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate, item.FirstOrDefault().WTaxTypeId),
-                                                            BranchId = purchaseOrderItems.FirstOrDefault().BranchId,
+                                                            BranchId = objReceivingReceiptItem.BranchId,
                                                             BaseUnitId = item.FirstOrDefault().UnitId,
                                                             BaseQuantity = baseQuantity,
                                                             BaseCost = baseCost

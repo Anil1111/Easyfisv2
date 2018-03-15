@@ -339,14 +339,21 @@
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
-                                        <td style="width: 60%">
+                                        <td style="width: 40%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
                                                 <input type="text" class="form-control " id="inputFilterPOItem" placeholder="Search">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
-                                        <td style="width: 39%">
+                                        <td style="width: 29%">
+                                            <div class="input-group ">
+                                                <span class="input-group-addon"><b>Receive To</b></span>
+                                                <div class="comboBox-wide" id="cboBranchPOStatus"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 29%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>PO Number</b></span>
                                                 <div class="comboBox-wide" id="cboPONumberPOStatus"></div>
@@ -550,6 +557,28 @@
             </div>
         </div>
     </div>
+    
+    <div class="modal fade" id="poStatusPickedAmountModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pick</h4>
+                </div>
+                <div class="modal-body">
+                    <dl>
+                        <dt>Quantity</dt>
+                        <dd>
+                            <input class="form-control numberField requiredPickedAmount" id="inpPOSTatusPickedQuantity" placeholder="0.00" />
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnSalesInvoiceStatusPerCustomerPickAmountContinue" class="btn btn-primary" onclick="btnSalesInvoiceStatusPerCustomerPickAmountContinueOnclick()"><i class="fa fa-arrow-right"></i> Continue</button>
+                    <button id="btnSalesInvoiceStatusPerCustomerPickAmountCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
@@ -568,6 +597,7 @@
         var receivingReceiptItemGrid;
         var isLocked = false;
         var cboPONumberPOStatus = new wijmo.input.ComboBox('#cboPONumberPOStatus');
+        var cboBranchPOStatus = new wijmo.input.ComboBox('#cboBranchPOStatus');
         var purchaseOrderStatusCollectionView;
         var purchasrOrderStatusFlexGrid = new wijmo.grid.FlexGrid('#purchasrOrderStatusFlexGrid');
         var cboRRItemBranch = new wijmo.input.ComboBox('#cboRRItemBranch');
@@ -1710,6 +1740,48 @@
                         }
                     });
 
+                    setTimeout(function () { getBranchInPOStatusForComboBox(); }, 1000);
+                }
+            });
+        }
+
+        // ==================================
+        // GET PO for PO Status for Combo Box
+        // ==================================
+        function getBranchInPOStatusForComboBox() {
+            var branchObservableArray = new wijmo.collections.ObservableArray();
+            var cboRRHeaderBranchId = cboRRbranch.selectedValue;
+            $.ajax({
+                url: '/api/receivingReceiptItem/dropdown/list/branch',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            branchObservableArray.push({
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                    }
+
+                    cboBranchPOStatus.dispose();
+                    cboBranchPOStatus = new wijmo.input.ComboBox('#cboBranchPOStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: branchObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "Id",
+                        selectedValue: cboRRHeaderBranchId
+                    });
+
                     setTimeout(function () { getPOBySupplierInPOStatus(); }, 1000);
                 }
             });
@@ -1749,6 +1821,7 @@
                                     ReceivedQuantityDisplay: parseFloat(results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                     BalanceQuantity: results[i]["BalanceQuantity"],
                                     BalanceQuantityDisplay: parseFloat(results[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    PickButton: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPOStatusPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
                                     Pick: (results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]) == 0 ? "<button class='btn btn-primary btn-xs' onclick='pickQuantity_OnClick()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='pickReverseQuantity_OnClick()'><i class='fa fa-arrow-left'></i></button>",
                                     Balance: results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"],
                                     BalanceDisplay: parseFloat(results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -1770,6 +1843,67 @@
 
             return purchaseOrderStatusObservableArray;
         }
+
+        function btnPOStatusPickOnclick() {
+            $('#poStatusPickedAmountModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", false);
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", false);
+
+            purchaseOrderStatusCollectionView.editItem(purchaseOrderStatusCollectionView.currentItem);
+            var poStatusCollectionView = purchaseOrderStatusCollectionView.currentEditItem;
+            var balance = poStatusCollectionView.BalanceQuantity;
+            document.getElementById("inpPOSTatusPickedQuantity").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+
+        // =================================================
+        // Sales Invoice Status Per Customer Amount Continue
+        // =================================================
+        function btnSalesInvoiceStatusPerCustomerPickAmountContinueOnclick() {
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", true);
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmount').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                purchaseOrderStatusCollectionView.editItem(purchaseOrderStatusCollectionView.currentItem);
+                var poStatusCollectionView = purchaseOrderStatusCollectionView.currentEditItem;
+                var balance = document.getElementById("inpPOSTatusPickedQuantity").value.split(",").join("");
+
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", false);
+                    $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", false);
+                } else {
+                    poStatusCollectionView.Balance = balance;
+                    poStatusCollectionView.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    purchaseOrderStatusCollectionView.refresh();
+                    purchasrOrderStatusFlexGrid.refresh();
+
+                    $('#poStatusPickedAmountModal').modal('hide');
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
 
         // =========================
         // Update Navigation Buttons
@@ -1875,19 +2009,19 @@
                             },
                             {
                                 "header": "Pick",
-                                "binding": "Pick",
-                                "width": 50,
+                                "binding": "PickButton",
+                                "width": 60,
                                 "align": "center",
                                 "isReadOnly": true,
                                 "isContentHtml": true
                             },
                             {
                                 "header": "Quantity",
-                                "binding": "Balance",
+                                "binding": "BalanceDisplay",
                                 "allowSorting": true,
                                 "width": "1*",
                                 "align": "right",
-                                "isReadOnly": false,
+                                "isReadOnly": true,
                                 "isContentHtml": true
                             },
                 ],
@@ -2014,6 +2148,7 @@
                     var item = purchaseOrderStatusCollectionView.items[i];
                     if (item.Balance > 0) {
                         purchaseOrderArrays.push({
+                            BranchId: cboBranchPOStatus.selectedValue,
                             POId: item.POId,
                             ItemId: item.ItemId,
                             Quantity: item.Balance,
