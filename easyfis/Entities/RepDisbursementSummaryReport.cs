@@ -11,6 +11,7 @@ namespace easyfis.Entities
         public String Branch { get; set; }
         public String CVNumber { get; set; }
         public String CVDate { get; set; }
+        public String ManualCVNumber { get; set; }
         public String Payee { get; set; }
         public String Particulars { get; set; }
         public String Bank { get; set; }
