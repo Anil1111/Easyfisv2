@@ -395,6 +395,24 @@ namespace easyfis.Controllers
             return UserRights("JournalVoucherDetail");
         }
 
+        // ==========
+        // Item Price
+        // ==========
+        [Authorize]
+        public ActionResult ItemPrice()
+        {
+            return UserRights("ItemPriceList");
+        }
+
+        // =================
+        // Item Price Detail
+        // =================
+        [Authorize]
+        public ActionResult ItemPriceDetail()
+        {
+            return UserRights("ItemPriceDetail");
+        }
+
         // ====
         // Bank
         // ====
