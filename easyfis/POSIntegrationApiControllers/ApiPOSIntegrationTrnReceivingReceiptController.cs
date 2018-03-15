@@ -22,7 +22,6 @@ namespace easyfis.POSIntegrationApiControllers
         {
             var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.RRDate == Convert.ToDateTime(receivingReceiptDate)
-                                    && d.MstBranch.BranchCode.Equals(branchCode)
                                     && d.IsLocked == true
                                     select new POSIntegrationEntities.POSIntegrationTrnReceivingReceipt
                                     {
@@ -50,6 +49,8 @@ namespace easyfis.POSIntegrationApiControllers
                                             ItemCode = i.MstArticle.ManualArticleCode,
                                             Item = i.MstArticle.Article,
                                             Particulars = i.Particulars,
+                                            BranchCode = i.MstBranch.BranchCode,
+                                            Branch = i.MstBranch.Branch,
                                             Unit = i.MstUnit.Unit,
                                             Quantity = i.Quantity,
                                             Cost = i.Cost,
@@ -57,7 +58,7 @@ namespace easyfis.POSIntegrationApiControllers
                                             BaseUnit = i.MstUnit1.Unit,
                                             BaseQuantity = i.BaseQuantity,
                                             BaseCost = i.BaseCost
-                                        }).Where(i => i.RRId == d.Id).ToList(),
+                                        }).Where(i => i.RRId == d.Id && i.BranchCode.Equals(branchCode)).ToList(),
                                     };
 
             return receivingReceipts.ToList();
