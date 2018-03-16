@@ -29,6 +29,7 @@ namespace easyfis.ModifiedApiControllers
                                         Id = d.Id,
                                         ArticlePriceId = d.ArticlePriceId,
                                         ItemId = d.ItemId,
+                                        ItemCode = d.MstArticle.ManualArticleCode,
                                         ItemDescription = d.MstArticle.Article,
                                         Price = d.Price,
                                         TriggerQuantity = d.TriggerQuantity
@@ -74,7 +75,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
                                     select d;
 
                     if (userForms.Any())
@@ -164,7 +165,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
                                     select d;
 
                     if (userForms.Any())
@@ -261,7 +262,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
                                     select d;
 
                     if (userForms.Any())
