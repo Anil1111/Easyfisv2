@@ -53,25 +53,25 @@ namespace easyfis.Controllers
         }
 
         // get article price
-        [Authorize]
-        [HttpGet]
-        [Route("api/articlePrice/{id}")]
-        public Models.MstArticlePrice GetPrice(String id)
-        {
-            var articlePrices = from d in db.MstArticlePrices
-                                where d.Id == Convert.ToInt32(id)
-                                select new Models.MstArticlePrice
-                                {
-                                    Id = d.Id,
-                                    ArticleId = d.ArticleId,
-                                    Article = d.MstArticle.Article,
-                                    PriceDescription = d.PriceDescription,
-                                    Price = d.Price,
-                                    Remarks = d.Remarks,
-                                };
+        //[Authorize]
+        //[HttpGet]
+        //[Route("api/articlePrice/{id}")]
+        //public Models.MstArticlePrice GetPrice(String id)
+        //{
+        //    var articlePrices = from d in db.MstArticlePrices
+        //                        where d.Id == Convert.ToInt32(id)
+        //                        select new Models.MstArticlePrice
+        //                        {
+        //                            Id = d.Id,
+        //                            ArticleId = d.ArticleId,
+        //                            Article = d.MstArticle.Article,
+        //                            PriceDescription = d.PriceDescription,
+        //                            Price = d.Price,
+        //                            Remarks = d.Remarks,
+        //                        };
 
-            return (Models.MstArticlePrice)articlePrices.FirstOrDefault();
-        }
+        //    return (Models.MstArticlePrice)articlePrices.FirstOrDefault();
+        //}
 
         // add Article Price
         [Authorize]

@@ -166,7 +166,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceList")
+                                    && d.SysForm.FormName.Equals("ItemPriceList")
                                     select d;
 
                     if (userForms.Any())
@@ -257,7 +257,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
                                     select d;
 
                     if (userForms.Any())
@@ -336,7 +336,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
                                     select d;
 
                     if (userForms.Any())
@@ -410,7 +410,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ArticlePriceList")
+                                    && d.SysForm.FormName.Equals("ItemPriceList")
                                     select d;
 
                     if (userForms.Any())
