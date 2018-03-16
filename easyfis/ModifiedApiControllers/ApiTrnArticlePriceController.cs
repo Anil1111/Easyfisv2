@@ -16,11 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===============
-        // List Item Price
-        // ===============
-        [Authorize, HttpGet, Route("api/itemPrice/list/{startDate}/{endDate}")]
-        public List<Entities.TrnArticlePrice> ListItemPrice(String startDate, String endDate)
+        // ==================
+        // List Article Price
+        // ==================
+        [Authorize, HttpGet, Route("api/articlePrice/list/{startDate}/{endDate}")]
+        public List<Entities.TrnArticlePrice> ListArticlePrice(String startDate, String endDate)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -28,37 +28,37 @@ namespace easyfis.ModifiedApiControllers
 
             var branchId = currentUser.FirstOrDefault().BranchId;
 
-            var itemPrices = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
-                             where d.BranchId == branchId
-                             && d.IPDate >= Convert.ToDateTime(startDate)
-                             && d.IPDate <= Convert.ToDateTime(endDate)
-                             select new Entities.TrnArticlePrice
-                             {
-                                 Id = d.Id,
-                                 IPNumber = d.IPNumber,
-                                 IPDate = d.IPDate.ToShortDateString(),
-                                 ManualIPNumber = d.ManualIPNumber,
-                                 Particulars = d.Particulars,
-                                 PreparedById = d.PreparedById,
-                                 CheckedById = d.CheckedById,
-                                 ApprovedById = d.ApprovedById,
-                                 IsLocked = d.IsLocked,
-                                 CreatedById = d.CreatedById,
-                                 CreatedBy = d.MstUser3.FullName,
-                                 CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                 UpdatedById = d.UpdatedById,
-                                 UpdatedBy = d.MstUser4.FullName,
-                                 UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                             };
+            var articlePrices = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
+                                where d.BranchId == branchId
+                                && d.IPDate >= Convert.ToDateTime(startDate)
+                                && d.IPDate <= Convert.ToDateTime(endDate)
+                                select new Entities.TrnArticlePrice
+                                {
+                                    Id = d.Id,
+                                    IPNumber = d.IPNumber,
+                                    IPDate = d.IPDate.ToShortDateString(),
+                                    ManualIPNumber = d.ManualIPNumber,
+                                    Particulars = d.Particulars,
+                                    PreparedById = d.PreparedById,
+                                    CheckedById = d.CheckedById,
+                                    ApprovedById = d.ApprovedById,
+                                    IsLocked = d.IsLocked,
+                                    CreatedById = d.CreatedById,
+                                    CreatedBy = d.MstUser3.FullName,
+                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                    UpdatedById = d.UpdatedById,
+                                    UpdatedBy = d.MstUser4.FullName,
+                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                                };
 
-            return itemPrices.ToList();
+            return articlePrices.ToList();
         }
 
-        // =================
-        // Detail Item Price
-        // =================
-        [Authorize, HttpGet, Route("api/itemPrice/detail/{id}")]
-        public Entities.TrnArticlePrice DetailItemPrice(String id)
+        // ====================
+        // Detail Article Price
+        // ====================
+        [Authorize, HttpGet, Route("api/articlePrice/detail/{id}")]
+        public Entities.TrnArticlePrice DetailArticlePrice(String id)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -66,31 +66,31 @@ namespace easyfis.ModifiedApiControllers
 
             var branchId = currentUser.FirstOrDefault().BranchId;
 
-            var itemPrice = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
-                            where d.BranchId == branchId
-                            && d.Id == Convert.ToInt32(id)
-                            select new Entities.TrnArticlePrice
-                            {
-                                Id = d.Id,
-                                IPNumber = d.IPNumber,
-                                IPDate = d.IPDate.ToShortDateString(),
-                                ManualIPNumber = d.ManualIPNumber,
-                                Particulars = d.Particulars,
-                                PreparedById = d.PreparedById,
-                                CheckedById = d.CheckedById,
-                                ApprovedById = d.ApprovedById,
-                                IsLocked = d.IsLocked,
-                                CreatedById = d.CreatedById,
-                                CreatedBy = d.MstUser3.FullName,
-                                CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                UpdatedById = d.UpdatedById,
-                                UpdatedBy = d.MstUser4.FullName,
-                                UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                            };
+            var articlePrice = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
+                               where d.BranchId == branchId
+                               && d.Id == Convert.ToInt32(id)
+                               select new Entities.TrnArticlePrice
+                               {
+                                   Id = d.Id,
+                                   IPNumber = d.IPNumber,
+                                   IPDate = d.IPDate.ToShortDateString(),
+                                   ManualIPNumber = d.ManualIPNumber,
+                                   Particulars = d.Particulars,
+                                   PreparedById = d.PreparedById,
+                                   CheckedById = d.CheckedById,
+                                   ApprovedById = d.ApprovedById,
+                                   IsLocked = d.IsLocked,
+                                   CreatedById = d.CreatedById,
+                                   CreatedBy = d.MstUser3.FullName,
+                                   CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                   UpdatedById = d.UpdatedById,
+                                   UpdatedBy = d.MstUser4.FullName,
+                                   UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                               };
 
-            if (itemPrice.Any())
+            if (articlePrice.Any())
             {
-                return itemPrice.FirstOrDefault();
+                return articlePrice.FirstOrDefault();
             }
             else
             {
@@ -101,8 +101,8 @@ namespace easyfis.ModifiedApiControllers
         // ==============================
         // Dropdown List - Branch (Field)
         // ==============================
-        [Authorize, HttpGet, Route("api/itemPrice/dropdown/list/branch")]
-        public List<Entities.MstBranch> DropdownListItemPriceBranch()
+        [Authorize, HttpGet, Route("api/articlePrice/dropdown/list/branch")]
+        public List<Entities.MstBranch> DropdownListArticlePriceBranch()
         {
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
                            select new Entities.MstBranch
@@ -117,8 +117,8 @@ namespace easyfis.ModifiedApiControllers
         // ============================
         // Dropdown List - User (Field)
         // ============================
-        [Authorize, HttpGet, Route("api/itemPrice/dropdown/list/users")]
-        public List<Entities.MstUser> DropdownListItemPriceUsers()
+        [Authorize, HttpGet, Route("api/articlePrice/dropdown/list/users")]
+        public List<Entities.MstUser> DropdownListArticlePriceUsers()
         {
             var users = from d in db.MstUsers.OrderBy(d => d.FullName)
                         where d.IsLocked == true
@@ -147,11 +147,11 @@ namespace easyfis.ModifiedApiControllers
             return result;
         }
 
-        // ==============
-        // Add Item Price
-        // ==============
-        [Authorize, HttpPost, Route("api/itemPrice/add")]
-        public HttpResponseMessage AddItemPrice()
+        // =================
+        // Add Article Price
+        // =================
+        [Authorize, HttpPost, Route("api/articlePrice/add")]
+        public HttpResponseMessage AddArticlePrice()
         {
             try
             {
@@ -166,7 +166,7 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ItemPriceList")
+                                    && d.SysForm.FormName.Equals("ArticlePriceList")
                                     select d;
 
                     if (userForms.Any())
@@ -174,13 +174,13 @@ namespace easyfis.ModifiedApiControllers
                         if (userForms.FirstOrDefault().CanAdd)
                         {
                             var defaultIPNumber = "0000000001";
-                            var lastItemPrice = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
-                                                where d.BranchId == currentBranchId
-                                                select d;
+                            var lastArticlePrice = from d in db.TrnArticlePrices.OrderByDescending(d => d.Id)
+                                                   where d.BranchId == currentBranchId
+                                                   select d;
 
-                            if (lastItemPrice.Any())
+                            if (lastArticlePrice.Any())
                             {
-                                var IPNumber = Convert.ToInt32(lastItemPrice.FirstOrDefault().IPNumber) + 0000000001;
+                                var IPNumber = Convert.ToInt32(lastArticlePrice.FirstOrDefault().IPNumber) + 0000000001;
                                 defaultIPNumber = FillLeadingZeroes(IPNumber, 10);
                             }
 
@@ -190,7 +190,7 @@ namespace easyfis.ModifiedApiControllers
 
                             if (users.Any())
                             {
-                                Data.TrnArticlePrice newItemPrice = new Data.TrnArticlePrice
+                                Data.TrnArticlePrice newArticlePrice = new Data.TrnArticlePrice
                                 {
                                     BranchId = currentBranchId,
                                     IPNumber = defaultIPNumber,
@@ -207,10 +207,10 @@ namespace easyfis.ModifiedApiControllers
                                     UpdatedDateTime = DateTime.Now
                                 };
 
-                                db.TrnArticlePrices.InsertOnSubmit(newItemPrice);
+                                db.TrnArticlePrices.InsertOnSubmit(newArticlePrice);
                                 db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK, newItemPrice.Id);
+                                return Request.CreateResponse(HttpStatusCode.OK, newArticlePrice.Id);
                             }
                             else
                             {
@@ -239,11 +239,11 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // ===============
-        // Lock Item Price
-        // ===============
-        [Authorize, HttpPut, Route("api/itemPrice/lock/{id}")]
-        public HttpResponseMessage LockItemPrice(Entities.TrnArticlePrice objItemPrice, String id)
+        // ==================
+        // Lock Article Price
+        // ==================
+        [Authorize, HttpPut, Route("api/articlePrice/lock/{id}")]
+        public HttpResponseMessage LockArticlePrice(Entities.TrnArticlePrice objArticlePrice, String id)
         {
             try
             {
@@ -257,30 +257,30 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
+                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
                                     select d;
 
                     if (userForms.Any())
                     {
                         if (userForms.FirstOrDefault().CanLock)
                         {
-                            var itemPrice = from d in db.TrnArticlePrices
-                                            where d.Id == Convert.ToInt32(id)
-                                            select d;
+                            var articlePrice = from d in db.TrnArticlePrices
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
 
-                            if (itemPrice.Any())
+                            if (articlePrice.Any())
                             {
-                                if (!itemPrice.FirstOrDefault().IsLocked)
+                                if (!articlePrice.FirstOrDefault().IsLocked)
                                 {
-                                    var lockItemPrice = itemPrice.FirstOrDefault();
-                                    lockItemPrice.IPDate = Convert.ToDateTime(objItemPrice.IPDate);
-                                    lockItemPrice.ManualIPNumber = objItemPrice.ManualIPNumber;
-                                    lockItemPrice.Particulars = objItemPrice.Particulars;
-                                    lockItemPrice.CheckedById = objItemPrice.CheckedById;
-                                    lockItemPrice.ApprovedById = objItemPrice.ApprovedById;
-                                    lockItemPrice.IsLocked = true;
-                                    lockItemPrice.UpdatedById = currentUserId;
-                                    lockItemPrice.UpdatedDateTime = DateTime.Now;
+                                    var lockArticlePrice = articlePrice.FirstOrDefault();
+                                    lockArticlePrice.IPDate = Convert.ToDateTime(objArticlePrice.IPDate);
+                                    lockArticlePrice.ManualIPNumber = objArticlePrice.ManualIPNumber;
+                                    lockArticlePrice.Particulars = objArticlePrice.Particulars;
+                                    lockArticlePrice.CheckedById = objArticlePrice.CheckedById;
+                                    lockArticlePrice.ApprovedById = objArticlePrice.ApprovedById;
+                                    lockArticlePrice.IsLocked = true;
+                                    lockArticlePrice.UpdatedById = currentUserId;
+                                    lockArticlePrice.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
 
@@ -318,11 +318,11 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // =================
-        // Unlock Item Price
-        // =================
-        [Authorize, HttpPut, Route("api/itemPrice/unlock/{id}")]
-        public HttpResponseMessage UnlockItemPrice(String id)
+        // ====================
+        // Unlock Article Price
+        // ====================
+        [Authorize, HttpPut, Route("api/articlePrice/unlock/{id}")]
+        public HttpResponseMessage UnlockArticlePrice(String id)
         {
             try
             {
@@ -336,25 +336,25 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
+                                    && d.SysForm.FormName.Equals("ArticlePriceDetail")
                                     select d;
 
                     if (userForms.Any())
                     {
                         if (userForms.FirstOrDefault().CanUnlock)
                         {
-                            var itemPrice = from d in db.TrnArticlePrices
-                                            where d.Id == Convert.ToInt32(id)
-                                            select d;
+                            var articlePrice = from d in db.TrnArticlePrices
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
 
-                            if (itemPrice.Any())
+                            if (articlePrice.Any())
                             {
-                                if (itemPrice.FirstOrDefault().IsLocked)
+                                if (articlePrice.FirstOrDefault().IsLocked)
                                 {
-                                    var unlockItemPrice = itemPrice.FirstOrDefault();
-                                    unlockItemPrice.IsLocked = false;
-                                    unlockItemPrice.UpdatedById = currentUserId;
-                                    unlockItemPrice.UpdatedDateTime = DateTime.Now;
+                                    var unlockArticlePrice = articlePrice.FirstOrDefault();
+                                    unlockArticlePrice.IsLocked = false;
+                                    unlockArticlePrice.UpdatedById = currentUserId;
+                                    unlockArticlePrice.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
 
@@ -393,10 +393,10 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =================
-        // Delete Item Price
+        // Delete Article Price
         // =================
-        [Authorize, HttpDelete, Route("api/itemPrice/delete/{id}")]
-        public HttpResponseMessage DeleteItemPrice(String id)
+        [Authorize, HttpDelete, Route("api/articlePrice/delete/{id}")]
+        public HttpResponseMessage DeleteArticlePrice(String id)
         {
             try
             {
@@ -410,22 +410,22 @@ namespace easyfis.ModifiedApiControllers
 
                     var userForms = from d in db.MstUserForms
                                     where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ItemPriceList")
+                                    && d.SysForm.FormName.Equals("ArticlePriceList")
                                     select d;
 
                     if (userForms.Any())
                     {
                         if (userForms.FirstOrDefault().CanDelete)
                         {
-                            var itemPrice = from d in db.TrnArticlePrices
-                                            where d.Id == Convert.ToInt32(id)
-                                            select d;
+                            var articlePrice = from d in db.TrnArticlePrices
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
 
-                            if (itemPrice.Any())
+                            if (articlePrice.Any())
                             {
-                                if (!itemPrice.FirstOrDefault().IsLocked)
+                                if (!articlePrice.FirstOrDefault().IsLocked)
                                 {
-                                    db.TrnArticlePrices.DeleteOnSubmit(itemPrice.First());
+                                    db.TrnArticlePrices.DeleteOnSubmit(articlePrice.First());
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

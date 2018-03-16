@@ -9,5 +9,10 @@ namespace easyfis.ModifiedApiControllers
 {
     public class ApiTrnArticlePriceItemController : ApiController
     {
+        // ============
+        // Data Context
+        // ============
+        private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
     }
 }
