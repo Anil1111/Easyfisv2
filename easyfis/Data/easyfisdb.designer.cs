@@ -15733,7 +15733,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnArticlePrice1", Storage="_TrnArticlePrices1", ThisKey="Id", OtherKey="CreatedById")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnArticlePrice1", Storage="_TrnArticlePrices1", ThisKey="Id", OtherKey="CheckedById")]
 		public EntitySet<TrnArticlePrice> TrnArticlePrices1
 		{
 			get
@@ -19619,6 +19619,10 @@ namespace easyfis.Data
 			{
 				if ((this._CheckedById != value))
 				{
+					if (this._MstUser1.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
 					this.OnCheckedByIdChanging(value);
 					this.SendPropertyChanging();
 					this._CheckedById = value;
@@ -19683,7 +19687,7 @@ namespace easyfis.Data
 			{
 				if ((this._CreatedById != value))
 				{
-					if ((this._MstUser1.HasLoadedOrAssignedValue || this._MstUser3.HasLoadedOrAssignedValue))
+					if (this._MstUser3.HasLoadedOrAssignedValue)
 					{
 						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
 					}
@@ -19841,7 +19845,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnArticlePrice1", Storage="_MstUser1", ThisKey="CreatedById", OtherKey="Id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_TrnArticlePrice1", Storage="_MstUser1", ThisKey="CheckedById", OtherKey="Id", IsForeignKey=true)]
 		public MstUser MstUser1
 		{
 			get
@@ -19864,11 +19868,11 @@ namespace easyfis.Data
 					if ((value != null))
 					{
 						value.TrnArticlePrices1.Add(this);
-						this._CreatedById = value.Id;
+						this._CheckedById = value.Id;
 					}
 					else
 					{
-						this._CreatedById = default(int);
+						this._CheckedById = default(int);
 					}
 					this.SendPropertyChanged("MstUser1");
 				}
