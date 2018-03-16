@@ -57,6 +57,27 @@ namespace easyfis.ModifiedApiControllers
             return items.ToList();
         }
 
+        // ========================
+        // Pop-Up List - Item Query
+        // ========================
+        [Authorize, HttpGet, Route("api/articlePriceItem/popUp/list/itemQuery")]
+        public List<Entities.MstArticle> PopUpListArticlePriceItemListItemQuery()
+        {
+            var items = from d in db.MstArticles
+                        where d.ArticleTypeId == 1
+                        && d.IsLocked == true
+                        select new Entities.MstArticle
+                        {
+                            Id = d.Id,
+                            ManualArticleCode = d.ManualArticleCode,
+                            Article = d.Article,
+                            Particulars = d.Particulars,
+                            Unit = d.MstUnit.Unit
+                        };
+
+            return items.ToList();
+        }
+
         // ======================
         // Add Article Price Item
         // ======================

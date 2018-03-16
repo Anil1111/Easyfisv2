@@ -166,7 +166,8 @@
                                             @{
                                                 if (canAdd)
                                                 {
-                                                    <button type="submit" class="btn btn-primary pull-right" id="btnArticlePriceItemAdd" onclick="btnArticlePriceItemAddOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button type="submit" class="btn btn-primary" id="btnArticlePriceItemAdd" onclick="btnArticlePriceItemAddOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
                                                 }
                                             }
                                         </td>
@@ -322,6 +323,62 @@
         </div>
     </div>
 
+    <!--
+        ===============================
+        Article Price Items: Item Query
+        ===============================
+    -->
+    <div class="modal fade" id="itemQueryListModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Item Query</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <span id="itemQueryLoading"></span>
+                    </center>
+                    <div id="itemQueryContent">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    <input type="text" class="form-control" id="itemQuerySearchFilter" placeholder="Search">
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="itemQueryFlexGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="itemQueryNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToFirstPageGrid">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToPreviousPageGrid">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemQueryCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToNextPageGrid">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToLastPageGrid">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ========================================
@@ -352,6 +409,18 @@
         var articlePriceItemId = 0;
         var cboArticlePriceItemCode = new wijmo.input.ComboBox('#cboArticlePriceItemCode');
         var cboArticlePriceItemDescription = new wijmo.input.ComboBox('#cboArticlePriceItemDescription');
+
+        // ==========
+        // Item Query
+        // ==========
+        var itemQueryItemsCollectionView;
+        var itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+        var btnItemQueryMoveToFirstPageGrid = document.getElementById('btnItemQueryMoveToFirstPageGrid');
+        var btnItemQueryMoveToPreviousPageGrid = document.getElementById('btnItemQueryMoveToPreviousPageGrid');
+        var btnItemQueryMoveToNextPageGrid = document.getElementById('btnItemQueryMoveToNextPageGrid');
+        var btnItemQueryMoveToLastPageGrid = document.getElementById('btnItemQueryMoveToLastPageGrid');
+        var btnItemQueryCurrentPageGrid = document.getElementById('btnItemQueryCurrentPageGrid');
+        var isItemQueryClicked = false;
 
         // =======================
         // Get URL Parameter Value
@@ -970,6 +1039,216 @@
             createCboArticlePriceItemData(articlePriceItem.ItemId);
             document.getElementById('inpArticlePriceItemPrice').value = formatDecimalValues(articlePriceItem.Price);
             document.getElementById('inpArticlePriceItemTriggerQuantity').value = formatDecimalValues(articlePriceItem.TriggerQuantity);
+
+            $("#inpArticlePriceItemPriceCode").show();
+            $("#dtArticlePriceItemCodeLabel").show();
+            $("#ddArticlePriceItemCodeData").show();
+
+            setTimeout(function () {
+                $("#articlePriceItemLoading").hide();
+                $("#btnArticlePriceItemSave").prop("disabled", false);
+                $("#articlePriceItemDetailForm").show();
+            }, 500);
+        }
+
+        // ====================
+        // Item Query Pop Modal
+        // ====================
+        function btnItemQueryOnclick() {
+            $('#itemQueryListModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#itemQueryContent").hide();
+            $("#itemQueryLoading").show();
+            document.getElementById("itemQueryLoading").innerHTML = "Loading...";
+
+            setTimeout(function () {
+                createItemQueryFlexGrid();
+            }, 500);
+        }
+
+        // ================================
+        // Get Aricle Price Item Query Data
+        // ================================
+        function getArticlePriceItemQueryData() {
+            var itemsObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/articlePriceItem/popUp/list/itemQuery',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    for (i = 0; i < results.length; i++) {
+                        itemsObservableArray.push({
+                            Id: results[i]["Id"],
+                            ManualArticleCode: results[i]["ManualArticleCode"],
+                            Article: results[i]["Article"],
+                            Particulars: results[i]["Particulars"],
+                            Unit: results[i]["Unit"],
+                            Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnItemQueryPickItemOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                        });
+                    }
+
+                    $("#itemQueryContent").show();
+                    $("#itemQueryLoading").hide();
+                }
+            });
+
+            return itemsObservableArray;
+        }
+
+        // ==========================
+        // Create Item Query Flexgrid
+        // ==========================
+        function createItemQueryFlexGrid() {
+            itemQueryItemsCollectionView = new wijmo.collections.CollectionView(getArticlePriceItemQueryData());
+            itemQueryItemsCollectionView.canFilter = true;
+            itemQueryItemsCollectionView.pageSize = 10;
+
+            var filterText = '';
+            $('#itemQuerySearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                itemQueryItemsCollectionView.refresh();
+            });
+
+            itemQueryItemsCollectionView.filter = function (item) {
+                return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            itemQueryItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemQueryNavigationButtons();
+            });
+
+            itemQueryFlexGrid.dispose();
+            itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+            itemQueryFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Code",
+                        "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "Description",
+                        "binding": "Article",
+                        "allowSorting": true,
+                        "width": "5*"
+                    },
+                    {
+                        "header": "Unit",
+                        "binding": "Unit",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Pick",
+                        "binding": "Pick",
+                        "width": "1*",
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: itemQueryItemsCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            itemQueryFlexGrid.trackChanges = true;
+
+            if (!isItemQueryClicked) {
+                updateItemQueryNavigationButtons();
+
+                btnItemQueryMoveToFirstPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToFirstPage();
+                    updateItemQueryNavigationButtons();
+                });
+
+                btnItemQueryMoveToPreviousPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToPreviousPage();
+                    updateItemQueryNavigationButtons();
+                });
+
+                btnItemQueryMoveToNextPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToNextPage();
+                    updateItemQueryNavigationButtons();
+                });
+
+                btnItemQueryMoveToLastPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToLastPage();
+                    updateItemQueryNavigationButtons();
+                });
+
+                isItemQueryClicked = true;
+            }
+        }
+
+        // ====================================
+        // Update Item Query Navigation Buttons
+        // ====================================
+        function updateItemQueryNavigationButtons() {
+            if (itemQueryItemsCollectionView.pageSize <= 0) {
+                document.getElementById('itemQueryNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('itemQueryNavigationPageGrid').style.display = 'block';
+            if (itemQueryItemsCollectionView.pageIndex === 0) {
+                btnItemQueryMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemQueryItemsCollectionView.pageIndex === (itemQueryItemsCollectionView.pageCount - 1)) {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemQueryCurrentPageGrid.innerHTML = (itemQueryItemsCollectionView.pageIndex + 1) + ' / ' + itemQueryItemsCollectionView.pageCount;
+        }
+
+        // =====================
+        // Item Query: Pick Item
+        // =====================
+        function btnItemQueryPickItemOnclick() {
+            $('#articlePriceItemDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredArticlePriceItem').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            $("#articlePriceItemLoading").show();
+            document.getElementById("articlePriceItemLoading").innerHTML = 'Loading...';
+            $("#articlePriceItemDetailForm").hide();
+
+            document.getElementById('btnArticlePriceItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnArticlePriceItemSave").prop("disabled", false);
+            $("#btnArticlePriceItemCloseDetailModal").prop("disabled", false);
+
+            itemQueryItemsCollectionView.editItem(itemQueryItemsCollectionView.currentItem);
+            var itemQueryItem = itemQueryItemsCollectionView.currentEditItem;
+            articlePriceItemId = 0;
+            createCboArticlePriceItemData(itemQueryItem.Id);
+            document.getElementById('inpArticlePriceItemPrice').value = formatDecimalValues(0);
+            document.getElementById('inpArticlePriceItemTriggerQuantity').value = formatDecimalValues(0);
 
             $("#inpArticlePriceItemPriceCode").show();
             $("#dtArticlePriceItemCodeLabel").show();
