@@ -1103,6 +1103,7 @@
                                     SIId: results[i]["SIId"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
                                     ItemInventoryId: results[i]["ItemInventoryId"],
@@ -1207,7 +1208,8 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.VAT.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Discount.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             SIItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -1240,7 +1242,8 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.VAT.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Discount.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             SIItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -1281,8 +1284,14 @@
                         }
                     }
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 100,
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": 100,
                     },
@@ -1455,13 +1464,156 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 19; i++) {
+                            for (var i = 0; i <= 20; i++) {
                                 if (i == 0) {
                                     columnName = "Edit";
                                 } else if (i == 1) {
                                     columnName = "Delete";
                                 } else if (i == 2) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 7) {
+                                    columnName = "Quantity";
+                                } else if (i == 8) {
+                                    columnName = "Unit";
+                                } else if (i == 9) {
+                                    columnName = "Price";
+                                } else {
+                                    if (i >= 10) {
+                                        columnName = "Discount";
+                                        for (var j = 10; j <= 12; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 13 && i <= 14) {
+                                        if (i == 13) {
+                                            columnName = "Net Price";
+                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                        } else if (i == 14) {
+                                            columnName = "Amount";
+                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                        }
+
+                                    }
+
+                                    if (i >= 15) {
+                                        columnName = "VAT";
+                                        for (var j = 15; j <= 17; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 18) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 18; j <= 20; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 9) {
+                                    SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 19; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Price";
+                                } else {
+                                    if (i >= 9) {
+                                        columnName = "Discount";
+                                        for (var j = 9; j <= 11; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 12 && i <= 13) {
+                                        if (i == 12) {
+                                            columnName = "Net Price";
+                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                        } else if (i == 13) {
+                                            columnName = "Amount";
+                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                        }
+
+                                    }
+
+                                    if (i >= 14) {
+                                        columnName = "VAT";
+                                        for (var j = 14; j <= 16; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 17) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 17; j <= 19; j++) {
+                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 8) {
+                                    SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 19; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
                                     columnName = "Description";
                                 } else if (i == 4) {
@@ -1524,11 +1676,11 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 16; i++) {
+                            for (var i = 0; i <= 18; i++) {
                                 if (i == 0) {
-                                    columnName = "Edit";
+                                    columnName = "Barcode";
                                 } else if (i == 1) {
-                                    columnName = "Code";
+                                    columnName = "SKU Code";
                                 } else if (i == 2) {
                                     columnName = "Description";
                                 } else if (i == 3) {
@@ -1581,141 +1733,6 @@
                                 }
 
                                 if (i <= 7) {
-                                    SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                    SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                }
-                else
-                {
-                    if (canDelete)
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 16; i++) {
-                                if (i == 0) {
-                                    columnName = "Delete";
-                                } else if (i == 1) {
-                                    columnName = "Code";
-                                } else if (i == 2) {
-                                    columnName = "Description";
-                                } else if (i == 3) {
-                                    columnName = "Particulars";
-                                } else if (i == 4) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 5) {
-                                    columnName = "Quantity";
-                                } else if (i == 6) {
-                                    columnName = "Unit";
-                                } else if (i == 7) {
-                                    columnName = "Price";
-                                } else {
-                                    if (i >= 8) {
-                                        columnName = "Discount";
-                                        for (var j = 8; j <= 10; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 11 && i <= 12) {
-                                        if (i == 11) {
-                                            columnName = "Net Price";
-                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                        } else if (i == 12) {
-                                            columnName = "Amount";
-                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                        }
-
-                                    }
-
-                                    if (i >= 13) {
-                                        columnName = "VAT";
-                                        for (var j = 13; j <= 15; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 16) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 16; j <= 18; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 7) {
-                                    SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                    SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                    else
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 15; i++) {
-                                if (i == 0) {
-                                    columnName = "Code";
-                                } else if (i == 1) {
-                                    columnName = "Description";
-                                } else if (i == 2) {
-                                    columnName = "Particulars";
-                                } else if (i == 3) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 4) {
-                                    columnName = "Quantity";
-                                } else if (i == 5) {
-                                    columnName = "Unit";
-                                } else if (i == 6) {
-                                    columnName = "Price";
-                                } else {
-                                    if (i >= 7) {
-                                        columnName = "Discount";
-                                        for (var j = 7; j <= 9; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 10 && i <= 11) {
-                                        if (i == 10) {
-                                            columnName = "Net Price";
-                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                        } else if (i == 11) {
-                                            columnName = "Amount";
-                                            SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                        }
-
-                                    }
-
-                                    if (i >= 12) {
-                                        columnName = "VAT";
-                                        for (var j = 12; j <= 14; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 15) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 15; j <= 17; j++) {
-                                            SIItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            SIItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 6) {
                                     SIItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
                                     SIItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
                                 }
@@ -3021,6 +3038,7 @@
                                 InventoryCode: results[i]["InventoryCode"],
                                 ArticleId: results[i]["ArticleId"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
+                                ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 Article: results[i]["Article"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -3060,6 +3078,7 @@
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
+                                ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 Article: results[i]["Article"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -3094,6 +3113,7 @@
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
+                                ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 Article: results[i]["Article"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -3213,7 +3233,8 @@
             itemInventoryCollectionView.filter = function (item) {
                 return !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemInventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -3231,8 +3252,14 @@
                                 "width": "2*"
                             },
                             {
-                                "header": "Code",
+                                "header": "Barcode",
                                 "binding": "ManualArticleCode",
+                                "allowSorting": true,
+                                "width": "2*",
+                            },
+                            {
+                                "header": "SKU Code",
+                                "binding": "ManualArticleOldCode",
                                 "allowSorting": true,
                                 "width": "2*",
                             },
@@ -3260,7 +3287,7 @@
                                 "header": "Unit",
                                 "binding": "Unit",
                                 "allowSorting": true,
-                                "width": "2*",
+                                "width": "1*",
                             },
                             {
                                 "header": "Pick",
@@ -3352,7 +3379,8 @@
 
             itemNonInventoryCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemNonInventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -3364,16 +3392,22 @@
             itemNonInventoryFlexGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
                         "allowSorting": true,
-                        "width": "4*"
+                        "width": "2*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
+                        "allowSorting": true,
+                        "width": "2*",
                     },
                     {
                         "header": "Item",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "5*"
+                        "width": "4*"
                     },
                     {
                         "header": "Price",
@@ -3472,7 +3506,8 @@
 
             itemPackageCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemPackageCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -3484,16 +3519,22 @@
             itemPackageFlexGrid.initialize({
                 columns: [
                             {
-                                "header": "Code",
+                                "header": "Barcode",
                                 "binding": "ManualArticleCode",
                                 "allowSorting": true,
-                                "width": "4*"
+                                "width": "2*"
+                            },
+                            {
+                                "header": "SKU Code",
+                                "binding": "ManualArticleOldCode",
+                                "allowSorting": true,
+                                "width": "2*",
                             },
                             {
                                 "header": "Item",
                                 "binding": "Article",
                                 "allowSorting": true,
-                                "width": "5*"
+                                "width": "4*"
                             },
                             {
                                 "header": "Price",

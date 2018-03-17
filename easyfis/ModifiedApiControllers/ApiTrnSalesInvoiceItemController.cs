@@ -30,6 +30,7 @@ namespace easyfis.ModifiedApiControllers
                                         SIId = d.SIId,
                                         ItemId = d.ItemId,
                                         ItemCode = d.MstArticle.ManualArticleCode,
+                                        ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                         ItemDescription = d.MstArticle.Article,
                                         Particulars = d.Particulars,
                                         ItemInventoryId = d.ItemInventoryId,
@@ -204,6 +205,7 @@ namespace easyfis.ModifiedApiControllers
                                      InventoryCode = d.InventoryCode,
                                      ArticleId = d.ArticleId,
                                      ManualArticleCode = d.MstArticle.ManualArticleCode,
+                                     ManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                      Article = d.MstArticle.Article,
                                      Price = d.MstArticle.Price,
                                      Quantity = d.Quantity,
@@ -232,6 +234,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
+                            ManualArticleOldCode = d.ManualArticleOldCode,
                             Article = d.Article,
                             Price = d.Price,
                             Particulars = d.Particulars
@@ -254,6 +257,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
+                            ManualArticleOldCode = d.ManualArticleOldCode,
                             Article = d.Article,
                             Price = d.Price,
                             Particulars = d.Particulars

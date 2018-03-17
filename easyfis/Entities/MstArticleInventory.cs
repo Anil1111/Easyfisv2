@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public Int32 ArticleId { get; set; }
         public String Article { get; set; }
         public String ManualArticleCode { get; set; }
+        public String ManualArticleOldCode { get; set; }
         public Int32 ExpenseAccountId { get; set; }
         public Decimal Price { get; set; }
         public Int32 UnitId { get; set; }
