@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public String ExpenseAccount { get; set; }
         public Int32 ItemId { get; set; }
         public String ItemCode { get; set; }
+        public String ItemManualArticleOldCode { get; set; }
         public String ItemDescription { get; set; }
         public Int32 ItemInventoryId { get; set; }
         public String ItemInventoryCode { get; set; }

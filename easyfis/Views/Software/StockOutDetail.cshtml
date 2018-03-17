@@ -1019,6 +1019,7 @@
                                     OTId: results[i]["OTId"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
                                     ItemInventoryId: results[i]["ItemInventoryId"],
@@ -1195,7 +1196,8 @@
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             items.collectionChanged.addHandler(function (sender, args) {
@@ -1226,7 +1228,8 @@
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             items.collectionChanged.addHandler(function (sender, args) {
@@ -1267,8 +1270,14 @@
                         }
                     }
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 120,
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": 120,
                     },
@@ -1398,13 +1407,114 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 13; i++) {
+                            for (var i = 0; i <= 14; i++) {
                                 if (i == 0) {
                                     columnName = "Edit";
                                 } else if (i == 1) {
                                     columnName = "Delete";
                                 } else if (i == 2) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 7) {
+                                    columnName = "Quantity";
+                                } else if (i == 8) {
+                                    columnName = "Unit";
+                                } else if (i == 9) {
+                                    columnName = "Cost";
+                                } else if (i == 10) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 11) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 11; j <= 13; j++) {
+                                            itemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            itemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 10) {
+                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+
+                                if (i == 14) {
+                                    columnName = "Expense Account";
+                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 13; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 10) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 10; j <= 12; j++) {
+                                            itemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            itemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 9) {
+                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+
+                                if (i == 13) {
+                                    columnName = "Expense Account";
+                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 13; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
                                     columnName = "Description";
                                 } else if (i == 4) {
@@ -1448,9 +1558,9 @@
                             var columnName = "";
                             for (var i = 0; i <= 12; i++) {
                                 if (i == 0) {
-                                    columnName = "Edit";
+                                    columnName = "Barcode";
                                 } else if (i == 1) {
-                                    columnName = "Code";
+                                    columnName = "SKU Code";
                                 } else if (i == 2) {
                                     columnName = "Description";
                                 } else if (i == 3) {
@@ -1481,99 +1591,6 @@
                                 }
 
                                 if (i == 12) {
-                                    columnName = "Expense Account";
-                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                }
-                else
-                {
-                    if (canDelete)
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 12; i++) {
-                                if (i == 0) {
-                                    columnName = "Delete";
-                                } else if (i == 1) {
-                                    columnName = "Code";
-                                } else if (i == 2) {
-                                    columnName = "Description";
-                                } else if (i == 3) {
-                                    columnName = "Particulars";
-                                } else if (i == 4) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 5) {
-                                    columnName = "Quantity";
-                                } else if (i == 6) {
-                                    columnName = "Unit";
-                                } else if (i == 7) {
-                                    columnName = "Cost";
-                                } else if (i == 8) {
-                                    columnName = "Amount";
-                                } else {
-                                    if (i >= 9) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 9; j <= 11; j++) {
-                                            itemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            itemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 8) {
-                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-
-                                if (i == 12) {
-                                    columnName = "Expense Account";
-                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                    else
-                    {
-                         <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 11; i++) {
-                                if (i == 0) {
-                                    columnName = "Code";
-                                } else if (i == 1) {
-                                    columnName = "Description";
-                                } else if (i == 2) {
-                                    columnName = "Particulars";
-                                } else if (i == 3) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 4) {
-                                    columnName = "Quantity";
-                                } else if (i == 5) {
-                                    columnName = "Unit";
-                                } else if (i == 6) {
-                                    columnName = "Cost";
-                                } else if (i == 7) {
-                                    columnName = "Amount";
-                                } else {
-                                    if (i >= 8) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 8; j <= 10; j++) {
-                                            itemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            itemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 7) {
-                                    itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    itemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-
-                                if (i == 11) {
                                     columnName = "Expense Account";
                                     itemGrid.columnHeaders.columns[i].allowMerging = true;
                                     itemGrid.columnHeaders.setCellData(0, i, columnName);
@@ -2490,6 +2507,7 @@
                             Id: results[i]["Id"],
                             ArticleId: results[i]["ArticleId"],
                             ManualArticleCode: results[i]["ManualArticleCode"],
+                            ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                             Article: results[i]["Article"],
                             InventoryCode: results[i]["InventoryCode"],
                             Price: results[i]["Price"],
@@ -2557,7 +2575,8 @@
 
             itemQueryItemsCollection.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
@@ -2570,8 +2589,14 @@
             itemQueryGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
                         "allowSorting": true,
                         "width": "3*"
                     },
@@ -2605,7 +2630,7 @@
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "width": 120
+                        "width": 80
                     },
                     {
                         "header": "Pick",
