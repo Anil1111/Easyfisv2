@@ -926,6 +926,7 @@
                                     PONumber: results[i]["PONumber"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
                                     Quantity: results[i]["Quantity"],
@@ -1027,7 +1028,8 @@
                     || !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.VAT.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.WTAX.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);;
             }
 
             receivingReceiptItemsCollection.collectionChanged.addHandler(function (sender, args) {
@@ -1109,8 +1111,14 @@
                         "width": 90
                     },
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 120
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": 120
                     },
@@ -1278,7 +1286,7 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 19; i++) {
+                            for (var i = 0; i <= 20; i++) {
                                 if (i == 0) {
                                     columnName = "Edit";
                                 } else if (i == 1) {
@@ -1286,7 +1294,133 @@
                                 } else if (i == 2) {
                                     columnName = "PO No.";
                                 } else if (i == 3) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
+                                } else if (i == 4) {
+                                    columnName = "SKU Code";
+                                } else if (i == 5) {
+                                    columnName = "Description";
+                                } else if (i == 6) {
+                                    columnName = "Particulars";
+                                } else if (i == 7) {
+                                    columnName = "Quantity";
+                                } else if (i == 8) {
+                                    columnName = "Unit";
+                                } else if (i == 9) {
+                                    columnName = "Cost";
+                                } else if (i == 10) {
+                                    columnName = "Amount";
+                                } else if (i == 11) {
+                                    columnName = "Branch";
+                                } else {
+                                    if (i >= 12) {
+                                        columnName = "VAT";
+                                        for (var j = 12; j <= 14; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 15) {
+                                        columnName = "WTAX";
+                                        for (var j = 15; j <= 17; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 18) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 18; j <= 20; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 11) {
+                                    receivingReceiptItemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    receivingReceiptItemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 19; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "PO No.";
+                                } else if (i == 2) {
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else if (i == 10) {
+                                    columnName = "Branch";
+                                } else {
+                                    if (i >= 11) {
+                                        columnName = "VAT";
+                                        for (var j = 11; j <= 13; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 14) {
+                                        columnName = "WTAX";
+                                        for (var j = 14; j <= 16; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+
+                                    if (i >= 17) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 17; j <= 19; j++) {
+                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
+                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 10) {
+                                    receivingReceiptItemGrid.columnHeaders.columns[i].allowMerging = true;
+                                    receivingReceiptItemGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 19; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "PO No.";
+                                } else if (i == 2) {
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
                                 } else if (i == 4) {
                                     columnName = "Description";
                                 } else if (i == 5) {
@@ -1340,11 +1474,11 @@
                             var columnName = "";
                             for (var i = 0; i <= 18; i++) {
                                 if (i == 0) {
-                                    columnName = "Edit";
-                                } else if (i == 1) {
                                     columnName = "PO No.";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
                                 } else if (i == 2) {
-                                    columnName = "Code";
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
                                     columnName = "Description";
                                 } else if (i == 4) {
@@ -1386,124 +1520,6 @@
                                 }
 
                                 if (i <= 9) {
-                                    receivingReceiptItemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    receivingReceiptItemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-
-                            }
-                        </text>
-                    }
-                }
-                else
-                {
-                    if (canDelete)
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 16; i++) {
-                                if (i == 0) {
-                                    columnName = "Delete";
-                                } else if (i == 1) {
-                                    columnName = "PO No.";
-                                } else if (i == 2) {
-                                    columnName = "Code";
-                                } else if (i == 3) {
-                                    columnName = "Description";
-                                } else if (i == 4) {
-                                    columnName = "Particulars";
-                                } else if (i == 5) {
-                                    columnName = "Quantity";
-                                } else if (i == 6) {
-                                    columnName = "Unit";
-                                } else if (i == 7) {
-                                    columnName = "Cost";
-                                } else if (i == 8) {
-                                    columnName = "Amount";
-                                } else if (i == 9) {
-                                    columnName = "Branch";
-                                } else {
-                                    if (i >= 10) {
-                                        columnName = "VAT";
-                                        for (var j = 10; j <= 12; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 13) {
-                                        columnName = "WTAX";
-                                        for (var j = 13; j <= 15; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 16) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 16; j <= 18; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 9) {
-                                    receivingReceiptItemGrid.columnHeaders.columns[i].allowMerging = true;
-                                    receivingReceiptItemGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                    else
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 15; i++) {
-                                if (i == 0) {
-                                    columnName = "PO No.";
-                                } else if (i == 1) {
-                                    columnName = "Code";
-                                } else if (i == 2) {
-                                    columnName = "Description";
-                                } else if (i == 3) {
-                                    columnName = "Particulars";
-                                } else if (i == 4) {
-                                    columnName = "Quantity";
-                                } else if (i == 5) {
-                                    columnName = "Unit";
-                                } else if (i == 6) {
-                                    columnName = "Cost";
-                                } else if (i == 7) {
-                                    columnName = "Amount";
-                                } else if (i == 8) {
-                                    columnName = "Branch";
-                                } else {
-                                    if (i >= 9) {
-                                        columnName = "VAT";
-                                        for (var j = 9; j <= 11; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 12) {
-                                        columnName = "WTAX";
-                                        for (var j = 12; j <= 14; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-
-                                    if (i >= 15) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 15; j <= 17; j++) {
-                                            receivingReceiptItemGrid.columnHeaders.columns[j].allowMerging = true;
-                                            receivingReceiptItemGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 8) {
                                     receivingReceiptItemGrid.columnHeaders.columns[i].allowMerging = true;
                                     receivingReceiptItemGrid.columnHeaders.setCellData(0, i, columnName);
                                 }

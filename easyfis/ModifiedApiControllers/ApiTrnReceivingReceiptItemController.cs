@@ -32,6 +32,7 @@ namespace easyfis.ModifiedApiControllers
                                             PONumber = d.TrnPurchaseOrder.PONumber,
                                             ItemId = d.ItemId,
                                             ItemCode = d.MstArticle.ManualArticleCode,
+                                            ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                             ItemDescription = d.MstArticle.Article,
                                             Particulars = d.Particulars,
                                             Quantity = d.Quantity,
