@@ -571,6 +571,7 @@
 
                                 $("#btnItemPriceDetailLock").prop("disabled", true);
                                 $("#btnArticlePriceItemAdd").prop("disabled", true);
+                                $("#btnItemQuery").prop("disabled", true);
 
                                 isLocked = true;
                             } else {
@@ -740,6 +741,7 @@
                                         ArticlePriceId: results[i]["ArticlePriceId"],
                                         ItemId: results[i]["ItemId"],
                                         ItemCode: results[i]["ItemCode"],
+                                        ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                         ItemDescription: results[i]["ItemDescription"],
                                         Price: results[i]["Price"],
                                         PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -774,6 +776,7 @@
 
             articlePriceItemCollectionView.filter = function (item) {
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -815,8 +818,14 @@
                         }
                     }
                     {
-                        "header": "Bar Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": "1.5*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": "1.5*"
                     },
@@ -916,6 +925,7 @@
 
             articlePriceItemCollectionView.filter = function (item) {
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -1091,6 +1101,7 @@
                         itemsObservableArray.push({
                             Id: results[i]["Id"],
                             ManualArticleCode: results[i]["ManualArticleCode"],
+                            ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                             Article: results[i]["Article"],
                             Particulars: results[i]["Particulars"],
                             Unit: results[i]["Unit"],
@@ -1122,6 +1133,7 @@
 
             itemQueryItemsCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -1134,8 +1146,14 @@
             itemQueryFlexGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
                         "allowSorting": true,
                         "width": "3*"
                     },
@@ -1143,13 +1161,12 @@
                         "header": "Description",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "5*"
+                        "width": "4*"
                     },
                     {
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "align": "right",
                         "width": "1*"
                     },
                     {
