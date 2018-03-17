@@ -11,6 +11,7 @@ namespace easyfis.Entities
         public Int32 INId { get; set; }
         public Int32 ItemId { get; set; }
         public String ItemCode { get; set; }
+        public String ItemManualArticleOldCode { get; set; }
         public String ItemDescription { get; set; }
         public String Particulars { get; set; }
         public Int32 UnitId { get; set; }

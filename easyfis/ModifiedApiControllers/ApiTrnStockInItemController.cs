@@ -30,6 +30,7 @@ namespace easyfis.ModifiedApiControllers
                                    INId = d.INId,
                                    ItemId = d.ItemId,
                                    ItemCode = d.MstArticle.ManualArticleCode,
+                                   ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                    ItemDescription = d.MstArticle.Article,
                                    Particulars = d.Particulars,
                                    UnitId = d.UnitId,
@@ -153,6 +154,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Id = d.Id,
                             ManualArticleCode = d.ManualArticleCode,
+                            ManualArticleOldCode = d.ManualArticleOldCode,
                             Article = d.Article,
                             Particulars = d.Particulars,
                             Price = d.Price
