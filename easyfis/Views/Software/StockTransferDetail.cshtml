@@ -795,6 +795,7 @@
                                     STId: results[i]["STId"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     ItemInventoryId: results[i]["ItemInventoryId"],
                                     ItemInventoryCode: results[i]["ItemInventoryCode"],
@@ -952,7 +953,8 @@
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             stockTransferItemCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -994,8 +996,14 @@
                         }
                     }
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 110
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": 110
                     },
@@ -1119,13 +1127,102 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 12; i++) {
+                            for (var i = 0; i <= 13; i++) {
                                 if (i == 0) {
                                     columnName = "Edit";
                                 } else if (i == 1) {
                                     columnName = "Delete";
                                 } else if (i == 2) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 7) {
+                                    columnName = "Quantity";
+                                } else if (i == 8) {
+                                    columnName = "Unit";
+                                } else if (i == 9) {
+                                    columnName = "Cost";
+                                } else if (i == 10) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 11) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 11; j <= 13; j++) {
+                                            stockTransferItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockTransferItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 10) {
+                                    stockTransferItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockTransferItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 12; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 10) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 10; j <= 12; j++) {
+                                            stockTransferItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockTransferItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 9) {
+                                    stockTransferItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockTransferItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 12; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
                                     columnName = "Description";
                                 } else if (i == 4) {
@@ -1163,9 +1260,9 @@
                             var columnName = "";
                             for (var i = 0; i <= 11; i++) {
                                 if (i == 0) {
-                                    columnName = "Edit";
+                                    columnName = "Barcode";
                                 } else if (i == 1) {
-                                    columnName = "Code";
+                                    columnName = "SKU Code";
                                 } else if (i == 2) {
                                     columnName = "Description";
                                 } else if (i == 3) {
@@ -1191,87 +1288,6 @@
                                 }
 
                                 if (i <= 8) {
-                                    stockTransferItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                    stockTransferItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                }
-                else
-                {
-                    if (canDelete)
-                    {
-                        <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 11; i++) {
-                                if (i == 0) {
-                                    columnName = "Delete";
-                                } else if (i == 1) {
-                                    columnName = "Code";
-                                } else if (i == 2) {
-                                    columnName = "Description";
-                                } else if (i == 3) {
-                                    columnName = "Particulars";
-                                } else if (i == 4) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 5) {
-                                    columnName = "Quantity";
-                                } else if (i == 6) {
-                                    columnName = "Unit";
-                                } else if (i == 7) {
-                                    columnName = "Cost";
-                                } else if (i == 8) {
-                                    columnName = "Amount";
-                                } else {
-                                    if (i >= 9) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 9; j <= 11; j++) {
-                                            stockTransferItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            stockTransferItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 8) {
-                                    stockTransferItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                    stockTransferItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                                }
-                            }
-                        </text>
-                    }
-                    else
-                    {
-                         <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 10; i++) {
-                                if (i == 0) {
-                                    columnName = "Code";
-                                } else if (i == 1) {
-                                    columnName = "Description";
-                                } else if (i == 2) {
-                                    columnName = "Particulars";
-                                } else if (i == 3) {
-                                    columnName = "Inventory Code";
-                                } else if (i == 4) {
-                                    columnName = "Quantity";
-                                } else if (i == 5) {
-                                    columnName = "Unit";
-                                } else if (i == 6) {
-                                    columnName = "Cost";
-                                } else if (i == 7) {
-                                    columnName = "Amount";
-                                } else {
-                                    if (i >= 8) {
-                                        columnName = "Basic Unit Conversion";
-                                        for (var j = 8; j <= 10; j++) {
-                                            stockTransferItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
-                                            stockTransferItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
-                                        }
-                                    }
-                                }
-
-                                if (i <= 7) {
                                     stockTransferItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
                                     stockTransferItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
                                 }
@@ -1717,6 +1733,7 @@
                             Id: results[i]["Id"],
                             ArticleId: results[i]["ArticleId"],
                             ManualArticleCode: results[i]["ManualArticleCode"],
+                            ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                             Article: results[i]["Article"],
                             UnitId: results[i]["UnitId"],
                             Unit: results[i]["Unit"],
@@ -1786,7 +1803,8 @@
             itemQueryItemsCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1);
+                    || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemQueryItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -1798,8 +1816,14 @@
             itemQueryItemsFlexGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
                         "allowSorting": true,
                         "width": "3*"
                     },
@@ -1833,7 +1857,7 @@
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "width": 120
+                        "width": 80
                     },
                     {
                         "header": "Pick",
