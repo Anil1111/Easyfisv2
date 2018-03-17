@@ -744,6 +744,7 @@
                                     SCId: results[i]["SCId"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemManualArticleOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
                                     Quantity: results[i]["Quantity"],
@@ -864,7 +865,8 @@
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             stockCountItems.collectionChanged.addHandler(function (sender, args) {
@@ -894,7 +896,8 @@
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             stockCountItems.collectionChanged.addHandler(function (sender, args) {
@@ -936,8 +939,14 @@
                         }
                     }
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
                         "allowSorting": true,
                         "width": "2*"
                     },
@@ -1380,6 +1389,7 @@
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
+                                ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 Article: results[i]["Article"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -1471,8 +1481,14 @@
             itemQueryGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
                         "allowSorting": true,
                         "width": "3*"
                     },
@@ -1480,7 +1496,7 @@
                         "header": "Item",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "5*"
+                        "width": "4*"
                     },
                     {
                         "header": "Price",
