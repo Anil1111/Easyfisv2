@@ -12,6 +12,7 @@ namespace easyfis.Entities
         public Int32 ComponentArticleId { get; set; }
         public String ComponentArticleManualCode { get; set; }
         public String ComponentArticle { get; set; }
+        public String ComponentManualArticleOldCode { get; set; }
         public Decimal Quantity { get; set; }
         public String Unit { get; set; }
         public Decimal Cost { get; set; }

@@ -75,6 +75,7 @@ namespace easyfis.ModifiedApiControllers
                                      ComponentArticleId = d.ComponentArticleId,
                                      ComponentArticleManualCode = d.MstArticle1.ManualArticleCode,
                                      ComponentArticle = d.MstArticle1.Article,
+                                     ComponentManualArticleOldCode = d.MstArticle1.ManualArticleOldCode,
                                      Quantity = d.Quantity,
                                      Unit = d.MstArticle1.MstUnit.Unit,
                                      Cost = d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).Any() ? d.MstArticle1.MstArticleInventories.Where(b => b.BranchId == branchId).OrderByDescending(c => c.Cost).FirstOrDefault().Cost : 0,

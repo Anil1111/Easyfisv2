@@ -862,6 +862,7 @@
                                     PRId: results[i]["PRId"],
                                     ItemId: results[i]["ItemId"],
                                     ItemCode: results[i]["ItemCode"],
+                                    ItemManualOldCode: results[i]["ItemManualOldCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
                                     Quantity: results[i]["Quantity"],
@@ -994,7 +995,8 @@
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             purchaseRequestItemCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -1035,8 +1037,14 @@
                         }
                     }
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 130,
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualOldCode",
                         "allowSorting": true,
                         "width": 130,
                     },
@@ -1154,13 +1162,47 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 11; i++) {
+                            for (var i = 0; i <= 12; i++) {
                                 if (i == 0) {
                                     columnName = "Edit";
                                 } else if (i == 1) {
                                     columnName = "Delete";
                                 } else if (i == 2) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else {
+                                    columnName = "Basic Unit Conversion";
+                                }
+
+                                purchaseRequestItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                purchaseRequestItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 11; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
                                     columnName = "Description";
                                 } else if (i == 4) {
@@ -1182,36 +1224,6 @@
                             }
                         </text>
                     }
-                    else
-                    {
-                         <text>
-                            var columnName = "";
-                            for (var i = 0; i <= 10; i++) {
-                                if (i == 0) {
-                                    columnName = "Edit";
-                                } else if (i == 1) {
-                                    columnName = "Code";
-                                } else if (i == 2) {
-                                    columnName = "Description";
-                                } else if (i == 3) {
-                                    columnName = "Particulars";
-                                } else if (i == 4) {
-                                    columnName = "Quantity";
-                                } else if (i == 5) {
-                                    columnName = "Unit";
-                                } else if (i == 6) {
-                                    columnName = "Cost";
-                                } else if (i == 7) {
-                                    columnName = "Amount";
-                                } else {
-                                    columnName = "Basic Unit Conversion";
-                                }
-
-                                purchaseRequestItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
-                                purchaseRequestItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
-                            }
-                        </text>
-                    }
                 }
                 else
                 {
@@ -1219,22 +1231,24 @@
                     {
                         <text>
                             var columnName = "";
-                            for (var i = 0; i <= 10; i++) {
+                            for (var i = 0; i <= 11; i++) {
                                 if (i == 0) {
                                     columnName = "Delete";
                                 } else if (i == 1) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
                                 } else if (i == 2) {
-                                    columnName = "Description";
+                                    columnName = "SKU Code";
                                 } else if (i == 3) {
-                                    columnName = "Particulars";
+                                    columnName = "Description";
                                 } else if (i == 4) {
-                                    columnName = "Quantity";
+                                    columnName = "Particulars";
                                 } else if (i == 5) {
-                                    columnName = "Unit";
+                                    columnName = "Quantity";
                                 } else if (i == 6) {
-                                    columnName = "Cost";
+                                    columnName = "Unit";
                                 } else if (i == 7) {
+                                    columnName = "Cost";
+                                } else if (i == 8) {
                                     columnName = "Amount";
                                 } else {
                                     columnName = "Basic Unit Conversion";
@@ -1251,20 +1265,22 @@
                     {
                          <text>
                             var columnName = "";
-                            for (var i = 0; i <= 9; i++) {
+                            for (var i = 0; i <= 10; i++) {
                                 if (i == 0) {
-                                    columnName = "Code";
+                                    columnName = "Barcode";
                                 } else if (i == 1) {
-                                    columnName = "Description";
+                                    columnName = "SKU Code";
                                 } else if (i == 2) {
-                                    columnName = "Particulars";
+                                    columnName = "Description";
                                 } else if (i == 3) {
-                                    columnName = "Quantity";
+                                    columnName = "Particulars";
                                 } else if (i == 4) {
-                                    columnName = "Unit";
+                                    columnName = "Quantity";
                                 } else if (i == 5) {
-                                    columnName = "Cost";
+                                    columnName = "Unit";
                                 } else if (i == 6) {
+                                    columnName = "Cost";
+                                } else if (i == 7) {
                                     columnName = "Amount";
                                 } else {
                                     columnName = "Basic Unit Conversion";
@@ -1460,7 +1476,8 @@
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             purchaseRequestItemCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -1751,6 +1768,7 @@
                         itemsObservableArray.push({
                             Id: results[i]["Id"],
                             ManualArticleCode: results[i]["ManualArticleCode"],
+                            ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                             Article: results[i]["Article"],
                             Particulars: results[i]["Particulars"],
                             Cost: results[i]["Cost"],
@@ -1811,7 +1829,8 @@
 
             itemQueryItemsCollection.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Article.toLowerCase().indexOf(filterText) > -1);
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
@@ -1823,23 +1842,29 @@
             itemQueryGrid.initialize({
                 columns: [
                     {
-                        "header": "Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
                         "allowSorting": true,
-                        "width": "3*"
+                        "width": "2*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
+                        "allowSorting": true,
+                        "width": "2*"
                     },
                     {
                         "header": "Description",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "5*"
+                        "width": "4*"
                     },
                     {
                         "header": "Last Purchase Price",
                         "binding": "CostDisplay",
                         "allowSorting": true,
                         "align": "right",
-                        "width": "2*"
+                        "width": "2.5*"
                     },
                     {
                         "header": "Pick",
