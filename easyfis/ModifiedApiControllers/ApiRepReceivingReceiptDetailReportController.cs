@@ -37,6 +37,7 @@ namespace easyfis.ApiControllers
                                             Remarks = d.TrnReceivingReceipt.Remarks,
                                             PONumber = d.TrnPurchaseOrder.PONumber,
                                             ItemCode = d.MstArticle.ManualArticleCode,
+                                            ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                             ItemDescription = d.MstArticle.Article,
                                             Unit = d.MstUnit.Unit,
                                             Quantity = d.Quantity,

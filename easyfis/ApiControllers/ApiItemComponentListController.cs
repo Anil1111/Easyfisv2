@@ -47,6 +47,7 @@ namespace easyfis.ApiControllers
                                         ArticleId = d.ArticleId,
                                         Article = d.MstArticle.Article,
                                         ManualArticleCode = d.MstArticle1.ManualArticleCode,
+                                        ComponentManualArticleOldCode = d.MstArticle1.ManualArticleOldCode,
                                         ComponentArticleId = d.ComponentArticleId,
                                         ComponentArticle = d.MstArticle1.Article,
                                         Quantity = d.Quantity,

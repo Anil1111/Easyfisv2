@@ -36,6 +36,8 @@ namespace easyfis.ApiControllers
                                          Remarks = d.TrnPurchaseOrder.Remarks,
                                          Quantity = d.Quantity,
                                          Unit = d.MstUnit.Unit,
+                                         ItemCode = d.MstArticle.ManualArticleCode,
+                                         ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                          Item = d.MstArticle.Article,
                                          Cost = d.Cost,
                                          Amount = d.Amount

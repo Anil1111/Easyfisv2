@@ -35,6 +35,8 @@ namespace easyfis.ApiControllers
                                         SIDate = d.TrnSalesInvoice.SIDate.ToShortDateString(),
                                         Customer = d.TrnSalesInvoice.MstArticle.Article,
                                         Sales = d.TrnSalesInvoice.MstUser4.FullName,
+                                        ItemCode = d.MstArticle.ManualArticleCode,
+                                        ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                         Item = d.MstArticle.Article,
                                         ItemCategory = d.MstArticle.Category,
                                         Unit = d.MstUnit.Unit,

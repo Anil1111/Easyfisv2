@@ -36,6 +36,7 @@ namespace easyfis.ApiControllers
                                    ExpenseAccount = d.MstAccount.Account,
                                    ItemId = d.ItemId,
                                    ItemCode = d.MstArticle.ManualArticleCode,
+                                   ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                    Item = d.MstArticle.Article,
                                    ItemInventoryId = d.ItemInventoryId,
                                    ItemInventory = d.MstArticleInventory.InventoryCode,

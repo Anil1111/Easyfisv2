@@ -413,6 +413,7 @@
                                             ArticleId: inventoryReportResult[i]["ArticleId"],
                                             BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 10px;'><i class='fa fa-cube'></i> Stock Card</a>",
                                             ManualArticleCode: inventoryReportResult[i]["ManualArticleCode"],
+                                            ManualArticleOldCode: inventoryReportResult[i]["ManualArticleOldCode"],
                                             Article: inventoryReportResult[i]["Article"],
                                             ArticleForCSV: inventoryReportResult[i]["Article"],
                                             InventoryCode: inventoryReportResult[i]["InventoryCode"],
@@ -519,8 +520,10 @@
 
             inventoryReportCollections.filter = function (item) {
                 return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemGroup.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Category.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -561,8 +564,10 @@
 
             inventoryReportCollections.filter = function (item) {
                 return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemGroup.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Category.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -581,13 +586,19 @@
                         "isContentHtml": true
                     },
                     {
-                        "header": "Manual Code",
+                        "header": "Barcode",
                         "binding": "ManualArticleCode",
                         "allowSorting": true,
                         "width": "1.5*"
                     },
                     {
-                        "header": "Item Description",
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
+                        "allowSorting": true,
+                        "width": "1.5*"
+                    },
+                    {
+                        "header": "Item",
                         "binding": "Article",
                         "allowSorting": true,
                         "width": "1.7*"
@@ -672,29 +683,32 @@
             inventoryReportGrid.columnHeaders.setCellData(0, 0, 'Stock Card');
 
             inventoryReportGrid.columnHeaders.columns[1].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 1, 'Manual Code');
+            inventoryReportGrid.columnHeaders.setCellData(0, 1, 'Barcode');
 
             inventoryReportGrid.columnHeaders.columns[2].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 2, 'Item Description');
+            inventoryReportGrid.columnHeaders.setCellData(0, 2, 'SKU Code');
 
             inventoryReportGrid.columnHeaders.columns[3].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 3, 'Category');
+            inventoryReportGrid.columnHeaders.setCellData(0, 3, 'Item');
 
             inventoryReportGrid.columnHeaders.columns[4].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 4, 'Code');
+            inventoryReportGrid.columnHeaders.setCellData(0, 4, 'Category');
 
             inventoryReportGrid.columnHeaders.columns[5].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 5, 'Unit');
+            inventoryReportGrid.columnHeaders.setCellData(0, 5, 'Code');
 
             inventoryReportGrid.columnHeaders.columns[6].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 6, 'Cost');
+            inventoryReportGrid.columnHeaders.setCellData(0, 6, 'Unit');
 
-            for (var columnBasicUnitConversion = 7; columnBasicUnitConversion <= 10; columnBasicUnitConversion++) {
+            inventoryReportGrid.columnHeaders.columns[7].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 7, 'Cost');
+
+            for (var columnBasicUnitConversion = 8; columnBasicUnitConversion <= 11; columnBasicUnitConversion++) {
                 inventoryReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            inventoryReportGrid.columnHeaders.columns[11].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 11, 'Amount');
+            inventoryReportGrid.columnHeaders.columns[12].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 12, 'Amount');
 
             updateNavigateButtonsItems();
 
@@ -738,8 +752,10 @@
                     inventoryReport.push({
                         Branch: inventoryReportCollections.items[i].Branch,
                         InventoryCode: inventoryReportCollections.items[i].InventoryCode,
+                        ManualArticleCode: inventoryReportCollections.items[i].ManualArticleCode,
+                        ManualArticleOldCode: inventoryReportCollections.items[i].ManualArticleOldCode,
                         Article: inventoryReportCollections.items[i].ArticleForCSV,
-                        ItemGroup: inventoryReportCollections.items[i].ItemGroup,
+                        Category: inventoryReportCollections.items[i].Category,
                         Unit: inventoryReportCollections.items[i].Unit,
                         Cost: inventoryReportCollections.items[i].Cost,
                         BegQuantity: inventoryReportCollections.items[i].BegQuantity,
@@ -760,6 +776,8 @@
             Headers.push({
                 Branch: "Branch",
                 InventoryCode: "Inventory Code",
+                ManualArticleCode: "Barcode",
+                ManualArticleOldCode: "SKU Code",
                 Article: "Item",
                 ItemGroup: "Item Group",
                 Unit: "Unit",

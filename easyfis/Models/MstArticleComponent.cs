@@ -26,5 +26,6 @@ namespace easyfis.Models
         public Decimal Amount { get; set; }
         public String Particulars { get; set; }
         public String ComponentArticleCode { get; internal set; }
+        public String ComponentManualArticleOldCode { get; set; }
     }
 }

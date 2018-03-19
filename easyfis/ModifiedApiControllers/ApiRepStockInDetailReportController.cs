@@ -34,6 +34,7 @@ namespace easyfis.ApiControllers
                                    INDate = d.TrnStockIn.INDate.ToShortDateString(),
                                    ItemId = d.ItemId,
                                    ItemCode = d.MstArticle.ManualArticleCode,
+                                   ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
                                    Item = d.MstArticle.Article,
                                    Particulars = d.Particulars,
                                    UnitId = d.UnitId,

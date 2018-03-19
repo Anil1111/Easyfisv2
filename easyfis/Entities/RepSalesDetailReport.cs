@@ -13,6 +13,8 @@ namespace easyfis.Entities
         public String SIDate { get; set; }
         public String Customer { get; set; }
         public String Sales { get; set; }
+        public String ItemCode { get; set; }
+        public String ItemManualArticleOldCode { get; set; }
         public String Item { get; set; }
         public String ItemCategory { get; set; }
         public Decimal Quantity { get; set; }
