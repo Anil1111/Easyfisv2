@@ -72,6 +72,7 @@ namespace easyfis.ModifiedApiControllers
                                select new Entities.TrnArticlePrice
                                {
                                    Id = d.Id,
+                                   BranchId = d.BranchId,
                                    IPNumber = d.IPNumber,
                                    IPDate = d.IPDate.ToShortDateString(),
                                    ManualIPNumber = d.ManualIPNumber,
