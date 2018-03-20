@@ -262,6 +262,11 @@ namespace easyfis.Controllers
                 secretKey = "6LffX0sUAAAAAKsLTyxgzo8Fuqsk1WRb4gx3iWnr";
             }
 
+            if (host.Equals("cogon.easyfis.com"))
+            {
+                secretKey = "6LdKs00UAAAAAM6LrdHJ3nvp8OJzG3G9lPIFmWxS";
+            }
+
             var client = new System.Net.WebClient();
             var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
             var verificationResult = JsonConvert.DeserializeObject<CaptchaVerificationResult>(verificationResultJson);
