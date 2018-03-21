@@ -32,31 +32,15 @@ namespace easyfis.POSIntegrationApiControllers
                                     STDate = d.STDate.ToShortDateString(),
                                     ToBranchCode = d.MstBranch1.BranchCode,
                                     ToBranch = d.MstBranch1.Branch,
-                                    Article = d.MstArticle.Article,
-                                    Particulars = d.Particulars,
-                                    ManualSTNumber = d.ManualSTNumber,
-                                    PreparedBy = d.MstUser3.FullName,
-                                    CheckedBy = d.MstUser1.FullName,
-                                    ApprovedBy = d.MstUser.FullName,
-                                    IsLocked = d.IsLocked,
-                                    CreatedBy = d.MstUser2.FullName,
-                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                    UpdatedBy = d.MstUser4.FullName,
-                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString(),
-                                    listPOSIntegrationTrnStockTransferItem = db.TrnStockTransferItems.Select(i => new POSIntegrationEntities.POSIntegrationTrnStockTransferItem
+                                    ListPOSIntegrationTrnStockTransferItem = db.TrnStockTransferItems.Select(i => new POSIntegrationEntities.POSIntegrationTrnStockTransferItem
                                     {
                                         STId = i.STId,
                                         ItemCode = i.MstArticle.ManualArticleCode,
                                         Item = i.MstArticle.Article,
-                                        InventoryCode = i.MstArticleInventory.InventoryCode,
-                                        Particulars = i.Particulars,
                                         Unit = i.MstUnit.Unit,
                                         Quantity = i.Quantity,
                                         Cost = i.Cost,
-                                        Amount = i.Amount,
-                                        BaseUnit = i.MstUnit1.Unit,
-                                        BaseQuantity = i.BaseQuantity,
-                                        BaseCost = i.BaseCost
+                                        Amount = i.Amount
                                     }).Where(i => i.STId == d.Id).ToList(),
                                 };
 
@@ -81,31 +65,15 @@ namespace easyfis.POSIntegrationApiControllers
                                     STDate = d.STDate.ToShortDateString(),
                                     ToBranchCode = d.MstBranch1.BranchCode,
                                     ToBranch = d.MstBranch1.Branch,
-                                    Article = d.MstArticle.Article,
-                                    Particulars = d.Particulars,
-                                    ManualSTNumber = d.ManualSTNumber,
-                                    PreparedBy = d.MstUser3.FullName,
-                                    CheckedBy = d.MstUser1.FullName,
-                                    ApprovedBy = d.MstUser.FullName,
-                                    IsLocked = d.IsLocked,
-                                    CreatedBy = d.MstUser2.FullName,
-                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                    UpdatedBy = d.MstUser4.FullName,
-                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString(),
-                                    listPOSIntegrationTrnStockTransferItem = db.TrnStockTransferItems.Select(i => new POSIntegrationEntities.POSIntegrationTrnStockTransferItem
+                                    ListPOSIntegrationTrnStockTransferItem = db.TrnStockTransferItems.Select(i => new POSIntegrationEntities.POSIntegrationTrnStockTransferItem
                                     {
                                         STId = i.STId,
                                         ItemCode = i.MstArticle.ManualArticleCode,
                                         Item = i.MstArticle.Article,
-                                        InventoryCode = i.MstArticleInventory.InventoryCode,
-                                        Particulars = i.Particulars,
                                         Unit = i.MstUnit.Unit,
                                         Quantity = i.Quantity,
                                         Cost = i.Cost,
-                                        Amount = i.Amount,
-                                        BaseUnit = i.MstUnit1.Unit,
-                                        BaseQuantity = i.BaseQuantity,
-                                        BaseCost = i.BaseCost
+                                        Amount = i.Amount
                                     }).Where(i => i.STId == d.Id).ToList(),
                                 };
 

@@ -28,21 +28,13 @@ namespace easyfis.POSIntegrationApiControllers
                         {
                             ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
-                            ArticleTypeId = d.ArticleTypeId,
                             Category = d.Category,
                             Unit = d.MstUnit.Unit,
                             Price = d.Price,
                             Cost = d.Cost,
                             IsInventory = d.IsInventory,
                             Particulars = d.Particulars,
-                            OutputTax = d.MstTaxType.TaxType,
-                            UpdatedDateTime = d.UpdatedDateTime.ToShortDateString(),
-                            ListPOSIntegrationMstItemPrice = db.MstArticlePrices.Select(p => new POSIntegrationEntities.POSIntegrationMstItemPrice
-                            {
-                                ArticleId = p.ArticleId,
-                                PriceDescription = p.PriceDescription,
-                                Price = p.Price
-                            }).Where(p => p.ArticleId == d.Id).ToList(),
+                            OutputTax = d.MstTaxType.TaxType
                         };
 
             return items.ToList();
