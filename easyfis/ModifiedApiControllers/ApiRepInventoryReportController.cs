@@ -48,7 +48,8 @@ namespace easyfis.ApiControllers
                                             InQuantity = d.QuantityIn,
                                             OutQuantity = d.QuantityOut,
                                             EndQuantity = d.Quantity,
-                                            Category = d.MstArticle.Category
+                                            Category = d.MstArticle.Category,
+                                            Price = d.MstArticle.Price
                                         }).Union(from d in db.TrnInventories
                                                  where d.InventoryDate >= Convert.ToDateTime(startDate)
                                                  && d.InventoryDate <= Convert.ToDateTime(endDate)
@@ -75,7 +76,8 @@ namespace easyfis.ApiControllers
                                                      InQuantity = d.QuantityIn,
                                                      OutQuantity = d.QuantityOut,
                                                      EndQuantity = d.Quantity,
-                                                     Category = d.MstArticle.Category
+                                                     Category = d.MstArticle.Category,
+                                                     Price = d.MstArticle.Price
                                                  });
 
                 if (unionInventories.Any())
@@ -93,7 +95,8 @@ namespace easyfis.ApiControllers
                                           d.Cost,
                                           d.UnitId,
                                           d.Unit,
-                                          d.Category
+                                          d.Category,
+                                          d.Price
                                       } into g
                                       select new Models.MstArticleInventory
                                       {
@@ -112,7 +115,8 @@ namespace easyfis.ApiControllers
                                           OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
                                           EndQuantity = g.Sum(d => d.EndQuantity),
                                           Amount = g.Sum(d => d.Quantity * d.Cost),
-                                          Category = g.Key.Category
+                                          Category = g.Key.Category,
+                                          Price = g.Key.Price
                                       };
 
                     return inventories.ToList();

@@ -88,7 +88,7 @@
                         </table>
                     </div>
                     <div class="panel-body">
-                        <div id="inventoryReportGrid" class="grid" style="font-size: 12.5px;"></div>
+                        <div id="inventoryReportGrid" class="grid" style="font-size: 11.5px;"></div>
                     </div>
                     <div class="panel-footer">
                         <div class="row">
@@ -411,7 +411,7 @@
                                         inventoryReports.push({
                                             Branch: inventoryReportResult[i]["Branch"],
                                             ArticleId: inventoryReportResult[i]["ArticleId"],
-                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 10px;'><i class='fa fa-cube'></i> Stock Card</a>",
+                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 9px;'><i class='fa fa-cube'></i> SC</a>",
                                             ManualArticleCode: inventoryReportResult[i]["ManualArticleCode"],
                                             ManualArticleOldCode: inventoryReportResult[i]["ManualArticleOldCode"],
                                             Article: inventoryReportResult[i]["Article"],
@@ -439,6 +439,8 @@
                                             VarianceAmountDisplay: parseFloat(varianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             Count: "0.00",
                                             Category: inventoryReportResult[i]["Category"],
+                                            Price: inventoryReportResult[i]["Price"],
+                                            PriceDisplay: parseFloat(inventoryReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                         });
 
                                         totalAllAmount += totalAmount;
@@ -579,10 +581,10 @@
             inventoryReportGrid.initialize({
                 columns: [
                     {
-                        "header": "Stock Card",
+                        "header": "SC",
                         "binding": "BtnDetail",
                         "allowSorting": true,
-                        "width": "1.1*",
+                        "width": "0.7*",
                         "isContentHtml": true
                     },
                     {
@@ -595,7 +597,7 @@
                         "header": "SKU Code",
                         "binding": "ManualArticleOldCode",
                         "allowSorting": true,
-                        "width": "1.5*"
+                        "width": "1.2*"
                     },
                     {
                         "header": "Item",
@@ -662,6 +664,13 @@
                         "allowSorting": true,
                         "align": "right",
                         "width": "*"
+                    },
+                    {
+                        "header": "Price",
+                        "binding": "PriceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "*"
                     }
                 ],
                 autoGenerateColumns: false,
@@ -680,7 +689,7 @@
             inventoryReportGrid.columnHeaders.rows[0].allowMerging = true;
 
             inventoryReportGrid.columnHeaders.columns[0].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 0, 'Stock Card');
+            inventoryReportGrid.columnHeaders.setCellData(0, 0, 'SC');
 
             inventoryReportGrid.columnHeaders.columns[1].allowMerging = true;
             inventoryReportGrid.columnHeaders.setCellData(0, 1, 'Barcode');
@@ -709,6 +718,9 @@
 
             inventoryReportGrid.columnHeaders.columns[12].allowMerging = true;
             inventoryReportGrid.columnHeaders.setCellData(0, 12, 'Amount');
+
+            inventoryReportGrid.columnHeaders.columns[13].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 13, 'Price');
 
             updateNavigateButtonsItems();
 
