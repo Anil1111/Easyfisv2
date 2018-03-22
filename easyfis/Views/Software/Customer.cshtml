@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Customer</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpCustomerSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,37 +58,55 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddCustomer" onclick="btnAddCustomerOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnCustomerAdd" onclick="btnCustomerAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseCustomer" onclick="btnCloseCustomerOnclick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnCustomerClose" onclick="btnCustomerCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="CustomerGrid" class="grid"></div>
+                        <div id="customerFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="customerNavigationFlexGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCustomerMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCustomerMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCustomerCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnCustomerMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnCustomerMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -114,24 +135,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Customer Delete Modal -->
-    <div class="modal fade" id="deleteCustomerConfirm" role="dialog">
+    <!--
+        ===============================
+        Customer Confirm Delete (Modal)
+        ===============================
+    -->
+    <div class="modal fade" id="customerConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this customer?
+                    Delete Customer?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteCustomer" class="btn btn-danger" onclick="btnDeleteConfirmCustomerOnclick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnCustomerConfirmDelete" class="btn btn-danger" onclick="btnCustomerConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnCustomerConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -139,21 +165,25 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
+        // ======================================
+        // Customer Collection View and Flex Grid
+        // ======================================
         var customerCollectionView;
         var customerFlexGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
 
-        // ==============================
-        // Get Data from MstArtcile Table
-        // ==============================
-        function getArtcileForCustomers() {
+        // ===========================
+        // Customer Navigation Buttons
+        // ===========================
+        var btnCustomerMoveToFirstPageGrid = document.getElementById('btnCustomerMoveToFirstPageGrid');
+        var btnCustomerMoveToPreviousPageGrid = document.getElementById('btnCustomerMoveToPreviousPageGrid');
+        var btnCustomerMoveToNextPageGrid = document.getElementById('btnCustomerMoveToNextPageGrid');
+        var btnCustomerMoveToLastPageGrid = document.getElementById('btnCustomerMoveToLastPageGrid');
+        var btnCustomerCurrentPageGrid = document.getElementById('btnCustomerCurrentPageGrid');
+
+        // =================
+        // Get Customer Data
+        // =================
+        function getCustomerData() {
             NProgress.start();
             var customersObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
@@ -165,8 +195,8 @@
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
                             customersObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditCustomerOnclick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteCustomerOnclick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnCustomerEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnCustomerDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
@@ -192,212 +222,16 @@
             return customersObservableArray;
         }
 
-        // =========================
-        // Refresh Customer Flexgrid
-        // =========================
-        function refreshCustomerFlexgrid() {
-            customerCollectionView = new wijmo.collections.CollectionView(getArtcileForCustomers());
-            customerCollectionView.canFilter = true;
-            customerCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                customerCollectionView.refresh();
-            });
-
-            customerCollectionView.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            customerCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCustomer();
-            });
-
-            customerCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            customerFlexGrid.itemsSource = customerCollectionView;
-            customerFlexGrid.trackChanges = true;
-        }
-
-        // ===================
-        // Customer Add Button
-        // ===================
-        function btnAddCustomerOnclick() {
-            document.getElementById('btnAddCustomer').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddCustomer').prop('disabled', true);
-            $('#btnCloseCustomer').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/customer/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/CustomerDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddCustomer').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCustomer').prop('disabled', false);
-                        $('#btnCloseCustomer').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddCustomer').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCustomer').prop('disabled', false);
-                        $('#btnCloseCustomer').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddCustomer').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddCustomer').prop('disabled', false);
-                        $('#btnCloseCustomer').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // =====================
-        // Customer Close Button
-        // =====================
-        function btnCloseCustomerOnclick() {
-            window.location = '/Software';
-        }
-
-        // ====================
-        // Customer Edit Button
-        // ====================
-        function btnEditCustomerOnclick() {
-            customerCollectionView.editItem(customerCollectionView.currentItem);
-            var customer = customerCollectionView.currentEditItem;
-            var customerId = customer.Id;
-
-            window.location = '/Software/CustomerDetail?id=' + customerId;
-        }
-
-        // =====================
-        // Customer delete Button
-        // =====================
-        function btnDeleteCustomerOnclick() {
-            customerCollectionView.editItem(customerCollectionView.currentItem);
-            var customer = customerCollectionView.currentEditItem;
-            if (customer.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteCustomerConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-
-                document.getElementById('cmdConfirmDeleteCustomer').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $('#cmdConfirmDeleteCustomer').prop('disabled', false);
-                $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-            }
-        }
-
-        // ==============================
-        // Customer Confirm Delete Button
-        // ==============================
-        function btnDeleteConfirmCustomerOnclick() {
-            document.getElementById('cmdConfirmDeleteCustomer').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $('#cmdConfirmDeleteCustomer').prop('disabled', true);
-            $('#cmdConfirmDeleteCloseButton').prop('disabled', true);
-
-            customerCollectionView.editItem(customerCollectionView.currentItem);
-            var customerId = customerCollectionView.currentEditItem.Id;
-            $.ajax({
-                url: '/api/customer/delete/' + customerId,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteCustomerConfirm').modal('hide');
-                        refreshCustomerFlexgrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteCustomerConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCustomer').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteCustomer').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteCustomerConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCustomer').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteCustomer').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteCustomerConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteCustomer').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteCustomer').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            customerCollectionView.editItem(customerCollectionView.currentItem);
-            var customer = customerCollectionView.currentItem;
-            document.getElementById('createdBy').innerHTML = customer.CreatedBy;
-            document.getElementById('createdDate').innerHTML = customer.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = customer.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = customer.UpdatedDateTime;
-        }
-
-        // ===============================
-        // Navigation Buttons for Customer
-        // ===============================
-        function updateNavigateButtonsCustomer() {
-            if (customerCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (customerCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (customerCollectionView.pageIndex === (customerCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (customerCollectionView.pageIndex + 1) + ' / ' + customerCollectionView.pageCount;
-        }
-
         // =================
         // Customer FlexGrid
         // =================
         function createCustomerFlexGrid() {
-            customerCollectionView = new wijmo.collections.CollectionView(getArtcileForCustomers());
+            customerCollectionView = new wijmo.collections.CollectionView(getCustomerData());
             customerCollectionView.canFilter = true;
             customerCollectionView.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpCustomerSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 customerCollectionView.refresh();
             });
@@ -411,14 +245,14 @@
             }
 
             customerCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsCustomer();
+                updateCustomerNavigationButtons();
             });
 
             customerCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+                updateCustomerDetailsFlexGridSelection();
             });
 
-            customerFlexGrid = new wijmo.grid.FlexGrid('#CustomerGrid');
+            customerFlexGrid = new wijmo.grid.FlexGrid('#customerFlexGrid');
             customerFlexGrid.initialize({
                 columns: [
                             @{
@@ -498,44 +332,241 @@
 
             customerFlexGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            updateCustomerNavigationButtons();
 
-            updateNavigateButtonsCustomer();
-
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnCustomerMoveToFirstPageGrid.addEventListener('click', function () {
                 customerCollectionView.moveToFirstPage();
-                updateNavigateButtonsCustomer();
+                updateCustomerNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnCustomerMoveToPreviousPageGrid.addEventListener('click', function () {
                 customerCollectionView.moveToPreviousPage();
-                updateNavigateButtonsCustomer();
+                updateCustomerNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnCustomerMoveToNextPageGrid.addEventListener('click', function () {
                 customerCollectionView.moveToNextPage();
-                updateNavigateButtonsCustomer();
+                updateCustomerNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnCustomerMoveToLastPageGrid.addEventListener('click', function () {
                 customerCollectionView.moveToLastPage();
-                updateNavigateButtonsCustomer();
+                updateCustomerNavigationButtons();
             });
         }
 
+        // ===========================================
+        // Update Customer Details Flex Grid Selection
+        // ===========================================
+        function updateCustomerDetailsFlexGridSelection() {
+            customerCollectionView.editItem(customerCollectionView.currentItem);
+            var customer = customerCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = customer.CreatedBy;
+            document.getElementById('createdDate').innerHTML = customer.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = customer.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = customer.UpdatedDateTime;
+        }
+
+        // ==================================
+        // Update Customer Navigation Buttons
+        // ==================================
+        function updateCustomerNavigationButtons() {
+            if (customerCollectionView.pageSize <= 0) {
+                document.getElementById('customerNavigationFlexGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('customerNavigationFlexGrid').style.display = 'block';
+            if (customerCollectionView.pageIndex === 0) {
+                btnCustomerMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnCustomerMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnCustomerMoveToNextPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (customerCollectionView.pageIndex === (customerCollectionView.pageCount - 1)) {
+                btnCustomerMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnCustomerMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnCustomerMoveToFirstPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToNextPageGrid.removeAttribute('disabled');
+                btnCustomerMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnCustomerCurrentPageGrid.innerHTML = (customerCollectionView.pageIndex + 1) + ' / ' + customerCollectionView.pageCount;
+        }
+
+        // =========================
+        // Refresh Customer Flexgrid
+        // =========================
+        function refreshCustomerFlexgrid() {
+            customerCollectionView = new wijmo.collections.CollectionView(getCustomerData());
+            customerCollectionView.canFilter = true;
+            customerCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpCustomerSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                customerCollectionView.refresh();
+            });
+
+            customerCollectionView.filter = function (item) {
+                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            customerCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateCustomerNavigationButtons();
+            });
+
+            customerCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateCustomerDetailsFlexGridSelection();
+            });
+
+            customerFlexGrid.itemsSource = customerCollectionView;
+            customerFlexGrid.trackChanges = true;
+        }
+
         // ============
-        // On Load Page
+        // Add Customer
         // ============
+        function btnCustomerAddOnclick() {
+            document.getElementById('btnCustomerAdd').innerHTML = "<i class='fa fa-plus'></i> Adding...";
+            $('#btnCustomerAdd').prop('disabled', true);
+            $('#btnCustomerClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/customer/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/CustomerDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCustomerAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCustomerAdd').prop('disabled', false);
+                        $('#btnCustomerClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCustomerAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCustomerAdd').prop('disabled', false);
+                        $('#btnCustomerClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCustomerAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnCustomerAdd').prop('disabled', false);
+                        $('#btnCustomerClose').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =============
+        // Edit Customer
+        // =============
+        function btnCustomerEditOnclick() {
+            customerCollectionView.editItem(customerCollectionView.currentItem);
+            var customer = customerCollectionView.currentEditItem;
+            var customerId = customer.Id;
+
+            window.location = '/Software/CustomerDetail?id=' + customerId;
+        }
+
+        // ==============
+        // Close Customer
+        // ==============
+        function btnCustomerCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // ===============
+        // Delete Customer
+        // ===============
+        function btnCustomerDeleteOnclick() {
+            customerCollectionView.editItem(customerCollectionView.currentItem);
+            var customer = customerCollectionView.currentEditItem;
+            if (customer.IsLocked) {
+                toastr.error("Delete is not allowed when the selected record is locked!");
+            } else {
+                $('#customerConfirmDeleteModal').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                document.getElementById('btnCustomerConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $('#btnCustomerConfirmDelete').prop('disabled', false);
+                $('#btnCustomerConfirmDeleteCloseModal').prop('disabled', false);
+            }
+        }
+
+        // =======================
+        // Confirm Delete Customer
+        // =======================
+        function btnCustomerConfirmDeleteOnclick() {
+            document.getElementById('btnCustomerConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $('#btnCustomerConfirmDelete').prop('disabled', true);
+            $('#btnCustomerConfirmDeleteCloseModal').prop('disabled', true);
+
+            customerCollectionView.editItem(customerCollectionView.currentItem);
+            var customerId = customerCollectionView.currentEditItem.Id;
+            $.ajax({
+                url: '/api/customer/delete/' + customerId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#customerConfirmDeleteModal').modal('hide');
+                        refreshCustomerFlexgrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#customerConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCustomerConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnCustomerConfirmDelete').prop('disabled', false);
+                        $('#btnCustomerConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#customerConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCustomerConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnCustomerConfirmDelete').prop('disabled', false);
+                        $('#btnCustomerConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#customerConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnCustomerConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnCustomerConfirmDelete').prop('disabled', false);
+                        $('#btnCustomerConfirmDeleteCloseModal').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             createCustomerFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -582,6 +613,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -621,6 +655,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
