@@ -165,6 +165,30 @@ namespace easyfis.ApiControllers
                             db.TrnPurchaseOrders.DeleteAllOnSubmit(purchaseOrders);
                         }
 
+                        var purchaseRequestItems = from d in db.TrnPurchaseRequestItems select d;
+                        if (purchaseRequestItems.Any())
+                        {
+                            db.TrnPurchaseRequestItems.DeleteAllOnSubmit(purchaseRequestItems);
+                        }
+
+                        var purchaseRequests = from d in db.TrnPurchaseRequests select d;
+                        if (purchaseRequests.Any())
+                        {
+                            db.TrnPurchaseRequests.DeleteAllOnSubmit(purchaseRequests);
+                        }
+
+                        var articlePriceItems = from d in db.TrnArticlePriceItems select d;
+                        if (articlePriceItems.Any())
+                        {
+                            db.TrnArticlePriceItems.DeleteAllOnSubmit(articlePriceItems);
+                        }
+
+                        var articlePrices = from d in db.TrnArticlePrices select d;
+                        if (articlePrices.Any())
+                        {
+                            db.TrnArticlePrices.DeleteAllOnSubmit(articlePrices);
+                        }
+
                         var articleInventories = from d in db.MstArticleInventories select d;
                         if (articleInventories.Any())
                         {
