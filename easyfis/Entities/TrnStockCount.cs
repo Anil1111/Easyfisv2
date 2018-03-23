@@ -22,5 +22,6 @@ namespace easyfis.Entities
         public Int32 UpdatedById { get; set; }
         public String UpdatedBy { get; set; }
         public String UpdatedDateTime { get; set; }
+        public List<TrnStockCountItem> StockCountItem { get; set; }
     }
 }

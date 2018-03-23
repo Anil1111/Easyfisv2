@@ -87,8 +87,21 @@
                             </tr>
                         </table>
                     </div>
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 24%">
+                                    <div class="input-group ">
+                                        <span class="input-group-addon"><b>SC Number</b></span>
+                                        <div class="comboBox-wide" id="cboStockCountFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 76%"></td>
+                            </tr>
+                        </table>
+                    </div>
                     <div class="panel-body">
-                        <div id="inventoryReportGrid" class="grid" style="font-size: 11.5px;"></div>
+                        <div id="inventoryReportGrid" class="grid" style="font-size: 10px;"></div>
                     </div>
                     <div class="panel-footer">
                         <div class="row">
@@ -154,6 +167,7 @@
         var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
         var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
         var currentPageIndex = 0;
+        var cboStockCountFilter = new wijmo.input.ComboBox('#cboStockCountFilter');
 
         // ===================
         // Get Parameter Value
@@ -185,6 +199,7 @@
                     if (!isInventoryReportStartDateSelected) {
                         NProgress.start();
                         refreshInventoryReportFlexGrid();
+                        createCboStockCountListFilter();
                     } else {
                         isInventoryReportStartDateSelected = false;
                     }
@@ -199,6 +214,7 @@
                     if (!isInventoryReportEndDateSelected) {
                         NProgress.start();
                         refreshInventoryReportFlexGrid();
+                        createCboStockCountListFilter();
                     } else {
                         isInventoryReportEndDateSelected = false;
                     }
@@ -305,9 +321,12 @@
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshInventoryReportFlexGrid();
+                                cboStockCountFilter.disabled = true;
+                                createCboStockCountListFilter();
                             }
                         });
 
+                        createCboStockCountListFilter();
                         createCboShowRows();
                     }
                 });
@@ -372,6 +391,7 @@
                 createInventoryReportFlexGrid();
             } else {
                 refreshInventoryReportFlexGrid();
+                createCboStockCountListFilter();
             }
         }
 
@@ -411,7 +431,7 @@
                                         inventoryReports.push({
                                             Branch: inventoryReportResult[i]["Branch"],
                                             ArticleId: inventoryReportResult[i]["ArticleId"],
-                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 9px;'><i class='fa fa-cube'></i> SC</a>",
+                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 7px;'><i class='fa fa-cube'></i> SC</a>",
                                             ManualArticleCode: inventoryReportResult[i]["ManualArticleCode"],
                                             ManualArticleOldCode: inventoryReportResult[i]["ManualArticleOldCode"],
                                             Article: inventoryReportResult[i]["Article"],
@@ -437,7 +457,10 @@
                                             QuantityVarianceDisplay: parseFloat(quantityVariance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             VarianceAmount: varianceAmount,
                                             VarianceAmountDisplay: parseFloat(varianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Count: "0.00",
+                                            Count: 0,
+                                            CountDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Variance: 0,
+                                            VarianceDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             Category: inventoryReportResult[i]["Category"],
                                             Price: inventoryReportResult[i]["Price"],
                                             PriceDisplay: parseFloat(inventoryReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -507,14 +530,24 @@
                 inventoryReportCollections.refresh();
 
                 if (inventoryReportCollections.items.length > 0) {
+                    inventoryReportCollections.moveToFirstPage();
+
                     var totalAmount = 0;
                     var totalVarianceAmount = 0;
-                    for (var i = 0; i < inventoryReportCollections.items.length; i++) {
-                        totalAmount += inventoryReportCollections.items[i].Cost * inventoryReportCollections.items[i].EndQuantity;
-                        totalVarianceAmount += inventoryReportCollections.items[i].VarianceAmount;
-                    }
 
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    for (var p = 1; p <= inventoryReportCollections.pageCount; p++) {
+                        for (i = 0; i < inventoryReportCollections.items.length; i++) {
+                            totalAmount += inventoryReportCollections.items[i].Cost * inventoryReportCollections.items[i].EndQuantity;
+                            totalVarianceAmount += inventoryReportCollections.items[i].VarianceAmount;
+
+                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
+
+                        inventoryReportCollections.moveToNextPage();
+                        if (p == inventoryReportCollections.pageCount) {
+                            inventoryReportCollections.moveToPage(currentPageIndex - 1);
+                        }
+                    }
                 } else {
                     document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
@@ -537,6 +570,103 @@
             inventoryReportGrid.trackChanges = true;
         }
 
+        // ====================================
+        // Create Combo Stock Count List Filter
+        // ====================================
+        function createCboStockCountListFilter() {
+            var stockCountObservableArray = new wijmo.collections.ObservableArray();
+            var branchId = cboInventoryReportBranch.selectedValue;
+
+            $.ajax({
+                url: '/api/inventoryReport/dropdown/list/stockCount/' + branchId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    var disabled = true;
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            stockCountObservableArray.push({
+                                Id: results[i]["Id"],
+                                SCNumber: results[i]["SCNumber"],
+                                StockCountItem: results[i]["StockCountItem"]
+                            });
+                        }
+
+                        disabled = false;
+                    }
+
+                    cboStockCountFilter.dispose();
+                    cboStockCountFilter = new wijmo.input.ComboBox('#cboStockCountFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        required: false,
+                        itemsSource: stockCountObservableArray,
+                        displayMemberPath: "SCNumber",
+                        selectedValue: "",
+                        onSelectedIndexChanged: function () {
+                            NProgress.start();
+                            if (this.selectedValue != null) {
+                                inventoryReportCollections.moveToFirstPage();
+
+                                for (var p = 1; p <= inventoryReportCollections.pageCount; p++) {
+                                    for (i = 0; i < inventoryReportCollections.items.length; i++) {
+                                        inventoryReportCollections.items[i].Count = 0;
+                                        inventoryReportCollections.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        inventoryReportCollections.items[i].Variance = parseFloat(0);
+                                        inventoryReportCollections.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                                        var inventoryArticleId = inventoryReportCollections.items[i].ArticleId;
+                                        var inventoryEndQuantity = inventoryReportCollections.items[i].EndQuantity;
+
+                                        for (var c = 0; c < this.selectedItem["StockCountItem"].length; c++) {
+                                            var countItemId = this.selectedItem["StockCountItem"][c].ItemId;
+                                            var countQuantity = this.selectedItem["StockCountItem"][c].Quantity;
+                                            if (countItemId === inventoryArticleId) {
+                                                inventoryReportCollections.items[i].Count = countQuantity;
+                                                inventoryReportCollections.items[i].CountDisplay = parseFloat(countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                inventoryReportCollections.items[i].Variance = parseFloat(inventoryEndQuantity - countQuantity);
+                                                inventoryReportCollections.items[i].VarianceDisplay = parseFloat(inventoryEndQuantity - countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                            }
+                                        }
+                                    }
+
+                                    inventoryReportCollections.moveToNextPage();
+                                    if (p == inventoryReportCollections.pageCount) {
+                                        inventoryReportCollections.moveToPage(currentPageIndex - 1);
+                                    }
+                                }
+
+                                inventoryReportCollections.refresh();
+                                inventoryReportGrid.refresh();
+                            } else {
+                                inventoryReportCollections.moveToFirstPage();
+
+                                for (var p = 1; p <= inventoryReportCollections.pageCount; p++) {
+                                    for (i = 0; i < inventoryReportCollections.items.length; i++) {
+                                        inventoryReportCollections.items[i].Count = 0;
+                                        inventoryReportCollections.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        inventoryReportCollections.items[i].Variance = parseFloat(0);
+                                        inventoryReportCollections.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    }
+
+                                    inventoryReportCollections.moveToNextPage();
+                                    if (p == inventoryReportCollections.pageCount) {
+                                        inventoryReportCollections.moveToPage(currentPageIndex - 1);
+                                    }
+                                }
+
+                                inventoryReportCollections.refresh();
+                                inventoryReportGrid.refresh();
+                            }
+
+                            NProgress.done();
+                        }
+                    });
+                }
+            });
+        }
+
         // =========
         // Flex Grid
         // =========
@@ -551,14 +681,24 @@
                 inventoryReportCollections.refresh();
 
                 if (inventoryReportCollections.items.length > 0) {
+                    inventoryReportCollections.moveToFirstPage();
+
                     var totalAmount = 0;
                     var totalVarianceAmount = 0;
-                    for (var i = 0; i < inventoryReportCollections.items.length; i++) {
-                        totalAmount += inventoryReportCollections.items[i].Cost * inventoryReportCollections.items[i].EndQuantity;
-                        totalVarianceAmount += inventoryReportCollections.items[i].VarianceAmount;
-                    }
 
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    for (var p = 1; p <= inventoryReportCollections.pageCount; p++) {
+                        for (i = 0; i < inventoryReportCollections.items.length; i++) {
+                            totalAmount += inventoryReportCollections.items[i].Cost * inventoryReportCollections.items[i].EndQuantity;
+                            totalVarianceAmount += inventoryReportCollections.items[i].VarianceAmount;
+
+                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        }
+
+                        inventoryReportCollections.moveToNextPage();
+                        if (p == inventoryReportCollections.pageCount) {
+                            inventoryReportCollections.moveToPage(currentPageIndex - 1);
+                        }
+                    }
                 } else {
                     document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
@@ -621,7 +761,14 @@
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "width": "0.5*"
+                        "width": "0.6*"
+                    },
+                    {
+                        "header": "Price",
+                        "binding": "PriceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "*"
                     },
                     {
                         "header": "Cost",
@@ -659,15 +806,22 @@
                         "width": "*"
                     },
                     {
-                        "header": "Amount",
-                        "binding": "TotalAmountDisplay",
+                        "header": "Count",
+                        "binding": "CountDisplay",
                         "allowSorting": true,
                         "align": "right",
                         "width": "*"
                     },
                     {
-                        "header": "Price",
-                        "binding": "PriceDisplay",
+                        "header": "Variance",
+                        "binding": "VarianceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "*"
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "TotalAmountDisplay",
                         "allowSorting": true,
                         "align": "right",
                         "width": "*"
@@ -710,17 +864,20 @@
             inventoryReportGrid.columnHeaders.setCellData(0, 6, 'Unit');
 
             inventoryReportGrid.columnHeaders.columns[7].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 7, 'Cost');
+            inventoryReportGrid.columnHeaders.setCellData(0, 7, 'Price');
 
-            for (var columnBasicUnitConversion = 8; columnBasicUnitConversion <= 11; columnBasicUnitConversion++) {
+            inventoryReportGrid.columnHeaders.columns[8].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 8, 'Cost');
+
+            for (var columnBasicUnitConversion = 9; columnBasicUnitConversion <= 13; columnBasicUnitConversion++) {
                 inventoryReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            inventoryReportGrid.columnHeaders.columns[12].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 12, 'Amount');
+            inventoryReportGrid.columnHeaders.columns[14].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 14, 'Variance');
 
-            inventoryReportGrid.columnHeaders.columns[13].allowMerging = true;
-            inventoryReportGrid.columnHeaders.setCellData(0, 13, 'Price');
+            inventoryReportGrid.columnHeaders.columns[15].allowMerging = true;
+            inventoryReportGrid.columnHeaders.setCellData(0, 15, 'Amount');
 
             updateNavigateButtonsItems();
 

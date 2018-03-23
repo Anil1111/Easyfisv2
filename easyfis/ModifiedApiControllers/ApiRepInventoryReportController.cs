@@ -15,6 +15,29 @@ namespace easyfis.ApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ===================================
+        // Dropdown List - Bank Group (Filter)
+        // ===================================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/stockCount/{branchId}")]
+        public List<Entities.TrnStockCount> DropdownListStockCount(String branchId)
+        {
+            var stockCounts = from d in db.TrnStockCounts.OrderByDescending(d => d.Id)
+                              where d.BranchId == Convert.ToInt32(branchId)
+                              && d.IsLocked == true
+                              select new Entities.TrnStockCount
+                              {
+                                  Id = d.Id,
+                                  SCNumber = d.SCNumber,
+                                  StockCountItem = d.TrnStockCountItems.Select(i => new Entities.TrnStockCountItem
+                                  {
+                                      ItemId = i.ItemId,
+                                      Quantity = i.Quantity
+                                  }).ToList(),
+                              };
+
+            return stockCounts.ToList();
+        }
+
         // =====================
         // Inventory Report List
         // =====================
