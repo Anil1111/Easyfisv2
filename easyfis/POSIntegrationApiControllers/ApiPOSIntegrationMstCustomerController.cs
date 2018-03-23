@@ -32,7 +32,8 @@ namespace easyfis.POSIntegrationApiControllers
                                 ContactPerson = d.ContactPerson,
                                 ContactNumber = d.ContactNumber,
                                 Term = d.MstTerm.Term,
-                                TaxNumber = d.TaxNumber
+                                TaxNumber = d.TaxNumber,
+                                CreditLimit = d.CreditLimit
                             };
 
             return customers.ToList();
