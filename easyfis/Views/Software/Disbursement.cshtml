@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Disbursement</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpDisbursmenetSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,57 +58,81 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddDisbursement" onclick="btnAddDisbursement_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnDisbursementAdd" onclick="btnDisbursementAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseDisbursement" onclick="btnCloseDisbursement_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnDisbursementClose" onclick="btnDisbursementCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 29%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div id="cboStartDateFilter"></div>
+                                        <div id="cboDisbursementStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 29%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div id="cboEndDateFilter"></div>
+                                        <div id="cboDisbursementEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 41%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="DisbursementGrid" class="grid" align="left"></div>
+                        <div id="disbursementFlexGrid" class="grid" align="left"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="disbursementNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnDisbursementMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnDisbursementMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnDisbursementCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnDisbursementMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnDisbursementMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -134,24 +161,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Disbursement Delete -->
-    <div class="modal fade" id="deleteDisbursementConfirm" role="dialog">
+    <!--
+        ===================================
+        Disbursement Confirm Delete (Modal)
+        ===================================
+    -->
+    <div class="modal fade" id="disbursementConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this disbursement?
+                    Delete Disbursement?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteDisbursement" class="btn btn-danger" onclick="cmdDisbursementConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnDisbursementConfirmDelete" class="btn btn-danger" onclick="btnDisbursementConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnDisbursementCloseConfirmDeleteModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -159,59 +191,67 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
+        // ===============================
+        // Disbursement Date Range Filters
+        // ===============================
+        var cboDisbursementStartDateFilter = new wijmo.input.InputDate('#cboDisbursementStartDateFilter');
+        var cboDisbursementEndDateFilter = new wijmo.input.InputDate('#cboDisbursementEndDateFilter');
+        var isCboDisbursementStartDateFilterSelected = true;
+        var isCboDisbursementEndDateFilterSelected = true;
+
+        // ==========================================
+        // Disbursement Collection View and Flex Grid
+        // ==========================================
         var disbursements;
         var disbursementGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
-        var cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter');
-        var cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter');
-        var isStartDateFirstSelect = true;
-        var isEndDateFirstSelect = true;
 
-        // ===========
-        // Date Filter
-        // ===========
-        function cboDateFilters() {
-            cboStartDateFilter.dispose();
-            cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter', {
+        // ===============================
+        // Disbursement Navigation Buttons
+        // ===============================
+        var btnFirstPageGrid = document.getElementById('btnDisbursementMoveToFirstPageGrid');
+        var btnPreviousPageGrid = document.getElementById('btnDisbursementMoveToPreviousPageGrid');
+        var btnNextPageGrid = document.getElementById('btnDisbursementMoveToNextPageGrid');
+        var btnLastPageGrid = document.getElementById('btnDisbursementMoveToLastPageGrid');
+        var btnDisbursementCurrentPageGrid = document.getElementById('btnDisbursementCurrentPageGrid');
+
+        // ===============================
+        // Create Combo Date Range Filters
+        // ===============================
+        function createCboDateRangeFilters() {
+            cboDisbursementStartDateFilter.dispose();
+            cboDisbursementStartDateFilter = new wijmo.input.InputDate('#cboDisbursementStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
+                    if (!isCboDisbursementStartDateFilterSelected) {
                         refreshDisbursementFlexGrid();
                     } else {
-                        isStartDateFirstSelect = false;
+                        isCboDisbursementStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboEndDateFilter.dispose();
-            cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter', {
+            cboDisbursementEndDateFilter.dispose();
+            cboDisbursementEndDateFilter = new wijmo.input.InputDate('#cboDisbursementEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isEndDateFirstSelect) {
+                    if (!isCboDisbursementEndDateFilterSelected) {
                         refreshDisbursementFlexGrid();
                     } else {
-                        isEndDateFirstSelect = false;
+                        isCboDisbursementEndDateFilterSelected = false;
                     }
                 }
             });
         }
 
-        // =======================================
-        // GET Disbursement List Filter by CV Date
-        // =======================================
-        function getDisbursementFilterByCVDate() {
+        // =====================
+        // Get Disbursement Data
+        // =====================
+        function getDisbursementData() {
             NProgress.start();
-            var startDate = cboStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboDisbursementStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboDisbursementEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
             var disbursementsObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
@@ -226,8 +266,8 @@
                             var CVDate = ('0' + (CVDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + CVDateResult.getDate()).slice(-2) + '-' + CVDateResult.getFullYear();
 
                             disbursementsObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='disbursementEditButton' onclick='cmdDisbursementEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdDisbursementDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='disbursementEditButton' onclick='btnDisbursementEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDisbursementDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 CVNumber: results[i]["CVNumber"],
                                 CVDate: CVDate,
@@ -253,207 +293,18 @@
             return disbursementsObservableArray;
         }
 
-        // ========================
-        // Disbursements Add Button
-        // ========================
-        function btnAddDisbursement_OnClick() {
-            document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddDisbursement').prop('disabled', true);
-            $('#btnCloseDisbursement').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/disbursement/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/DisbursementDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddDisbursement').prop('disabled', false);
-                        $('#btnCloseDisbursement').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddDisbursement').prop('disabled', false);
-                        $('#btnCloseDisbursement').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddDisbursement').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddDisbursement').prop('disabled', false);
-                        $('#btnCloseDisbursement').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // =========================
-        // Disbursements Edit Button
-        // =========================
-        function cmdDisbursementEditButton_OnClick() {
-            disbursements.editItem(disbursements.currentItem);
-            var disbursement = disbursements.currentEditItem;
-            var disbursementId = disbursement.Id;
-            window.location = '/Software/DisbursementDetail?id=' + disbursementId;
-        }
-
-        // ==========================
-        // Disbursements Close Button
-        // ==========================
-        function btnCloseDisbursement_OnClick() {
-            window.location = '/Software';
-        }
-
-        // ===========================
-        // Disbursements delete Button
-        // ===========================
-        function cmdDisbursementDeleteButton_OnClick() {
-            disbursements.editItem(disbursements.currentItem);
-            var disbursement = disbursements.currentEditItem;
-            if (disbursement.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteDisbursementConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-
-                document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-            }
-        }
-
-        // Disbursements Confirm Delete Button
-        function cmdDisbursementConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteDisbursement").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
-
-            disbursements.editItem(disbursements.currentItem);
-            var id = disbursements.currentEditItem.Id;
-
-            $.ajax({
-                url: '/api/disbursement/delete/' + id,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteDisbursementConfirm').modal('hide');
-                        refreshDisbursementFlexGrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdConfirmDeleteDisbursement').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursement").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            var item = disbursements.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // ====================================
-        // Navigation Buttons for disbursements
-        // ====================================
-        function updateNavigateButtonsDisbursement() {
-            if (disbursements.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (disbursements.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (disbursements.pageIndex === (disbursements.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (disbursements.pageIndex + 1) + ' / ' + disbursements.pageCount;
-        }
-
-        // ==============================
-        // refresh disbursement Flex grid
-        // ==============================
-        function refreshDisbursementFlexGrid() {
-            disbursements = new wijmo.collections.CollectionView(getDisbursementFilterByCVDate());
-            disbursements.canFilter = true;
-            disbursements.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                disbursements.refresh();
-            });
-
-            disbursements.filter = function (item) {
-                return !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualCVNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            disbursements.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsDisbursement();
-            });
-
-            disbursements.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            disbursementGrid.itemsSource = disbursements;
-            disbursementGrid.trackChanges = true;
-        }
-
-        // =====================
-        // Disbursement FlexGrid
-        // =====================
+        // =============================
+        // Create Disbursement Flex Grid
+        // =============================
         function createDisbursementFlexGrid() {
-            cboDateFilters();
-            disbursements = new wijmo.collections.CollectionView(getDisbursementFilterByCVDate());
+            createCboDateRangeFilters();
+
+            disbursements = new wijmo.collections.CollectionView(getDisbursementData());
             disbursements.canFilter = true;
             disbursements.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpDisbursmenetSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 disbursements.refresh();
             });
@@ -467,14 +318,14 @@
             }
 
             disbursements.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsDisbursement();
+                updateDisbursementNavigationButtons();
             });
 
             disbursements.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+                updateDisbursementDetailsFlexGridSelection();
             });
 
-            disbursementGrid = new wijmo.grid.FlexGrid('#DisbursementGrid');
+            disbursementGrid = new wijmo.grid.FlexGrid('#disbursementFlexGrid');
             disbursementGrid.initialize({
                 columns: [
                             @{
@@ -567,44 +418,237 @@
 
             disbursementGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-
-            updateNavigateButtonsDisbursement();
+            updateDisbursementNavigationButtons();
 
             btnFirstPageGrid.addEventListener('click', function () {
                 disbursements.moveToFirstPage();
-                updateNavigateButtonsDisbursement();
+                updateDisbursementNavigationButtons();
             });
 
             btnPreviousPageGrid.addEventListener('click', function () {
                 disbursements.moveToPreviousPage();
-                updateNavigateButtonsDisbursement();
+                updateDisbursementNavigationButtons();
             });
 
             btnNextPageGrid.addEventListener('click', function () {
                 disbursements.moveToNextPage();
-                updateNavigateButtonsDisbursement();
+                updateDisbursementNavigationButtons();
             });
 
             btnLastPageGrid.addEventListener('click', function () {
                 disbursements.moveToLastPage();
-                updateNavigateButtonsDisbursement();
+                updateDisbursementNavigationButtons();
             });
         }
 
-        // ===========
-        // OnLoad Page
-        // ===========
+        // ===============================================
+        // Update Disbursement Details Flex Grid Selection
+        // ===============================================
+        function updateDisbursementDetailsFlexGridSelection() {
+            var item = disbursements.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ======================================
+        // Update Disbursement Navigation Buttons
+        // ======================================
+        function updateDisbursementNavigationButtons() {
+            if (disbursements.pageSize <= 0) {
+                document.getElementById('disbursementNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('disbursementNavigationPageGrid').style.display = 'block';
+            if (disbursements.pageIndex === 0) {
+                btnFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            } else if (disbursements.pageIndex === (disbursements.pageCount - 1)) {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.setAttribute('disabled', 'disabled');
+                btnNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnFirstPageGrid.removeAttribute('disabled');
+                btnPreviousPageGrid.removeAttribute('disabled');
+                btnNextPageGrid.removeAttribute('disabled');
+                btnLastPageGrid.removeAttribute('disabled');
+            }
+            btnDisbursementCurrentPageGrid.innerHTML = (disbursements.pageIndex + 1) + ' / ' + disbursements.pageCount;
+        }
+
+        // ==============================
+        // Refresh Disbursement Flex Grid
+        // ==============================
+        function refreshDisbursementFlexGrid() {
+            disbursements = new wijmo.collections.CollectionView(getDisbursementData());
+            disbursements.canFilter = true;
+            disbursements.pageSize = 15;
+
+            var filterText = '';
+            $('#inpDisbursmenetSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                disbursements.refresh();
+            });
+
+            disbursements.filter = function (item) {
+                return !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualCVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            disbursements.collectionChanged.addHandler(function (sender, args) {
+                updateDisbursementNavigationButtons();
+            });
+
+            disbursements.currentChanged.addHandler(function (sender, args) {
+                updateDisbursementDetailsFlexGridSelection();
+            });
+
+            disbursementGrid.itemsSource = disbursements;
+            disbursementGrid.trackChanges = true;
+        }
+
+        // ================
+        // Add Disbursement
+        // ================
+        function btnDisbursementAddOnclick() {
+            document.getElementById('btnDisbursementAdd').innerHTML = "<i class='fa fa-plus'></i> Adding...";
+            $('#btnDisbursementAdd').prop('disabled', true);
+            $('#btnDisbursementClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/disbursement/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/DisbursementDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnDisbursementAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnDisbursementAdd').prop('disabled', false);
+                        $('#btnDisbursementClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnDisbursementAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnDisbursementAdd').prop('disabled', false);
+                        $('#btnDisbursementClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnDisbursementAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnDisbursementAdd').prop('disabled', false);
+                        $('#btnDisbursementClose').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =================
+        // Edit Disbursement
+        // =================
+        function btnDisbursementEditOnclick() {
+            disbursements.editItem(disbursements.currentItem);
+            var disbursement = disbursements.currentEditItem;
+            var disbursementId = disbursement.Id;
+            window.location = '/Software/DisbursementDetail?id=' + disbursementId;
+        }
+
+        // ==================
+        // Close Disbursement
+        // ==================
+        function btnDisbursementCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // ===================
+        // Delete Disbursement
+        // ===================
+        function btnDisbursementDeleteOnclick() {
+            disbursements.editItem(disbursements.currentItem);
+            var disbursement = disbursements.currentEditItem;
+            if (disbursement.IsLocked) {
+                toastr.error("Delete is not allowed when the selected record is locked!");
+            } else {
+                $('#disbursementConfirmDeleteModal').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                document.getElementById('btnDisbursementConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $("#btnDisbursementConfirmDelete").prop("disabled", false);
+                $("#btnDisbursementCloseConfirmDeleteModal").prop("disabled", false);
+            }
+        }
+
+        // ===========================
+        // Confirm Delete Disbursement
+        // ===========================
+        function btnDisbursementConfirmDeleteOnclick() {
+            document.getElementById('btnDisbursementConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnDisbursementConfirmDelete").prop("disabled", true);
+            $("#btnDisbursementCloseConfirmDeleteModal").prop("disabled", true);
+
+            disbursements.editItem(disbursements.currentItem);
+            var id = disbursements.currentEditItem.Id;
+
+            $.ajax({
+                url: '/api/disbursement/delete/' + id,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#disbursementConfirmDeleteModal').modal('hide');
+                        refreshDisbursementFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnDisbursementConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementCloseConfirmDeleteModal").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnDisbursementConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementCloseConfirmDeleteModal").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnDisbursementConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementCloseConfirmDeleteModal").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             createDisbursementFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -622,12 +666,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -651,6 +695,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -690,6 +737,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
