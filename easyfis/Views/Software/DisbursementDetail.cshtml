@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Disbursement Detail</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,28 +38,40 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ======================================================
+                        Options: Journal, Lock, Unlock, Print and Close Button
+                        ======================================================
+                    -->
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                <button class="btn btn-primary" id="btnJournalDisbursement" onclick="btnJournalDisbursementOnclick()"><i class="fa fa-book"></i> Journal</button>
+                                <button class="btn btn-primary" id="btnDisbursementDetailJournal" onclick="btnDisbursementDetailJournalOnclick()"><i class="fa fa-book"></i> Journal</button>
                                 @{
                                     if (canLock)
                                     {
-                                        <button class="btn btn-primary" id="btnLockDisbursement" onclick="btnLockDisbursementOnclick()"><i class="fa fa-lock"></i> Lock</button>
+                                        <button class="btn btn-primary" id="btnDisbursementDetailLock" onclick="btnDisbursementDetailLockOnclick()"><i class="fa fa-lock"></i> Lock</button>
                                     }
                                     if (canUnlock)
                                     {
-                                        <button class="btn btn-primary" id="btnUnlockDisbursement" onclick="btnUnlockDisbursementOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                        <button class="btn btn-primary" id="btnDisbursementDetailUnlock" onclick="btnDisbursementDetailUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
                                     if (canPrint)
                                     {
-                                        <button class="btn btn-primary" id="btnPrintDisbursement" onclick="btnPrintDisbursementOnclick()"><i class="fa fa-print"></i> Print</button>
+                                        <button class="btn btn-primary" id="btnDisbursementDetailPrint" onclick="btnDisbursementDetailPrintOnclick()"><i class="fa fa-print"></i> Print</button>
                                     }
                                 }
-                                <button class="btn btn-danger" id="btnCloseDisbursement" onclick="window.location.href = '/Software/Disbursement'"><i class="fa fa-times"></i> Close</button>
+                                <button class="btn btn-danger" id="btnDisbursementDetailClose" onclick="window.location.href = '/Software/Disbursement'"><i class="fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
+
+                    <!--
+                        ======================================
+                        Details, Fields and Other Informations
+                        ======================================
+                    -->
                     <div class="panel-body">
                         <form class="form-horizontal" role="form">
                             <div class="row">
@@ -70,35 +79,35 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Branch</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVBranch"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailBranch"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">CV Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredDisbursement" id="disbursement_CVNumber" disabled />
+                                            <input type="text" class="form-control requiredDisbursement" id="inpDisbursementDetailCVNumber" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">CV Date</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVDate"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailCVDate"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Manual CV Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredDisbursement" id="disbursement_ManualCVNumber" placeholder="Manual CV Number" />
+                                            <input type="text" class="form-control requiredDisbursement" id="inpDisbursementDetailManualCVNumber" placeholder="Manual CV Number" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Supplier</label>
                                         <div class="col-sm-8">
                                             <div class="input-group">
-                                                <div class="comboBox-wide" id="cboCVSupplier"></div>
+                                                <div class="comboBox-wide" id="cboDisbursementDetailSupplier"></div>
                                                 <div class="input-group-btn">
-                                                    <button type="button" class="btn btn-primary" id="cmdAP" onclick="btnnOclickAP()">AP</button>
-                                                    <button type="button" class="btn btn-primary" id="cmdAdvances" onclick="btnnOclickAdvances()">Advances</button>
+                                                    <button type="button" class="btn btn-primary" id="btnDisbursementDetailAP" onclick="btnDisbursementDetailAPOnclick()">AP</button>
+                                                    <button type="button" class="btn btn-primary" id="btnDisbursementDetailAdvances" onclick="btnDisbursementDetailAdvancesOnclick()">Advances</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -106,19 +115,19 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Payee</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredDisbursement" id="disbursement_Payee" placeholder="Payee" />
+                                            <input type="text" class="form-control requiredDisbursement" id="inpDisbursementDetailPayee" placeholder="Payee" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Pay Type</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVPayType"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailPayType"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Particulars</label>
                                         <div class="col-sm-8">
-                                            <textarea rows="5" class="form-control textarea-custom requiredDisbursement" id="disbursement_Particulars" placeholder="Particulars"></textarea>
+                                            <textarea rows="5" class="form-control textarea-custom requiredDisbursement" id="inpDisbursementDetailParticulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -126,55 +135,55 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Bank</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVBank"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailBank"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Check Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control  requiredDisbursement" id="disbursement_CheckNumber" placeholder="Check Number" />
+                                            <input type="text" class="form-control  requiredDisbursement" id="inpDisbursementDetailCheckNumber" placeholder="Check Number" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Check Date</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVCheckDate"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailCheckDate"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Amount</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control numberField requiredDisbursement" id="disbursement_Amount" placeholder="0.00" disabled />
+                                            <input type="text" class="form-control numberField requiredDisbursement" id="cboDisbursementDetailAmount" placeholder="0.00" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Is Cross Check</label>
                                         <div class="col-sm-8">
-                                            <input type="checkbox" id="disbursement_CrossCheck">
+                                            <input type="checkbox" id="inpDisbursementDetailIsCrossCheck">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Prepared by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVPreparedBy"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailPreparedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Checked by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVCheckedBy"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailCheckedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Approved by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboCVApprovedBy"></div>
+                                            <div class="comboBox-wide" id="cboDisbursementDetailApprovedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Is Clear</label>
                                         <div class="col-sm-8">
-                                            <input type="checkbox" id="disbursement_IsClear">
+                                            <input type="checkbox" id="inpDisbursementDetailIsClear">
                                         </div>
                                     </div>
                                 </div>
@@ -182,6 +191,12 @@
                         </form>
                     </div>
                 </div>
+
+                <!--
+                    ==================
+                    Disbursement Lines
+                    ==================
+                -->
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
                     <li role="presentation" class="active"><a data-toggle="tab" href="#DisbursementLine" id="itemTabId">Disbursement Line</a></li>
                 </ul>
@@ -189,20 +204,26 @@
                 <div class="tab-content">
                     <div id="DisbursementLine" class="tab-pane fade in active">
                         <div class="panel panel-default">
+
+                            <!--
+                                =======================================================================
+                                Disbursement Lines: Search, Filter, Display Number of Rows and  Buttons
+                                =======================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="DisbursementLineInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpDisbursementLineSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboDisbursementLineShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboDisbursementLineDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -210,36 +231,54 @@
                                             @{
                                                 if (canAdd)
                                                 {
-                                                    <button class="btn btn-primary" id="btnAddDisbursementLine" onclick="cmdAddDisbursementLineButton_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnDisbursementLineAdd" onclick="btnDisbursementLineAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                                 }
                                             }
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                =============================
+                                Disbursement Lines: Flex Grid
+                                =============================
+                            -->
                             <div class="panel-body">
-                                <div id="DisbursementLineGrid"></div>
+                                <div id="disbursementLineFlexGrid"></div>
                             </div>
+
+                            <!--
+                                ======================================
+                                Disbursement Lines: Navigation Buttons
+                                ======================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <div class="btn-group col-md-7" id="disbursementLineNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementLineMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementLineMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnDisbursementLineCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementLineMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnDisbursementLineMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!--
+                            ==========================
+                            Disbursement Lines: Totals
+                            ==========================
+                        -->
                         <div class="panel panel-default">
                             <div class="panel-body" style="padding-bottom: 0px;">
                                 <div class="row">
@@ -250,7 +289,7 @@
                                                 <b>Total Amount</b>
                                             </dt>
                                             <dd>
-                                                <input type="text" class="form-control numberField" id="totalCVAmount" placeholder="0.00" disabled />
+                                                <input type="text" class="form-control numberField" id="inpDisbursementLineTotalAmount" placeholder="0.00" disabled />
                                             </dd>
                                         </dl>
                                     </div>
@@ -259,6 +298,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -287,26 +332,33 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Disbursement Edit Detail -->
-    <div class="modal fade" id="disbursementLineEdit" role="dialog">
+    <!--
+        ================================
+        Disbursement Lines: Detail Modal
+        ================================
+    -->
+    <div class="modal fade" id="disbursementLineDetailModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="disbursementLineModalLabel">Disbursement Line</h4>
+                    <h4 class="modal-title" id="disbursementLineModalTitle">Disbursement Line</h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingLines"></span>
+                        <span id="disbursementLineLoading"></span>
                     </center>
                     <div id="disbursementLineDetailForm">
                         <dl class="dl-horizontal">
                             <dt>Branch</dt>
-                            <dd><div class="comboBox-wide" id="cboDisbursementLineBranch"></div></dd>
+                            <dd>
+                                <div class="comboBox-wide" id="cboDisbursementLineBranch"></div>
+                            </dd>
                             <dt>Account</dt>
                             <dd>
                                 <table style="width: 100%" border="0">
@@ -322,54 +374,70 @@
                                 </table>
                             </dd>
                             <dt>Article</dt>
-                            <dd><div class="comboBox-wide" id="cboDisbursementLineArticle"></div></dd>
+                            <dd>
+                                <div class="comboBox-wide" id="cboDisbursementLineArticle"></div>
+                            </dd>
                             <dt>RR No.</dt>
-                            <dd><div class="comboBox-wide" id="cboDisbursementLineRRNo"></div></dd>
+                            <dd>
+                                <div class="comboBox-wide" id="cboDisbursementLineRRNumber"></div>
+                            </dd>
                             <dt>Particulars</dt>
-                            <dd><textarea rows="5" class="form-control textarea-custom requiredDisbursementLine" id="disbursementLine_Particulars" placeholder="Particulars"></textarea></dd>
+                            <dd>
+                                <textarea rows="5" class="form-control textarea-custom requiredDisbursementLine" id="inpDisbursementLineParticulars" placeholder="Particulars"></textarea>
+                            </dd>
                             <dt>Amount</dt>
-                            <dd><input class="form-control  numberField  requiredDisbursementLine" id="disbursementLine_Amount" placeholder="0.00" /></dd>
+                            <dd>
+                                <input class="form-control  numberField  requiredDisbursementLine" id="inpDisbursementLineAmount" placeholder="0.00" />
+                            </dd>
                         </dl>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdSaveDisbursementLineButton" class="btn btn-primary" onclick="cmdDisbursementLineSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
-                    <button id="cmdDisbursementLineDetailCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button id="btnDisbursementLineSave" class="btn btn-primary" onclick="btnDisbursementLineSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="btnDisbursementLineCloseDetailModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- disbursement Line Delete Modal Confirmation -->
-    <div class="modal fade" id="deleteDisbursementLineConfirm" role="dialog">
+    <!--
+        ================================
+        Disbursement Lines: Delete Modal
+        ================================
+    -->
+    <div class="modal fade" id="disbursementLineConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this disbursement line?
+                    Delete Disbursement Line?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteDisbursementLine" class="btn btn-danger" onclick="cmdDisbursementLineConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteDisbursementLineCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnDisbursementLineConfirmDelete" class="btn btn-danger" onclick="btnDisbursementLineConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnDisbursementLineCloseConfirmDeleteModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Journal -->
-    <div class="modal fade" id="journalDetail" role="dialog">
+    <!--
+        =====================
+        Journal Entries Modal
+        =====================
+    -->
+    <div class="modal fade" id="journalEntryModal" role="dialog">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="journalModalLabel"> Journal</h4>
+                    <h4 class="modal-title"> Journal </h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingJournalGridList"></span>
+                        <span id="journalLoading"></span>
                     </center>
-                    <div id="journal_Content">
+                    <div id="journalContent">
                         <div id="journalFlexGrid" style="max-height: 250px;"></div>
                         <br /><br />
                         <div class="row">
@@ -380,19 +448,19 @@
                                         <b>Total Debit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="totalDebitInJournal" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalTotalDebit" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Credit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="totalCreditInJournal" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalTotalCredit" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Variance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="variance" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalVariance" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -400,48 +468,220 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdJournalDetailCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- RR status -->
-    <div class="modal fade" id="RRStatus" role="dialog">
+    <!--
+        ==================================
+        AP: Receiving Receipt Status Modal
+        ==================================
+    -->
+    <div class="modal fade" id="receivingReceiptStatusModal" role="dialog">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="RRStatusModalLabel">Receiving Receipt Status</h4>
+                    <h4 class="modal-title">Receiving Receipt Status</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+
+                        <!--
+                            ===============
+                            Search / Filter
+                            ===============
+                        -->
+                        <div class="panel-heading">
+                            <table style="width: 100%" border="0">
+                                <tr>
+                                    <td style="width: 40%">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                            <input type="text" class="form-control" id="inpReceivingReceiptStatusSearchFilter" placeholder="Search">
+                                        </div>
+                                    </td>
+                                    <td style="width: 1%"></td>
+                                    <td style="width: 29%">
+                                        <div class="input-group ">
+                                            <span class="input-group-addon"><b>Start Date</b></span>
+                                            <div id="cboReceivingReceiptStatusStartDateFilter"></div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 1%"></td>
+                                    <td style="width: 29%">
+                                        <div class="input-group ">
+                                            <span class="input-group-addon"><b>End Date</b></span>
+                                            <div id="cboReceivingReceiptStatusEndDateFilter"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!--
+                            =========
+                            Flex Grid
+                            =========
+                        -->
+                        <div class="panel-body">
+                            <center>
+                                <span id="receivingReceiptStatusLoading"></span>
+                            </center>
+                            <div id="receivingReceiptStatusContent">
+                                <div id="receivingReceiptStatusFlexGrid" style="font-size: 13px;"></div>
+                            </div>
+                        </div>
+
+                        <!--
+                            ====================
+                            Navigation Page Grid
+                            ====================
+                        -->
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="btn-group col-md-7" id="receivingStatusNavigationPageGrid">
+                                    <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptStatusMoveToFirstPageGrid">
+                                        <span class="glyphicon glyphicon-fast-backward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptStatusMoveToPreviousPageGrid">
+                                        <span class="glyphicon glyphicon-step-backward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnReceivingReceiptStatusCurrentPageGrid"></button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptStatusMoveToNextPageGrid">
+                                        <span class="glyphicon glyphicon-step-forward"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptStatusMoveToLastPageGrid">
+                                        <span class="glyphicon glyphicon-fast-forward"></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Total Amount</b></span>
+                                        <input type="text" class="form-control numberField" id="inpReceivingReceiptStatusTotalAmount" placeholder="0.00" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnReceivingReceiptStatusApply" class="btn btn-primary" onclick="btnReceivingReceiptStatusApplyOnclick()"><i class="fa fa-check"></i> Apply</button>
+                    <button id="btnReceivingReceiptStatusApplyCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        ==============================================
+        AP: Receiving Receipt Status Pick Amount Modal
+        ==============================================
+    -->
+    <div class="modal fade" id="receivingReceiptStatusPickAmountModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pick</h4>
+                </div>
+                <div class="modal-body">
+                    <dl>
+                        <dt>Amount</dt>
+                        <dd>
+                            <input class="form-control numberField requiredPickedAmount" id="inpReceivingReceiptStatusPickAmount" placeholder="0.00" />
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnReceivingReceiptStatusPickAmountContinue" class="btn btn-primary" onclick="btnReceivingReceiptStatusPickAmountContinueOnclick()"><i class="fa fa-arrow-right"></i> Continue</button>
+                    <button id="btnReceivingReceiptStatusPickAmountCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        =============================================================
+        AP: Confirm Apply Receiving Receipt Status Total Amount Modal
+        =============================================================
+    -->
+    <div class="modal fade" id="receivingReceiptStatusApplyPickAmountModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Apply</h4>
+                </div>
+                <div class="modal-body">
+                    Apply All Picked Amount?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="btnReceivingReceiptStatusApplyPickAmount" onclick="btnReceivingReceiptStatusApplyPickAmountOnclick()"><i class="fa fa-check"></i> Apply</button>
+                    <button class="btn btn-danger" id="btnReceivingReceiptStatusApplyPickAmountCloseModal" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        =================================
+        Advances: Supplier Advances Modal
+        =================================
+    -->
+    <div class="modal fade" id="supplierAdvancesModal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Supplier Advances</h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingRRStatus"></span>
+                        <span id="supplierAdvancesLoading"></span>
                     </center>
-                    <div id="statusGrid">
+                    <div id="supplierAdvancesContent">
                         <div class="panel panel-default">
+
+                            <!--
+                                ===============
+                                Search / Filter
+                                ===============
+                            -->
                             <div class="panel-heading">
                                 <div class="input-group  ">
                                     <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control" id="RRStatusFilter" placeholder="Search">
+                                    <input type="text" class="form-control" id="inpSupplierAdvancesSearchFilter" placeholder="Search">
                                 </div>
                             </div>
+
+                            <!--
+                                =========
+                                Flex Grid
+                                =========
+                            -->
                             <div class="panel-body">
-                                <div id="receivingStatusGrid"></div>
+                                <div id="supplierAdvancesFlexGrid"></div>
                             </div>
+
+                            <!--
+                                ====================
+                                Navigation Page Grid
+                                ====================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridRRStatus">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridRRStatus">
+                                    <div class="btn-group col-md-7" id="supplierAdvancesNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnSupplierAdvancesMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridRRStatus">
+                                        <button type="button" class="btn btn-default border-custom" id="btnSupplierAdvancesMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridRRStatus"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridRRStatus">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnSupplierAdvancesCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnSupplierAdvancesMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridRRStatus">
+                                        <button type="button" class="btn btn-default border-custom" id="btnSupplierAdvancesMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -451,95 +691,29 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="btnIdApplyAllRR" class="btn btn-primary" onclick="btnOnclickApplyAllRR()"><i class="fa fa-check"></i> Apply</button>
-                    <button id="cmdPOStatusCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button id="btnSupplierAdvancesCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Spplier Advances -->
-    <div class="modal fade" id="SupplierAdvances" role="dialog">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="SupplierAdvancesModalLabel">Spplier Advances</h4>
-                </div>
-                <div class="modal-body">
-                    <center>
-                        <span id="loadingRRAdvances"></span>
-                    </center>
-                    <div id="AdvancesGrid">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="input-group  ">
-                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control" id="RRAdvancesFilter" placeholder="Search">
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                <div id="RRAdvancesGrid"></div>
-                            </div>
-                            <div class="panel-footer">
-                                <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridRRAdvances">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridRRAdvances">
-                                            <span class="glyphicon glyphicon-fast-backward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridRRAdvances">
-                                            <span class="glyphicon glyphicon-step-backward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridRRAdvances"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridRRAdvances">
-                                            <span class="glyphicon glyphicon-step-forward"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridRRAdvances">
-                                            <span class="glyphicon glyphicon-fast-forward"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="cmdPOStatusCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- disbursement apply -->
-    <div class="modal fade" id="applyAmount" role="dialog">
+    <!--
+        ============================================================
+        Advances: Confirm Apply Supplier Advances Total Amount Modal
+        ============================================================
+    -->
+    <div class="modal fade" id="supplierAdvancesApplyModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Apply</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure that you want to apply all picked amount?
+                    Apply Advances?
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="cmdConfirmApplyAmount" onclick="btnConfrimApplyAmountOnClick()"><i class="fa fa-check"></i> Apply</button>
-                    <button class="btn btn-danger" id="cmdCloseButtonApplyAmount" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- disbursement apply -->
-    <div class="modal fade" id="applyConfirm" role="dialog">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Apply</h4>
-                </div>
-                <div class="modal-body">
-                    Are you sure that you want to apply these advances?
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-primary" id="cmdConfirmApplyAdvances" onclick="btnConfrimApplyAdvances_OnClick()"><i class="fa fa-check"></i> Apply</button>
-                    <button class="btn btn-danger" id="cmdCloseButtonApplyAdvances" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button class="btn btn-primary" id="btnSupplierAdvancesConfirmApply" onclick="btnSupplierAdvancesConfirmApplyOnclick()"><i class="fa fa-check"></i> Apply</button>
+                    <button class="btn btn-danger" id="btnSupplierAdvancesConfirmApplyCloseModal" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -547,55 +721,82 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboCVBranch = new wijmo.input.ComboBox('#cboCVBranch');
-        var cboCVSupplier = new wijmo.input.ComboBox('#cboCVSupplier');
-        var cboCVPayType = new wijmo.input.ComboBox('#cboCVPayType');
-        var cboCVBank = new wijmo.input.ComboBox('#cboCVBank');
-        var cboCVPreparedBy = new wijmo.input.ComboBox('#cboCVPreparedBy');
-        var cboCVCheckedBy = new wijmo.input.ComboBox('#cboCVCheckedBy');
-        var cboCVApprovedBy = new wijmo.input.ComboBox('#cboCVApprovedBy');
-        var cboCVDate = new wijmo.input.InputDate('#cboCVDate');
-        var cboCVCheckDate = new wijmo.input.InputDate('#cboCVCheckDate');
-        var disbursementLines;
-        var disbursementGrid;
+        // =========================================
+        // Disbursement Detail Combo Data and Fields
+        // =========================================
+        var cboDisbursementDetailBranch = new wijmo.input.ComboBox('#cboDisbursementDetailBranch');
+        var cboDisbursementDetailCVDate = new wijmo.input.InputDate('#cboDisbursementDetailCVDate');
+        var cboDisbursementDetailSupplier = new wijmo.input.ComboBox('#cboDisbursementDetailSupplier');
+        var cboDisbursementDetailPayType = new wijmo.input.ComboBox('#cboDisbursementDetailPayType');
+        var cboDisbursementDetailBank = new wijmo.input.ComboBox('#cboDisbursementDetailBank');
+        var cboDisbursementDetailCheckDate = new wijmo.input.InputDate('#cboDisbursementDetailCheckDate');
+        var cboDisbursementDetailPreparedBy = new wijmo.input.ComboBox('#cboDisbursementDetailPreparedBy');
+        var cboDisbursementDetailCheckedBy = new wijmo.input.ComboBox('#cboDisbursementDetailCheckedBy');
+        var cboDisbursementDetailApprovedBy = new wijmo.input.ComboBox('#cboDisbursementDetailApprovedBy');
         var isLocked = false;
+
+        // ====================================================================
+        // Disbursement Lines Collection View, Flex Grid and Navigation Buttons
+        // ====================================================================
+        var disbursementLineCollectionView;
+        var disbursementFlexGrid;
+        var cboDisbursementLineDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementLineDisplayNumberOfRows');
+        var btnDisbursementLineMoveToFirstPageGrid = document.getElementById('btnDisbursementLineMoveToFirstPageGrid');
+        var btnDisbursementLineMoveToPreviousPageGrid = document.getElementById('btnDisbursementLineMoveToPreviousPageGrid');
+        var btnDisbursementLineMoveToNextPageGrid = document.getElementById('btnDisbursementLineMoveToNextPageGrid');
+        var btnDisbursementLineMoveToLastPageGrid = document.getElementById('btnDisbursementLineMoveToLastPageGrid');
+        var btnDisbursementLineCurrentPageGrid = document.getElementById('btnDisbursementLineCurrentPageGrid');
+
+        // ========================================
+        // Disbursement Lines Combo Data and Fields
+        // ========================================
+        var disbursementLineId = 0;
         var cboDisbursementLineBranch = new wijmo.input.ComboBox('#cboDisbursementLineBranch');
         var cboDisbursementLineAccountCode = new wijmo.input.ComboBox('#cboDisbursementLineAccountCode');
         var cboDisbursementLineAccount = new wijmo.input.ComboBox('#cboDisbursementLineAccount');
+        var IsCboDisbursementLineAccountChanged = false;
         var cboDisbursementLineArticle = new wijmo.input.ComboBox('#cboDisbursementLineArticle');
-        var cboDisbursementLineRRNo = new wijmo.input.ComboBox('#cboDisbursementLineRRNo');
-        var disbursementLineId = 0;
-        var IsAccountChanged = false;
+        var cboDisbursementLineRRNumber = new wijmo.input.ComboBox('#cboDisbursementLineRRNumber');
+
+        // =============================================
+        // Journal Entries Collection View and Flex Grid
+        // =============================================
         var journalCollectionView;
         var journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
-        var receivingReceipts;
-        var receivingStatusGrid = new wijmo.grid.FlexGrid('#receivingStatusGrid');
-        var RRAdvances;
-        var RRAdvancesGrid = new wijmo.grid.FlexGrid('#RRAdvancesGrid');
-        var cboDisbursementLineShowNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementLineShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var btnFirstPageGridRRStatus = document.getElementById('btnMoveToFirstPageGridRRStatus');
-        var btnPreviousPageGridRRStatus = document.getElementById('btnMoveToPreviousPageGridRRStatus');
-        var btnNextPageGridRRStatus = document.getElementById('btnMoveToNextPageGridRRStatus');
-        var btnLastPageGridRRStatus = document.getElementById('btnMoveToLastPageGridRRStatus');
-        var btnCurrentPageGridRRStatus = document.getElementById('btnCurrentPageGridRRStatus');
-        var btnFirstPageGridRRAdvances = document.getElementById('btnMoveToFirstPageGridRRAdvances');
-        var btnPreviousPageGridRRAdvances = document.getElementById('btnMoveToPreviousPageGridRRAdvances');
-        var btnNextPageGridRRAdvances = document.getElementById('btnMoveToNextPageGridRRAdvances');
-        var btnLastPageGridRRAdvances = document.getElementById('btnMoveToLastPageGridRRAdvances');
-        var btnCurrentPageGridRRAdvances = document.getElementById('btnCurrentPageGridRRAdvances');
+
+        // ===================================================================================
+        // Receiving Receipt Status Filters, Collection View, Flex Grid and Navigation Buttons
+        // ===================================================================================
+        var cboReceivingReceiptStatusStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptStatusStartDateFilter');
+        var cboReceivingReceiptStatusEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptStatusEndDateFilter');
+        var isCboReceivingReceiptStatusStartDateFilterSelected = true;
+        var isCboReceivingReceiptStatusEndDateFilterSelected = true;
+        var receivingReceiptsSatatusCollectionView;
+        var receivingReceiptStatusFlexGrid = new wijmo.grid.FlexGrid('#receivingReceiptStatusFlexGrid');
+        var btnReceivingReceiptStatusMoveToFirstPageGrid = document.getElementById('btnReceivingReceiptStatusMoveToFirstPageGrid');
+        var btnReceivingReceiptStatusMoveToPreviousPageGrid = document.getElementById('btnReceivingReceiptStatusMoveToPreviousPageGrid');
+        var btnReceivingReceiptStatusMoveToNextPageGrid = document.getElementById('btnReceivingReceiptStatusMoveToNextPageGrid');
+        var btnReceivingReceiptStatusMoveToLastPageGrid = document.getElementById('btnReceivingReceiptStatusMoveToLastPageGrid');
+        var btnReceivingReceiptStatusCurrentPageGrid = document.getElementById('btnReceivingReceiptStatusCurrentPageGrid');
+        var receivingReceiptStatusCurrentPageIndex = 0;
+        var isBtnReceivingReceiptStatusClicked = false;
+
+        // ===================================================================
+        // Supplier Advances Collection View, Flex Grid and Navigation Buttons
+        // ===================================================================
+        var supplierAdvancesCollectionView;
+        var supplierAdvancesFlexGrid = new wijmo.grid.FlexGrid('#supplierAdvancesFlexGrid');
+        var btnSupplierAdvancesMoveToFirstPageGrid = document.getElementById('btnSupplierAdvancesMoveToFirstPageGrid');
+        var btnSupplierAdvancesMoveToPreviousPageGrid = document.getElementById('btnSupplierAdvancesMoveToPreviousPageGrid');
+        var btnSupplierAdvancesMoveToNextPageGrid = document.getElementById('btnSupplierAdvancesMoveToNextPageGrid');
+        var btnSupplierAdvancesMoveToLastPageGrid = document.getElementById('btnSupplierAdvancesMoveToLastPageGrid');
+        var btnSupplierAdvancesCurrentPageGrid = document.getElementById('btnSupplierAdvancesCurrentPageGrid');
+        var isSupplierAdvancesClicked = false;
 
         // =======================
         // Get URL Parameter Value
         // =======================
-        function getParam(name) {
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -609,10 +810,10 @@
             }
         }
 
-        // ========================
-        // GET Branch for Combo Box
-        // ========================
-        function getBranchesForComboBox() {
+        // =======================================
+        // Create Disbursement Detail Combo Branch
+        // =======================================
+        function createCboDisbursementDetailBranch() {
             NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
@@ -630,8 +831,8 @@
                         }
                     }
 
-                    cboCVBranch.dispose();
-                    cboCVBranch = new wijmo.input.ComboBox('#cboCVBranch', {
+                    cboDisbursementDetailBranch.dispose();
+                    cboDisbursementDetailBranch = new wijmo.input.ComboBox('#cboDisbursementDetailBranch', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select Branch",
@@ -640,15 +841,15 @@
                         selectedValuePath: "Id"
                     });
 
-                    getSupplierForComboBox();
+                    createCboDisbursementDetailSupplier();
                 }
             });
         }
 
-        // ==========================
-        // GET Supplier for Combo Box
-        // ==========================
-        function getSupplierForComboBox() {
+        // =========================================
+        // Create Disbursement Detail Combo Supplier
+        // =========================================
+        function createCboDisbursementDetailSupplier() {
             var suppliersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursement/dropdown/list/supplier',
@@ -665,27 +866,27 @@
                         }
                     }
 
-                    cboCVSupplier.dispose();
-                    cboCVSupplier = new wijmo.input.ComboBox('#cboCVSupplier', {
+                    cboDisbursementDetailSupplier.dispose();
+                    cboDisbursementDetailSupplier = new wijmo.input.ComboBox('#cboDisbursementDetailSupplier', {
                         isEditable: false,
                         placeholder: "Select Supplier",
                         itemsSource: suppliersObservableArray,
                         displayMemberPath: "Supplier",
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
-                            document.getElementById("disbursement_Payee").value = this.selectedItem["Supplier"];
+                            document.getElementById("inpDisbursementDetailPayee").value = this.selectedItem["Supplier"];
                         }
                     });
 
-                    getPaytypeForComboBox();
+                    createCboDisbursementDetailPayType();
                 }
             });
         }
 
-        // =========================
-        // GET Paytype for Combo Box
-        // =========================
-        function getPaytypeForComboBox() {
+        // =========================================
+        // Create Disbursement Detail Combo Pay Type
+        // =========================================
+        function createCboDisbursementDetailPayType() {
             var payTypesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursement/dropdown/list/payType',
@@ -702,8 +903,8 @@
                         }
                     }
 
-                    cboCVPayType.dispose();
-                    cboCVPayType = new wijmo.input.ComboBox('#cboCVPayType', {
+                    cboDisbursementDetailPayType.dispose();
+                    cboDisbursementDetailPayType = new wijmo.input.ComboBox('#cboDisbursementDetailPayType', {
                         isEditable: false,
                         placeholder: "Select Pay Type",
                         itemsSource: payTypesObservableArray,
@@ -711,15 +912,15 @@
                         selectedValuePath: "Id"
                     });
 
-                    getBankForComboBox();
+                    createCboDisbursementDetailBank();
                 }
             });
         }
 
-        // ======================
-        // GET Bank for Combo Box
-        // ======================
-        function getBankForComboBox() {
+        // =====================================
+        // Create Disbursement Detail Combo Bank
+        // =====================================
+        function createCboDisbursementDetailBank() {
             var banksObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursement/dropdown/list/bank',
@@ -736,8 +937,8 @@
                         }
                     }
 
-                    cboCVBank.dispose();
-                    cboCVBank = new wijmo.input.ComboBox('#cboCVBank', {
+                    cboDisbursementDetailBank.dispose();
+                    cboDisbursementDetailBank = new wijmo.input.ComboBox('#cboDisbursementDetailBank', {
                         isEditable: false,
                         placeholder: "Select Bank",
                         itemsSource: banksObservableArray,
@@ -745,15 +946,15 @@
                         selectedValuePath: "Id"
                     });
 
-                    getUsersForComboBox();
+                    createCboDisbursementDetailUser();
                 }
             });
         }
 
-        // =======================
-        // GET Users for Combo Box
-        // =======================
-        function getUsersForComboBox() {
+        // =====================================
+        // Create Disbursement Detail Combo User
+        // =====================================
+        function createCboDisbursementDetailUser() {
             var usersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursement/dropdown/list/users',
@@ -770,8 +971,8 @@
                         }
                     }
 
-                    cboCVPreparedBy.dispose();
-                    cboCVPreparedBy = new wijmo.input.ComboBox('#cboCVPreparedBy', {
+                    cboDisbursementDetailPreparedBy.dispose();
+                    cboDisbursementDetailPreparedBy = new wijmo.input.ComboBox('#cboDisbursementDetailPreparedBy', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select User",
@@ -780,8 +981,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboCVCheckedBy.dispose();
-                    cboCVCheckedBy = new wijmo.input.ComboBox('#cboCVCheckedBy', {
+                    cboDisbursementDetailCheckedBy.dispose();
+                    cboDisbursementDetailCheckedBy = new wijmo.input.ComboBox('#cboDisbursementDetailCheckedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -789,8 +990,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboCVApprovedBy.dispose();
-                    cboCVApprovedBy = new wijmo.input.ComboBox('#cboCVApprovedBy', {
+                    cboDisbursementDetailApprovedBy.dispose();
+                    cboDisbursementDetailApprovedBy = new wijmo.input.ComboBox('#cboDisbursementDetailApprovedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -798,17 +999,17 @@
                         selectedValuePath: "Id"
                     });
 
-                    getDisbursementById();
+                    getDisbursementDetailData();
                 }
             });
         }
 
-        // ======================
-        // GET Disbursement By Id
-        // ======================
-        function getDisbursementById() {
+        // ============================
+        // Get Disbursement Detail Data
+        // ============================
+        function getDisbursementDetailData() {
             if (document.location.search.length > 0) {
-                var id = getParam("id");
+                var id = getURLParameterValue("id");
                 $.ajax({
                     url: '/api/disbursement/detail/' + id,
                     cache: false,
@@ -816,65 +1017,65 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
                         if (results != null) {
-                            cboCVBranch.selectedValue = results.BranchId;
-                            document.getElementById('disbursement_CVNumber').value = results.CVNumber;
-                            cboCVDate.dispose();
-                            cboCVDate = new wijmo.input.InputDate('#cboCVDate', {
+                            cboDisbursementDetailBranch.selectedValue = results.BranchId;
+                            document.getElementById('inpDisbursementDetailCVNumber').value = results.CVNumber;
+                            cboDisbursementDetailCVDate.dispose();
+                            cboDisbursementDetailCVDate = new wijmo.input.InputDate('#cboDisbursementDetailCVDate', {
                                 format: 'MM-dd-yyyy',
                                 value: new Date(results.CVDate)
                             });
-                            document.getElementById('disbursement_ManualCVNumber').value = results.ManualCVNumber;
-                            cboCVSupplier.selectedValue = results.SupplierId;
-                            document.getElementById('disbursement_Payee').value = results.Payee;
-                            cboCVPayType.selectedValue = results.PayTypeId;
-                            document.getElementById('disbursement_Particulars').value = results.Particulars;
-                            cboCVBank.selectedValue = results.BankId;
-                            document.getElementById('disbursement_CheckNumber').value = results.CheckNumber;
-                            cboCVCheckDate.dispose();
-                            cboCVCheckDate = new wijmo.input.InputDate('#cboCVCheckDate', {
+                            document.getElementById('inpDisbursementDetailManualCVNumber').value = results.ManualCVNumber;
+                            cboDisbursementDetailSupplier.selectedValue = results.SupplierId;
+                            document.getElementById('inpDisbursementDetailPayee').value = results.Payee;
+                            cboDisbursementDetailPayType.selectedValue = results.PayTypeId;
+                            document.getElementById('inpDisbursementDetailParticulars').value = results.Particulars;
+                            cboDisbursementDetailBank.selectedValue = results.BankId;
+                            document.getElementById('inpDisbursementDetailCheckNumber').value = results.CheckNumber;
+                            cboDisbursementDetailCheckDate.dispose();
+                            cboDisbursementDetailCheckDate = new wijmo.input.InputDate('#cboDisbursementDetailCheckDate', {
                                 format: 'MM-dd-yyyy',
                                 value: new Date(results.CheckDate)
                             });
-                            document.getElementById('disbursement_Amount').value = formatDecimalValues(results.Amount);
-                            document.getElementById('disbursement_CrossCheck').checked = results.IsCrossCheck;
-                            cboCVPreparedBy.selectedValue = results.PreparedById;
-                            cboCVCheckedBy.selectedValue = results.CheckedById;
-                            cboCVApprovedBy.selectedValue = results.ApprovedById;
-                            document.getElementById('disbursement_IsClear').checked = results.IsClear;
+                            document.getElementById('cboDisbursementDetailAmount').value = formatDecimalValues(results.Amount);
+                            document.getElementById('inpDisbursementDetailIsCrossCheck').checked = results.IsCrossCheck;
+                            cboDisbursementDetailPreparedBy.selectedValue = results.PreparedById;
+                            cboDisbursementDetailCheckedBy.selectedValue = results.CheckedById;
+                            cboDisbursementDetailApprovedBy.selectedValue = results.ApprovedById;
+                            document.getElementById('inpDisbursementDetailIsClear').checked = results.IsClear;
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
                             document.getElementById('updatedBy').innerHTML = results.UpdatedBy;
                             document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
                             if (results.IsLocked) {
-                                cboCVDate.disabled = true;
-                                document.getElementById('disbursement_ManualCVNumber').disabled = true;
-                                cboCVSupplier.disabled = true;
-                                document.getElementById('disbursement_Payee').disabled = true;
-                                cboCVPayType.disabled = true;
-                                document.getElementById('disbursement_Particulars').disabled = true;
-                                cboCVBank.disabled = true;
-                                document.getElementById('disbursement_CheckNumber').disabled = true;
-                                cboCVCheckDate.disabled = true;
-                                document.getElementById('disbursement_CrossCheck').disabled = true;
-                                cboCVPreparedBy.disabled = true;
-                                cboCVCheckedBy.disabled = true;
-                                cboCVApprovedBy.disabled = true;
-                                document.getElementById('disbursement_IsClear').disabled = true;
+                                cboDisbursementDetailCVDate.disabled = true;
+                                document.getElementById('inpDisbursementDetailManualCVNumber').disabled = true;
+                                cboDisbursementDetailSupplier.disabled = true;
+                                document.getElementById('inpDisbursementDetailPayee').disabled = true;
+                                cboDisbursementDetailPayType.disabled = true;
+                                document.getElementById('inpDisbursementDetailParticulars').disabled = true;
+                                cboDisbursementDetailBank.disabled = true;
+                                document.getElementById('inpDisbursementDetailCheckNumber').disabled = true;
+                                cboDisbursementDetailCheckDate.disabled = true;
+                                document.getElementById('inpDisbursementDetailIsCrossCheck').disabled = true;
+                                cboDisbursementDetailPreparedBy.disabled = true;
+                                cboDisbursementDetailCheckedBy.disabled = true;
+                                cboDisbursementDetailApprovedBy.disabled = true;
+                                document.getElementById('inpDisbursementDetailIsClear').disabled = true;
 
-                                $("#btnLockDisbursement").prop("disabled", true);
-                                $("#cmdAP").prop("disabled", true);
-                                $("#cmdAdvances").prop("disabled", true);
-                                $("#btnAddDisbursementLine").prop("disabled", true);
+                                $("#btnDisbursementDetailLock").prop("disabled", true);
+                                $("#btnDisbursementDetailAP").prop("disabled", true);
+                                $("#btnDisbursementDetailAdvances").prop("disabled", true);
+                                $("#btnDisbursementLineAdd").prop("disabled", true);
 
                                 isLocked = true;
                             } else {
-                                $("#btnJournalDisbursement").prop("disabled", true);
-                                $("#btnUnlockDisbursement").prop("disabled", true);
-                                $("#btnPrintDisbursement").prop("disabled", true);
+                                $("#btnDisbursementDetailJournal").prop("disabled", true);
+                                $("#btnDisbursementDetailUnlock").prop("disabled", true);
+                                $("#btnDisbursementDetailPrint").prop("disabled", true);
                             }
 
-                            createCboShowRows();
+                            createCboDisplayNumberOfRows();
                             createDisbursementLineFlexGrid();
                         } else {
                             alert("No Data");
@@ -891,21 +1092,21 @@
         // =================
         // Lock Disbursement
         // =================
-        function btnLockDisbursementOnclick() {
+        function btnDisbursementDetailLockOnclick() {
             var disbursementObject = new Object();
-            disbursementObject.CVDate = cboCVDate.value.toLocaleDateString();
-            disbursementObject.SupplierId = cboCVSupplier.selectedValue;
-            disbursementObject.Payee = document.getElementById('disbursement_Payee').value;
-            disbursementObject.PayTypeId = cboCVPayType.selectedValue;
-            disbursementObject.BankId = cboCVBank.selectedValue;
-            disbursementObject.ManualCVNumber = document.getElementById('disbursement_ManualCVNumber').value;
-            disbursementObject.Particulars = document.getElementById('disbursement_Particulars').value;
-            disbursementObject.CheckNumber = document.getElementById('disbursement_CheckNumber').value;
-            disbursementObject.CheckDate = cboCVCheckDate.value.toLocaleDateString();
-            disbursementObject.IsCrossCheck = document.getElementById('disbursement_CrossCheck').checked;
-            disbursementObject.CheckedById = cboCVCheckedBy.selectedValue;
-            disbursementObject.ApprovedById = cboCVApprovedBy.selectedValue;
-            disbursementObject.IsClear = document.getElementById('disbursement_IsClear').checked;
+            disbursementObject.CVDate = cboDisbursementDetailCVDate.value.toLocaleDateString();
+            disbursementObject.SupplierId = cboDisbursementDetailSupplier.selectedValue;
+            disbursementObject.Payee = document.getElementById('inpDisbursementDetailPayee').value;
+            disbursementObject.PayTypeId = cboDisbursementDetailPayType.selectedValue;
+            disbursementObject.BankId = cboDisbursementDetailBank.selectedValue;
+            disbursementObject.ManualCVNumber = document.getElementById('inpDisbursementDetailManualCVNumber').value;
+            disbursementObject.Particulars = document.getElementById('inpDisbursementDetailParticulars').value;
+            disbursementObject.CheckNumber = document.getElementById('inpDisbursementDetailCheckNumber').value;
+            disbursementObject.CheckDate = cboDisbursementDetailCheckDate.value.toLocaleDateString();
+            disbursementObject.IsCrossCheck = document.getElementById('inpDisbursementDetailIsCrossCheck').checked;
+            disbursementObject.CheckedById = cboDisbursementDetailCheckedBy.selectedValue;
+            disbursementObject.ApprovedById = cboDisbursementDetailApprovedBy.selectedValue;
+            disbursementObject.IsClear = document.getElementById('inpDisbursementDetailIsClear').checked;
             var data = JSON.stringify(disbursementObject);
 
             var isValid = true;
@@ -923,14 +1124,14 @@
             });
 
             if (isValid) {
-                document.getElementById('btnLockDisbursement').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
-                $("#btnJournalDisbursement").prop("disabled", true);
-                $("#btnLockDisbursement").prop("disabled", true);
-                $("#btnUnlockDisbursement").prop("disabled", true);
-                $("#btnPrintDisbursement").prop("disabled", true);
-                $("#btnCloseDisbursement").prop("disabled", true);
+                document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $("#btnDisbursementDetailJournal").prop("disabled", true);
+                $("#btnDisbursementDetailLock").prop("disabled", true);
+                $("#btnDisbursementDetailUnlock").prop("disabled", true);
+                $("#btnDisbursementDetailPrint").prop("disabled", true);
+                $("#btnDisbursementDetailClose").prop("disabled", true);
 
-                var id = getParam('id');
+                var id = getURLParameterValue('id');
 
                 $.ajax({
                     type: "PUT",
@@ -947,21 +1148,21 @@
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('btnLockDisbursement').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockDisbursement").prop("disabled", false);
-                            $("#btnCloseDisbursement").prop("disabled", true);
+                            document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailLock").prop("disabled", false);
+                            $("#btnDisbursementDetailClose").prop("disabled", true);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('btnLockDisbursement').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockDisbursement").prop("disabled", false);
-                            $("#btnCloseDisbursement").prop("disabled", true);
+                            document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailLock").prop("disabled", false);
+                            $("#btnDisbursementDetailClose").prop("disabled", true);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('btnLockDisbursement').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockDisbursement").prop("disabled", false);
-                            $("#btnCloseDisbursement").prop("disabled", true);
+                            document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailLock").prop("disabled", false);
+                            $("#btnDisbursementDetailClose").prop("disabled", true);
                         }
                     },
                 });
@@ -970,18 +1171,18 @@
             }
         }
 
-        // ================
-        // Edit Disbursment
-        // ================
-        function btnUnlockDisbursementOnclick() {
-            document.getElementById('btnUnlockDisbursement').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
-            $("#btnJournalDisbursement").prop("disabled", true);
-            $("#btnLockDisbursement").prop("disabled", true);
-            $("#btnUnlockDisbursement").prop("disabled", true);
-            $("#btnPrintDisbursement").prop("disabled", true);
-            $("#btnCloseDisbursement").prop("disabled", true);
+        // ==================
+        // Unlock Disbursment
+        // ==================
+        function btnDisbursementDetailUnlockOnclick() {
+            document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $("#btnDisbursementDetailJournal").prop("disabled", true);
+            $("#btnDisbursementDetailLock").prop("disabled", true);
+            $("#btnDisbursementDetailUnlock").prop("disabled", true);
+            $("#btnDisbursementDetailPrint").prop("disabled", true);
+            $("#btnDisbursementDetailClose").prop("disabled", true);
 
-            var id = getParam("id");
+            var id = getURLParameterValue("id");
 
             $.ajax({
                 type: "PUT",
@@ -997,48 +1198,48 @@
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnUnlockDisbursement').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnJournalDisbursement").prop("disabled", false);
-                        $("#btnUnlockDisbursement").prop("disabled", false);
-                        $("#btnPrintDisbursement").prop("disabled", false);
-                        $("#btnCloseDisbursement").prop("disabled", false);
+                        document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnUnlockDisbursement').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnJournalDisbursement").prop("disabled", false);
-                        $("#btnUnlockDisbursement").prop("disabled", false);
-                        $("#btnPrintDisbursement").prop("disabled", false);
-                        $("#btnCloseDisbursement").prop("disabled", false);
+                        document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnUnlockDisbursement').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnJournalDisbursement").prop("disabled", false);
-                        $("#btnUnlockDisbursement").prop("disabled", false);
-                        $("#btnPrintDisbursement").prop("disabled", false);
-                        $("#btnCloseDisbursement").prop("disabled", false);
+                        document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // ========
-        // Print CV
-        // ========
-        function btnPrintDisbursementOnclick() {
-            var disbursementId = getParam("id");
+        // ================================
+        // Print Disbursment (Cash Voucher)
+        // ================================
+        function btnDisbursementDetailPrintOnclick() {
+            var disbursementId = getURLParameterValue("id");
             var pirntLink = "/RepDisbursement/Disbursement?DisbursementId=" + disbursementId;
             window.open(pirntLink, '_blank');
         }
 
         // ==========================
-        // GET Disbursement Line List
+        // Get Disbursement Line Data
         // ==========================
-        function getDisbursementLines() {
-            var disbursementLinesObservableArray = new wijmo.collections.ObservableArray;
+        function getDisbursementLineData() {
+            var disbursementLineObservableArray = new wijmo.collections.ObservableArray;
             if (document.location.search.length > 0) {
-                var CVId = getParam("id");
+                var CVId = getURLParameterValue("id");
 
                 $.ajax({
                     url: '/api/disbursementLine/list/' + CVId,
@@ -1048,15 +1249,15 @@
                     success: function (results) {
                         var totalAmount = 0;
                         if (results.length > 0) {
-                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditDisbursementLine_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
-                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteDisbursementLine_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
+                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnDisbursementLineEditOnclick()'><i class='fa fa-edit'></i> Edit</button>";
+                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDisbursementLineDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>";
                             if (isLocked) {
-                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditDisbursementLine_OnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
-                                btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteDisbursementLine_OnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnDisbursementLineEditOnclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnDisbursementLineDeleteOnclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
                             }
 
                             for (i = 0; i < results.length; i++) {
-                                disbursementLinesObservableArray.push({
+                                disbursementLineObservableArray.push({
                                     EditId: btnEditId,
                                     DeleteId: btnDeleteId,
                                     Id: results[i]["Id"],
@@ -1078,144 +1279,31 @@
                             }
                         }
 
-                        document.getElementById('totalCVAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('disbursement_Amount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById('inpDisbursementLineTotalAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById('cboDisbursementDetailAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
                     }
                 });
             }
 
-            return disbursementLinesObservableArray;
+            return disbursementLineObservableArray;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (disbursementLines.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (disbursementLines.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (disbursementLines.pageIndex === (disbursementLines.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (disbursementLines.pageIndex + 1) + ' / ' + disbursementLines.pageCount;
-        }
-
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
-            var rowsObservableArray = new wijmo.collections.ObservableArray();
-
-            for (var i = 0; i <= 4; i++) {
-                var rows = 0;
-                var rowsString = "";
-
-                if (i == 0) {
-                    rows = 15;
-                    rowsString = "Show 15 Rows";
-                } else if (i == 1) {
-                    rows = 50;
-                    rowsString = "Show 50 Rows";
-                } else if (i == 2) {
-                    rows = 100;
-                    rowsString = "Show 100 Rows";
-                } else if (i == 3) {
-                    rows = 150;
-                    rowsString = "Show 150 Rows";
-                } else {
-                    rows = 200;
-                    rowsString = "Show 200 Rows";
-                }
-
-                rowsObservableArray.push({
-                    rowNumber: rows,
-                    rowString: rowsString
-                });
-            }
-
-            cboDisbursementLineShowNumberOfRows.dispose();
-            cboDisbursementLineShowNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementLineShowNumberOfRows', {
-                isEditable: false,
-                itemsSource: rowsObservableArray,
-                displayMemberPath: "rowString",
-                selectedValuePath: "rowNumber",
-                selectedValue: 50,
-                onSelectedIndexChanged: function () {
-                    NProgress.start();
-
-                    setTimeout(function () {
-                        var numberOfRows = cboDisbursementLineShowNumberOfRows.selectedValue;
-                        disbursementLines.pageSize = parseInt(numberOfRows);
-                        disbursementLines.refresh();
-                        disbursementGrid.refresh();
-
-                        NProgress.done();
-                    }, 300);
-                }
-            });
-        }
-
-        // =================================
-        // Refresh Disbursment Line FlexGrid
-        // =================================
-        function refreshDisbursementLineFlexGrid() {
-            disbursementLines = new wijmo.collections.CollectionView(getDisbursementLines());
-            disbursementLines.canFilter = true;
-            disbursementLines.pageSize = cboDisbursementLineShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#DisbursementLineInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                disbursementLines.refresh();
-            });
-
-            disbursementLines.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            disbursementLines.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            disbursementGrid.itemsSource = disbursementLines;
-            disbursementGrid.trackChanges = true;
-        }
-
-        // =========================
-        // Disbursment Line FlexGrid
-        // =========================
+        // ==========================
+        // Disbursment Line Flex Grid
+        // ==========================
         function createDisbursementLineFlexGrid() {
-            disbursementLines = new wijmo.collections.CollectionView(getDisbursementLines());
-            disbursementLines.canFilter = true;
-            disbursementLines.pageSize = cboDisbursementLineShowNumberOfRows.selectedValue;
+            disbursementLineCollectionView = new wijmo.collections.CollectionView(getDisbursementLineData());
+            disbursementLineCollectionView.canFilter = true;
+            disbursementLineCollectionView.pageSize = cboDisbursementLineDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#DisbursementLineInputFilter').keyup(function () {
+            $('#inpDisbursementLineSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                disbursementLines.refresh();
+                disbursementLineCollectionView.refresh();
             });
 
-            disbursementLines.filter = function (item) {
+            disbursementLineCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
@@ -1223,12 +1311,12 @@
                     || !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            disbursementLines.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            disbursementLineCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateDisbursementLineNavigationButtons();
             });
 
-            disbursementGrid = new wijmo.grid.FlexGrid('#DisbursementLineGrid');
-            disbursementGrid.initialize({
+            disbursementFlexGrid = new wijmo.grid.FlexGrid('#disbursementLineFlexGrid');
+            disbursementFlexGrid.initialize({
                 columns: [
                     @{
                         if (canEdit)
@@ -1299,42 +1387,155 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: disbursementLines,
+                itemsSource: disbursementLineCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            disbursementGrid.trackChanges = true;
+            disbursementFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateDisbursementLineNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                disbursementLines.moveToFirstPage();
-                updateNavigateButtonsItems();
+            btnDisbursementLineMoveToFirstPageGrid.addEventListener('click', function () {
+                disbursementLineCollectionView.moveToFirstPage();
+                updateDisbursementLineNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                disbursementLines.moveToPreviousPage();
-                updateNavigateButtonsItems();
+            btnDisbursementLineMoveToPreviousPageGrid.addEventListener('click', function () {
+                disbursementLineCollectionView.moveToPreviousPage();
+                updateDisbursementLineNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                disbursementLines.moveToNextPage();
-                updateNavigateButtonsItems();
+            btnDisbursementLineMoveToNextPageGrid.addEventListener('click', function () {
+                disbursementLineCollectionView.moveToNextPage();
+                updateDisbursementLineNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                disbursementLines.moveToLastPage();
-                updateNavigateButtonsItems();
+            btnDisbursementLineMoveToLastPageGrid.addEventListener('click', function () {
+                disbursementLineCollectionView.moveToLastPage();
+                updateDisbursementLineNavigationButtons();
             });
         }
 
-        // ==========================================
-        // GET Disbursement Line Branch for Combo Box
-        // ==========================================
-        function getDisbursementBranchesForComboBox(branchId, accountId, articleId, RRId) {
+        // ===========================================
+        // Update Disbursement Line Navigation Buttons
+        // ===========================================
+        function updateDisbursementLineNavigationButtons() {
+            if (disbursementLineCollectionView.pageSize <= 0) {
+                document.getElementById('disbursementLineNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('disbursementLineNavigationPageGrid').style.display = 'block';
+            if (disbursementLineCollectionView.pageIndex === 0) {
+                btnDisbursementLineMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementLineMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementLineMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (disbursementLineCollectionView.pageIndex === (disbursementLineCollectionView.pageCount - 1)) {
+                btnDisbursementLineMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementLineMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnDisbursementLineMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementLineMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnDisbursementLineCurrentPageGrid.innerHTML = (disbursementLineCollectionView.pageIndex + 1) + ' / ' + disbursementLineCollectionView.pageCount;
+        }
+
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboDisbursementLineDisplayNumberOfRows.dispose();
+            cboDisbursementLineDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementLineDisplayNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboDisbursementLineDisplayNumberOfRows.selectedValue;
+                        disbursementLineCollectionView.pageSize = parseInt(numberOfRows);
+                        disbursementLineCollectionView.refresh();
+                        disbursementFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // =================================
+        // Refresh Disbursment Line FlexGrid
+        // =================================
+        function refreshDisbursementLineFlexGrid() {
+            disbursementLineCollectionView = new wijmo.collections.CollectionView(getDisbursementLineData());
+            disbursementLineCollectionView.canFilter = true;
+            disbursementLineCollectionView.pageSize = cboDisbursementLineDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpDisbursementLineSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                disbursementLineCollectionView.refresh();
+            });
+
+            disbursementLineCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            disbursementLineCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateDisbursementLineNavigationButtons();
+            });
+
+            disbursementFlexGrid.itemsSource = disbursementLineCollectionView;
+            disbursementFlexGrid.trackChanges = true;
+        }
+
+        // =====================================
+        // Create Disbursement Line Combo Branch
+        // =====================================
+        function createDisbursementLineCboBranch(branchId, accountId, articleId, RRId) {
             var disbursementLineBranchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursementLine/dropdown/list/branch',
@@ -1355,9 +1556,9 @@
                     var disabled = true;
                     if (results.length > 0) {
                         disabled = false;
-                        $("#cmdSaveDisbursementLineButton").prop("disabled", false);
+                        $("#btnDisbursementLineSave").prop("disabled", false);
                     } else {
-                        $("#cmdSaveDisbursementLineButton").prop("disabled", true);
+                        $("#btnDisbursementLineSave").prop("disabled", true);
                     }
 
                     cboDisbursementLineBranch.dispose();
@@ -1370,15 +1571,15 @@
                         selectedValue: branchId
                     });
 
-                    getDisbursementLineAccountForComboBox(accountId, articleId, RRId)
+                    createCboDisbursementLineAccount(accountId, articleId, RRId)
                 }
             });
         }
 
-        // =============================
-        // Get Disbursement Line Account
-        // =============================
-        function getDisbursementLineAccountForComboBox(accountId, articleId, RRId) {
+        // ======================================
+        // Create Disbursement Line Combo Account
+        // ======================================
+        function createCboDisbursementLineAccount(accountId, articleId, RRId) {
             var disbursementLineAccountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursementLine/dropdown/list/account',
@@ -1400,7 +1601,7 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#cmdSaveDisbursementLineButton").prop("disabled", true);
+                        $("#btnDisbursementLineSave").prop("disabled", true);
                     }
 
                     cboDisbursementLineAccountCode.dispose();
@@ -1427,20 +1628,20 @@
                         onSelectedIndexChanged: function () {
                             cboDisbursementLineAccountCode.selectedValue = this.selectedValue;
                             cboDisbursementLineArticle.disabled = true;
-                            IsAccountChanged = true;
-                            getDisbursementArticlesForComboBox(articleId, RRId);
+                            IsCboDisbursementLineAccountChanged = true;
+                            createCboDisbursementLineArticle(articleId, RRId);
                         }
                     });
 
-                    getDisbursementArticlesForComboBox(articleId, RRId);
+                    createCboDisbursementLineArticle(articleId, RRId);
                 }
             });
         }
 
-        // ============================================
-        // GET Disbursement Line Articles for Combo Box
-        // ============================================
-        function getDisbursementArticlesForComboBox(articleId, RRId) {
+        // ======================================
+        // Create Disbursement Line Combo Article
+        // ======================================
+        function createCboDisbursementLineArticle(articleId, RRId) {
             var disbursementLineArticlesObservableArray = new wijmo.collections.ObservableArray();
             if (cboDisbursementLineAccount.selectedValue != null) {
                 $.ajax({
@@ -1461,9 +1662,9 @@
                         var disabled = true;
                         if (results.length > 0) {
                             disabled = false;
-                            $("#cmdSaveDisbursementLineButton").prop("disabled", false);
+                            $("#btnDisbursementLineSave").prop("disabled", false);
                         } else {
-                            $("#cmdSaveDisbursementLineButton").prop("disabled", true);
+                            $("#btnDisbursementLineSave").prop("disabled", true);
                         }
 
                         cboDisbursementLineArticle.dispose();
@@ -1476,8 +1677,8 @@
                             selectedValue: articleId
                         });
 
-                        if (!IsAccountChanged) {
-                            getReceivingReceiptForComboBoxInDisbursementLine(RRId);
+                        if (!IsCboDisbursementLineAccountChanged) {
+                            createCboDisbursementLineRRNumber(RRId);
                         }
                     }
                 });
@@ -1489,18 +1690,18 @@
                     itemsSource: disbursementLineArticlesObservableArray
                 });
 
-                if (!IsAccountChanged) {
-                    getReceivingReceiptForComboBoxInDisbursementLine(RRId);
+                if (!IsCboDisbursementLineAccountChanged) {
+                    createCboDisbursementLineRRNumber(RRId);
                 }
             }
         }
 
-        // ================================================
-        // GET RR Number for Combo Box in Disbursement Line
-        // ================================================
-        function getReceivingReceiptForComboBoxInDisbursementLine(RRId) {
+        // ========================================
+        // Create Disbursement Line Combo RR Number
+        // ========================================
+        function createCboDisbursementLineRRNumber(RRId) {
             var disbursementLineReceivingReceiptsObservableArray = new wijmo.collections.ObservableArray();
-            var supplierId = cboCVSupplier.selectedValue;
+            var supplierId = cboDisbursementDetailSupplier.selectedValue;
             $.ajax({
                 url: '/api/disbursementLine/dropdown/list/receivingReceipt/' + supplierId,
                 cache: false,
@@ -1524,8 +1725,8 @@
                         disabled = false;
                     }
 
-                    cboDisbursementLineRRNo.dispose();
-                    cboDisbursementLineRRNo = new wijmo.input.ComboBox('#cboDisbursementLineRRNo', {
+                    cboDisbursementLineRRNumber.dispose();
+                    cboDisbursementLineRRNumber = new wijmo.input.ComboBox('#cboDisbursementLineRRNumber', {
                         disabled: disabled,
                         required: false,
                         isEditable: false,
@@ -1535,43 +1736,44 @@
                         selectedValue: RRId,
                         onSelectedIndexChanged: function () {
                             if (this.selectedValue != null) {
-                                document.getElementById("disbursementLine_Amount").value = formatDecimalValues(this.selectedItem["BalanceAmount"]);
+                                document.getElementById("inpDisbursementLineAmount").value = formatDecimalValues(this.selectedItem["BalanceAmount"]);
                             } else {
-                                document.getElementById("disbursementLine_Amount").value = formatDecimalValues(0);
+                                document.getElementById("inpDisbursementLineAmount").value = formatDecimalValues(0);
                             }
                         }
                     });
 
                     if (disbursementLineId == 0) {
-                        if (cboDisbursementLineRRNo.selectedValue != null) {
-                            document.getElementById("disbursementLine_Amount").value = formatDecimalValues(cboDisbursementLineRRNo.selectedItem["BalanceAmount"]);
+                        if (cboDisbursementLineRRNumber.selectedValue != null) {
+                            document.getElementById("inpDisbursementLineAmount").value = formatDecimalValues(cboDisbursementLineRRNumber.selectedItem["BalanceAmount"]);
                         } else {
-                            document.getElementById("disbursementLine_Amount").value = formatDecimalValues(0);
+                            document.getElementById("inpDisbursementLineAmount").value = formatDecimalValues(0);
                         }
                     }
 
-                    $("#loadingLines").hide();
+                    $("#disbursementLineLoading").hide();
                     $("#disbursementLineDetailForm").show();
                 }
             });
         }
 
         // =====================
-        // ADD Disbursement Line
+        // Add Disbursement Line
         // =====================
-        function cmdAddDisbursementLineButton_OnClick() {
-            $('#disbursementLineEdit').modal({
+        function btnDisbursementLineAddOnclick() {
+            $('#disbursementLineDetailModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            $("#loadingLines").show();
-            document.getElementById("loadingLines").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById('disbursementLineModalTitle').innerHTML = "Add Disbursement Line";
+            $("#disbursementLineLoading").show();
+            document.getElementById("disbursementLineLoading").innerHTML = 'Loading...';
             $("#disbursementLineDetailForm").hide();
 
-            document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSaveDisbursementLineButton").prop("disabled", true);
-            $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+            document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnDisbursementLineSave").prop("disabled", true);
+            $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
 
             $('.requiredDisbursementLine').each(function () {
                 $(this).css({
@@ -1579,31 +1781,32 @@
                 });
             });
 
-            IsAccountChanged = false;
+            IsCboDisbursementLineAccountChanged = false;
             disbursementLineId = 0;
 
-            var cboCVBranchId = cboCVBranch.selectedValue;
-            getDisbursementBranchesForComboBox(cboCVBranchId, 0, 0, 0);
-            var headerParticulars = document.getElementById("disbursement_Particulars").value;
-            document.getElementById('disbursementLine_Particulars').value = headerParticulars;
+            var cboDisbursementDetailBranchId = cboDisbursementDetailBranch.selectedValue;
+            createDisbursementLineCboBranch(cboDisbursementDetailBranchId, 0, 0, 0);
+            var headerParticulars = document.getElementById("inpDisbursementDetailParticulars").value;
+            document.getElementById('inpDisbursementLineParticulars').value = headerParticulars;
         }
 
         // ======================
         // Edit Disbursement Line
         // ======================
-        function btnEditDisbursementLine_OnClick() {
-            $('#disbursementLineEdit').modal({
+        function btnDisbursementLineEditOnclick() {
+            $('#disbursementLineDetailModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            $("#loadingLines").show();
-            document.getElementById("loadingLines").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById('disbursementLineModalTitle').innerHTML = "Edit Disbursement Line";
+            $("#disbursementLineLoading").show();
+            document.getElementById("disbursementLineLoading").innerHTML = 'Loading...';
             $("#disbursementLineDetailForm").hide();
 
-            document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSaveDisbursementLineButton").prop("disabled", true);
-            $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+            document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnDisbursementLineSave").prop("disabled", true);
+            $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
 
             $('.requiredDisbursementLine').each(function () {
                 $(this).css({
@@ -1611,26 +1814,26 @@
                 });
             });
 
-            IsAccountChanged = false;
-            disbursementLines.editItem(disbursementLines.currentItem);
-            var disbursementLine = disbursementLines.currentEditItem;
+            IsCboDisbursementLineAccountChanged = false;
+            disbursementLineCollectionView.editItem(disbursementLineCollectionView.currentItem);
+            var disbursementLine = disbursementLineCollectionView.currentEditItem;
             disbursementLineId = disbursementLine.Id;
-            getDisbursementBranchesForComboBox(disbursementLine.BranchId, disbursementLine.AccountId, disbursementLine.ArticleId, disbursementLine.RRId);
-            document.getElementById('disbursementLine_Particulars').value = disbursementLine.Particulars;
-            document.getElementById('disbursementLine_Amount').value = formatDecimalValues(disbursementLine.Amount);
+            createDisbursementLineCboBranch(disbursementLine.BranchId, disbursementLine.AccountId, disbursementLine.ArticleId, disbursementLine.RRId);
+            document.getElementById('inpDisbursementLineParticulars').value = disbursementLine.Particulars;
+            document.getElementById('inpDisbursementLineAmount').value = formatDecimalValues(disbursementLine.Amount);
         }
 
         // ======================
-        // SAVE Disbursement Line
+        // Save Disbursement Line
         // ======================
-        function cmdDisbursementLineSaveButton_OnClick() {
+        function btnDisbursementLineSaveOnclick() {
             var disbursementLineObject = new Object();
             disbursementLineObject.BranchId = cboDisbursementLineBranch.selectedValue;
             disbursementLineObject.AccountId = cboDisbursementLineAccount.selectedValue;
             disbursementLineObject.ArticleId = cboDisbursementLineArticle.selectedValue;
-            disbursementLineObject.RRId = cboDisbursementLineRRNo.selectedValue;
-            disbursementLineObject.Particulars = document.getElementById('disbursementLine_Particulars').value;
-            disbursementLineObject.Amount = document.getElementById('disbursementLine_Amount').value;
+            disbursementLineObject.RRId = cboDisbursementLineRRNumber.selectedValue;
+            disbursementLineObject.Particulars = document.getElementById('inpDisbursementLineParticulars').value;
+            disbursementLineObject.Amount = document.getElementById('inpDisbursementLineAmount').value;
             var disbursementLineData = JSON.stringify(disbursementLineObject);
 
             var isValid = true;
@@ -1648,11 +1851,11 @@
             });
 
             if (isValid) {
-                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $("#cmdSaveDisbursementLineButton").prop("disabled", true);
-                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", true);
+                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnDisbursementLineSave").prop("disabled", true);
+                $("#btnDisbursementLineCloseDetailModal").prop("disabled", true);
 
-                var CVId = getParam("id");
+                var CVId = getURLParameterValue("id");
 
                 if (disbursementLineId == 0) {
                     $.ajax({
@@ -1664,29 +1867,29 @@
                         statusCode: {
                             200: function () {
                                 toastr.success("Save Successful");
-                                $('#disbursementLineEdit').modal('hide');
+                                $('#disbursementLineDetailModal').modal('hide');
                                 refreshDisbursementLineFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             }
                         }
                     });
@@ -1700,29 +1903,29 @@
                         statusCode: {
                             200: function () {
                                 toastr.success("Update Successful");
-                                $('#disbursementLineEdit').modal('hide');
+                                $('#disbursementLineDetailModal').modal('hide');
                                 refreshDisbursementLineFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#disbursementLineEdit').modal('hide');
-                                document.getElementById('cmdSaveDisbursementLineButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveDisbursementLineButton").prop("disabled", false);
-                                $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                                $('#disbursementLineDetailModal').modal('hide');
+                                document.getElementById('btnDisbursementLineSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnDisbursementLineSave").prop("disabled", false);
+                                $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                             }
                         }
                     });
@@ -1735,27 +1938,29 @@
         // ========================
         // Delete Disbursement Line
         // ========================
-        function btnDeleteDisbursementLine_OnClick() {
-            $('#deleteDisbursementLineConfirm').modal({
+        function btnDisbursementLineDeleteOnclick() {
+            $('#disbursementLineConfirmDeleteModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            document.getElementById('cmdConfirmDeleteDisbursementLine').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $("#cmdConfirmDeleteDisbursementLine").prop("disabled", false);
-            $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+            document.getElementById('btnDisbursementLineConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#btnDisbursementLineConfirmDelete").prop("disabled", false);
+            $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
         }
 
+        // ================================
         // Confirm Delete Disbursement Line
-        function cmdDisbursementLineConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteDisbursementLine').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteDisbursementLine").prop("disabled", true);
-            $("#cmdDisbursementLineDetailCloseButton").prop("disabled", true);
+        // ================================
+        function btnDisbursementLineConfirmDeleteOnclick() {
+            document.getElementById('btnDisbursementLineConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnDisbursementLineConfirmDelete").prop("disabled", true);
+            $("#btnDisbursementLineCloseDetailModal").prop("disabled", true);
 
-            var CVId = getParam("id");
+            var CVId = getURLParameterValue("id");
 
-            disbursementLines.editItem(disbursementLines.currentItem);
-            var disbursementLineId = disbursementLines.currentEditItem.Id;
+            disbursementLineCollectionView.editItem(disbursementLineCollectionView.currentItem);
+            var disbursementLineId = disbursementLineCollectionView.currentEditItem.Id;
 
             $.ajax({
                 url: '/api/disbursementLine/delete/' + disbursementLineId + '/' + CVId,
@@ -1765,37 +1970,38 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Delete Successful");
-                        $('#deleteDisbursementLineConfirm').modal('hide');
+                        $('#disbursementLineConfirmDeleteModal').modal('hide');
                         refreshDisbursementLineFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdConfirmDeleteDisbursementLine').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursementLine").prop("disabled", false);
-                        $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                        document.getElementById('btnDisbursementLineConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementLineConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdConfirmDeleteDisbursementLine').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursementLine").prop("disabled", false);
-                        $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                        document.getElementById('btnDisbursementLineConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementLineConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdConfirmDeleteDisbursementLine').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteDisbursementLine").prop("disabled", false);
-                        $("#cmdDisbursementLineDetailCloseButton").prop("disabled", false);
+                        document.getElementById('btnDisbursementLineConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnDisbursementLineConfirmDelete").prop("disabled", false);
+                        $("#btnDisbursementLineCloseDetailModal").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // ===========
-        // Get Journal
-        // ===========
-        function getJournalListForRR() {
+        // ================
+        // Get Journal Data
+        // ================
+        function getJournalData() {
             var journalsObservableArray = new wijmo.collections.ObservableArray;
-            var CVId = getParam('id');
+            var CVId = getURLParameterValue('id');
+
             $.ajax({
                 url: '/api/jounal/disbursement/list/' + CVId,
                 cache: false,
@@ -1830,40 +2036,43 @@
                             }
                         }
 
-                        document.getElementById('totalDebitInJournal').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('totalCreditInJournal').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var variance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('variance').value = variance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById('inpJournalTotalDebit').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById('inpJournalTotalCredit').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        var inpJournalVariance = debitAmountTotal - creditAmountTotal;
+                        document.getElementById('inpJournalVariance').value = inpJournalVariance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     }
 
-                    $("#loadingJournalGridList").hide();
-                    $("#journal_Content").show();
+                    $("#journalLoading").hide();
+                    $("#journalContent").show();
                 }
             });
 
             return journalsObservableArray;
         }
 
-        // ============
-        // Journal List
-        // ============
-        function btnJournalDisbursementOnclick() {
-            $('#journalDetail').modal({
+        // ===============
+        // Display Journal
+        // ===============
+        function btnDisbursementDetailJournalOnclick() {
+            $('#journalEntryModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            $("#loadingJournalGridList").show();
-            document.getElementById("loadingJournalGridList").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#journal_Content").hide();
+            $("#journalLoading").show();
+            document.getElementById("journalLoading").innerHTML = 'Loading...';
+            $("#journalContent").hide();
 
             setTimeout(function () {
                 createJournalFlexGrid();
             }, 500)
         }
 
+        // ========================
+        // Create Journal Flex Grid
+        // ========================
         function createJournalFlexGrid() {
-            journalCollectionView = new wijmo.collections.CollectionView(getJournalListForRR());
+            journalCollectionView = new wijmo.collections.CollectionView(getJournalData());
 
             journalFlexGrid.dispose();
             journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
@@ -1925,44 +2134,95 @@
             journalFlexGrid.trackChanges = true;
         }
 
-        // =========
-        // AP Onlick
-        // =========
-        function btnnOclickAP() {
-            $('#RRStatus').modal({
+        // ============================================
+        // Create Receiving Receipt Status Date Filters
+        // ============================================
+        function createReceivingReceiptStatusDateFilters() {
+            cboReceivingReceiptStatusStartDateFilter.dispose();
+            cboReceivingReceiptStatusStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptStatusStartDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isCboReceivingReceiptStatusStartDateFilterSelected) {
+                        $('#receivingReceiptStatusLoading').show();
+                        document.getElementById("receivingReceiptStatusLoading").innerHTML = "Loading...";
+                        $('#receivingReceiptStatusContent').hide();
+                        $('#btnReceivingReceiptStatusApply').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createReceivingReceiptStatusFlexGrid();
+                        }, 500);
+                    } else {
+                        isCboReceivingReceiptStatusStartDateFilterSelected = false;
+                    }
+                }
+            });
+
+            cboReceivingReceiptStatusEndDateFilter.dispose();
+            cboReceivingReceiptStatusEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptStatusEndDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isCboReceivingReceiptStatusEndDateFilterSelected) {
+                        $('#receivingReceiptStatusLoading').show();
+                        document.getElementById("receivingReceiptStatusLoading").innerHTML = "Loading...";
+                        $('#receivingReceiptStatusContent').hide();
+                        $('#btnReceivingReceiptStatusApply').prop("disabled", true);
+
+                        setTimeout(function () {
+                            createReceivingReceiptStatusFlexGrid();
+                        }, 500);
+                    } else {
+                        isCboReceivingReceiptStatusEndDateFilterSelected = false;
+                    }
+                }
+            });
+        }
+
+        // ================================
+        // Display Receiving Receipt Status
+        // ================================
+        function btnDisbursementDetailAPOnclick() {
+            createReceivingReceiptStatusDateFilters();
+            $('#receivingReceiptStatusModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            $('#loadingRRStatus').show();
-            document.getElementById("loadingRRStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-            $('#statusGrid').hide();
-            $('#btnIdApplyAllRR').prop("disabled", true);
+            $('#receivingReceiptStatusLoading').show();
+            document.getElementById("receivingReceiptStatusLoading").innerHTML = "Loading...";
+            $('#receivingReceiptStatusContent').hide();
+            $('#btnReceivingReceiptStatusApply').prop("disabled", true);
 
             setTimeout(function () {
                 createReceivingReceiptStatusFlexGrid();
             }, 500);
         }
 
-        // ==============
-        // RR Status Data
-        // ==============
-        function getReceivingReceiptBySupplierByBalance() {
-            var receivingReceiptsObservableArray = new wijmo.collections.ObservableArray;
+        // =================================
+        // Get Receiving Receipt Status Data
+        // =================================
+        function getReceivingReceiptStatusData() {
+            var receivingReceiptsSatatusObservableArray = new wijmo.collections.ObservableArray;
+
+            var startDate = cboReceivingReceiptStatusStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboReceivingReceiptStatusEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+
             $.ajax({
-                url: '/api/disbursementLine/popUp/list/receivingReceiptStatus/' + cboCVSupplier.selectedValue,
+                url: '/api/disbursementLine/popUp/list/receivingReceiptStatus/' + cboDisbursementDetailSupplier.selectedValue + '/' + startDate + '/' + endDate,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
-                    $('#btnIdApplyAllRR').prop("disabled", false);
+                    $('#btnReceivingReceiptStatusApply').prop("disabled", false);
+                    var inpReceivingReceiptStatusTotalAmount = 0;
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
                             var RRDateResult = new Date(results[i]["RRDate"])
                             var RRDate = ('0' + (RRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + RRDateResult.getDate()).slice(-2) + '-' + RRDateResult.getFullYear();
 
-                            receivingReceiptsObservableArray.push({
+                            receivingReceiptsSatatusObservableArray.push({
                                 Id: results[i]["Id"],
                                 RRNumber: results[i]["RRNumber"],
                                 RRDate: RRDate,
@@ -1977,68 +2237,166 @@
                                 BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 Balance: results[i]["BalanceAmount"],
                                 BalanceDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Pick: results[i]["BalanceAmount"] == 0 ? "<button class='btn btn-primary btn-xs' onclick='btnPickAmount()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='btnUnpickAmountReverse()'><i class='fa fa-arrow-left'></i></button>",
+                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnReceivingReceiptStatusPickAmount()' style='font-size: 10.5px;'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                Unpick: "<button class='btn btn-danger btn-xs btn-block' onclick='btnReceivingReceiptStatusUnpickAmount()' style='font-size: 10.5px;'><i class='fa fa-hand-o-left'></i> Unpick</button>",
                             });
+
+                            inpReceivingReceiptStatusTotalAmount += results[i]["BalanceAmount"];
                         }
                     } else {
-                        $('#btnIdApplyAllRR').prop("disabled", true);
+                        $('#btnReceivingReceiptStatusApply').prop("disabled", true);
                     }
 
-                    $('#loadingRRStatus').hide();
-                    $('#statusGrid').show();
+                    document.getElementById("inpReceivingReceiptStatusTotalAmount").value = parseFloat(inpReceivingReceiptStatusTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    $('#receivingReceiptStatusLoading').hide();
+                    $('#receivingReceiptStatusContent').show();
                 }
             });
 
-            return receivingReceiptsObservableArray;
+            return receivingReceiptsSatatusObservableArray;
         }
 
-        // ============
-        // PICK Balance
-        // ============
-        function btnPickAmount() {
-            receivingReceipts.editItem(receivingReceipts.currentItem);
-            var receivingReceipt = receivingReceipts.currentEditItem;
-            var balance = receivingReceipt.Amount - receivingReceipt.PaidAmount;
-            if (balance > 0) {
-                receivingReceipt.Balance = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                receivingReceipt.Pick = "<button class='btn btn-warning btn-xs' onclick='btnUnpickAmountReverse()'><i class='fa fa-arrow-left'></i></button>";
-                receivingReceipts.refresh();
-                receivingStatusGrid.refresh();
-            }
-        }
-
-        // ==============
-        // REPICK Balance
-        // ==============
-        function btnUnpickAmountReverse() {
-            receivingReceipts.editItem(receivingReceipts.currentItem);
-            var receivingReceipt = receivingReceipts.currentEditItem;
-            receivingReceipt.Balance = formatDecimalValues(0);
-            receivingReceipt.Pick = "<button class='btn btn-primary btn-xs' onclick='btnPickAmount()'><i class='fa fa-arrow-right'></i></button>";
-            receivingReceipts.refresh();
-            receivingStatusGrid.refresh();
-        }
-
-        function btnOnclickApplyAllRR() {
-            $('#applyAmount').modal({
+        // ============================================
+        // Pick Receiving Receipt Status Amount (Modal)
+        // ============================================
+        function btnReceivingReceiptStatusPickAmount() {
+            $('#receivingReceiptStatusPickAmountModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            document.getElementById('cmdConfirmApplyAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
-            $("#cmdConfirmApplyAmount").prop("disabled", false);
-            $("#cmdCloseButtonApplyAmount").prop("disabled", false);
+            $("#btnReceivingReceiptStatusPickAmountContinue").prop("disabled", false);
+            $("#btnReceivingReceiptStatusPickAmountCloseModal").prop("disabled", false);
+
+            receivingReceiptsSatatusCollectionView.editItem(receivingReceiptsSatatusCollectionView.currentItem);
+            var saleInvoice = receivingReceiptsSatatusCollectionView.currentEditItem;
+            var balance = saleInvoice.Amount - saleInvoice.PaidAmount;
+            document.getElementById("inpReceivingReceiptStatusPickAmount").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        function btnConfrimApplyAmountOnClick() {
-            document.getElementById('cmdConfirmApplyAmount').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Applying";
-            $("#cmdConfirmApplyAmount").prop("disabled", true);
-            $("#cmdCloseButtonApplyAmount").prop("disabled", true);
+        // ========================================
+        // Receiving Receipt Status Amount Continue
+        // ========================================
+        function btnReceivingReceiptStatusPickAmountContinueOnclick() {
+            $("#btnReceivingReceiptStatusPickAmountContinue").prop("disabled", true);
+            $("#btnReceivingReceiptStatusPickAmountCloseModal").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmount').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                receivingReceiptsSatatusCollectionView.editItem(receivingReceiptsSatatusCollectionView.currentItem);
+                var saleInvoice = receivingReceiptsSatatusCollectionView.currentEditItem;
+                var balance = document.getElementById("inpReceivingReceiptStatusPickAmount").value.split(",").join("");
+
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#btnReceivingReceiptStatusPickAmountContinue").prop("disabled", false);
+                    $("#btnReceivingReceiptStatusPickAmountCloseModal").prop("disabled", false);
+                } else {
+                    saleInvoice.Balance = balance;
+                    saleInvoice.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    setTimeout(function () {
+                        var totalALLRRAmount = 0
+                        receivingReceiptsSatatusCollectionView.moveToFirstPage();
+                        for (var p = 1; p <= receivingReceiptsSatatusCollectionView.pageCount; p++) {
+                            var totalCurrentPageRRAmount = 0
+                            for (var i = 0; i < receivingReceiptsSatatusCollectionView.items.length; i++) {
+                                totalCurrentPageRRAmount += parseFloat(receivingReceiptsSatatusCollectionView.items[i].Balance);
+                            }
+
+                            totalALLRRAmount += parseFloat(totalCurrentPageRRAmount);
+                            receivingReceiptsSatatusCollectionView.moveToNextPage();
+                            if (p == receivingReceiptsSatatusCollectionView.pageCount) {
+                                receivingReceiptsSatatusCollectionView.moveToPage(receivingReceiptStatusCurrentPageIndex - 1);
+                            }
+                        }
+
+                        document.getElementById("inpReceivingReceiptStatusTotalAmount").value = parseFloat(totalALLRRAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        $('#receivingReceiptStatusPickAmountModal').modal('hide');
+                    }, 100);
+
+                    receivingReceiptsSatatusCollectionView.refresh();
+                    receivingReceiptStatusFlexGrid.refresh();
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ======================================
+        // Unpick Receiving Receipt Status Amount
+        // ======================================
+        function btnReceivingReceiptStatusUnpickAmount() {
+            receivingReceiptsSatatusCollectionView.editItem(receivingReceiptsSatatusCollectionView.currentItem);
+            var saleInvoice = receivingReceiptsSatatusCollectionView.currentEditItem;
+            saleInvoice.Balance = 0;
+            saleInvoice.BalanceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            setTimeout(function () {
+                var totalALLRRAmount = 0
+                receivingReceiptsSatatusCollectionView.moveToFirstPage();
+                for (var p = 1; p <= receivingReceiptsSatatusCollectionView.pageCount; p++) {
+                    var totalCurrentPageRRAmount = 0
+                    for (var i = 0; i < receivingReceiptsSatatusCollectionView.items.length; i++) {
+                        totalCurrentPageRRAmount += parseFloat(receivingReceiptsSatatusCollectionView.items[i].Balance);
+                    }
+
+                    totalALLRRAmount += parseFloat(totalCurrentPageRRAmount);
+                    receivingReceiptsSatatusCollectionView.moveToNextPage();
+                    if (p == receivingReceiptsSatatusCollectionView.pageCount) {
+                        receivingReceiptsSatatusCollectionView.moveToPage(receivingReceiptStatusCurrentPageIndex - 1);
+                    }
+                }
+
+                document.getElementById("inpReceivingReceiptStatusTotalAmount").value = parseFloat(totalALLRRAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                $('#salesInvoiceStatusPickAmountModal').modal('hide');
+            }, 100);
+
+            receivingReceiptsSatatusCollectionView.refresh();
+            receivingReceiptStatusFlexGrid.refresh();
+        }
+
+        // ==============================
+        // Apply Receiving Receipt Status
+        // ==============================
+        function btnReceivingReceiptStatusApplyOnclick() {
+            $('#receivingReceiptStatusApplyPickAmountModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnReceivingReceiptStatusApplyPickAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
+            $("#btnReceivingReceiptStatusApplyPickAmount").prop("disabled", false);
+            $("#btnReceivingReceiptStatusApplyPickAmountCloseModal").prop("disabled", false);
+        }
+
+        // ================================================
+        // Apply Receiving Receipt Status All Picked Amount
+        // ================================================
+        function btnReceivingReceiptStatusApplyPickAmountOnclick() {
+            document.getElementById('btnReceivingReceiptStatusApplyPickAmount').innerHTML = "<i class='fa fa-check'></i> Applying...";
+            $("#btnReceivingReceiptStatusApplyPickAmount").prop("disabled", true);
+            $("#btnReceivingReceiptStatusApplyPickAmountCloseModal").prop("disabled", true);
 
             var receivingReceiptArrays = new Array();
 
-            for (var i = 0; i < receivingReceipts.items.length; i++) {
-                var item = receivingReceipts.items[i];
+            for (var i = 0; i < receivingReceiptsSatatusCollectionView.items.length; i++) {
+                var item = receivingReceiptsSatatusCollectionView.items[i];
                 if (item.Balance > 0) {
                     receivingReceiptArrays.push({
                         RRId: item.Id,
@@ -2048,7 +2406,7 @@
             }
 
             var receivingReceitItemsObjects = JSON.stringify(receivingReceiptArrays);
-            var CVId = getParam("id");
+            var CVId = getURLParameterValue("id");
 
             $.ajax({
                 url: '/api/disbursementLine/popUp/apply/receivingReceiptStatus/' + CVId,
@@ -2059,94 +2417,92 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Apply Successful");
-                        $('#applyAmount').modal('hide');
-                        $('#RRStatus').modal('hide');
+                        $('#receivingReceiptStatusApplyPickAmountModal').modal('hide');
+                        $('#receivingReceiptStatusModal').modal('hide');
                         refreshDisbursementLineFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#applyAmount').modal('hide');
-                        $('#RRStatus').modal('hide');
-                        document.getElementById('cmdConfirmApplyAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAmount").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAmount").prop("disabled", false);
+                        $('#receivingReceiptStatusApplyPickAmountModal').modal('hide');
+                        $('#receivingReceiptStatusModal').modal('hide');
+                        document.getElementById('btnReceivingReceiptStatusApplyPickAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnReceivingReceiptStatusApplyPickAmount").prop("disabled", false);
+                        $("#btnReceivingReceiptStatusApplyPickAmountCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#applyAmount').modal('hide');
-                        $('#RRStatus').modal('hide');
-                        document.getElementById('cmdConfirmApplyAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAmount").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAmount").prop("disabled", false);
+                        $('#receivingReceiptStatusApplyPickAmountModal').modal('hide');
+                        $('#receivingReceiptStatusModal').modal('hide');
+                        document.getElementById('btnReceivingReceiptStatusApplyPickAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnReceivingReceiptStatusApplyPickAmount").prop("disabled", false);
+                        $("#btnReceivingReceiptStatusApplyPickAmountCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#applyAmount').modal('hide');
-                        $('#RRStatus').modal('hide');
-                        document.getElementById('cmdConfirmApplyAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAmount").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAmount").prop("disabled", false);
+                        $('#receivingReceiptStatusApplyPickAmountModal').modal('hide');
+                        $('#receivingReceiptStatusModal').modal('hide');
+                        document.getElementById('btnReceivingReceiptStatusApplyPickAmount').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnReceivingReceiptStatusApplyPickAmount").prop("disabled", false);
+                        $("#btnReceivingReceiptStatusApplyPickAmountCloseModal").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsRRStatus() {
-            if (receivingReceipts.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridRRStatus').style.display = 'none';
+        // ==================================================
+        // Update Receiving Receipt Status Navigation Buttons
+        // ==================================================
+        function updateReceivingReceiptStatusNavigateButtons() {
+            if (receivingReceiptsSatatusCollectionView.pageSize <= 0) {
+                document.getElementById('receivingStatusNavigationPageGrid').style.display = 'none';
                 return;
             }
-            document.getElementById('naviagtionPageGridRRStatus').style.display = 'block';
-            if (receivingReceipts.pageIndex === 0) {
-                btnFirstPageGridRRStatus.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridRRStatus.setAttribute('disabled', 'disabled');
-                btnNextPageGridRRStatus.removeAttribute('disabled');
-                btnLastPageGridRRStatus.removeAttribute('disabled');
-            } else if (receivingReceipts.pageIndex === (receivingReceipts.pageCount - 1)) {
-                btnFirstPageGridRRStatus.removeAttribute('disabled');
-                btnPreviousPageGridRRStatus.removeAttribute('disabled');
-                btnNextPageGridRRStatus.setAttribute('disabled', 'disabled');
-                btnLastPageGridRRStatus.setAttribute('disabled', 'disabled');
+            document.getElementById('receivingStatusNavigationPageGrid').style.display = 'block';
+            if (receivingReceiptsSatatusCollectionView.pageIndex === 0) {
+                btnReceivingReceiptStatusMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptStatusMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptStatusMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (receivingReceiptsSatatusCollectionView.pageIndex === (receivingReceiptsSatatusCollectionView.pageCount - 1)) {
+                btnReceivingReceiptStatusMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptStatusMoveToLastPageGrid.setAttribute('disabled', 'disabled');
             } else {
-                btnFirstPageGridRRStatus.removeAttribute('disabled');
-                btnPreviousPageGridRRStatus.removeAttribute('disabled');
-                btnNextPageGridRRStatus.removeAttribute('disabled');
-                btnLastPageGridRRStatus.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptStatusMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnCurrentPageGridRRStatus.innerHTML = (receivingReceipts.pageIndex + 1) + ' / ' + receivingReceipts.pageCount;
+            btnReceivingReceiptStatusCurrentPageGrid.innerHTML = (receivingReceiptsSatatusCollectionView.pageIndex + 1) + ' / ' + receivingReceiptsSatatusCollectionView.pageCount;
         }
 
-        var isAPClicked = false;
-
-        // =============================
-        // Receiving Receipt Status Grid
-        // =============================
+        // ==================================
+        // Receiving Receipt Status Flex Grid
+        // ==================================
         function createReceivingReceiptStatusFlexGrid() {
-            receivingReceipts = new wijmo.collections.CollectionView(getReceivingReceiptBySupplierByBalance());
-            receivingReceipts.canFilter = true;
-            receivingReceipts.pageSize = 10;
+            receivingReceiptsSatatusCollectionView = new wijmo.collections.CollectionView(getReceivingReceiptStatusData());
+            receivingReceiptsSatatusCollectionView.canFilter = true;
+            receivingReceiptsSatatusCollectionView.pageSize = 10;
 
             var filterText = '';
-            $('#RRStatusFilter').keyup(function () {
+            $('#inpReceivingReceiptStatusSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                receivingReceipts.refresh();
+                receivingReceiptsSatatusCollectionView.refresh();
             });
 
-            receivingReceipts.filter = function (item) {
+            receivingReceiptsSatatusCollectionView.filter = function (item) {
                 return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
                 || (item.RRNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            receivingReceipts.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsRRStatus();
+            receivingReceiptsSatatusCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateReceivingReceiptStatusNavigateButtons();
             });
 
-            receivingStatusGrid.dispose();
-            receivingStatusGrid = new wijmo.grid.FlexGrid('#receivingStatusGrid');
-            receivingStatusGrid.initialize({
+            receivingReceiptStatusFlexGrid.dispose();
+            receivingReceiptStatusFlexGrid = new wijmo.grid.FlexGrid('#receivingReceiptStatusFlexGrid');
+            receivingReceiptStatusFlexGrid.initialize({
                 columns: [
                             {
                                 "header": "RR No.",
@@ -2160,7 +2516,7 @@
                                 "binding": "DocumentReference",
                                 "allowSorting": true,
                                 "isReadOnly": true,
-                                "width": "3*"
+                                "width": "4*"
                             },
                             {
                                 "header": "Date",
@@ -2206,91 +2562,127 @@
                                 "binding": "Pick",
                                 "allowSorting": true,
                                 "isReadOnly": true,
-                                "width": 50,
+                                "width": 60,
                                 "align": "center",
                                 "allowResizing": false,
                                 "allowSorting": false,
                                 "isContentHtml": true
                             },
                             {
-                                "header": "Balance",
-                                "binding": "Balance",
+                                "header": "Unpick",
+                                "binding": "Unpick",
                                 "allowSorting": true,
-                                "isReadOnly": false,
-                                "width": "2*"
+                                "isReadOnly": true,
+                                "width": 65,
+                                "align": "center",
+                                "allowResizing": false,
+                                "allowSorting": false,
+                                "isContentHtml": true
+                            },
+                            {
+                                "header": "Amount",
+                                "binding": "BalanceDisplay",
+                                "allowSorting": true,
+                                "align": "right",
+                                "isReadOnly": true,
+                                "width": "1.5*"
                             },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: receivingReceipts,
+                itemsSource: receivingReceiptsSatatusCollectionView,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            receivingStatusGrid.trackChanges = true;
+            receivingReceiptStatusFlexGrid.trackChanges = true;
 
             var hr = new wijmo.grid.Row();
-            receivingStatusGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
-            receivingStatusGrid.columnHeaders.rows.push(hr);
-            receivingStatusGrid.columnHeaders.rows[0].allowMerging = true;
+            receivingReceiptStatusFlexGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            receivingReceiptStatusFlexGrid.columnHeaders.rows.push(hr);
+            receivingReceiptStatusFlexGrid.columnHeaders.rows[0].allowMerging = true;
 
-            receivingStatusGrid.columnHeaders.columns[0].allowMerging = true;
-            receivingStatusGrid.columnHeaders.setCellData(0, 0, 'RR No.');
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[0].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 0, 'RR No.');
 
-            receivingStatusGrid.columnHeaders.columns[1].allowMerging = true;
-            receivingStatusGrid.columnHeaders.setCellData(0, 1, 'Doc Ref');
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[1].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 1, 'Doc Ref');
 
-            receivingStatusGrid.columnHeaders.columns[2].allowMerging = true;
-            receivingStatusGrid.columnHeaders.setCellData(0, 2, 'Date');
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[2].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 2, 'Date');
 
             for (var columnQuantityTopAssigned = 3; columnQuantityTopAssigned <= 6; columnQuantityTopAssigned++) {
-                receivingStatusGrid.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Amount');
+                receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Amount');
             }
 
-            receivingStatusGrid.columnHeaders.columns[7].allowMerging = true;
-            receivingStatusGrid.columnHeaders.setCellData(0, 7, 'Pick')
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[7].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 7, 'Pick')
 
-            receivingStatusGrid.columnHeaders.columns[8].allowMerging = true;
-            receivingStatusGrid.columnHeaders.setCellData(0, 8, 'Balance');
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[8].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 8, 'Unpick')
 
-            if (!isAPClicked) {
-                updateNavigateButtonsRRStatus();
+            receivingReceiptStatusFlexGrid.columnHeaders.columns[9].allowMerging = true;
+            receivingReceiptStatusFlexGrid.columnHeaders.setCellData(0, 9, 'Amount');
 
-                btnFirstPageGridRRStatus.addEventListener('click', function () {
-                    receivingReceipts.moveToFirstPage();
-                    updateNavigateButtonsRRStatus();
+            if (!isBtnReceivingReceiptStatusClicked) {
+                updateReceivingReceiptStatusNavigateButtons();
+
+                btnReceivingReceiptStatusMoveToFirstPageGrid.addEventListener('click', function () {
+                    receivingReceiptsSatatusCollectionView.moveToFirstPage();
+                    updateReceivingReceiptStatusNavigateButtons();
                 });
 
-                btnPreviousPageGridRRStatus.addEventListener('click', function () {
-                    receivingReceipts.moveToPreviousPage();
-                    updateNavigateButtonsRRStatus();
+                btnReceivingReceiptStatusMoveToPreviousPageGrid.addEventListener('click', function () {
+                    receivingReceiptsSatatusCollectionView.moveToPreviousPage();
+                    updateReceivingReceiptStatusNavigateButtons();
                 });
 
-                btnNextPageGridRRStatus.addEventListener('click', function () {
-                    receivingReceipts.moveToNextPage();
-                    updateNavigateButtonsRRStatus();
+                btnReceivingReceiptStatusMoveToNextPageGrid.addEventListener('click', function () {
+                    receivingReceiptsSatatusCollectionView.moveToNextPage();
+                    updateReceivingReceiptStatusNavigateButtons();
                 });
 
-                btnLastPageGridRRStatus.addEventListener('click', function () {
-                    receivingReceipts.moveToLastPage();
-                    updateNavigateButtonsRRStatus();
+                btnReceivingReceiptStatusMoveToLastPageGrid.addEventListener('click', function () {
+                    receivingReceiptsSatatusCollectionView.moveToLastPage();
+                    updateReceivingReceiptStatusNavigateButtons();
                 });
 
-                isAPClicked = true;
+                isBtnReceivingReceiptStatusClicked = true;
             }
         }
 
-        function getJournalByArticleId() {
-            var RRAdvancesObservableArray = new wijmo.collections.ObservableArray;
+        // =================
+        // Supplier Advances
+        // =================
+        function btnDisbursementDetailAdvancesOnclick() {
+            $('#supplierAdvancesModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('#supplierAdvancesLoading').show();
+            document.getElementById("supplierAdvancesLoading").innerHTML = "Loading...";
+            $('#supplierAdvancesContent').hide();
+
+            setTimeout(function () {
+                createSupplierAdvancesFlexGrid();
+            }, 500);
+        }
+
+        // ==========================
+        // Get Supplier Advances Data
+        // ==========================
+        function getSupplierAdvancesData() {
+            var supplierAdvancesCollectionViewObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
-                url: '/api/disbursementLine/popUp/list/supplierAdvances/' + cboCVSupplier.selectedValue,
+                url: '/api/disbursementLine/popUp/list/supplierAdvances/' + cboDisbursementDetailSupplier.selectedValue,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            RRAdvancesObservableArray.push({
+                            supplierAdvancesCollectionViewObservableArray.push({
                                 BranchId: results[i]["BranchId"],
                                 Branch: results[i]["Branch"],
                                 AccountId: results[i]["AccountId"],
@@ -2309,89 +2701,41 @@
                         }
                     }
 
-                    $('#loadingRRAdvances').hide();
-                    $('#AdvancesGrid').show();
+                    $('#supplierAdvancesLoading').hide();
+                    $('#supplierAdvancesContent').show();
                 }
             });
 
-            return RRAdvancesObservableArray;
+            return supplierAdvancesCollectionViewObservableArray;
         }
 
-        // ========
-        // Advances
-        // ========
-        function btnnOclickAdvances() {
-            $('#SupplierAdvances').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('#loadingRRAdvances').show();
-            document.getElementById("loadingRRAdvances").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-            $('#AdvancesGrid').hide();
-
-            setTimeout(function () {
-                createRRAdvancesFlexGrid();
-            }, 500);
-        }
-
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsRRAdvances() {
-            if (RRAdvances.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridRRAdvances').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridRRAdvances').style.display = 'block';
-            if (RRAdvances.pageIndex === 0) {
-                btnFirstPageGridRRAdvances.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridRRAdvances.setAttribute('disabled', 'disabled');
-                btnNextPageGridRRAdvances.removeAttribute('disabled');
-                btnLastPageGridRRAdvances.removeAttribute('disabled');
-            } else if (RRAdvances.pageIndex === (RRAdvances.pageCount - 1)) {
-                btnFirstPageGridRRAdvances.removeAttribute('disabled');
-                btnPreviousPageGridRRAdvances.removeAttribute('disabled');
-                btnNextPageGridRRAdvances.setAttribute('disabled', 'disabled');
-                btnLastPageGridRRAdvances.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGridRRAdvances.removeAttribute('disabled');
-                btnPreviousPageGridRRAdvances.removeAttribute('disabled');
-                btnNextPageGridRRAdvances.removeAttribute('disabled');
-                btnLastPageGridRRAdvances.removeAttribute('disabled');
-            }
-            btnCurrentPageGridRRAdvances.innerHTML = (RRAdvances.pageIndex + 1) + ' / ' + RRAdvances.pageCount;
-        }
-
-        var isAdvancesClicked = false;
-
-        // ===============================
-        // Receiving Receipt Advances Grid
-        // ===============================
-        function createRRAdvancesFlexGrid() {
-            RRAdvances = new wijmo.collections.CollectionView(getJournalByArticleId());
-            RRAdvances.canFilter = true;
-            RRAdvances.pageSize = 10;
+        // ==================================
+        // Create Supplier Advances Flex Grid
+        // ==================================
+        function createSupplierAdvancesFlexGrid() {
+            supplierAdvancesCollectionView = new wijmo.collections.CollectionView(getSupplierAdvancesData());
+            supplierAdvancesCollectionView.canFilter = true;
+            supplierAdvancesCollectionView.pageSize = 10;
 
             var filterText = '';
-            $('#RRAdvancesFilter').keyup(function () {
+            $('#inpSupplierAdvancesSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                RRAdvances.refresh();
+                supplierAdvancesCollectionView.refresh();
             });
 
-            RRAdvances.filter = function (item) {
+            supplierAdvancesCollectionView.filter = function (item) {
                 return !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
 
-            RRAdvances.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsRRAdvances();
+            supplierAdvancesCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSupplierdvancesNavigationButtons();
             });
 
-            RRAdvancesGrid.dispose();
-            RRAdvancesGrid = new wijmo.grid.FlexGrid('#RRAdvancesGrid');
-            RRAdvancesGrid.initialize({
+            supplierAdvancesFlexGrid.dispose();
+            supplierAdvancesFlexGrid = new wijmo.grid.FlexGrid('#supplierAdvancesFlexGrid');
+            supplierAdvancesFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Code",
@@ -2444,66 +2788,100 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: RRAdvances,
+                itemsSource: supplierAdvancesCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            RRAdvancesGrid.trackChanges = true;
+            supplierAdvancesFlexGrid.trackChanges = true;
 
-            if (!isAdvancesClicked) {
-                updateNavigateButtonsRRAdvances();
+            if (!isSupplierAdvancesClicked) {
+                updateSupplierdvancesNavigationButtons();
 
-                btnFirstPageGridRRAdvances.addEventListener('click', function () {
-                    RRAdvances.moveToFirstPage();
-                    updateNavigateButtonsRRAdvances();
+                btnSupplierAdvancesMoveToFirstPageGrid.addEventListener('click', function () {
+                    supplierAdvancesCollectionView.moveToFirstPage();
+                    updateSupplierdvancesNavigationButtons();
                 });
 
-                btnPreviousPageGridRRAdvances.addEventListener('click', function () {
-                    RRAdvances.moveToPreviousPage();
-                    updateNavigateButtonsRRAdvances();
+                btnSupplierAdvancesMoveToPreviousPageGrid.addEventListener('click', function () {
+                    supplierAdvancesCollectionView.moveToPreviousPage();
+                    updateSupplierdvancesNavigationButtons();
                 });
 
-                btnNextPageGridRRAdvances.addEventListener('click', function () {
-                    RRAdvances.moveToNextPage();
-                    updateNavigateButtonsRRAdvances();
+                btnSupplierAdvancesMoveToNextPageGrid.addEventListener('click', function () {
+                    supplierAdvancesCollectionView.moveToNextPage();
+                    updateSupplierdvancesNavigationButtons();
                 });
 
-                btnLastPageGridRRAdvances.addEventListener('click', function () {
-                    RRAdvances.moveToLastPage();
-                    updateNavigateButtonsRRAdvances();
+                btnSupplierAdvancesMoveToLastPageGrid.addEventListener('click', function () {
+                    supplierAdvancesCollectionView.moveToLastPage();
+                    updateSupplierdvancesNavigationButtons();
                 });
 
-                isAdvancesClicked = true;
+                isSupplierAdvancesClicked = true;
             }
         }
 
+        // ===========================================
+        // Update Supplier Advances Navigation Buttons
+        // ===========================================
+        function updateSupplierdvancesNavigationButtons() {
+            if (supplierAdvancesCollectionView.pageSize <= 0) {
+                document.getElementById('supplierAdvancesNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('supplierAdvancesNavigationPageGrid').style.display = 'block';
+            if (supplierAdvancesCollectionView.pageIndex === 0) {
+                btnSupplierAdvancesMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierAdvancesMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierAdvancesMoveToNextPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (supplierAdvancesCollectionView.pageIndex === (supplierAdvancesCollectionView.pageCount - 1)) {
+                btnSupplierAdvancesMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierAdvancesMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnSupplierAdvancesMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToNextPageGrid.removeAttribute('disabled');
+                btnSupplierAdvancesMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnSupplierAdvancesCurrentPageGrid.innerHTML = (supplierAdvancesCollectionView.pageIndex + 1) + ' / ' + supplierAdvancesCollectionView.pageCount;
+        }
+
+        // =======================
+        // Apply Supplier Advances
+        // =======================
         function btnApplyAdvancesOnclick() {
-            $('#applyConfirm').modal({
+            $('#supplierAdvancesApplyModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
-            $("#cmdConfirmApplyAdvances").prop("disabled", false);
-            $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
+            document.getElementById('btnSupplierAdvancesConfirmApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+            $("#btnSupplierAdvancesConfirmApply").prop("disabled", false);
+            $("#btnSupplierAdvancesConfirmApplyCloseModal").prop("disabled", false);
         }
 
-        function btnConfrimApplyAdvances_OnClick() {
-            document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Applying";
-            $("#cmdConfirmApplyAdvances").prop("disabled", true);
-            $("#cmdCloseButtonApplyAdvances").prop("disabled", true);
+        // ===============================
+        // Confirm Apply Supplier Advances
+        // ===============================
+        function btnSupplierAdvancesConfirmApplyOnclick() {
+            document.getElementById('btnSupplierAdvancesConfirmApply').innerHTML = "<i class='fa fa-check'></i> Applying...";
+            $("#btnSupplierAdvancesConfirmApply").prop("disabled", true);
+            $("#btnSupplierAdvancesConfirmApplyCloseModal").prop("disabled", true);
 
-            RRAdvances.editItem(RRAdvances.currentItem);
-            var RRAdvancesItem = RRAdvances.currentEditItem;
+            supplierAdvancesCollectionView.editItem(supplierAdvancesCollectionView.currentItem);
+            var supplierAdvancesCollectionViewItem = supplierAdvancesCollectionView.currentEditItem;
 
-            var CVId = getParam("id");
+            var CVId = getURLParameterValue("id");
 
             var receivingReceiptAdvancesObject = new Object();
-            receivingReceiptAdvancesObject.AccountId = RRAdvancesItem.AccountId;
-            receivingReceiptAdvancesObject.ArticleId = RRAdvancesItem.ArticleId;
+            receivingReceiptAdvancesObject.AccountId = supplierAdvancesCollectionViewItem.AccountId;
+            receivingReceiptAdvancesObject.ArticleId = supplierAdvancesCollectionViewItem.ArticleId;
             var receivingReceiptAdvancesData = JSON.stringify(receivingReceiptAdvancesObject);
 
             $.ajax({
@@ -2515,39 +2893,39 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Apply Successful");
-                        $('#applyConfirm').modal('hide');
+                        $('#supplierAdvancesApplyModal').modal('hide');
                         refreshDisbursementLineFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#applyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAdvances").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
+                        $('#supplierAdvancesApplyModal').modal('hide');
+                        document.getElementById('btnSupplierAdvancesConfirmApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnSupplierAdvancesConfirmApply").prop("disabled", false);
+                        $("#btnSupplierAdvancesConfirmApplyCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#applyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAdvances").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
+                        $('#supplierAdvancesApplyModal').modal('hide');
+                        document.getElementById('btnSupplierAdvancesConfirmApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnSupplierAdvancesConfirmApply").prop("disabled", false);
+                        $("#btnSupplierAdvancesConfirmApplyCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#applyConfirm').modal('hide');
-                        document.getElementById('cmdConfirmApplyAdvances').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmApplyAdvances").prop("disabled", false);
-                        $("#cmdCloseButtonApplyAdvances").prop("disabled", false);
+                        $('#supplierAdvancesApplyModal').modal('hide');
+                        document.getElementById('btnSupplierAdvancesConfirmApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnSupplierAdvancesConfirmApply").prop("disabled", false);
+                        $("#btnSupplierAdvancesConfirmApplyCloseModal").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // ===========
-        // OnLoad Page
-        // ===========
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            getBranchesForComboBox();
+            createCboDisbursementDetailBranch();
 
             $(document).on('show.bs.modal', '.modal', function (event) {
                 var zIndex = 1040 + (10 * $('.modal:visible').length);
@@ -2563,7 +2941,14 @@
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -2581,12 +2966,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -2610,6 +2995,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -2649,6 +3037,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

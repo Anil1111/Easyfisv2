@@ -154,8 +154,8 @@ namespace easyfis.ModifiedApiControllers
         // ======================================
         // Pop-Up List - Receiving Receipt Status
         // ======================================
-        [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/receivingReceiptStatus/{supplierId}")]
-        public List<Entities.TrnReceivingReceipt> PopUpListDisbursementLineListReceivingReceiptStatus(String supplierId)
+        [Authorize, HttpGet, Route("api/disbursementLine/popUp/list/receivingReceiptStatus/{supplierId}/{startDate}/{endDate}")]
+        public List<Entities.TrnReceivingReceipt> PopUpListDisbursementLineListReceivingReceiptStatus(String supplierId, String startDate, String endDate)
         {
             var currentUser = from d in db.MstUsers
                               where d.UserId == User.Identity.GetUserId()
@@ -165,6 +165,8 @@ namespace easyfis.ModifiedApiControllers
 
             var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
                                     where d.SupplierId == Convert.ToInt32(supplierId)
+                                    && d.RRDate >= Convert.ToDateTime(startDate)
+                                    && d.RRDate <= Convert.ToDateTime(endDate)
                                     && d.BranchId == branchId
                                     && d.BalanceAmount > 0
                                     && d.IsLocked == true
