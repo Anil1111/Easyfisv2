@@ -26,67 +26,91 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="disbursementSummaryFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpDisbursementSummaryReportSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnDisbursementSummaryReportCSVOnclick()" id="btnDisbursementSummaryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnDisbursementSummaryReportPDFOnclick()" id="btnDisbursementSummaryReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnDisbursementSummaryReportDownloadCSVOnclick()" id="btnDisbursementSummaryReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnDisbursementSummaryReportPrintPDFOnclick()" id="btnDisbursementSummaryReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsPayable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboDisbursementSummaryReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="disbursementSummaryReportGrid" style="font-size: 12px;"></div>
+                        <div id="disbursementSummaryReportFlexGrid" style="font-size: 12px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
                             <div class="btn-group col-md-7" id="btnDisbursementSummaryReportNaviagtionPageGrid">
@@ -107,6 +131,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -117,7 +147,7 @@
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -133,34 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboDisbursementSummaryReportStartDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportStartDate');
-        var cboDisbursementSummaryReportEndDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportEndDate');
-        var isDisbursementSummaryReportStartDateSelected = false;
-        var isDisbursementSummaryReportEndDateSelected = false;
+        // ============
+        // Date Filters
+        // ============
+        var cboDisbursementSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboDisbursementSummaryReportStartDateFilter');
+        var cboDisbursementSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboDisbursementSummaryReportEndDateFilter');
+        var isCboDisbursementSummaryReportStartDateFilterSelected = false;
+        var isCboDisbursementSummaryReportEndDateFilterSelected = false;
 
-        var cboDisbursementSummaryReportCompany = new wijmo.input.ComboBox('#cboDisbursementSummaryReportCompany');
-        var cboDisbursementSummaryReportBranch = new wijmo.input.ComboBox('#cboDisbursementSummaryReportBranch');
-        var isAPDisbursementSummaryReportCompanySelected = false;
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboDisbursementSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboDisbursementSummaryReportCompanyFilter');
+        var isCboDisbursementSummaryReportCompanyFilterSelected = false;
+        var cboDisbursementSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboDisbursementSummaryReportBranchFilter');
 
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
         var disbursementSummaryReportCollections;
-        var disbursementSummaryReportGrid;
+        var disbursementSummaryReportFlexGrid;
+        var cboDisbursementSummaryReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportDisplayNumberOfRows');
 
-        var cboDisbursementSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportShowNumberOfRows');
-
+        // ==================
+        // Navigation Buttons
+        // ==================
         var btnDisbursementSummaryReportMoveToFirstPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToFirstPageGrid');
         var btnDisbursementSummaryReportMoveToPreviousPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToPreviousPageGrid');
         var btnDisbursementSummaryReportMoveToNextPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToNextPageGrid');
         var btnDisbursementSummaryReportMoveToLastPageGrid = document.getElementById('btnDisbursementSummaryReportMoveToLastPageGrid');
         var btnDisbursementSummaryReportCurrentPageGrid = document.getElementById('btnDisbursementSummaryReportCurrentPageGrid');
-        var currentPageIndex = 0;
+        var disbursementSummaryReportCurrentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -174,47 +212,47 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function disbursementSummaryReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
 
-            cboDisbursementSummaryReportStartDate.dispose();
-            cboDisbursementSummaryReportStartDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportStartDate', {
+            cboDisbursementSummaryReportStartDateFilter.dispose();
+            cboDisbursementSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboDisbursementSummaryReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isDisbursementSummaryReportStartDateSelected) {
+                    if (!isCboDisbursementSummaryReportStartDateFilterSelected) {
                         NProgress.start();
                         refreshDisbursementSummaryReportFlexGrid();
                     } else {
-                        isDisbursementSummaryReportStartDateSelected = false;
+                        isCboDisbursementSummaryReportStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboDisbursementSummaryReportEndDate.dispose();
-            cboDisbursementSummaryReportEndDate = new wijmo.input.InputDate('#cboDisbursementSummaryReportEndDate', {
+            cboDisbursementSummaryReportEndDateFilter.dispose();
+            cboDisbursementSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboDisbursementSummaryReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isDisbursementSummaryReportEndDateSelected) {
+                    if (!isCboDisbursementSummaryReportEndDateFilterSelected) {
                         NProgress.start();
                         refreshDisbursementSummaryReportFlexGrid();
                     } else {
-                        isDisbursementSummaryReportEndDateSelected = false;
+                        isCboDisbursementSummaryReportEndDateFilterSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/disbursementSummaryReport/dropdown/list/company',
@@ -235,40 +273,40 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnDisbursementSummaryReportCSV").prop("disabled", true);
-                        $("#btnDisbursementSummaryReportPDF").prop("disabled", true);
+                        $("#btnDisbursementSummaryReportDownloadCSV").prop("disabled", true);
+                        $("#btnDisbursementSummaryReportPrintPDF").prop("disabled", true);
                     }
 
-                    cboDisbursementSummaryReportCompany.dispose();
-                    cboDisbursementSummaryReportCompany = new wijmo.input.ComboBox('#cboDisbursementSummaryReportCompany', {
+                    cboDisbursementSummaryReportCompanyFilter.dispose();
+                    cboDisbursementSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboDisbursementSummaryReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnDisbursementSummaryReportCSV").prop("disabled", false);
-                            $("#btnDisbursementSummaryReportPDF").prop("disabled", false);
-                            isAPDisbursementSummaryReportCompanySelected = true;
-                            createCboBranch();
+                            $("#btnDisbursementSummaryReportDownloadCSV").prop("disabled", false);
+                            $("#btnDisbursementSummaryReportPrintPDF").prop("disabled", false);
+                            isCboDisbursementSummaryReportCompanyFilterSelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboDisbursementSummaryReportCompany.selectedValue != null) {
+            if (cboDisbursementSummaryReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/disbursementSummaryReport/dropdown/list/branch/' + cboDisbursementSummaryReportCompany.selectedValue,
+                    url: '/api/disbursementSummaryReport/dropdown/list/branch/' + cboDisbursementSummaryReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -286,34 +324,34 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnDisbursementSummaryReportCSV").prop("disabled", true);
-                            $("#btnDisbursementSummaryReportPDF").prop("disabled", true);
+                            $("#btnDisbursementSummaryReportDownloadCSV").prop("disabled", true);
+                            $("#btnDisbursementSummaryReportPrintPDF").prop("disabled", true);
                         }
 
-                        cboDisbursementSummaryReportBranch.dispose();
-                        cboDisbursementSummaryReportBranch = new wijmo.input.ComboBox('#cboDisbursementSummaryReportBranch', {
+                        cboDisbursementSummaryReportBranchFilter.dispose();
+                        cboDisbursementSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboDisbursementSummaryReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshDisbursementSummaryReportFlexGrid();
                             }
                         });
 
-                        createCboShowRows();
+                        createCboDisplayNumberOfRows();
                     }
                 });
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -343,8 +381,8 @@
                 });
             }
 
-            cboDisbursementSummaryReportShowNumberOfRows.dispose();
-            cboDisbursementSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportShowNumberOfRows', {
+            cboDisbursementSummaryReportDisplayNumberOfRows.dispose();
+            cboDisbursementSummaryReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -354,35 +392,35 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboDisbursementSummaryReportShowNumberOfRows.selectedValue;
+                        var numberOfRows = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
                         disbursementSummaryReportCollections.pageSize = parseInt(numberOfRows);
                         disbursementSummaryReportCollections.refresh();
-                        disbursementSummaryReportGrid.refresh();
+                        disbursementSummaryReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isAPDisbursementSummaryReportCompanySelected) {
+            if (!isCboDisbursementSummaryReportCompanyFilterSelected) {
                 createDisbursementSummaryReportFlexGrid();
             } else {
                 refreshDisbursementSummaryReportFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Disbursement Order Summary Data
-        // ===============================
-        function getDisbursementSummaryReport() {
+        // ====================================
+        // Get Disbursement Summary Report Data
+        // ====================================
+        function getDisbursementSummaryReportData() {
             var disbursementSummaryReports = new wijmo.collections.ObservableArray;
-            if (cboDisbursementSummaryReportCompany.selectedValue != null) {
-                if (cboDisbursementSummaryReportBranch.selectedValue != null) {
+            if (cboDisbursementSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboDisbursementSummaryReportBranchFilter.selectedValue != null) {
 
-                    var startDate = cboDisbursementSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboDisbursementSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboDisbursementSummaryReportCompany.selectedValue;
-                    var branchId = cboDisbursementSummaryReportBranch.selectedValue;
+                    var startDate = cboDisbursementSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboDisbursementSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboDisbursementSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboDisbursementSummaryReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/disbursementSummaryReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -390,7 +428,7 @@
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
                         success: function (results) {
-                            var totalAmount = 0;
+                            var inpTotalAmount = 0;
                             if (results.length > 0) {
                                 for (i = 0; i < results.length; i++) {
                                     var docLink = "/Software/DisbursementDetail?id=" + results[i]["CVId"];
@@ -416,94 +454,36 @@
                                         AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                     });
 
-                                    totalAmount += results[i]["Amount"];
+                                    inpTotalAmount += results[i]["Amount"];
                                 }
                             }
 
-                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalAmount").value = parseFloat(inpTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return disbursementSummaryReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (disbursementSummaryReportCollections.pageSize <= 0) {
-                document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'block';
-            if (disbursementSummaryReportCollections.pageIndex === 0) {
-                btnDisbursementSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnDisbursementSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (disbursementSummaryReportCollections.pageIndex === (disbursementSummaryReportCollections.pageCount - 1)) {
-                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnDisbursementSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-            btnDisbursementSummaryReportCurrentPageGrid.innerHTML = (disbursementSummaryReportCollections.pageIndex + 1) + ' / ' + disbursementSummaryReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshDisbursementSummaryReportFlexGrid() {
-            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReport());
-            disbursementSummaryReportCollections.canFilter = true;
-            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#disbursementSummaryFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                disbursementSummaryReportCollections.refresh();
-            });
-
-            disbursementSummaryReportCollections.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            disbursementSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            disbursementSummaryReportGrid.itemsSource = disbursementSummaryReportCollections;
-            disbursementSummaryReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ============================================
+        // Create Disbursement Summary Report Flex Grid
+        // ============================================
         function createDisbursementSummaryReportFlexGrid() {
-            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReport());
+            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
             disbursementSummaryReportCollections.canFilter = true;
-            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportShowNumberOfRows.selectedValue;
+            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#disbursementSummaryFilter').keyup(function () {
+            $('#inpDisbursementSummaryReportSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 disbursementSummaryReportCollections.refresh();
             });
@@ -517,11 +497,11 @@
             }
 
             disbursementSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updateDisbursementSummaryReportNavigationButtons();
             });
 
-            disbursementSummaryReportGrid = new wijmo.grid.FlexGrid('#disbursementSummaryReportGrid');
-            disbursementSummaryReportGrid.initialize({
+            disbursementSummaryReportFlexGrid = new wijmo.grid.FlexGrid('#disbursementSummaryReportFlexGrid');
+            disbursementSummaryReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -588,39 +568,97 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            disbursementSummaryReportGrid.trackChanges = true;
+            disbursementSummaryReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateDisbursementSummaryReportNavigationButtons();
 
             btnDisbursementSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToFirstPage();
-                currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToPreviousPage();
-                currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToNextPage();
-                currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
                 disbursementSummaryReportCollections.moveToLastPage();
-                currentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                updateDisbursementSummaryReportNavigationButtons();
             });
+        }
+
+        // =====================================================
+        // Update Disbursement Summary Report Navigation Buttons
+        // =====================================================
+        function updateDisbursementSummaryReportNavigationButtons() {
+            if (disbursementSummaryReportCollections.pageSize <= 0) {
+                document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'block';
+            if (disbursementSummaryReportCollections.pageIndex === 0) {
+                btnDisbursementSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (disbursementSummaryReportCollections.pageIndex === (disbursementSummaryReportCollections.pageCount - 1)) {
+                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnDisbursementSummaryReportCurrentPageGrid.innerHTML = (disbursementSummaryReportCollections.pageIndex + 1) + ' / ' + disbursementSummaryReportCollections.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshDisbursementSummaryReportFlexGrid() {
+            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
+            disbursementSummaryReportCollections.canFilter = true;
+            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpDisbursementSummaryReportSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                disbursementSummaryReportCollections.refresh();
+            });
+
+            disbursementSummaryReportCollections.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            disbursementSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updateDisbursementSummaryReportNavigationButtons();
+            });
+
+            disbursementSummaryReportFlexGrid.itemsSource = disbursementSummaryReportCollections;
+            disbursementSummaryReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnDisbursementSummaryReportCSVOnclick() {
+        function btnDisbursementSummaryReportDownloadCSVOnclick() {
             var CSV = '';
             var disbursementSummaryReport = [];
             var fileName = 'DisbursementSummaryReport.CSV';
@@ -644,7 +682,7 @@
 
                 disbursementSummaryReportCollections.moveToNextPage();
                 if (p == disbursementSummaryReportCollections.pageCount) {
-                    disbursementSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                    disbursementSummaryReportCollections.moveToPage(disbursementSummaryReportCurrentPageIndex - 1);
                 }
             }
 
@@ -702,20 +740,20 @@
                 link.click();
                 document.body.removeChild(link);
 
-                toastr.success("Dowload successful.");
+                toastr.success("Download successful.");
             }
         }
 
-        // =====================
-        // Preview and Print PDF
-        // =====================
-        function btnDisbursementSummaryReportPDFOnclick() {
-            if (cboDisbursementSummaryReportCompany.selectedValue != null) {
-                if (cboDisbursementSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboDisbursementSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboDisbursementSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboDisbursementSummaryReportCompany.selectedValue;
-                    var branchId = cboDisbursementSummaryReportBranch.selectedValue;
+        // =========
+        // Print PDF
+        // =========
+        function btnDisbursementSummaryReportPrintPDFOnclick() {
+            if (cboDisbursementSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboDisbursementSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboDisbursementSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboDisbursementSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboDisbursementSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboDisbursementSummaryReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepDisbursementSummaryReport/DisbursementSummaryReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -730,11 +768,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            disbursementSummaryReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -781,6 +826,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -820,6 +868,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
