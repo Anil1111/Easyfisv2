@@ -181,7 +181,7 @@
         // =============================
         // Collection View and Flex Grid
         // =============================
-        var disbursementSummaryReportCollections;
+        var disbursementSummaryReportCollectionView;
         var disbursementSummaryReportFlexGrid;
         var cboDisbursementSummaryReportDisplayNumberOfRows = new wijmo.input.ComboBox('#cboDisbursementSummaryReportDisplayNumberOfRows');
 
@@ -393,8 +393,8 @@
 
                     setTimeout(function () {
                         var numberOfRows = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
-                        disbursementSummaryReportCollections.pageSize = parseInt(numberOfRows);
-                        disbursementSummaryReportCollections.refresh();
+                        disbursementSummaryReportCollectionView.pageSize = parseInt(numberOfRows);
+                        disbursementSummaryReportCollectionView.refresh();
                         disbursementSummaryReportFlexGrid.refresh();
 
                         NProgress.done();
@@ -478,17 +478,17 @@
         // Create Disbursement Summary Report Flex Grid
         // ============================================
         function createDisbursementSummaryReportFlexGrid() {
-            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
-            disbursementSummaryReportCollections.canFilter = true;
-            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
+            disbursementSummaryReportCollectionView = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
+            disbursementSummaryReportCollectionView.canFilter = true;
+            disbursementSummaryReportCollectionView.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#inpDisbursementSummaryReportSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                disbursementSummaryReportCollections.refresh();
+                disbursementSummaryReportCollectionView.refresh();
             });
 
-            disbursementSummaryReportCollections.filter = function (item) {
+            disbursementSummaryReportCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
@@ -496,7 +496,7 @@
                     || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            disbursementSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+            disbursementSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateDisbursementSummaryReportNavigationButtons();
             });
 
@@ -561,7 +561,7 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: disbursementSummaryReportCollections,
+                itemsSource: disbursementSummaryReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -573,26 +573,26 @@
             updateDisbursementSummaryReportNavigationButtons();
 
             btnDisbursementSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
-                disbursementSummaryReportCollections.moveToFirstPage();
-                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                disbursementSummaryReportCollectionView.moveToFirstPage();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollectionView.pageIndex + 1;
                 updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
-                disbursementSummaryReportCollections.moveToPreviousPage();
-                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                disbursementSummaryReportCollectionView.moveToPreviousPage();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollectionView.pageIndex + 1;
                 updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
-                disbursementSummaryReportCollections.moveToNextPage();
-                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                disbursementSummaryReportCollectionView.moveToNextPage();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollectionView.pageIndex + 1;
                 updateDisbursementSummaryReportNavigationButtons();
             });
 
             btnDisbursementSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
-                disbursementSummaryReportCollections.moveToLastPage();
-                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollections.pageIndex + 1;
+                disbursementSummaryReportCollectionView.moveToLastPage();
+                disbursementSummaryReportCurrentPageIndex = disbursementSummaryReportCollectionView.pageIndex + 1;
                 updateDisbursementSummaryReportNavigationButtons();
             });
         }
@@ -601,17 +601,17 @@
         // Update Disbursement Summary Report Navigation Buttons
         // =====================================================
         function updateDisbursementSummaryReportNavigationButtons() {
-            if (disbursementSummaryReportCollections.pageSize <= 0) {
+            if (disbursementSummaryReportCollectionView.pageSize <= 0) {
                 document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'none';
                 return;
             }
             document.getElementById('btnDisbursementSummaryReportNaviagtionPageGrid').style.display = 'block';
-            if (disbursementSummaryReportCollections.pageIndex === 0) {
+            if (disbursementSummaryReportCollectionView.pageIndex === 0) {
                 btnDisbursementSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
                 btnDisbursementSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
                 btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
                 btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (disbursementSummaryReportCollections.pageIndex === (disbursementSummaryReportCollections.pageCount - 1)) {
+            } else if (disbursementSummaryReportCollectionView.pageIndex === (disbursementSummaryReportCollectionView.pageCount - 1)) {
                 btnDisbursementSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
                 btnDisbursementSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
                 btnDisbursementSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
@@ -622,24 +622,24 @@
                 btnDisbursementSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
                 btnDisbursementSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnDisbursementSummaryReportCurrentPageGrid.innerHTML = (disbursementSummaryReportCollections.pageIndex + 1) + ' / ' + disbursementSummaryReportCollections.pageCount;
+            btnDisbursementSummaryReportCurrentPageGrid.innerHTML = (disbursementSummaryReportCollectionView.pageIndex + 1) + ' / ' + disbursementSummaryReportCollectionView.pageCount;
         }
 
         // =================
         // Refresh Flex Grid
         // =================
         function refreshDisbursementSummaryReportFlexGrid() {
-            disbursementSummaryReportCollections = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
-            disbursementSummaryReportCollections.canFilter = true;
-            disbursementSummaryReportCollections.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
+            disbursementSummaryReportCollectionView = new wijmo.collections.CollectionView(getDisbursementSummaryReportData());
+            disbursementSummaryReportCollectionView.canFilter = true;
+            disbursementSummaryReportCollectionView.pageSize = cboDisbursementSummaryReportDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#inpDisbursementSummaryReportSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                disbursementSummaryReportCollections.refresh();
+                disbursementSummaryReportCollectionView.refresh();
             });
 
-            disbursementSummaryReportCollections.filter = function (item) {
+            disbursementSummaryReportCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
@@ -647,11 +647,11 @@
                     || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
             }
 
-            disbursementSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+            disbursementSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateDisbursementSummaryReportNavigationButtons();
             });
 
-            disbursementSummaryReportFlexGrid.itemsSource = disbursementSummaryReportCollections;
+            disbursementSummaryReportFlexGrid.itemsSource = disbursementSummaryReportCollectionView;
             disbursementSummaryReportFlexGrid.trackChanges = true;
         }
 
@@ -663,26 +663,26 @@
             var disbursementSummaryReport = [];
             var fileName = 'DisbursementSummaryReport.CSV';
 
-            disbursementSummaryReportCollections.moveToFirstPage();
+            disbursementSummaryReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= disbursementSummaryReportCollections.pageCount; p++) {
-                for (i = 0; i < disbursementSummaryReportCollections.items.length; i++) {
+            for (var p = 1; p <= disbursementSummaryReportCollectionView.pageCount; p++) {
+                for (i = 0; i < disbursementSummaryReportCollectionView.items.length; i++) {
                     disbursementSummaryReport.push({
-                        Branch: disbursementSummaryReportCollections.items[i].Branch,
-                        CVNumber: "CV-" + disbursementSummaryReportCollections.items[i].CVNumber,
-                        CVDate: disbursementSummaryReportCollections.items[i].CVDate,
-                        Payee: disbursementSummaryReportCollections.items[i].Payee,
-                        Particulars: disbursementSummaryReportCollections.items[i].Particulars,
-                        Bank: disbursementSummaryReportCollections.items[i].Bank,
-                        CheckNumber: disbursementSummaryReportCollections.items[i].CheckNumber,
-                        CheckDate: disbursementSummaryReportCollections.items[i].CheckDate,
-                        Amount: disbursementSummaryReportCollections.items[i].Amount,
+                        Branch: disbursementSummaryReportCollectionView.items[i].Branch,
+                        CVNumber: "CV-" + disbursementSummaryReportCollectionView.items[i].CVNumber,
+                        CVDate: disbursementSummaryReportCollectionView.items[i].CVDate,
+                        Payee: disbursementSummaryReportCollectionView.items[i].Payee,
+                        Particulars: disbursementSummaryReportCollectionView.items[i].Particulars,
+                        Bank: disbursementSummaryReportCollectionView.items[i].Bank,
+                        CheckNumber: disbursementSummaryReportCollectionView.items[i].CheckNumber,
+                        CheckDate: disbursementSummaryReportCollectionView.items[i].CheckDate,
+                        Amount: disbursementSummaryReportCollectionView.items[i].Amount,
                     });
                 }
 
-                disbursementSummaryReportCollections.moveToNextPage();
-                if (p == disbursementSummaryReportCollections.pageCount) {
-                    disbursementSummaryReportCollections.moveToPage(disbursementSummaryReportCurrentPageIndex - 1);
+                disbursementSummaryReportCollectionView.moveToNextPage();
+                if (p == disbursementSummaryReportCollectionView.pageCount) {
+                    disbursementSummaryReportCollectionView.moveToPage(disbursementSummaryReportCurrentPageIndex - 1);
                 }
             }
 
