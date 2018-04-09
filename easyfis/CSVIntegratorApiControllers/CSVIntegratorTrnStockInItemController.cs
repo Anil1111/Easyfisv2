@@ -19,21 +19,21 @@ namespace easyfis.CSVIntegratorApiControllers
         // Add Stock In Item (CSV Integrator)
         // ==================================
         [HttpPost, Route("api/add/CSVIntegrator/stockInItem")]
-        public HttpResponseMessage AddStockInItem(List<CSVIntegratorEntities.CSVIntegratorTrnStockInItem> objStockInItems)
+        public HttpResponseMessage AddCSVIntegratorStockInItem(List<CSVIntegratorEntities.CSVIntegratorTrnStockInItem> objStockInItems)
         {
             try
             {
                 if (objStockInItems.Any())
                 {
+                    Boolean stockInExists = false;
+                    var stockIn = from d in db.TrnStockIns where d.MstBranch.BranchCode.Equals(objStockInItems.FirstOrDefault().BranchCode) && d.INNumber.Equals(objStockInItems.FirstOrDefault().INNumber) select d;
+                    if (stockIn.Any())
+                    {
+                        stockInExists = true;
+                    }
+
                     foreach (var objStockInItem in objStockInItems)
                     {
-                        Boolean stockInExists = false;
-                        var stockIn = from d in db.TrnStockIns where d.MstBranch.BranchCode.Equals(objStockInItem.BranchCode) && d.INNumber.Equals(objStockInItem.INNumber) select d;
-                        if (stockIn.Any())
-                        {
-                            stockInExists = true;
-                        }
-
                         Boolean itemExists = false;
                         var item = from d in db.MstArticles where d.ManualArticleCode.Equals(objStockInItem.ItemCode) && d.ArticleTypeId == 1 && d.IsLocked == true select d;
                         if (item.Any())
@@ -96,11 +96,59 @@ namespace easyfis.CSVIntegratorApiControllers
 
                     db.SubmitChanges();
 
-                    return Request.CreateResponse(HttpStatusCode.OK);
+                    return LockCSVIntegratorStockIn(stockIn.FirstOrDefault().Id);
                 }
                 else
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, "Empty!");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ==============================
+        // Lock Stock In (CSV Integrator)
+        // ==============================
+        public HttpResponseMessage LockCSVIntegratorStockIn(Int32 id)
+        {
+            try
+            {
+                var stockIn = from d in db.TrnStockIns where d.Id == id select d;
+                if (stockIn.Any())
+                {
+                    if (!stockIn.FirstOrDefault().IsLocked)
+                    {
+                        var lockStockIn = stockIn.FirstOrDefault();
+                        lockStockIn.IsLocked = true;
+
+                        db.SubmitChanges();
+
+                        // =====================
+                        // Journal and Inventory
+                        // =====================
+                        Business.Journal journal = new Business.Journal();
+                        Business.Inventory inventory = new Business.Inventory();
+
+                        if (lockStockIn.IsLocked)
+                        {
+                            journal.InsertStockInJournal(id);
+                            inventory.InsertStockInInventory(id);
+                        }
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These stock in details are already locked.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock in details are not found in the server.");
                 }
             }
             catch (Exception e)
