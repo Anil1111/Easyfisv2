@@ -35,135 +35,123 @@ namespace easyfis.CSVIntegratorApiControllers
         // Add Stock In (CSV Integrator)
         // =============================
         [HttpPost, Route("api/add/CSVIntegrator/stockIn")]
-        public HttpResponseMessage AddStockInCSVIntegrator(CSVIntegratorEntities.CSVIntegratorTrnStockIn objStockIn)
+        public HttpResponseMessage AddStockInCSVIntegrator(List<CSVIntegratorEntities.CSVIntegratorTrnStockIn> objStockIns)
         {
             try
             {
-                Boolean currentBranchExist = false;
-                var currentBranch = from d in db.MstBranches where d.BranchCode.Equals(objStockIn.BranchCode) select d;
-                if (currentBranch.Any())
+                if (objStockIns.Any())
                 {
-                    currentBranchExist = true;
-                }
-
-                Boolean accountsExist = false;
-                var accounts = from d in db.MstAccounts where d.IsLocked == true select d;
-
-                List<Int32> listArticleIds = new List<Int32>();
-                if (accounts.Any())
-                {
-                    accountsExist = true;
-                    var accountArticleTypes = from d in db.MstAccountArticleTypes where d.AccountId == accounts.FirstOrDefault().Id && d.MstAccount.IsLocked == true select d;
-                    if (accountArticleTypes.Any())
+                    foreach (var objStockIn in objStockIns)
                     {
-                        foreach (var accountArticleType in accountArticleTypes)
+                        Boolean currentBranchExist = false;
+                        var currentBranch = from d in db.MstBranches where d.BranchCode.Equals(objStockIn.BranchCode) select d;
+                        if (currentBranch.Any())
                         {
-                            var articles = from d in db.MstArticles where d.ArticleTypeId == accountArticleType.ArticleTypeId && d.IsLocked == true select d;
-                            if (articles.Any())
+                            currentBranchExist = true;
+                        }
+
+                        Boolean accountsExist = false;
+                        var accounts = from d in db.MstAccounts where d.IsLocked == true select d;
+
+                        List<Int32> listArticleIds = new List<Int32>();
+                        if (accounts.Any())
+                        {
+                            accountsExist = true;
+                            var accountArticleTypes = from d in db.MstAccountArticleTypes where d.AccountId == accounts.FirstOrDefault().Id && d.MstAccount.IsLocked == true select d;
+                            if (accountArticleTypes.Any())
                             {
-                                foreach (var article in articles)
+                                foreach (var accountArticleType in accountArticleTypes)
                                 {
-                                    listArticleIds.Add(article.Id);
+                                    var articles = from d in db.MstArticles where d.ArticleTypeId == accountArticleType.ArticleTypeId && d.IsLocked == true select d;
+                                    if (articles.Any())
+                                    {
+                                        foreach (var article in articles)
+                                        {
+                                            listArticleIds.Add(article.Id);
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
 
-                Boolean articleListsExist = false;
-                var articleLists = from d in listArticleIds.ToList() select d;
-                if (articleLists.Any())
-                {
-                    articleListsExist = true;
-                }
-
-                Boolean usersExist = false;
-                var users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
-                if (users.Any())
-                {
-                    usersExist = true;
-                }
-
-                String errorMessage = "";
-                Boolean isValid = false;
-
-                if (currentBranchExist)
-                {
-                    if (accountsExist)
-                    {
-                        if (articleListsExist)
+                        Boolean articleListsExist = false;
+                        var articleLists = from d in listArticleIds.ToList() select d;
+                        if (articleLists.Any())
                         {
-                            if (usersExist)
+                            articleListsExist = true;
+                        }
+
+                        Boolean usersExist = false;
+                        var users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
+                        if (users.Any())
+                        {
+                            usersExist = true;
+                        }
+
+                        Boolean isValid = false;
+                        if (currentBranchExist)
+                        {
+                            if (accountsExist)
                             {
-                                isValid = true;
-                            }
-                            else
-                            {
-                                errorMessage = "No User!";
+                                if (articleListsExist)
+                                {
+                                    if (usersExist)
+                                    {
+                                        isValid = true;
+                                    }
+                                }
                             }
                         }
-                        else
+
+                        if (isValid)
                         {
-                            errorMessage = "No Article!";
+                            var defaultINNumber = "0000000001";
+                            var lastStockIn = from d in db.TrnStockIns.OrderByDescending(d => d.Id)
+                                              where d.MstBranch.BranchCode.Equals(objStockIn.BranchCode)
+                                              select d;
+
+                            if (lastStockIn.Any())
+                            {
+                                var INNumber = Convert.ToInt32(lastStockIn.FirstOrDefault().INNumber) + 0000000001;
+                                defaultINNumber = FillLeadingZeroes(INNumber, 10);
+                            }
+
+                            Data.TrnStockIn newStockIn = new Data.TrnStockIn
+                            {
+                                BranchId = currentBranch.FirstOrDefault().Id,
+                                INNumber = defaultINNumber,
+                                INDate = Convert.ToDateTime(objStockIn.INDate),
+                                AccountId = accounts.FirstOrDefault().Id,
+                                ArticleId = listArticleIds.FirstOrDefault(),
+                                Particulars = objStockIn.Particulars,
+                                ManualINNumber = objStockIn.ManualINNumber,
+                                IsProduced = objStockIn.IsProduced,
+                                PreparedById = users.FirstOrDefault().Id,
+                                CheckedById = users.FirstOrDefault().Id,
+                                ApprovedById = users.FirstOrDefault().Id,
+                                IsLocked = false,
+                                CreatedById = users.FirstOrDefault().Id,
+                                CreatedDateTime = DateTime.Now,
+                                UpdatedById = users.FirstOrDefault().Id,
+                                UpdatedDateTime = DateTime.Now
+                            };
+
+                            db.TrnStockIns.InsertOnSubmit(newStockIn);
+                            db.SubmitChanges();
                         }
                     }
-                    else
-                    {
-                        errorMessage = "No Account!";
-                    }
+
+                    return Request.CreateResponse(HttpStatusCode.OK, "Sent Successful!");
                 }
                 else
                 {
-                    errorMessage = "No Branch!";
-                }
-
-                if (isValid)
-                {
-                    var defaultINNumber = "0000000001";
-                    var lastStockIn = from d in db.TrnStockIns.OrderByDescending(d => d.Id)
-                                      where d.MstBranch.BranchCode.Equals(objStockIn.BranchCode)
-                                      select d;
-
-                    if (lastStockIn.Any())
-                    {
-                        var INNumber = Convert.ToInt32(lastStockIn.FirstOrDefault().INNumber) + 0000000001;
-                        defaultINNumber = FillLeadingZeroes(INNumber, 10);
-                    }
-
-                    Data.TrnStockIn newStockIn = new Data.TrnStockIn
-                    {
-                        BranchId = currentBranch.FirstOrDefault().Id,
-                        INNumber = defaultINNumber,
-                        INDate = Convert.ToDateTime(objStockIn.INDate),
-                        AccountId = accounts.FirstOrDefault().Id,
-                        ArticleId = listArticleIds.FirstOrDefault(),
-                        Particulars = objStockIn.Particulars,
-                        ManualINNumber = objStockIn.ManualINNumber,
-                        IsProduced = objStockIn.IsProduced,
-                        PreparedById = users.FirstOrDefault().Id,
-                        CheckedById = users.FirstOrDefault().Id,
-                        ApprovedById = users.FirstOrDefault().Id,
-                        IsLocked = false,
-                        CreatedById = users.FirstOrDefault().Id,
-                        CreatedDateTime = DateTime.Now,
-                        UpdatedById = users.FirstOrDefault().Id,
-                        UpdatedDateTime = DateTime.Now
-                    };
-
-                    db.TrnStockIns.InsertOnSubmit(newStockIn);
-                    db.SubmitChanges();
-
-                    return Request.CreateResponse(HttpStatusCode.OK, newStockIn.INNumber);
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, errorMessage);
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Empty!");
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server! " + e.Message);
             }
         }
     }

@@ -18,7 +18,7 @@ namespace easyfis.CSVIntegratorEntities
     public class CSVIntegratorTrnStockInItem
     {
         public String BranchCode { get; set; }
-        public String INNumber { get; set; }
+        public String ManualINNumber { get; set; }
         public String ItemCode { get; set; }
         public String Particulars { get; set; }
         public String Unit { get; set; }

@@ -25,15 +25,15 @@ namespace easyfis.CSVIntegratorApiControllers
             {
                 if (objStockInItems.Any())
                 {
-                    Boolean stockInExists = false;
-                    var stockIn = from d in db.TrnStockIns where d.MstBranch.BranchCode.Equals(objStockInItems.FirstOrDefault().BranchCode) && d.INNumber.Equals(objStockInItems.FirstOrDefault().INNumber) select d;
-                    if (stockIn.Any())
-                    {
-                        stockInExists = true;
-                    }
-
                     foreach (var objStockInItem in objStockInItems)
                     {
+                        Boolean stockInExists = false;
+                        var stockIn = from d in db.TrnStockIns where d.MstBranch.BranchCode.Equals(objStockInItem.BranchCode) && d.ManualINNumber.Equals(objStockInItem.ManualINNumber) select d;
+                        if (stockIn.Any())
+                        {
+                            stockInExists = true;
+                        }
+
                         Boolean itemExists = false;
                         var item = from d in db.MstArticles where d.ManualArticleCode.Equals(objStockInItem.ItemCode) && d.ArticleTypeId == 1 && d.IsLocked == true select d;
                         if (item.Any())
@@ -90,13 +90,14 @@ namespace easyfis.CSVIntegratorApiControllers
                                 };
 
                                 db.TrnStockInItems.InsertOnSubmit(newStockInItem);
+                                db.SubmitChanges();
                             }
                         }
+
+                        LockCSVIntegratorStockIn(stockIn.FirstOrDefault().Id);
                     }
 
-                    db.SubmitChanges();
-
-                    return LockCSVIntegratorStockIn(stockIn.FirstOrDefault().Id);
+                    return Request.CreateResponse(HttpStatusCode.OK, "Sent Successful!");
                 }
                 else
                 {
@@ -113,48 +114,35 @@ namespace easyfis.CSVIntegratorApiControllers
         // ==============================
         // Lock Stock In (CSV Integrator)
         // ==============================
-        public HttpResponseMessage LockCSVIntegratorStockIn(Int32 id)
+        public void LockCSVIntegratorStockIn(Int32 id)
         {
             try
             {
                 var stockIn = from d in db.TrnStockIns where d.Id == id select d;
                 if (stockIn.Any())
                 {
-                    if (!stockIn.FirstOrDefault().IsLocked)
-                    {
-                        var lockStockIn = stockIn.FirstOrDefault();
-                        lockStockIn.IsLocked = true;
+                    // =====================
+                    // Journal and Inventory
+                    // =====================
+                    Business.Journal journal = new Business.Journal();
+                    Business.Inventory inventory = new Business.Inventory();
 
-                        db.SubmitChanges();
+                    var unlockStockIn = stockIn.FirstOrDefault();
+                    unlockStockIn.IsLocked = false;
+                    db.SubmitChanges();
+                    journal.DeleteStockInJournal(Convert.ToInt32(id));
+                    inventory.DeleteStockInInventory(Convert.ToInt32(id));
 
-                        // =====================
-                        // Journal and Inventory
-                        // =====================
-                        Business.Journal journal = new Business.Journal();
-                        Business.Inventory inventory = new Business.Inventory();
-
-                        if (lockStockIn.IsLocked)
-                        {
-                            journal.InsertStockInJournal(id);
-                            inventory.InsertStockInInventory(id);
-                        }
-
-                        return Request.CreateResponse(HttpStatusCode.OK);
-                    }
-                    else
-                    {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These stock in details are already locked.");
-                    }
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock in details are not found in the server.");
+                    var lockStockIn = stockIn.FirstOrDefault();
+                    lockStockIn.IsLocked = true;
+                    db.SubmitChanges();
+                    journal.InsertStockInJournal(id);
+                    inventory.InsertStockInInventory(id);
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
             }
         }
     }
