@@ -12,7 +12,6 @@ namespace easyfis.CSVIntegratorEntities
         public String Particulars { get; set; }
         public String ManualINNumber { get; set; }
         public Boolean IsProduced { get; set; }
-        public String CreatedBy { get; set; }
     }
     
     public class CSVIntegratorTrnStockInItem

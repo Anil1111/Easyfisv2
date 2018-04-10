@@ -150,7 +150,7 @@ namespace easyfis.CSVIntegratorApiControllers
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.Message);
+                Debug.WriteLine(e);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server! " + e.Message);
             }
         }
