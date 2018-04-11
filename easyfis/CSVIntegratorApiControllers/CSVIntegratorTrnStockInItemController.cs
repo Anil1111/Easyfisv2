@@ -25,12 +25,15 @@ namespace easyfis.CSVIntegratorApiControllers
             {
                 if (objStockInItems.Any())
                 {
+                    List<Int32> listStockInIds = new List<Int32>();
+
                     foreach (var objStockInItem in objStockInItems)
                     {
                         Boolean stockInExists = false;
                         var stockIn = from d in db.TrnStockIns where d.MstBranch.BranchCode.Equals(objStockInItem.BranchCode) && d.ManualINNumber.Equals(objStockInItem.ManualINNumber) select d;
                         if (stockIn.Any())
                         {
+                            listStockInIds.Add(stockIn.FirstOrDefault().Id);
                             stockInExists = true;
                         }
 
@@ -90,11 +93,25 @@ namespace easyfis.CSVIntegratorApiControllers
                                 };
 
                                 db.TrnStockInItems.InsertOnSubmit(newStockInItem);
-                                db.SubmitChanges();
                             }
                         }
+                    }
 
-                        LockCSVIntegratorStockIn(stockIn.FirstOrDefault().Id);
+                    db.SubmitChanges();
+
+                    if (listStockInIds.Any())
+                    {
+                        var stockInIds = from d in listStockInIds
+                                         group d by d into g
+                                         select g.Key;
+
+                        if (stockInIds.Any())
+                        {
+                            foreach (var stockInId in stockInIds)
+                            {
+                                LockCSVIntegratorStockIn(stockInId);
+                            }
+                        }
                     }
 
                     return Request.CreateResponse(HttpStatusCode.OK, "Sent Successful!");
@@ -121,22 +138,14 @@ namespace easyfis.CSVIntegratorApiControllers
                 var stockIn = from d in db.TrnStockIns where d.Id == id select d;
                 if (stockIn.Any())
                 {
-                    // =====================
-                    // Journal and Inventory
-                    // =====================
-                    Business.Journal journal = new Business.Journal();
-                    Business.Inventory inventory = new Business.Inventory();
-
-                    var unlockStockIn = stockIn.FirstOrDefault();
-                    unlockStockIn.IsLocked = false;
-                    db.SubmitChanges();
-                    journal.DeleteStockInJournal(Convert.ToInt32(id));
-                    inventory.DeleteStockInInventory(Convert.ToInt32(id));
-
                     var lockStockIn = stockIn.FirstOrDefault();
                     lockStockIn.IsLocked = true;
                     db.SubmitChanges();
+
+                    Business.Journal journal = new Business.Journal();
                     journal.InsertStockInJournal(id);
+
+                    Business.Inventory inventory = new Business.Inventory();
                     inventory.InsertStockInInventory(id);
                 }
             }

@@ -26,17 +26,16 @@ namespace easyfis.CSVIntegratorApiControllers
             {
                 if (objSalesInvoiceItems.Any())
                 {
+                    List<Int32> listSalesInvoiceIds = new List<Int32>();
+
                     foreach (var objSalesInvoiceItem in objSalesInvoiceItems)
                     {
                         Boolean salesInvoiceExists = false;
                         var salesInvoice = from d in db.TrnSalesInvoices where d.MstBranch.BranchCode.Equals(objSalesInvoiceItem.BranchCode) && d.ManualSINumber.Equals(objSalesInvoiceItem.ManualSINumber) select d;
                         if (salesInvoice.Any())
                         {
+                            listSalesInvoiceIds.Add(salesInvoice.FirstOrDefault().Id);
                             salesInvoiceExists = true;
-                        }
-                        else
-                        {
-                            Debug.WriteLine("NO SI");
                         }
 
                         Boolean itemExists = false;
@@ -45,20 +44,12 @@ namespace easyfis.CSVIntegratorApiControllers
                         {
                             itemExists = true;
                         }
-                        else
-                        {
-                            Debug.WriteLine("NO ITEM");
-                        }
 
                         Boolean unitExist = false;
                         var units = from d in db.MstUnits where d.Unit == objSalesInvoiceItem.Unit select d;
                         if (units.Any())
                         {
                             unitExist = true;
-                        }
-                        else
-                        {
-                            Debug.WriteLine("NO UNIT");
                         }
 
                         Boolean taxTypesExist = false;
@@ -67,20 +58,12 @@ namespace easyfis.CSVIntegratorApiControllers
                         {
                             taxTypesExist = true;
                         }
-                        else
-                        {
-                            Debug.WriteLine("NO TAX TYPE");
-                        }
 
                         Boolean discountsExist = false;
                         var discounts = from d in db.MstDiscounts where d.Discount == objSalesInvoiceItem.Discount && d.IsLocked == true select d;
                         if (discounts.Any())
                         {
                             discountsExist = true;
-                        }
-                        else
-                        {
-                            Debug.WriteLine("NO DISCOUNT");
                         }
 
                         Boolean isValid = false;
@@ -158,7 +141,6 @@ namespace easyfis.CSVIntegratorApiControllers
                                     };
 
                                     db.TrnSalesInvoiceItems.InsertOnSubmit(addSaleInvoiceItemPackage);
-                                    db.SubmitChanges();
 
                                     var articleComponents = from d in db.MstArticleComponents where d.MstArticle.ManualArticleCode == objSalesInvoiceItem.ItemCode select d;
                                     if (articleComponents.Any())
@@ -260,8 +242,6 @@ namespace easyfis.CSVIntegratorApiControllers
                                                 }
                                             }
                                         }
-
-                                        db.SubmitChanges();
                                     }
 
                                     Decimal salesInvoiceItemTotalAmount = 0;
@@ -273,7 +253,6 @@ namespace easyfis.CSVIntegratorApiControllers
 
                                     var updateSalesInvoiceAmount = salesInvoice.FirstOrDefault();
                                     updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
-                                    db.SubmitChanges();
                                 }
                             }
                             else
@@ -320,7 +299,6 @@ namespace easyfis.CSVIntegratorApiControllers
                                     };
 
                                     db.TrnSalesInvoiceItems.InsertOnSubmit(addSaleInvoiceItem);
-                                    db.SubmitChanges();
 
                                     Decimal salesInvoiceItemTotalAmount = 0;
 
@@ -331,12 +309,26 @@ namespace easyfis.CSVIntegratorApiControllers
 
                                     var updateSalesInvoiceAmount = salesInvoice.FirstOrDefault();
                                     updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
-                                    db.SubmitChanges();
                                 }
                             }
                         }
+                    }
 
-                        LockCSVIntegratorSalesInvoice(salesInvoice.FirstOrDefault().Id);
+                    db.SubmitChanges();
+
+                    if (listSalesInvoiceIds.Any())
+                    {
+                        var salesInvoiceIds = from d in listSalesInvoiceIds
+                                              group d by d into g
+                                              select g.Key;
+
+                        if (salesInvoiceIds.Any())
+                        {
+                            foreach (var salesInvoiceId in salesInvoiceIds)
+                            {
+                                LockCSVIntegratorSalesInvoice(salesInvoiceId);
+                            }
+                        }
                     }
 
                     return Request.CreateResponse(HttpStatusCode.OK, "Sent Successful!");
@@ -382,18 +374,6 @@ namespace easyfis.CSVIntegratorApiControllers
                 var salesInvoice = from d in db.TrnSalesInvoices where d.Id == id select d;
                 if (salesInvoice.Any())
                 {
-                    // =====================
-                    // Inventory and Journal
-                    // =====================
-                    Business.Inventory inventory = new Business.Inventory();
-                    Business.Journal journal = new Business.Journal();
-
-                    var unlockSalesInvoice = salesInvoice.FirstOrDefault();
-                    unlockSalesInvoice.IsLocked = false;
-                    db.SubmitChanges();
-                    inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
-                    journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
-
                     Decimal paidAmount = 0;
                     Decimal adjustmentAmount = 0;
 
@@ -420,7 +400,10 @@ namespace easyfis.CSVIntegratorApiControllers
                     lockSalesInvoice.IsLocked = true;
                     db.SubmitChanges();
 
+                    Business.Inventory inventory = new Business.Inventory();
                     inventory.InsertSalesInvoiceInventory(id);
+
+                    Business.Journal journal = new Business.Journal();
                     journal.InsertSalesInvoiceJournal(id);
                 }
             }
