@@ -82,7 +82,7 @@ namespace easyfis.ModifiedApiControllers
                               CheckedById = d.CheckedById,
                               ApprovedById = d.ApprovedById,
                               IsLocked = d.IsLocked,
-                              CreatedBy = d.MstUser2.FullName,
+                              CreatedBy = d.MstUser3.FullName,
                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
                               UpdatedBy = d.MstUser4.FullName,
                               UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()

@@ -377,6 +377,24 @@ namespace easyfis.Controllers
             return UserRights("StockCountDetail");
         }
 
+        // ================
+        // Stock Withdrawal
+        // ================
+        [Authorize]
+        public ActionResult StockWithdrawal()
+        {
+            return UserRights("StockWithdrawalList");
+        }
+
+        // =======================
+        // Stock Withdrawal Detail  
+        // =======================
+        [Authorize]
+        public ActionResult StockWithdrawalDetail()
+        {
+            return UserRights("StockWithdrawalDetail");
+        }
+
         // ===============
         // Journal Voucher
         // ===============

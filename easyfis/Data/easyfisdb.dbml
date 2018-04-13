@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="easyfis" Class="easyfisdbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString1" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AspNetRoles" Member="AspNetRoles">
     <Type Name="AspNetRole">
       <Column Name="Id" Type="System.String" DbType="NVarChar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -7,10 +7,10 @@
       <Association Name="AspNetRole_AspNetUserRole" Member="AspNetUserRoles" ThisKey="Id" OtherKey="RoleId" Type="AspNetUserRole" />
     </Type>
   </Table>
-  <Table Name="dbo.TrnStockTransferItem" Member="TrnStockTransferItems">
-    <Type Name="TrnStockTransferItem">
+  <Table Name="dbo.TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems">
+    <Type Name="TrnStockWithdrawalItem">
       <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="STId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SWId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ItemId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="ItemInventoryId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="Particulars" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
@@ -21,11 +21,11 @@
       <Column Name="BaseUnitId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="BaseQuantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="BaseCost" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
-      <Association Name="MstArticle_TrnStockTransferItem" Member="MstArticle" ThisKey="ItemId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
-      <Association Name="MstArticleInventory_TrnStockTransferItem" Member="MstArticleInventory" ThisKey="ItemInventoryId" OtherKey="Id" Type="MstArticleInventory" IsForeignKey="true" />
-      <Association Name="MstUnit_TrnStockTransferItem" Member="MstUnit" ThisKey="UnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
-      <Association Name="MstUnit_TrnStockTransferItem1" Member="MstUnit1" ThisKey="BaseUnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
-      <Association Name="TrnStockTransfer_TrnStockTransferItem" Member="TrnStockTransfer" ThisKey="STId" OtherKey="Id" Type="TrnStockTransfer" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+      <Association Name="MstArticle_TrnStockWithdrawalItem" Member="MstArticle" ThisKey="ItemId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
+      <Association Name="MstArticleInventory_TrnStockWithdrawalItem" Member="MstArticleInventory" ThisKey="ItemInventoryId" OtherKey="Id" Type="MstArticleInventory" IsForeignKey="true" />
+      <Association Name="MstUnit_TrnStockWithdrawalItem" Member="MstUnit" ThisKey="UnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
+      <Association Name="MstUnit_TrnStockWithdrawalItem1" Member="MstUnit1" ThisKey="BaseUnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
+      <Association Name="TrnStockWithdrawal_TrnStockWithdrawalItem" Member="TrnStockWithdrawal" ThisKey="SWId" OtherKey="Id" Type="TrnStockWithdrawal" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.AspNetUserClaims" Member="AspNetUserClaims">
@@ -222,7 +222,7 @@
       <Column Name="CreatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="MstArticle_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="ItemId" Type="TrnStockTransferItem" />
+      <Association Name="MstArticle_TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems" ThisKey="Id" OtherKey="ItemId" Type="TrnStockWithdrawalItem" />
       <Association Name="MstArticle_MstArticleComponent" Member="MstArticleComponents" ThisKey="Id" OtherKey="ArticleId" Type="MstArticleComponent" />
       <Association Name="MstArticle_MstArticleComponent1" Member="MstArticleComponents1" ThisKey="Id" OtherKey="ComponentArticleId" Type="MstArticleComponent" />
       <Association Name="MstArticle_MstArticleContact" Member="MstArticleContacts" ThisKey="Id" OtherKey="ArticleId" Type="MstArticleContact" />
@@ -253,6 +253,7 @@
       <Association Name="MstArticle_TrnStockOut" Member="TrnStockOuts" ThisKey="Id" OtherKey="ArticleId" Type="TrnStockOut" />
       <Association Name="MstArticle_TrnStockOutItem" Member="TrnStockOutItems" ThisKey="Id" OtherKey="ItemId" Type="TrnStockOutItem" />
       <Association Name="MstArticle_TrnStockTransfer" Member="TrnStockTransfers" ThisKey="Id" OtherKey="ArticleId" Type="TrnStockTransfer" />
+      <Association Name="MstArticle_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="ItemId" Type="TrnStockTransferItem" />
       <Association Name="MstAccount_MstArticle" Member="MstAccount" ThisKey="AccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
       <Association Name="MstAccount_MstArticle1" Member="MstAccount1" ThisKey="SalesAccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
       <Association Name="MstAccount_MstArticle2" Member="MstAccount2" ThisKey="CostAccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
@@ -346,10 +347,11 @@
       <Column Name="Cost" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="Amount" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="Particulars" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
-      <Association Name="MstArticleInventory_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="ItemInventoryId" Type="TrnStockTransferItem" />
+      <Association Name="MstArticleInventory_TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems" ThisKey="Id" OtherKey="ItemInventoryId" Type="TrnStockWithdrawalItem" />
       <Association Name="MstArticleInventory_TrnInventory" Member="TrnInventories" ThisKey="Id" OtherKey="ArticleInventoryId" Type="TrnInventory" />
       <Association Name="MstArticleInventory_TrnSalesInvoiceItem" Member="TrnSalesInvoiceItems" ThisKey="Id" OtherKey="ItemInventoryId" Type="TrnSalesInvoiceItem" />
       <Association Name="MstArticleInventory_TrnStockOutItem" Member="TrnStockOutItems" ThisKey="Id" OtherKey="ItemInventoryId" Type="TrnStockOutItem" />
+      <Association Name="MstArticleInventory_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="ItemInventoryId" Type="TrnStockTransferItem" />
       <Association Name="MstArticle_MstArticleInventory" Member="MstArticle" ThisKey="ArticleId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
       <Association Name="MstBranch_MstArticleInventory" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
     </Type>
@@ -428,6 +430,8 @@
       <Association Name="MstBranch_TrnStockOut" Member="TrnStockOuts" ThisKey="Id" OtherKey="BranchId" Type="TrnStockOut" />
       <Association Name="MstBranch_TrnStockTransfer" Member="TrnStockTransfers" ThisKey="Id" OtherKey="BranchId" Type="TrnStockTransfer" />
       <Association Name="MstBranch_TrnStockTransfer1" Member="TrnStockTransfers1" ThisKey="Id" OtherKey="ToBranchId" Type="TrnStockTransfer" />
+      <Association Name="MstBranch_TrnStockWithdrawal" Member="TrnStockWithdrawals" ThisKey="Id" OtherKey="BranchId" Type="TrnStockWithdrawal" />
+      <Association Name="MstBranch_TrnStockWithdrawal1" Member="TrnStockWithdrawals1" ThisKey="Id" OtherKey="SIBranchId" Type="TrnStockWithdrawal" />
       <Association Name="MstCompany_MstBranch" Member="MstCompany" ThisKey="CompanyId" OtherKey="Id" Type="MstCompany" IsForeignKey="true" />
       <Association Name="MstUser_MstBranch" Member="MstUser" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstUser_MstBranch1" Member="MstUser1" ThisKey="UpdatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
@@ -538,8 +542,8 @@
       <Column Name="CreatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="MstUnit_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="UnitId" Type="TrnStockTransferItem" />
-      <Association Name="MstUnit_TrnStockTransferItem1" Member="TrnStockTransferItems1" ThisKey="Id" OtherKey="BaseUnitId" Type="TrnStockTransferItem" />
+      <Association Name="MstUnit_TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems" ThisKey="Id" OtherKey="UnitId" Type="TrnStockWithdrawalItem" />
+      <Association Name="MstUnit_TrnStockWithdrawalItem1" Member="TrnStockWithdrawalItems1" ThisKey="Id" OtherKey="BaseUnitId" Type="TrnStockWithdrawalItem" />
       <Association Name="MstUnit_MstArticle" Member="MstArticles" ThisKey="Id" OtherKey="UnitId" Type="MstArticle" />
       <Association Name="MstUnit_MstArticleUnit" Member="MstArticleUnits" ThisKey="Id" OtherKey="UnitId" Type="MstArticleUnit" />
       <Association Name="MstUnit_TrnPurchaseOrderItem" Member="TrnPurchaseOrderItems" ThisKey="Id" OtherKey="UnitId" Type="TrnPurchaseOrderItem" />
@@ -554,6 +558,8 @@
       <Association Name="MstUnit_TrnStockInItem1" Member="TrnStockInItems1" ThisKey="Id" OtherKey="BaseUnitId" Type="TrnStockInItem" />
       <Association Name="MstUnit_TrnStockOutItem" Member="TrnStockOutItems" ThisKey="Id" OtherKey="UnitId" Type="TrnStockOutItem" />
       <Association Name="MstUnit_TrnStockOutItem1" Member="TrnStockOutItems1" ThisKey="Id" OtherKey="BaseUnitId" Type="TrnStockOutItem" />
+      <Association Name="MstUnit_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="UnitId" Type="TrnStockTransferItem" />
+      <Association Name="MstUnit_TrnStockTransferItem1" Member="TrnStockTransferItems1" ThisKey="Id" OtherKey="BaseUnitId" Type="TrnStockTransferItem" />
       <Association Name="MstUser_MstUnit" Member="MstUser" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstUser_MstUnit1" Member="MstUser1" ThisKey="UpdatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
     </Type>
@@ -677,6 +683,11 @@
       <Association Name="MstUser_TrnStockTransfer2" Member="TrnStockTransfers2" ThisKey="Id" OtherKey="CreatedById" Type="TrnStockTransfer" />
       <Association Name="MstUser_TrnStockTransfer3" Member="TrnStockTransfers3" ThisKey="Id" OtherKey="PreparedById" Type="TrnStockTransfer" />
       <Association Name="MstUser_TrnStockTransfer4" Member="TrnStockTransfers4" ThisKey="Id" OtherKey="UpdatedById" Type="TrnStockTransfer" />
+      <Association Name="MstUser_TrnStockWithdrawal" Member="TrnStockWithdrawals" ThisKey="Id" OtherKey="PreparedById" Type="TrnStockWithdrawal" />
+      <Association Name="MstUser_TrnStockWithdrawal1" Member="TrnStockWithdrawals1" ThisKey="Id" OtherKey="CheckedById" Type="TrnStockWithdrawal" />
+      <Association Name="MstUser_TrnStockWithdrawal2" Member="TrnStockWithdrawals2" ThisKey="Id" OtherKey="ApprovedById" Type="TrnStockWithdrawal" />
+      <Association Name="MstUser_TrnStockWithdrawal3" Member="TrnStockWithdrawals3" ThisKey="Id" OtherKey="CreatedById" Type="TrnStockWithdrawal" />
+      <Association Name="MstUser_TrnStockWithdrawal4" Member="TrnStockWithdrawals4" ThisKey="Id" OtherKey="UpdatedById" Type="TrnStockWithdrawal" />
       <Association Name="AspNetUser_MstUser" Member="AspNetUser" ThisKey="UserId" OtherKey="Id" Type="AspNetUser" IsForeignKey="true" />
       <Association Name="MstAccount_MstUser" Member="MstAccount" ThisKey="IncomeAccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
       <Association Name="MstAccount_MstUser1" Member="MstAccount1" ThisKey="SupplierAdvancesAccountId" OtherKey="Id" Type="MstAccount" IsForeignKey="true" />
@@ -1217,6 +1228,7 @@
       <Association Name="TrnSalesInvoice_TrnJournal1" Member="TrnJournals1" ThisKey="Id" OtherKey="ARSIId" Type="TrnJournal" />
       <Association Name="TrnSalesInvoice_TrnJournalVoucherLine" Member="TrnJournalVoucherLines" ThisKey="Id" OtherKey="ARSIId" Type="TrnJournalVoucherLine" />
       <Association Name="TrnSalesInvoice_TrnSalesInvoiceItem" Member="TrnSalesInvoiceItems" ThisKey="Id" OtherKey="SIId" Type="TrnSalesInvoiceItem" />
+      <Association Name="TrnSalesInvoice_TrnStockWithdrawal" Member="TrnStockWithdrawals" ThisKey="Id" OtherKey="SIId" Type="TrnStockWithdrawal" />
       <Association Name="MstArticle_TrnSalesInvoice" Member="MstArticle" ThisKey="CustomerId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
       <Association Name="MstBranch_TrnSalesInvoice" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
       <Association Name="MstTerm_TrnSalesInvoice" Member="MstTerm" ThisKey="TermId" OtherKey="Id" Type="MstTerm" IsForeignKey="true" />
@@ -1417,9 +1429,9 @@
       <Column Name="CreatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Association Name="TrnStockTransfer_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="STId" Type="TrnStockTransferItem" />
       <Association Name="TrnStockTransfer_TrnInventory" Member="TrnInventories" ThisKey="Id" OtherKey="STId" Type="TrnInventory" />
       <Association Name="TrnStockTransfer_TrnJournal" Member="TrnJournals" ThisKey="Id" OtherKey="STId" Type="TrnJournal" />
+      <Association Name="TrnStockTransfer_TrnStockTransferItem" Member="TrnStockTransferItems" ThisKey="Id" OtherKey="STId" Type="TrnStockTransferItem" />
       <Association Name="MstArticle_TrnStockTransfer" Member="MstArticle" ThisKey="ArticleId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
       <Association Name="MstBranch_TrnStockTransfer" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
       <Association Name="MstBranch_TrnStockTransfer1" Member="MstBranch1" ThisKey="ToBranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
@@ -1428,6 +1440,59 @@
       <Association Name="MstUser_TrnStockTransfer2" Member="MstUser2" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstUser_TrnStockTransfer3" Member="MstUser3" ThisKey="PreparedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
       <Association Name="MstUser_TrnStockTransfer4" Member="MstUser4" ThisKey="UpdatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnStockTransferItem" Member="TrnStockTransferItems">
+    <Type Name="TrnStockTransferItem">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="STId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ItemInventoryId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Particulars" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="UnitId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="Cost" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="Amount" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="BaseUnitId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="BaseQuantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Column Name="BaseCost" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
+      <Association Name="MstArticle_TrnStockTransferItem" Member="MstArticle" ThisKey="ItemId" OtherKey="Id" Type="MstArticle" IsForeignKey="true" />
+      <Association Name="MstArticleInventory_TrnStockTransferItem" Member="MstArticleInventory" ThisKey="ItemInventoryId" OtherKey="Id" Type="MstArticleInventory" IsForeignKey="true" />
+      <Association Name="MstUnit_TrnStockTransferItem" Member="MstUnit" ThisKey="UnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
+      <Association Name="MstUnit_TrnStockTransferItem1" Member="MstUnit1" ThisKey="BaseUnitId" OtherKey="Id" Type="MstUnit" IsForeignKey="true" />
+      <Association Name="TrnStockTransfer_TrnStockTransferItem" Member="TrnStockTransfer" ThisKey="STId" OtherKey="Id" Type="TrnStockTransfer" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.TrnStockWithdrawal" Member="TrnStockWithdrawals">
+    <Type Name="TrnStockWithdrawal">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="BranchId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SWNumber" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="SWDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="SIBranchId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="SIId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Remarks" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="DocumentReference" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="ContactPerson" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="ContactNumber" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="Address" Type="System.String" DbType="NVarChar(MAX) NOT NULL" CanBeNull="false" />
+      <Column Name="PreparedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CheckedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ApprovedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="IsLocked" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="TrnStockWithdrawal_TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems" ThisKey="Id" OtherKey="SWId" Type="TrnStockWithdrawalItem" />
+      <Association Name="MstBranch_TrnStockWithdrawal" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
+      <Association Name="MstBranch_TrnStockWithdrawal1" Member="MstBranch1" ThisKey="SIBranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
+      <Association Name="MstUser_TrnStockWithdrawal" Member="MstUser" ThisKey="PreparedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnStockWithdrawal1" Member="MstUser1" ThisKey="CheckedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnStockWithdrawal2" Member="MstUser2" ThisKey="ApprovedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnStockWithdrawal3" Member="MstUser3" ThisKey="CreatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="MstUser_TrnStockWithdrawal4" Member="MstUser4" ThisKey="UpdatedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />
+      <Association Name="TrnSalesInvoice_TrnStockWithdrawal" Member="TrnSalesInvoice" ThisKey="SIId" OtherKey="Id" Type="TrnSalesInvoice" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>
