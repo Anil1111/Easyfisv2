@@ -204,39 +204,38 @@ namespace easyfis.ModifiedApiControllers
                                             && d.TrnPurchaseOrder.IsLocked == true
                                             group d by new
                                             {
-                                                PurchaseOrder = d.TrnPurchaseOrder,
+                                                d.POId,
+                                                d.TrnPurchaseOrder.Remarks,
                                                 d.ItemId,
-                                                ItemCode = d.MstArticle.ManualArticleCode,
-                                                ItemDescription = d.MstArticle.Article,
+                                                d.MstArticle.ManualArticleCode,
+                                                d.MstArticle.Article,
                                                 d.BaseUnitId,
-                                                BaseUnit = d.MstUnit1.Unit,
+                                                d.MstUnit1.Unit,
                                                 d.BaseCost
                                             } into g
                                             select new
                                             {
-                                                POId = g.Key.PurchaseOrder.Id,
+                                                g.Key.POId,
+                                                g.Key.Remarks,
                                                 g.Key.ItemId,
-                                                g.Key.ItemCode,
-                                                g.Key.ItemDescription,
-                                                Particulars = g.Key.PurchaseOrder.Remarks,
-                                                Amount = g.Sum(d => d.Amount),
+                                                g.Key.ManualArticleCode,
+                                                g.Key.Article,
                                                 g.Key.BaseUnitId,
-                                                g.Key.BaseUnit,
+                                                BaseUnit = g.Key.Unit,
                                                 BaseQuantity = g.Sum(d => d.BaseQuantity),
                                                 g.Key.BaseCost
                                             };
 
             if (groupedPurchaseOrderItems.Any())
             {
-                var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList().OrderBy(d => d.ItemDescription)
+                var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList().OrderBy(d => d.Article)
                                          select new Entities.TrnPurchaseOrderItem
                                          {
                                              POId = d.POId,
                                              ItemId = d.ItemId,
-                                             ItemCode = d.ItemCode,
-                                             ItemDescription = d.ItemDescription,
-                                             Particulars = d.Particulars,
-                                             Amount = d.Amount,
+                                             ItemCode = d.ManualArticleCode,
+                                             ItemDescription = d.Article,
+                                             Particulars = d.Remarks,
                                              BaseUnitId = d.BaseUnitId,
                                              BaseUnit = d.BaseUnit,
                                              BaseQuantity = d.BaseQuantity,
@@ -256,54 +255,30 @@ namespace easyfis.ModifiedApiControllers
         // ==================
         // Compute VAT Amount
         // ==================
-        public Decimal ComputeVATAmount(Decimal Amount, Decimal VATRate, Int32 VATId)
+        public Decimal ComputeVATAmount(Boolean IsInclusive, Decimal Amount, Decimal VATRate)
         {
-            var taxType = from d in db.MstTaxTypes
-                          where d.Id == VATId
-                          && d.IsLocked == true
-                          select d;
-
-            if (taxType.Any())
+            if (IsInclusive)
             {
-                if (taxType.FirstOrDefault().IsInclusive)
-                {
-                    return (Amount / (1 + VATRate / 100)) * (VATRate / 100);
-                }
-                else
-                {
-                    return Amount * (VATRate / 100); ;
-                }
+                return (Amount / (1 + VATRate / 100)) * (VATRate / 100);
             }
             else
             {
-                return 0;
+                return Amount * (VATRate / 100); ;
             }
         }
 
         // ===================
         // Compute WTAX Amount
         // ===================
-        public Decimal ComputeWTAXAmount(Decimal Amount, Decimal VATRate, Decimal WTAXRate, Int32 WTAXId)
+        public Decimal ComputeWTAXAmount(Boolean IsInclusive, Decimal Amount, Decimal VATRate, Decimal WTAXRate)
         {
-            var taxType = from d in db.MstTaxTypes
-                          where d.Id == WTAXId
-                          && d.IsLocked == true
-                          select d;
-
-            if (taxType.Any())
+            if (IsInclusive)
             {
-                if (taxType.FirstOrDefault().IsInclusive)
-                {
-                    return (Amount / (1 + VATRate / 100)) * (WTAXRate / 100);
-                }
-                else
-                {
-                    return Amount * (WTAXRate / 100);
-                }
+                return (Amount / (1 + VATRate / 100)) * (WTAXRate / 100);
             }
             else
             {
-                return 0;
+                return Amount * (WTAXRate / 100);
             }
         }
 
@@ -356,82 +331,58 @@ namespace easyfis.ModifiedApiControllers
                     {
                         foreach (var objReceivingReceiptItem in objReceivingReceiptItems)
                         {
-                            var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
-                                                     where d.POId == Convert.ToInt32(objReceivingReceiptItems.FirstOrDefault().POId)
-                                                     && d.BaseQuantity > 0
-                                                     && d.TrnPurchaseOrder.IsLocked == true
-                                                     && d.ItemId == objReceivingReceiptItem.ItemId
-                                                     && d.BaseCost == objReceivingReceiptItem.BaseCost
-                                                     group d by new
-                                                     {
-                                                         d.POId,
-                                                         d.TrnPurchaseOrder.Remarks,
-                                                         d.ItemId,
-                                                         d.BaseCost
-                                                     } into g
-                                                     select new
-                                                     {
-                                                         g.Key.POId,
-                                                         g.Key.Remarks,
-                                                         g.Key.ItemId,
-                                                         g.Key.BaseCost
-                                                     };
+                            var item = from d in db.MstArticles
+                                       where d.Id == objReceivingReceiptItem.ItemId
+                                       && d.ArticleTypeId == 1
+                                       && d.IsLocked == true
+                                       select d;
 
-                            if (purchaseOrderItems.Any())
+                            if (item.Any())
                             {
-                                var item = from d in db.MstArticles
-                                           where d.Id == purchaseOrderItems.FirstOrDefault().ItemId
-                                           && d.ArticleTypeId == 1
-                                           && d.IsLocked == true
-                                           select d;
+                                var conversionUnit = from d in db.MstArticleUnits
+                                                     where d.ArticleId == item.FirstOrDefault().Id
+                                                     && d.UnitId == item.FirstOrDefault().UnitId
+                                                     && d.MstArticle.IsLocked == true
+                                                     select d;
 
-                                if (item.Any())
+                                if (conversionUnit.Any())
                                 {
-                                    var conversionUnit = from d in db.MstArticleUnits
-                                                         where d.ArticleId == item.FirstOrDefault().Id
-                                                         && d.UnitId == item.FirstOrDefault().UnitId
-                                                         && d.MstArticle.IsLocked == true
-                                                         select d;
-
-                                    if (conversionUnit.Any())
+                                    Decimal baseQuantity = objReceivingReceiptItem.Quantity * 1;
+                                    if (conversionUnit.FirstOrDefault().Multiplier > 0)
                                     {
-                                        Decimal baseQuantity = objReceivingReceiptItem.Quantity * 1;
-                                        if (conversionUnit.FirstOrDefault().Multiplier > 0)
-                                        {
-                                            baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
-                                        }
-
-                                        Decimal amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost;
-                                        Decimal baseCost = amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId);
-                                        if (baseQuantity > 0)
-                                        {
-                                            baseCost = (amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId)) / baseQuantity;
-                                        }
-
-                                        Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
-                                        {
-                                            RRId = Convert.ToInt32(RRId),
-                                            POId = purchaseOrderItems.FirstOrDefault().POId,
-                                            ItemId = item.FirstOrDefault().Id,
-                                            Particulars = purchaseOrderItems.FirstOrDefault().Remarks,
-                                            UnitId = item.FirstOrDefault().UnitId,
-                                            Quantity = objReceivingReceiptItem.Quantity,
-                                            Cost = purchaseOrderItems.FirstOrDefault().BaseCost,
-                                            Amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost,
-                                            VATId = item.FirstOrDefault().InputTaxId,
-                                            VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
-                                            VATAmount = ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId),
-                                            WTAXId = item.FirstOrDefault().WTaxTypeId,
-                                            WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
-                                            WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate, item.FirstOrDefault().WTaxTypeId),
-                                            BranchId = objReceivingReceiptItem.BranchId,
-                                            BaseUnitId = item.FirstOrDefault().UnitId,
-                                            BaseQuantity = baseQuantity,
-                                            BaseCost = baseCost
-                                        };
-
-                                        db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
+                                        baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                                     }
+
+                                    Decimal amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost;
+                                    Decimal baseCost = amount - ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate);
+                                    if (baseQuantity > 0)
+                                    {
+                                        baseCost = (amount - ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate)) / baseQuantity;
+                                    }
+
+                                    Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
+                                    {
+                                        RRId = Convert.ToInt32(RRId),
+                                        POId = objReceivingReceiptItem.POId,
+                                        ItemId = item.FirstOrDefault().Id,
+                                        Particulars = objReceivingReceiptItem.Particulars,
+                                        UnitId = item.FirstOrDefault().UnitId,
+                                        Quantity = objReceivingReceiptItem.Quantity,
+                                        Cost = objReceivingReceiptItem.BaseCost,
+                                        Amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost,
+                                        VATId = item.FirstOrDefault().InputTaxId,
+                                        VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
+                                        VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate),
+                                        WTAXId = item.FirstOrDefault().WTaxTypeId,
+                                        WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
+                                        WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate),
+                                        BranchId = objReceivingReceiptItem.BranchId,
+                                        BaseUnitId = item.FirstOrDefault().UnitId,
+                                        BaseQuantity = baseQuantity,
+                                        BaseCost = baseCost
+                                    };
+
+                                    db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
                                 }
                             }
                         }
@@ -551,10 +502,10 @@ namespace easyfis.ModifiedApiControllers
                                                     Amount = amount,
                                                     VATId = objReceivingReceiptItem.VATId,
                                                     VATPercentage = objReceivingReceiptItem.VATPercentage,
-                                                    VATAmount = ComputeVATAmount(objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.VATId),
+                                                    VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage),
                                                     WTAXId = objReceivingReceiptItem.WTAXId,
                                                     WTAXPercentage = objReceivingReceiptItem.WTAXPercentage,
-                                                    WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage, objReceivingReceiptItem.WTAXId),
+                                                    WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage),
                                                     BranchId = objReceivingReceiptItem.BranchId,
                                                     BaseUnitId = item.FirstOrDefault().UnitId,
                                                     BaseQuantity = baseQuantity,
@@ -712,10 +663,10 @@ namespace easyfis.ModifiedApiControllers
                                                     updateReceivingReceiptItem.Amount = amount;
                                                     updateReceivingReceiptItem.VATId = objReceivingReceiptItem.VATId;
                                                     updateReceivingReceiptItem.VATPercentage = objReceivingReceiptItem.VATPercentage;
-                                                    updateReceivingReceiptItem.VATAmount = ComputeVATAmount(objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.VATId);
+                                                    updateReceivingReceiptItem.VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage);
                                                     updateReceivingReceiptItem.WTAXId = objReceivingReceiptItem.WTAXId;
                                                     updateReceivingReceiptItem.WTAXPercentage = objReceivingReceiptItem.WTAXPercentage;
-                                                    updateReceivingReceiptItem.WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage, objReceivingReceiptItem.WTAXId);
+                                                    updateReceivingReceiptItem.WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage);
                                                     updateReceivingReceiptItem.BranchId = objReceivingReceiptItem.BranchId;
                                                     updateReceivingReceiptItem.BaseUnitId = item.FirstOrDefault().UnitId;
                                                     updateReceivingReceiptItem.BaseQuantity = baseQuantity;
