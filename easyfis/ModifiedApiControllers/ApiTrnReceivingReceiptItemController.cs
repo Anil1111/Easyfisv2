@@ -205,25 +205,25 @@ namespace easyfis.ModifiedApiControllers
                                             group d by new
                                             {
                                                 PurchaseOrder = d.TrnPurchaseOrder,
-                                                ItemId = d.ItemId,
+                                                d.ItemId,
                                                 ItemCode = d.MstArticle.ManualArticleCode,
                                                 ItemDescription = d.MstArticle.Article,
-                                                BaseUnitId = d.BaseUnitId,
+                                                d.BaseUnitId,
                                                 BaseUnit = d.MstUnit1.Unit,
-                                                BaseCost = d.BaseCost
+                                                d.BaseCost
                                             } into g
                                             select new
                                             {
                                                 POId = g.Key.PurchaseOrder.Id,
-                                                ItemId = g.Key.ItemId,
-                                                ItemCode = g.Key.ItemCode,
-                                                ItemDescription = g.Key.ItemDescription,
+                                                g.Key.ItemId,
+                                                g.Key.ItemCode,
+                                                g.Key.ItemDescription,
                                                 Particulars = g.Key.PurchaseOrder.Remarks,
                                                 Amount = g.Sum(d => d.Amount),
-                                                BaseUnitId = g.Key.BaseUnitId,
-                                                BaseUnit = g.Key.BaseUnit,
+                                                g.Key.BaseUnitId,
+                                                g.Key.BaseUnit,
                                                 BaseQuantity = g.Sum(d => d.BaseQuantity),
-                                                BaseCost = g.Key.BaseCost
+                                                g.Key.BaseCost
                                             };
 
             if (groupedPurchaseOrderItems.Any())
@@ -315,168 +315,145 @@ namespace easyfis.ModifiedApiControllers
         {
             try
             {
-                var currentUser = from d in db.MstUsers
-                                  where d.UserId == User.Identity.GetUserId()
-                                  select d;
-
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
                     var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
-                    var userForms = from d in db.MstUserForms
-                                    where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("ReceivingReceiptDetail")
-                                    select d;
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("ReceivingReceiptDetail") select d;
+                    IQueryable<Data.TrnReceivingReceipt> receivingReceipt = from d in db.TrnReceivingReceipts where d.Id == Convert.ToInt32(RRId) select d;
 
-                    if (userForms.Any())
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
                     {
-                        if (userForms.FirstOrDefault().CanAdd)
-                        {
-                            var receivingReceipt = from d in db.TrnReceivingReceipts
-                                                   where d.Id == Convert.ToInt32(RRId)
-                                                   select d;
-
-                            if (receivingReceipt.Any())
-                            {
-                                if (!receivingReceipt.FirstOrDefault().IsLocked)
-                                {
-                                    foreach (var objReceivingReceiptItem in objReceivingReceiptItems)
-                                    {
-                                        var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems
-                                                                        where d.POId == Convert.ToInt32(objReceivingReceiptItem.POId)
-                                                                        && d.BaseQuantity > 0
-                                                                        && d.TrnPurchaseOrder.IsLocked == true
-                                                                        group d by new
-                                                                        {
-                                                                            PurchaseOrder = d.TrnPurchaseOrder,
-                                                                            ItemId = d.ItemId,
-                                                                            ItemDescription = d.MstArticle.Article,
-                                                                            BaseUnitId = d.BaseUnitId,
-                                                                            BaseCost = d.BaseCost
-                                                                        } into g
-                                                                        select new
-                                                                        {
-                                                                            BranchId = g.Key.PurchaseOrder.BranchId,
-                                                                            POId = g.Key.PurchaseOrder.Id,
-                                                                            ItemId = g.Key.ItemId,
-                                                                            ItemDescription = g.Key.ItemDescription,
-                                                                            Particulars = g.Key.PurchaseOrder.Remarks,
-                                                                            Amount = g.Sum(d => d.Amount),
-                                                                            BaseUnitId = g.Key.BaseUnitId,
-                                                                            BaseQuantity = g.Sum(d => d.BaseQuantity),
-                                                                            BaseCost = g.Key.BaseCost
-                                                                        };
-
-                                        if (groupedPurchaseOrderItems.Any())
-                                        {
-                                            var purchaseOrderItems = from d in groupedPurchaseOrderItems.ToList().OrderBy(d => d.ItemDescription)
-                                                                     where d.ItemId == objReceivingReceiptItem.ItemId
-                                                                     && d.BaseCost == objReceivingReceiptItem.BaseCost
-                                                                     select new
-                                                                     {
-                                                                         BranchId = d.BranchId,
-                                                                         POId = d.POId,
-                                                                         ItemId = d.ItemId,
-                                                                         Particulars = d.Particulars,
-                                                                         Amount = d.Amount,
-                                                                         BaseUnitId = d.BaseUnitId,
-                                                                         BaseQuantity = d.BaseQuantity,
-                                                                         BaseCost = d.BaseCost
-                                                                     };
-
-                                            if (purchaseOrderItems.Any())
-                                            {
-                                                var item = from d in db.MstArticles
-                                                           where d.Id == purchaseOrderItems.FirstOrDefault().ItemId
-                                                           && d.ArticleTypeId == 1
-                                                           && d.IsLocked == true
-                                                           select d;
-
-                                                if (item.Any())
-                                                {
-                                                    var conversionUnit = from d in db.MstArticleUnits
-                                                                         where d.ArticleId == item.FirstOrDefault().Id
-                                                                         && d.UnitId == item.FirstOrDefault().UnitId
-                                                                         && d.MstArticle.IsLocked == true
-                                                                         select d;
-
-                                                    if (conversionUnit.Any())
-                                                    {
-                                                        Decimal baseQuantity = objReceivingReceiptItem.Quantity * 1;
-                                                        if (conversionUnit.FirstOrDefault().Multiplier > 0)
-                                                        {
-                                                            baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
-                                                        }
-
-                                                        Decimal amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost;
-                                                        Decimal baseCost = amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId);
-                                                        if (baseQuantity > 0)
-                                                        {
-                                                            baseCost = (amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId)) / baseQuantity;
-                                                        }
-
-                                                        Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
-                                                        {
-                                                            RRId = Convert.ToInt32(RRId),
-                                                            POId = purchaseOrderItems.FirstOrDefault().POId,
-                                                            ItemId = item.FirstOrDefault().Id,
-                                                            Particulars = purchaseOrderItems.FirstOrDefault().Particulars,
-                                                            UnitId = item.FirstOrDefault().UnitId,
-                                                            Quantity = objReceivingReceiptItem.Quantity,
-                                                            Cost = purchaseOrderItems.FirstOrDefault().BaseCost,
-                                                            Amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost,
-                                                            VATId = item.FirstOrDefault().InputTaxId,
-                                                            VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
-                                                            VATAmount = ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId),
-                                                            WTAXId = item.FirstOrDefault().WTaxTypeId,
-                                                            WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
-                                                            WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate, item.FirstOrDefault().WTaxTypeId),
-                                                            BranchId = objReceivingReceiptItem.BranchId,
-                                                            BaseUnitId = item.FirstOrDefault().UnitId,
-                                                            BaseQuantity = baseQuantity,
-                                                            BaseCost = baseCost
-                                                        };
-
-                                                        db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
-                                                        db.SubmitChanges();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    Decimal receivingReceiptItemTotalAmount = 0;
-
-                                    if (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Any())
-                                    {
-                                        receivingReceiptItemTotalAmount = receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Sum(d => d.Amount);
-                                    }
-
-                                    var updateReceivingReceiptAmount = receivingReceipt.FirstOrDefault();
-                                    updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
-                                    db.SubmitChanges();
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot apply purchase order items to receiving receipt item if the current receiving receipt detail is locked.");
-                                }
-                            }
-                            else
-                            {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current receiving receipt details are not found in the server. Please add new receiving receipt first before proceeding.");
-                            }
-                        }
-                        else
-                        {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new receiving receipt item in this receiving receipt detail page.");
-                        }
+                        returnMessage = "Sorry. You have no access in this receiving receipt detail page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanAdd)
+                    {
+                        returnMessage = "Sorry. You have no rights to add new receiving receipt item in this receiving receipt detail page.";
+                    }
+                    else if (!receivingReceipt.Any())
+                    {
+                        returnMessage = "These current receiving receipt details are not found in the server. Please add new receiving receipt first before proceeding.";
+                    }
+                    else if (receivingReceipt.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot apply purchase order items to receiving receipt item if the current receiving receipt detail is locked.";
+                    }
+                    else if (!objReceivingReceiptItems.Any())
+                    {
+                        returnMessage = "There are no purchase order items.";
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this receiving receipt detail page.");
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        foreach (var objReceivingReceiptItem in objReceivingReceiptItems)
+                        {
+                            var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
+                                                     where d.POId == Convert.ToInt32(objReceivingReceiptItems.FirstOrDefault().POId)
+                                                     && d.BaseQuantity > 0
+                                                     && d.TrnPurchaseOrder.IsLocked == true
+                                                     && d.ItemId == objReceivingReceiptItem.ItemId
+                                                     && d.BaseCost == objReceivingReceiptItem.BaseCost
+                                                     group d by new
+                                                     {
+                                                         d.POId,
+                                                         d.TrnPurchaseOrder.Remarks,
+                                                         d.ItemId,
+                                                         d.BaseCost
+                                                     } into g
+                                                     select new
+                                                     {
+                                                         g.Key.POId,
+                                                         g.Key.Remarks,
+                                                         g.Key.ItemId,
+                                                         g.Key.BaseCost
+                                                     };
+
+                            if (purchaseOrderItems.Any())
+                            {
+                                var item = from d in db.MstArticles
+                                           where d.Id == purchaseOrderItems.FirstOrDefault().ItemId
+                                           && d.ArticleTypeId == 1
+                                           && d.IsLocked == true
+                                           select d;
+
+                                if (item.Any())
+                                {
+                                    var conversionUnit = from d in db.MstArticleUnits
+                                                         where d.ArticleId == item.FirstOrDefault().Id
+                                                         && d.UnitId == item.FirstOrDefault().UnitId
+                                                         && d.MstArticle.IsLocked == true
+                                                         select d;
+
+                                    if (conversionUnit.Any())
+                                    {
+                                        Decimal baseQuantity = objReceivingReceiptItem.Quantity * 1;
+                                        if (conversionUnit.FirstOrDefault().Multiplier > 0)
+                                        {
+                                            baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
+                                        }
+
+                                        Decimal amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost;
+                                        Decimal baseCost = amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId);
+                                        if (baseQuantity > 0)
+                                        {
+                                            baseCost = (amount - ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId)) / baseQuantity;
+                                        }
+
+                                        Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
+                                        {
+                                            RRId = Convert.ToInt32(RRId),
+                                            POId = purchaseOrderItems.FirstOrDefault().POId,
+                                            ItemId = item.FirstOrDefault().Id,
+                                            Particulars = purchaseOrderItems.FirstOrDefault().Remarks,
+                                            UnitId = item.FirstOrDefault().UnitId,
+                                            Quantity = objReceivingReceiptItem.Quantity,
+                                            Cost = purchaseOrderItems.FirstOrDefault().BaseCost,
+                                            Amount = objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost,
+                                            VATId = item.FirstOrDefault().InputTaxId,
+                                            VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
+                                            VATAmount = ComputeVATAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().InputTaxId),
+                                            WTAXId = item.FirstOrDefault().WTaxTypeId,
+                                            WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
+                                            WTAXAmount = ComputeWTAXAmount(objReceivingReceiptItem.Quantity * purchaseOrderItems.FirstOrDefault().BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate, item.FirstOrDefault().WTaxTypeId),
+                                            BranchId = objReceivingReceiptItem.BranchId,
+                                            BaseUnitId = item.FirstOrDefault().UnitId,
+                                            BaseQuantity = baseQuantity,
+                                            BaseCost = baseCost
+                                        };
+
+                                        db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
+                                    }
+                                }
+                            }
+                        }
+
+                        db.SubmitChanges();
+
+                        Decimal receivingReceiptItemTotalAmount = 0;
+
+                        if (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Any())
+                        {
+                            receivingReceiptItemTotalAmount = receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Sum(d => d.Amount);
+                        }
+
+                        var updateReceivingReceiptAmount = receivingReceipt.FirstOrDefault();
+                        updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
+                        db.SubmitChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, returnMessage);
                     }
                 }
                 else
