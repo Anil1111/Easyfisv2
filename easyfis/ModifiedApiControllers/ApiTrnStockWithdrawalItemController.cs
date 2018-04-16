@@ -168,124 +168,102 @@ namespace easyfis.ModifiedApiControllers
         {
             try
             {
-                var currentUser = from d in db.MstUsers
-                                  where d.UserId == User.Identity.GetUserId()
-                                  select d;
-
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
                 if (currentUser.Any())
                 {
-                    var currentUserId = currentUser.FirstOrDefault().Id;
-                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
+                    Int32 currentUserId = currentUser.FirstOrDefault().Id;
+                    Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
-                    var userForms = from d in db.MstUserForms
-                                    where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("StockWithdrawalDetail")
-                                    select d;
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
+                    IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(SWId) select d;
+                    IQueryable<Data.MstArticle> item = from d in db.MstArticles where d.Id == objStockWithdrawalItem.ItemId && d.IsInventory == true && d.Kitting != 2 && d.IsLocked == true select d;
+                    IQueryable<Data.MstArticleInventory> itemInventories = from d in db.MstArticleInventories
+                                                                           where d.ArticleId == objStockWithdrawalItem.ItemId && d.BranchId == currentBranchId
+                                                                           && d.Quantity > 0 && d.MstArticle.IsInventory == true && d.MstArticle.IsLocked == true
+                                                                           select d;
 
-                    if (userForms.Any())
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
                     {
-                        if (userForms.FirstOrDefault().CanAdd)
+                        returnMessage = "Sorry. You have no access for this stock withdrawal page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanAdd)
+                    {
+                        returnMessage = "Sorry. You have no rights to add stock withdrawal item.";
+                    }
+                    else if (!stockWithdrawal.Any())
+                    {
+                        returnMessage = "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.";
+                    }
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot add new stock withdrawal item if the current stock withdrawal detail is locked.";
+                    }
+                    else if (!item.Any())
+                    {
+                        returnMessage = "The selected item was not found in the server.";
+                    }
+                    else if (!itemInventories.Any())
+                    {
+                        returnMessage = "The selected item has no inventory code.";
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        var conversionUnit = from d in db.MstArticleUnits
+                                             where d.ArticleId == objStockWithdrawalItem.ItemId
+                                             && d.UnitId == objStockWithdrawalItem.UnitId
+                                             && d.MstArticle.IsLocked == true
+                                             select d;
+
+                        if (conversionUnit.Any())
                         {
-                            var stockWithdrawal = from d in db.TrnStockWithdrawals
-                                                  where d.Id == Convert.ToInt32(SWId)
-                                                  select d;
-
-                            if (stockWithdrawal.Any())
+                            Decimal baseQuantity = objStockWithdrawalItem.Quantity * 1;
+                            if (conversionUnit.FirstOrDefault().Multiplier > 0)
                             {
-                                if (!stockWithdrawal.FirstOrDefault().IsLocked)
-                                {
-                                    var item = from d in db.MstArticles
-                                               where d.Id == objStockWithdrawalItem.ItemId
-                                               && d.IsInventory == true
-                                               && d.Kitting != 2
-                                               && d.IsLocked == true
-                                               select d;
-
-                                    if (item.Any())
-                                    {
-                                        var conversionUnit = from d in db.MstArticleUnits
-                                                             where d.ArticleId == objStockWithdrawalItem.ItemId
-                                                             && d.UnitId == objStockWithdrawalItem.UnitId
-                                                             && d.MstArticle.IsLocked == true
-                                                             select d;
-
-                                        if (conversionUnit.Any())
-                                        {
-                                            var itemInventories = from d in db.MstArticleInventories
-                                                                  where d.ArticleId == objStockWithdrawalItem.ItemId
-                                                                  && d.BranchId == currentBranchId
-                                                                  && d.Quantity > 0
-                                                                  && d.MstArticle.IsInventory == true
-                                                                  && d.MstArticle.IsLocked == true
-                                                                  select d;
-
-                                            if (itemInventories.Any())
-                                            {
-                                                Decimal baseQuantity = objStockWithdrawalItem.Quantity * 1;
-                                                if (conversionUnit.FirstOrDefault().Multiplier > 0)
-                                                {
-                                                    baseQuantity = objStockWithdrawalItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
-                                                }
-
-                                                Decimal baseCost = objStockWithdrawalItem.Amount;
-                                                if (baseQuantity > 0)
-                                                {
-                                                    baseCost = objStockWithdrawalItem.Amount / baseQuantity;
-                                                }
-
-                                                Data.TrnStockWithdrawalItem newStockWithdrawalItem = new Data.TrnStockWithdrawalItem
-                                                {
-                                                    SWId = Convert.ToInt32(SWId),
-                                                    ItemId = objStockWithdrawalItem.ItemId,
-                                                    ItemInventoryId = objStockWithdrawalItem.ItemInventoryId,
-                                                    Particulars = objStockWithdrawalItem.Particulars,
-                                                    UnitId = objStockWithdrawalItem.UnitId,
-                                                    Quantity = objStockWithdrawalItem.Quantity,
-                                                    Cost = objStockWithdrawalItem.Cost,
-                                                    Amount = objStockWithdrawalItem.Amount,
-                                                    BaseUnitId = item.FirstOrDefault().UnitId,
-                                                    BaseQuantity = baseQuantity,
-                                                    BaseCost = baseCost,
-                                                };
-
-                                                db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
-                                                db.SubmitChanges();
-
-                                                return Request.CreateResponse(HttpStatusCode.OK);
-                                            }
-                                            else
-                                            {
-                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no inventory code.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
-                                    }
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot add new stock withdrawal item if the current stock withdrawal detail is locked.");
-                                }
+                                baseQuantity = objStockWithdrawalItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                             }
-                            else
+
+                            Decimal baseCost = objStockWithdrawalItem.Amount;
+                            if (baseQuantity > 0)
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.");
+                                baseCost = objStockWithdrawalItem.Amount / baseQuantity;
                             }
+
+                            Data.TrnStockWithdrawalItem newStockWithdrawalItem = new Data.TrnStockWithdrawalItem
+                            {
+                                SWId = Convert.ToInt32(SWId),
+                                ItemId = objStockWithdrawalItem.ItemId,
+                                ItemInventoryId = objStockWithdrawalItem.ItemInventoryId,
+                                Particulars = objStockWithdrawalItem.Particulars,
+                                UnitId = objStockWithdrawalItem.UnitId,
+                                Quantity = objStockWithdrawalItem.Quantity,
+                                Cost = objStockWithdrawalItem.Cost,
+                                Amount = objStockWithdrawalItem.Amount,
+                                BaseUnitId = item.FirstOrDefault().UnitId,
+                                BaseQuantity = baseQuantity,
+                                BaseCost = baseCost,
+                            };
+
+                            db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
+                            db.SubmitChanges();
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to add new stock withdrawal item in this stock withdrawal detail page.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this stock withdrawal detail page.");
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
                     }
                 }
                 else
@@ -295,7 +273,7 @@ namespace easyfis.ModifiedApiControllers
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Debug.WriteLine(e.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
             }
         }
@@ -308,131 +286,103 @@ namespace easyfis.ModifiedApiControllers
         {
             try
             {
-                var currentUser = from d in db.MstUsers
-                                  where d.UserId == User.Identity.GetUserId()
-                                  select d;
-
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
                 if (currentUser.Any())
                 {
-                    var currentUserId = currentUser.FirstOrDefault().Id;
-                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
+                    Int32 currentUserId = currentUser.FirstOrDefault().Id;
+                    Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
-                    var userForms = from d in db.MstUserForms
-                                    where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("StockWithdrawalDetail")
-                                    select d;
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
+                    IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(SWId) select d;
+                    IQueryable<Data.TrnStockWithdrawalItem> stockWithdrawalItem = from d in db.TrnStockWithdrawalItems where d.Id == Convert.ToInt32(id) select d;
+                    IQueryable<Data.MstArticle> item = from d in db.MstArticles where d.Id == objStockWithdrawalItem.ItemId && d.IsInventory == true && d.Kitting != 2 && d.IsLocked == true select d;
+                    IQueryable<Data.MstArticleInventory> itemInventories = from d in db.MstArticleInventories
+                                                                           where d.ArticleId == objStockWithdrawalItem.ItemId && d.BranchId == currentBranchId
+                                                                           && d.Quantity > 0 && d.MstArticle.IsInventory == true && d.MstArticle.IsLocked == true
+                                                                           select d;
 
-                    if (userForms.Any())
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
                     {
-                        if (userForms.FirstOrDefault().CanEdit)
+                        returnMessage = "Sorry. You have no access for this stock withdrawal page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanAdd)
+                    {
+                        returnMessage = "Sorry. You have no rights to add stock withdrawal item.";
+                    }
+                    else if (!stockWithdrawal.Any())
+                    {
+                        returnMessage = "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.";
+                    }
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot add new stock withdrawal item if the current stock withdrawal detail is locked.";
+                    }
+                    else if (!stockWithdrawalItem.Any())
+                    {
+                        returnMessage = "This stock withdrawal item detail is no longer exist in the server.";
+                    }
+                    else if (!item.Any())
+                    {
+                        returnMessage = "The selected item was not found in the server.";
+                    }
+                    else if (!itemInventories.Any())
+                    {
+                        returnMessage = "The selected item has no inventory code.";
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        var conversionUnit = from d in db.MstArticleUnits
+                                             where d.ArticleId == objStockWithdrawalItem.ItemId
+                                             && d.UnitId == objStockWithdrawalItem.UnitId
+                                             && d.MstArticle.IsLocked == true
+                                             select d;
+
+                        if (conversionUnit.Any())
                         {
-                            var stockWithdrawal = from d in db.TrnStockWithdrawals
-                                                  where d.Id == Convert.ToInt32(SWId)
-                                                  select d;
-
-                            if (stockWithdrawal.Any())
+                            Decimal baseQuantity = objStockWithdrawalItem.Quantity * 1;
+                            if (conversionUnit.FirstOrDefault().Multiplier > 0)
                             {
-                                if (!stockWithdrawal.FirstOrDefault().IsLocked)
-                                {
-                                    var stockWithdrawalItem = from d in db.TrnStockWithdrawalItems
-                                                              where d.Id == Convert.ToInt32(id)
-                                                              select d;
-
-                                    if (stockWithdrawalItem.Any())
-                                    {
-                                        var item = from d in db.MstArticles
-                                                   where d.Id == objStockWithdrawalItem.ItemId
-                                                   && d.ArticleTypeId == 1
-                                                   && d.IsLocked == true
-                                                   select d;
-
-                                        if (item.Any())
-                                        {
-                                            var conversionUnit = from d in db.MstArticleUnits
-                                                                 where d.ArticleId == objStockWithdrawalItem.ItemId
-                                                                 && d.UnitId == objStockWithdrawalItem.UnitId
-                                                                 && d.MstArticle.IsLocked == true
-                                                                 select d;
-
-                                            if (conversionUnit.Any())
-                                            {
-                                                var itemInventories = from d in db.MstArticleInventories
-                                                                      where d.ArticleId == objStockWithdrawalItem.ItemId
-                                                                      && d.BranchId == currentBranchId
-                                                                      && d.Quantity > 0
-                                                                      && d.MstArticle.IsInventory == true
-                                                                      && d.MstArticle.IsLocked == true
-                                                                      select d;
-
-                                                if (itemInventories.Any())
-                                                {
-                                                    Decimal baseQuantity = objStockWithdrawalItem.Quantity * 1;
-                                                    if (conversionUnit.FirstOrDefault().Multiplier > 0)
-                                                    {
-                                                        baseQuantity = objStockWithdrawalItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
-                                                    }
-
-                                                    Decimal baseCost = objStockWithdrawalItem.Amount;
-                                                    if (baseQuantity > 0)
-                                                    {
-                                                        baseCost = objStockWithdrawalItem.Amount / baseQuantity;
-                                                    }
-
-                                                    var updateStockWithdrawalItem = stockWithdrawalItem.FirstOrDefault();
-                                                    updateStockWithdrawalItem.SWId = Convert.ToInt32(SWId);
-                                                    updateStockWithdrawalItem.ItemId = objStockWithdrawalItem.ItemId;
-                                                    updateStockWithdrawalItem.ItemInventoryId = objStockWithdrawalItem.ItemInventoryId;
-                                                    updateStockWithdrawalItem.Particulars = objStockWithdrawalItem.Particulars;
-                                                    updateStockWithdrawalItem.Quantity = objStockWithdrawalItem.Quantity;
-                                                    updateStockWithdrawalItem.UnitId = objStockWithdrawalItem.UnitId;
-                                                    updateStockWithdrawalItem.Cost = objStockWithdrawalItem.Cost;
-                                                    updateStockWithdrawalItem.Amount = objStockWithdrawalItem.Amount;
-                                                    updateStockWithdrawalItem.BaseUnitId = item.FirstOrDefault().UnitId;
-                                                    updateStockWithdrawalItem.BaseQuantity = baseQuantity;
-                                                    updateStockWithdrawalItem.BaseCost = baseCost;
-
-                                                    db.SubmitChanges();
-
-                                                    return Request.CreateResponse(HttpStatusCode.OK);
-                                                }
-                                                else
-                                                {
-                                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no inventory code.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item was not found in the server.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return Request.CreateResponse(HttpStatusCode.NotFound, "This stock withdrawal item detail is no longer exist in the server.");
-                                    }
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot update stock withdrawal item if the current stock withdrawal detail is locked.");
-                                }
+                                baseQuantity = objStockWithdrawalItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                             }
-                            else
+
+                            Decimal baseCost = objStockWithdrawalItem.Amount;
+                            if (baseQuantity > 0)
                             {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.");
+                                baseCost = objStockWithdrawalItem.Amount / baseQuantity;
                             }
+
+                            var updateStockWithdrawalItem = stockWithdrawalItem.FirstOrDefault();
+                            updateStockWithdrawalItem.SWId = Convert.ToInt32(SWId);
+                            updateStockWithdrawalItem.ItemId = objStockWithdrawalItem.ItemId;
+                            updateStockWithdrawalItem.ItemInventoryId = objStockWithdrawalItem.ItemInventoryId;
+                            updateStockWithdrawalItem.Particulars = objStockWithdrawalItem.Particulars;
+                            updateStockWithdrawalItem.Quantity = objStockWithdrawalItem.Quantity;
+                            updateStockWithdrawalItem.UnitId = objStockWithdrawalItem.UnitId;
+                            updateStockWithdrawalItem.Cost = objStockWithdrawalItem.Cost;
+                            updateStockWithdrawalItem.Amount = objStockWithdrawalItem.Amount;
+                            updateStockWithdrawalItem.BaseUnitId = item.FirstOrDefault().UnitId;
+                            updateStockWithdrawalItem.BaseQuantity = baseQuantity;
+                            updateStockWithdrawalItem.BaseCost = baseCost;
+                            db.SubmitChanges();
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else
                         {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to edit and update stock withdrawal item in this stock withdrawal detail page.");
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "The selected item has no unit conversion.");
                         }
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this stock withdrawal detail page.");
+                        return Request.CreateResponse(HttpStatusCode.OK, returnMessage);
                     }
                 }
                 else
@@ -461,59 +411,50 @@ namespace easyfis.ModifiedApiControllers
 
                 if (currentUser.Any())
                 {
-                    var currentUserId = currentUser.FirstOrDefault().Id;
+                    Int32 currentUserId = currentUser.FirstOrDefault().Id;
 
-                    var userForms = from d in db.MstUserForms
-                                    where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("StockWithdrawalDetail")
-                                    select d;
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
+                    IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(SWId) select d;
+                    IQueryable<Data.TrnStockWithdrawalItem> stockWithdrawalItem = from d in db.TrnStockWithdrawalItems where d.Id == Convert.ToInt32(id) select d;
 
-                    if (userForms.Any())
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
                     {
-                        if (userForms.FirstOrDefault().CanDelete)
-                        {
-                            var stockWithdrawal = from d in db.TrnStockWithdrawals
-                                                  where d.Id == Convert.ToInt32(SWId)
-                                                  select d;
-
-                            if (stockWithdrawal.Any())
-                            {
-                                if (!stockWithdrawal.FirstOrDefault().IsLocked)
-                                {
-                                    var stockWithdrawalItem = from d in db.TrnStockWithdrawalItems
-                                                              where d.Id == Convert.ToInt32(id)
-                                                              select d;
-
-                                    if (stockWithdrawalItem.Any())
-                                    {
-                                        db.TrnStockWithdrawalItems.DeleteOnSubmit(stockWithdrawalItem.First());
-                                        db.SubmitChanges();
-
-                                        return Request.CreateResponse(HttpStatusCode.OK);
-                                    }
-                                    else
-                                    {
-                                        return Request.CreateResponse(HttpStatusCode.NotFound, "This stock withdrawal item detail is no longer exist in the server.");
-                                    }
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "You cannot delete stock withdrawal item if the current stock withdrawal detail is locked.");
-                                }
-                            }
-                            else
-                            {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.");
-                            }
-                        }
-                        else
-                        {
-                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to delete stock withdrawal item in this stock withdrawal item detail page.");
-                        }
+                        returnMessage = "Sorry. You have no access in this stock withdrawal detail page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanDelete)
+                    {
+                        returnMessage = "Sorry. You have no rights to delete stock withdrawal item in this stock withdrawal item detail page.";
+                    }
+                    else if (!stockWithdrawal.Any())
+                    {
+                        returnMessage = "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.";
+                    }
+                    else if (!stockWithdrawal.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot delete stock withdrawal item if the current stock withdrawal detail is locked.";
+                    }
+                    else if (!stockWithdrawalItem.Any())
+                    {
+                        returnMessage = "This stock withdrawal item detail is no longer exist in the server.";
                     }
                     else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access in this stock withdrawal detail page.");
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        db.TrnStockWithdrawalItems.DeleteOnSubmit(stockWithdrawalItem.First());
+                        db.SubmitChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
                     }
                 }
                 else
@@ -523,7 +464,7 @@ namespace easyfis.ModifiedApiControllers
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
+                Debug.WriteLine(e.Message);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
             }
         }
