@@ -19,7 +19,7 @@ namespace easyfis.ModifiedApiControllers
         // ==========================
         // List Stock Withdrawal Item
         // ==========================
-        [Authorize, HttpGet, Route("api/stockWithdrawalItem/list/{INId}")]
+        [Authorize, HttpGet, Route("api/stockWithdrawalItem/list/{SWId}")]
         public List<Entities.TrnStockWithdrawalItem> ListStockWithdrawalItem(String SWId)
         {
             var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
@@ -122,42 +122,6 @@ namespace easyfis.ModifiedApiControllers
                            };
 
             return itemUnit.ToList();
-        }
-
-        // ========================
-        // Pop-Up List - Item Query
-        // ========================
-        [Authorize, HttpGet, Route("api/stockWithdrawalItem/popUp/list/itemQuery")]
-        public List<Entities.MstArticleInventory> PopUpListStockWithdrawalItemListItemQuery()
-        {
-            var currentUser = from d in db.MstUsers
-                              where d.UserId == User.Identity.GetUserId()
-                              select d;
-
-            var branchId = currentUser.FirstOrDefault().BranchId;
-
-            var itemInventories = from d in db.MstArticleInventories
-                                  where d.BranchId == branchId
-                                  && d.Quantity > 0
-                                  && d.MstArticle.IsInventory == true
-                                  && d.MstArticle.IsLocked == true
-                                  select new Entities.MstArticleInventory
-                                  {
-                                      Id = d.Id,
-                                      ArticleId = d.ArticleId,
-                                      ManualArticleCode = d.MstArticle.ManualArticleCode,
-                                      ManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
-                                      Article = d.MstArticle.Article,
-                                      UnitId = d.MstArticle.UnitId,
-                                      Unit = d.MstArticle.MstUnit.Unit,
-                                      InventoryCode = d.InventoryCode,
-                                      Price = d.MstArticle.Price,
-                                      Quantity = d.Quantity,
-                                      Cost = d.Cost,
-                                      Amount = d.Amount
-                                  };
-
-            return itemInventories.ToList();
         }
 
         // =========================
@@ -432,7 +396,7 @@ namespace easyfis.ModifiedApiControllers
                     {
                         returnMessage = "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.";
                     }
-                    else if (!stockWithdrawal.FirstOrDefault().IsLocked)
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
                     {
                         returnMessage = "You cannot delete stock withdrawal item if the current stock withdrawal detail is locked.";
                     }

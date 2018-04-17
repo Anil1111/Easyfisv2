@@ -38,6 +38,8 @@ namespace easyfis.ModifiedApiControllers
                                         SWNumber = d.SWNumber,
                                         SWDate = d.SWDate.ToShortDateString(),
                                         DocumentReference = d.DocumentReference,
+                                        SIBranch = d.TrnSalesInvoice.MstBranch.Branch,
+                                        SINumber = d.TrnSalesInvoice.SINumber,
                                         Remarks = d.Remarks,
                                         IsLocked = d.IsLocked,
                                         CreatedBy = d.MstUser2.FullName,
@@ -47,6 +49,53 @@ namespace easyfis.ModifiedApiControllers
                                     };
 
             return stockWiithdrawals.ToList();
+        }
+
+        // =======================
+        // Detail Stock Withdrawal
+        // =======================
+        [Authorize, HttpGet, Route("api/stockWithdrawal/detail/{id}")]
+        public Entities.TrnStockWithdrawal DetailStockWithdrawal(String id)
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
+            var stockWithdrawal = from d in db.TrnStockWithdrawals
+                                where d.BranchId == branchId
+                                && d.Id == Convert.ToInt32(id)
+                                select new Entities.TrnStockWithdrawal
+                                {
+                                    Id = d.Id,
+                                    SWNumber = d.SWNumber,
+                                    SWDate = d.SWDate.ToShortDateString(),
+                                    DocumentReference = d.DocumentReference,
+                                    SIBranchId = d.SIBranchId,
+                                    SIId = d.SIId,
+                                    Remarks = d.Remarks,
+                                    ContactPerson = d.ContactPerson,
+                                    ContactNumber = d.ContactNumber,
+                                    Address = d.Address,
+                                    PreparedById = d.PreparedById,
+                                    CheckedById = d.CheckedById,
+                                    ApprovedById = d.ApprovedById,
+                                    IsLocked = d.IsLocked,
+                                    CreatedBy = d.MstUser2.FullName,
+                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                    UpdatedBy = d.MstUser4.FullName,
+                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                                };
+
+            if (stockWithdrawal.Any())
+            {
+                return stockWithdrawal.FirstOrDefault();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // ==============================
@@ -241,7 +290,7 @@ namespace easyfis.ModifiedApiControllers
         // =====================
         // Lock Stock Withdrawal
         // =====================
-        [Authorize, HttpPost, Route("api/stockWithdrawal/lock/{id}")]
+        [Authorize, HttpPut, Route("api/stockWithdrawal/lock/{id}")]
         public HttpResponseMessage LockStockWithdrawal(Entities.TrnStockWithdrawal objStockWithdrawal, String id)
         {
             try
@@ -344,7 +393,7 @@ namespace easyfis.ModifiedApiControllers
         // =======================
         // Unlock Stock Withdrawal
         // =======================
-        [Authorize, HttpPost, Route("api/stockWithdrawal/unlock/{id}")]
+        [Authorize, HttpPut, Route("api/stockWithdrawal/unlock/{id}")]
         public HttpResponseMessage UnlockStockWithdrawal(String id)
         {
             try
@@ -412,7 +461,7 @@ namespace easyfis.ModifiedApiControllers
         // =======================
         // Delete Stock Withdrawal
         // =======================
-        [Authorize, HttpPost, Route("api/stockWithdrawal/delete/{id}")]
+        [Authorize, HttpDelete, Route("api/stockWithdrawal/delete/{id}")]
         public HttpResponseMessage DeleteStockWithdrawal(String id)
         {
             try
@@ -441,7 +490,7 @@ namespace easyfis.ModifiedApiControllers
                     {
                         returnMessage = "Data not found. These stock withdrawal details are not found in the server.";
                     }
-                    else if (!stockWithdrawal.FirstOrDefault().IsLocked)
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
                     {
                         returnMessage = "Delete Error. You cannot delete stock withdrawal if the current stock withdrawal record is locked.";
                     }

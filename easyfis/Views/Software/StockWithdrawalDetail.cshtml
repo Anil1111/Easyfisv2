@@ -1,1 +1,2381 @@
-﻿
+﻿@model easyfis.Entities.MstUserForm
+@{
+    // =====================
+    // User Rights Variables
+    // =====================
+    var canAdd = Model.CanAdd;
+    var canEdit = Model.CanEdit;
+    var canDelete = Model.CanDelete;
+    var canLock = Model.CanLock;
+    var canUnlock = Model.CanUnlock;
+    var canPrint = Model.CanPrint;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!-- Title of the Page -->
+    <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
+    <title>Stock Withdrawal Detail</title>
+
+    <!-- CSS StyleSheets-->
+    @Styles.Render("~/Content/Software-css")
+</head>
+<body>
+    <div id="o-wrapper" class="o-wrapper">
+        <main class="o-content">
+            @Html.Partial("_SoftwareHeader")
+            <section class="content-header">
+                <div class="container">
+                    <h3>
+                        Stock Withdrawal Detail
+                    </h3>
+                    <p>
+                        <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
+                        <i class="fa fa-home fa-fw"></i> &nbsp; <a href="#" onclick="getUserBranches()" style="color: white;">@ViewData["Branch"]</a>
+                    </p>
+                </div>
+            </section>
+            <section class="container">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12" align="right">
+                                <button class="btn btn-primary " id="cmdStockWithdrawalJournal" onclick="stockWithdrawalJournal_OnClick()"><i class="fa fa-book"></i> Journal</button>
+                                @{
+                                    if (canLock)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockWithdrawalSaveLock" onclick="btnStockWithdrawalSaveLock_OnClick()"><i class="fa fa-lock"></i> Lock</button>
+                                    }
+                                    if (canUnlock)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockWithdrawalEdit" onclick="btnStockWithdrawalEdit_OnClick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                    }
+                                    if (canPrint)
+                                    {
+                                        <button class="btn btn-primary " id="cmdStockWithdrawalPrint" onclick="btnStockWithdrawalPrint_OnClick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                }
+                                <button onclick="window.location.href = '/Software/StockWithdrawal'" class="btn btn-danger " id="cmdStockWithdrawalClose"><i class="fa fa-times"></i> Close</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="">
+                            <form class="form-horizontal" role="form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Branch</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalBranch"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">SW Number</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control requiredStockWithdrawal" id="stockWithdrawalSWNumber" disabled />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">SW Date</label>
+                                            <div class="col-sm-8">
+                                                <div class="" id="cboStockWithdrawalSWDate"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Doc Reference</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control  requiredStockWithdrawal" id="stockWithdrawal_DocReference" placeholder="Manual SW Number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">SI Branch</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalSIBranch"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">SI Number</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalSINumber"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Remarks</label>
+                                            <div class="col-sm-8">
+                                                <textarea rows="5" class="form-control textarea-custom requiredStockWithdrawal" id="stockWithdrawal_Remarks" placeholder="Particulars"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Contact Person</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control  requiredStockWithdrawal" id="stockWithdrawal_ContactPerson" placeholder="Manual SW Number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Contact Number</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control  requiredStockWithdrawal" id="stockWithdrawal_ContactNumber" placeholder="Manual SW Number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Address</label>
+                                            <div class="col-sm-8">
+                                                <textarea rows="5" class="form-control textarea-custom requiredStockWithdrawal" id="stockWithdrawal_Address" placeholder="Particulars"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Prepared by</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalPreparedBy"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Checked by</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalCheckedBy"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Approved by</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalApprovedBy"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <ul class="nav nav-tabs" role="tablist" id="myTab">
+                    <li role="presentation" class="active"><a data-toggle="tab" href="#Items" id="itemTabId">Items</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#InventoryEntries" id="inventoryEntryTabId">Inventory Entries</a></li>
+                </ul>
+                <br />
+                <div class="tab-content">
+                    <div id="Items" class="tab-pane active">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="StockWithdrawalInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboStockWithdrawalItemsShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right">
+                                            @{
+                                                if (canAdd)
+                                                {
+                                                    <button class="btn btn-primary " id="btnAddStockWithdrawalItem" onclick="cmdAddStockWithdrawalItem_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row" align="left">
+                                    <div class="col-lg-12">
+                                        <div id="stockWithdrawalItemFlexGrid" class="grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItem">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItem">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItem"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItem">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItem">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body" style="padding-bottom: 0px;">
+                                <div class="row">
+                                    <div class="col-md-6">
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <dl class="dl-horizontal">
+                                            <dt>
+                                                <b>Total Amount</b>
+                                            </dt>
+                                            <dd>
+                                                <input type="text" class="form-control numberField" id="totalSWAmount" placeholder="0.00" disabled />
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="InventoryEntries" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="InventoryEntryInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboInventoryEntryShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                                <div id="inventoryFlexGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridInventoryEntry">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridInventoryEntry"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridInventoryEntry">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        User stamp
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p>Created by:</p>
+                                <div style="padding-left: 10px;">
+                                    <i class="fa fa-key fa-fw"></i> <label id="createdBy">NA</label>
+                                    <br />
+                                    <small><i class="fa fa-calendar fa-fw"></i> &nbsp;<span id="createdDate">mm/dd/yyyy</span></small>
+                                </div>
+                                <br />
+                            </div>
+                            <div class="col-md-6">
+                                <p>Updated by:</p>
+                                <div style="padding-left: 10px;">
+                                    <i class="fa fa-key fa-fw"></i> <label id="updatedBy">NA</label>
+                                    <br />
+                                    <small><i class="fa fa-calendar fa-fw"></i> &nbsp;<span id="updatedDate">mm/dd/yyyy</span></small>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            @Html.Partial("_SoftwareFooter")
+        </main>
+    </div>
+    <div id="c-mask" class="c-mask"></div>
+
+    <!-- ========================== -->
+    <!-- Stock Withdrawal Item Detail -->
+    <!-- ========================== -->
+    <div class="modal fade" id="stockWithdrawalItemsEdit" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" id="stockWithdrawalItemsModalLabel">Stock Withdrawal Item</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <span id="loadingModalItem"></span>
+                    </center>
+                    <div id="SWItemContent">
+                        <dl class="dl-horizontal">
+                            <dt>Item</dt>
+                            <dd>
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 30%">
+                                            <div class="comboBox-wide" id="cboStockWithdrawalItemItemCode"></div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 69%">
+                                            <div class="comboBox-wide" id="cboStockWithdrawalItemItemDescription"></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </dd>
+                            <dt>Particulars</dt>
+                            <dd><textarea rows="5" class="form-control textarea-custom requiredStockWithdrawalItem" id="stockWithdrawalItem_Particulars"></textarea></dd>
+                            <dt>Inventory Code</dt>
+                            <dd><div class="comboBox-wide" id="cboStockWithdrawalItemInventoryCode"></div></dd>
+                            <dt>Quantity</dt>
+                            <dd><input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="stockWithdrawalItem_Quantity" placeholder="0.00" /></dd>
+                            <dt>Unit</dt>
+                            <dd><div class="comboBox-wide" id="cboStockWithdrawalItemUnit"></div></dd>
+                            <dt>Cost</dt>
+                            <dd><input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="stockWithdrawalItem_Cost" placeholder="0.00" disabled /></dd>
+                            <dt>Amount</dt>
+                            <dd><input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="stockWithdrawalItem_Amount" placeholder="0.00" disabled /></dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary " id="cmdSaveStockWithdrawalItemButton" onclick="cmdStockWithdrawalItemSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="cmdStockWithdrawalItemDetailCloseButton" class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Journal Detail -->
+    <div class="modal fade" id="journalDetail" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="journalModalLabel"> Journal</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <span id="loadingJournalGridList"></span>
+                    </center>
+                    <div id="journal_Content">
+                        <div id="journalFlexGrid" style="max-height: 250px;"></div>
+                        <br /><br />
+                        <div class="row">
+                            <div class="col-md-7"></div>
+                            <div class="col-md-5">
+                                <dl class="dl-horizontal">
+                                    <dt>
+                                        <b>Total Debit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="totalDebitInJournal" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Credit</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="totalCreditInJournal" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Variance</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control  numberField  requiredStockWithdrawalItem" id="variance" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cmdJournalDetailCloseButton" class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- Stock-Withdrawal Items Delete Modal Confirmation -->
+    <!-- ============================================== -->
+    <div class="modal fade" id="deleteStockWithdrawalItemsConfirm" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this stock transfer item?
+                </div>
+                <div class="modal-footer">
+                    <button id="cmdConfirmDeleteStockWithdrawalItems" class="btn btn-danger" onclick="cmdStockWithdrawalItemsConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="cmdConfirmDeleteStockWithdrawalItemsCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Scripts.Render("~/Scripts/Software-js")
+    <script type="text/javascript">
+        // ================
+        // Global Variables
+        // ================
+        var cboStockWithdrawalBranch = new wijmo.input.ComboBox('#cboStockWithdrawalBranch');
+        var cboStockWithdrawalSIBranch = new wijmo.input.ComboBox('#cboStockWithdrawalSIBranch');
+        var cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber');
+        var cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy');
+        var cboStockWithdrawalCheckedBy = new wijmo.input.ComboBox('#cboStockWithdrawalCheckedBy');
+        var cboStockWithdrawalApprovedBy = new wijmo.input.ComboBox('#cboStockWithdrawalApprovedBy');
+        var cboStockWithdrawalSWDate = new wijmo.input.InputDate('#cboStockWithdrawalSWDate');
+        var isLocked = false;
+        var stockWithdrawalItemCollectionView;
+        var stockWithdrawalItemFlexGrid;
+        var cboStockWithdrawalItemItemCode = new wijmo.input.ComboBox('#cboStockWithdrawalItemItemCode');
+        var cboStockWithdrawalItemItemDescription = new wijmo.input.ComboBox('#cboStockWithdrawalItemItemDescription');
+        var cboStockWithdrawalItemInventoryCode = new wijmo.input.ComboBox('#cboStockWithdrawalItemInventoryCode');
+        var cboStockWithdrawalItemUnit = new wijmo.input.ComboBox('#cboStockWithdrawalItemUnit');
+        var stockWithdrawalItemId = 0;
+        var inventoryCollectionView;
+        var inventoryFlexGrid = new wijmo.grid.FlexGrid('#inventoryFlexGrid');
+        var journalCollectionView;
+        var journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
+        var isFromBranchSelect = false;
+        var cboStockWithdrawalItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockWithdrawalItemsShowNumberOfRows');
+        var btnMoveToFirstPageGridItem = document.getElementById('btnMoveToFirstPageGridItem');
+        var btnMoveToPreviousPageGridItem = document.getElementById('btnMoveToPreviousPageGridItem');
+        var btnMoveToNextPageGridItem = document.getElementById('btnMoveToNextPageGridItem');
+        var btnMoveToLastPageGridItem = document.getElementById('btnMoveToLastPageGridItem');
+        var btnCurrentPageGridItem = document.getElementById('btnCurrentPageGridItem');
+        var cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows');
+        var btnMoveToFirstPageGridInventoryEntry = document.getElementById('btnMoveToFirstPageGridInventoryEntry');
+        var btnMoveToPreviousPageGridInventoryEntry = document.getElementById('btnMoveToPreviousPageGridInventoryEntry');
+        var btnMoveToNextPageGridInventoryEntry = document.getElementById('btnMoveToNextPageGridInventoryEntry');
+        var btnMoveToLastPageGridInventoryEntry = document.getElementById('btnMoveToLastPageGridInventoryEntry');
+        var isInventoryClicked = false;
+        var isSIBranchChanged = false;
+        var SIIdSelectedId = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getParam(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+            var regexS = "[\\?&]" + name + "=([^&#]*)";
+            var regex = new RegExp(regexS);
+            var results = regex.exec(window.location.href);
+
+            if (results == null)
+                return "";
+            else {
+                return results[1];
+            }
+        }
+
+        // ========================
+        // GET Branch for Combo Box
+        // ========================
+        function getBranchesForComboBox() {
+            NProgress.start();
+            var branchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawal/dropdown/list/branch',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            branchesObservableArray.push({
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    cboStockWithdrawalBranch.dispose();
+                    cboStockWithdrawalBranch = new wijmo.input.ComboBox('#cboStockWithdrawalBranch', {
+                        disabled: true,
+                        isEditable: false,
+                        placeholder: "Select Branch",
+                        itemsSource: branchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            if (isFromBranchSelect) {
+                                getToBranchesForComboBox();
+                            }
+                        }
+                    });
+
+                    if (!isFromBranchSelect) {
+                        getToBranchesForComboBox();
+                    }
+                }
+            });
+        }
+
+        // ===========================
+        // GET To Branch for Combo Box
+        // ===========================
+        function getToBranchesForComboBox() {
+            NProgress.start();
+            var branchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawal/dropdown/list/salesInvoice/branch',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            branchesObservableArray.push({
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    cboStockWithdrawalSIBranch.dispose();
+                    cboStockWithdrawalSIBranch = new wijmo.input.ComboBox('#cboStockWithdrawalSIBranch', {
+                        isEditable: false,
+                        placeholder: "Select Branch",
+                        itemsSource: branchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            isSIBranchChanged = true;
+
+                            getArticleForComboBox();
+                        }
+                    });
+
+                    getArticleForComboBox();
+                }
+            });
+        }
+
+        // =========================
+        // GET Article for Combo Box
+        // =========================
+        function getArticleForComboBox() {
+            var articlesObservableArray = new wijmo.collections.ObservableArray();
+            if (cboStockWithdrawalSIBranch.selectedValue != null) {
+                $.ajax({
+                    url: '/api/stockWithdrawal/dropdown/list/salesInvoice/' + cboStockWithdrawalSIBranch.selectedValue,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                articlesObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    SINumber: results[i]["SINumber"],
+                                    SIDetails: results[i]["SINumber"] + " (" + results[i]["SIDate"] + ")",
+                                });
+                            }
+                        }
+
+                        var disabled = true;
+                        if (!isLocked) {
+                            if (results.length > 0) {
+                                disabled = false;
+                            }
+                        }
+
+                        cboStockWithdrawalSINumber.dispose();
+                        cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: articlesObservableArray,
+                            displayMemberPath: "SINumber",
+                            selectedValuePath: "Id",
+                            selectedValue: SIIdSelectedId
+                        });
+
+                        if (!isSIBranchChanged) {
+                            getUsersForComboBox();
+                        }
+                    }
+                });
+            } else {
+                cboStockWithdrawalSINumber.dispose();
+                cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
+                    disabled: true,
+                    isEditable: false,
+                    itemsSource: articlesObservableArray,
+                });
+
+                if (!isSIBranchChanged) {
+                    getUsersForComboBox();
+                }
+            }
+        }
+
+        // =======================
+        // GET Users for Combo Box
+        // =======================
+        function getUsersForComboBox() {
+            var usersObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawal/dropdown/list/users',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            usersObservableArray.push({
+                                Id: results[i]["Id"],
+                                FullName: results[i]["FullName"]
+                            });
+                        }
+                    }
+
+                    cboStockWithdrawalPreparedBy.dispose();
+                    cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy', {
+                        disabled: true,
+                        isEditable: false,
+                        placeholder: "Select User",
+                        itemsSource: usersObservableArray,
+                        displayMemberPath: "FullName",
+                        selectedValuePath: "Id"
+                    });
+
+                    cboStockWithdrawalCheckedBy.dispose();
+                    cboStockWithdrawalCheckedBy = new wijmo.input.ComboBox('#cboStockWithdrawalCheckedBy', {
+                        isEditable: false,
+                        placeholder: "Select User",
+                        itemsSource: usersObservableArray,
+                        displayMemberPath: "FullName",
+                        selectedValuePath: "Id"
+                    });
+
+                    cboStockWithdrawalApprovedBy.dispose();
+                    cboStockWithdrawalApprovedBy = new wijmo.input.ComboBox('#cboStockWithdrawalApprovedBy', {
+                        isEditable: false,
+                        placeholder: "Select User",
+                        itemsSource: usersObservableArray,
+                        displayMemberPath: "FullName",
+                        selectedValuePath: "Id"
+                    });
+
+                    getStockWithdrawalById();
+                }
+            });
+        }
+
+        // =======================
+        // GET Stock Withdrawal by Id
+        // =======================
+        function getStockWithdrawalById() {
+            if (document.location.search.length > 0) {
+                var id = getParam("id");
+                $.ajax({
+                    url: '/api/stockWithdrawal/detail/' + id,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results != null) {
+                            cboStockWithdrawalBranch.selectedValue = results.BranchId;
+                            document.getElementById('stockWithdrawalSWNumber').value = results.SWNumber;
+                            cboStockWithdrawalSWDate.dispose();
+                            cboStockWithdrawalSWDate = new wijmo.input.InputDate('#cboStockWithdrawalSWDate', {
+                                format: 'MM-dd-yyyy',
+                                value: new Date(results.SWDate),
+                            });
+                            document.getElementById('stockWithdrawal_DocReference').value = results.DocumentReference;
+                            cboStockWithdrawalSIBranch.selectedValue = results.SIBranchId;
+                            cboStockWithdrawalSINumber.selectedValue = results.SIId;
+                            SIIdSelectedId = results.SIId;
+                            document.getElementById('stockWithdrawal_Remarks').value = results.Remarks;
+                            document.getElementById('stockWithdrawal_ContactPerson').value = results.ContactPerson;
+                            document.getElementById('stockWithdrawal_ContactNumber').value = results.ContactNumber;
+                            document.getElementById('stockWithdrawal_Address').value = results.Address;
+                            cboStockWithdrawalPreparedBy.selectedValue = results.PreparedById;
+                            cboStockWithdrawalCheckedBy.selectedValue = results.CheckedById;
+                            cboStockWithdrawalApprovedBy.selectedValue = results.ApprovedById;
+
+                            if (results.IsLocked == true) {
+                                cboStockWithdrawalSWDate.disabled = true;
+                                cboStockWithdrawalSIBranch.disabled = true;
+                                cboStockWithdrawalSINumber.disabled = true;
+                                document.getElementById('stockWithdrawal_Remarks').disabled = true;
+                                document.getElementById('stockWithdrawal_DocReference').disabled = true;
+                                document.getElementById('stockWithdrawal_ContactPerson').disabled = true;
+                                document.getElementById('stockWithdrawal_ContactNumber').disabled = true;
+                                document.getElementById('stockWithdrawal_Address').disabled = true;
+                                cboStockWithdrawalCheckedBy.disabled = true;
+                                cboStockWithdrawalApprovedBy.disabled = true;
+
+                                $("#cmdStockWithdrawalSaveLock").prop("disabled", true);
+                                $('#btnAddStockWithdrawalItem').prop('disabled', true);
+
+                                isLocked = true;
+                            } else {
+                                $("#cmdStockWithdrawalJournal").prop("disabled", true);
+                                $("#cmdStockWithdrawalEdit").prop("disabled", true);
+                                $("#cmdStockWithdrawalPrint").prop("disabled", true);
+                            }
+
+                            createCboShowRows();
+                            createStockWithdrawalItemsFlexgrid();
+                        } else {
+                            alert("No Data.");
+                            window.location = "/Software/StockWithdrawal";
+                        }
+                    }
+                });
+            } else {
+                alert("No Id Parameter Value");
+                window.location = "/Software/StockWithdrawal";
+            }
+        }
+
+        // ============================
+        // GET Stock Withdrawal Item List
+        // ============================
+        function getItem() {
+            var itemsObservableArray = new wijmo.collections.ObservableArray;
+            if (document.location.search.length > 0) {
+                var SWId = getParam("id");
+                $.ajax({
+                    url: '/api/stockWithdrawalItem/list/' + SWId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var totalAmount = 0;
+                        if (results.length > 0) {
+                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockWithdrawalItem_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
+                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockWithdrawalItem_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
+                            if (isLocked) {
+                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockWithdrawalItem_OnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockWithdrawalItem_OnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                            }
+
+                            for (i = 0; i < results.length; i++) {
+                                itemsObservableArray.push({
+                                    EditId: btnEditId,
+                                    DeleteId: btnDeleteId,
+                                    Id: results[i]["Id"],
+                                    SWId: results[i]["SWId"],
+                                    ItemId: results[i]["ItemId"],
+                                    ItemCode: results[i]["ItemManualCode"],
+                                    ItemManualArticleOldCode: results[i]["ItemSKUCode"],
+                                    ItemDescription: results[i]["ItemDescription"],
+                                    ItemInventoryId: results[i]["ItemInventoryId"],
+                                    ItemInventoryCode: results[i]["ItemInventoryCode"],
+                                    Particulars: results[i]["Particulars"],
+                                    UnitId: results[i]["UnitId"],
+                                    Unit: results[i]["Unit"],
+                                    Quantity: results[i]["Quantity"],
+                                    QuantityDisplay: parseFloat(results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Cost: results[i]["Cost"],
+                                    CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    BaseUnitId: results[i]["BaseUnitId"],
+                                    BaseUnit: results[i]["BaseUnit"],
+                                    BaseQuantity: results[i]["BaseQuantity"],
+                                    BaseQuantityDisplay: parseFloat(results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    BaseCost: results[i]["BaseCost"],
+                                    BaseCostDisplay: parseFloat(results[i]["BaseCost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                });
+
+                                totalAmount += results[i]["Amount"];
+                            }
+                        }
+
+                        document.getElementById('totalSWAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        NProgress.done();
+                    }
+                });
+            }
+
+            return itemsObservableArray;
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboStockWithdrawalItemsShowNumberOfRows.dispose();
+            cboStockWithdrawalItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockWithdrawalItemsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboStockWithdrawalItemsShowNumberOfRows.selectedValue;
+                        stockWithdrawalItemCollectionView.pageSize = parseInt(numberOfRows);
+                        stockWithdrawalItemCollectionView.refresh();
+                        stockWithdrawalItemFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            cboInventoryEntryShowNumberOfRows.dispose();
+            cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboInventoryEntryShowNumberOfRows.selectedValue;
+                        inventoryCollectionView.pageSize = parseInt(numberOfRows);
+                        inventoryCollectionView.refresh();
+                        inventoryFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItems() {
+            if (stockWithdrawalItemCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridItem').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridItem').style.display = 'block';
+            if (stockWithdrawalItemCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridItem.removeAttribute('disabled');
+                btnMoveToLastPageGridItem.removeAttribute('disabled');
+            } else if (stockWithdrawalItemCollectionView.pageIndex === (stockWithdrawalItemCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridItem.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
+                btnMoveToNextPageGridItem.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridItem.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridItem.removeAttribute('disabled');
+                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
+                btnMoveToNextPageGridItem.removeAttribute('disabled');
+                btnMoveToLastPageGridItem.removeAttribute('disabled');
+            }
+            btnCurrentPageGridItem.innerHTML = (stockWithdrawalItemCollectionView.pageIndex + 1) + ' / ' + stockWithdrawalItemCollectionView.pageCount;
+        }
+
+        // ======
+        //  Items
+        // ======
+        function createStockWithdrawalItemsFlexgrid() {
+            stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+            stockWithdrawalItemCollectionView.canFilter = true;
+            stockWithdrawalItemCollectionView.pageSize = cboStockWithdrawalItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#StockWithdrawalInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockWithdrawalItemCollectionView.refresh();
+            });
+
+            stockWithdrawalItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockWithdrawalItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
+            // Flex Grid for Items
+            stockWithdrawalItemFlexGrid = new wijmo.grid.FlexGrid('#stockWithdrawalItemFlexGrid');
+            stockWithdrawalItemFlexGrid.initialize({
+                columns: [
+                   @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
+                    {
+                        "header": "Barcode",
+                        "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": 110
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ItemManualArticleOldCode",
+                        "allowSorting": true,
+                        "width": 110
+                    },
+                    {
+                        "header": "Description",
+                        "binding": "ItemDescription",
+                        "allowSorting": true,
+                        "width": 150
+                    },
+                    {
+                        "header": "Particulars",
+                        "binding": "Particulars",
+                        "allowSorting": true,
+                        "width": 120
+                    },
+                    {
+                        "header": "Inventory Code",
+                        "binding": "ItemInventoryCode",
+                        "allowSorting": true,
+                        "width": 150
+                    },
+                    {
+                        "header": "Quantity",
+                        "binding": "QuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": 100
+                    },
+                    {
+                        "header": "Unit",
+                        "binding": "Unit",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "Cost",
+                        "binding": "CostDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": 100
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "AmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": 100
+                    },
+                    {
+                        "header": "Unit",
+                        "binding": "BaseUnit",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "Quantity",
+                        "binding": "BaseQuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": 100
+                    },
+                    {
+                        "header": "Cost",
+                        "binding": "BaseCostDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": 100
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: stockWithdrawalItemCollectionView,
+                isReadOnly: true,
+                @{
+                    if (canEdit)
+                    {
+                        if (canDelete)
+                        {
+                            <text>
+                                frozenColumns: 2,
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                frozenColumns: 1,
+                            </text>
+                        }
+                    }
+                    else
+                    {
+                        if (canDelete)
+                        {
+                            <text>
+                                frozenColumns: 1,
+                            </text>
+                        }
+                        else
+                        {
+                            <text>
+                                frozenColumns: 0,
+                            </text>
+                        }
+                    }
+                }
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            stockWithdrawalItemFlexGrid.trackChanges = true;
+
+            var hr = new wijmo.grid.Row();
+            stockWithdrawalItemFlexGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            stockWithdrawalItemFlexGrid.columnHeaders.rows.push(hr);
+            stockWithdrawalItemFlexGrid.columnHeaders.rows[0].allowMerging = true;
+
+            @{
+                if (canEdit)
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 13; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Delete";
+                                } else if (i == 2) {
+                                    columnName = "Barcode";
+                                } else if (i == 3) {
+                                    columnName = "SKU Code";
+                                } else if (i == 4) {
+                                    columnName = "Description";
+                                } else if (i == 5) {
+                                    columnName = "Particulars";
+                                } else if (i == 6) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 7) {
+                                    columnName = "Quantity";
+                                } else if (i == 8) {
+                                    columnName = "Unit";
+                                } else if (i == 9) {
+                                    columnName = "Cost";
+                                } else if (i == 10) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 11) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 11; j <= 13; j++) {
+                                            stockWithdrawalItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 10) {
+                                    stockWithdrawalItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 12; i++) {
+                                if (i == 0) {
+                                    columnName = "Edit";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 10) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 10; j <= 12; j++) {
+                                            stockWithdrawalItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 9) {
+                                    stockWithdrawalItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                }
+                else
+                {
+                    if (canDelete)
+                    {
+                        <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 12; i++) {
+                                if (i == 0) {
+                                    columnName = "Delete";
+                                } else if (i == 1) {
+                                    columnName = "Barcode";
+                                } else if (i == 2) {
+                                    columnName = "SKU Code";
+                                } else if (i == 3) {
+                                    columnName = "Description";
+                                } else if (i == 4) {
+                                    columnName = "Particulars";
+                                } else if (i == 5) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 6) {
+                                    columnName = "Quantity";
+                                } else if (i == 7) {
+                                    columnName = "Unit";
+                                } else if (i == 8) {
+                                    columnName = "Cost";
+                                } else if (i == 9) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 10) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 10; j <= 12; j++) {
+                                            stockWithdrawalItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 9) {
+                                    stockWithdrawalItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                    else
+                    {
+                         <text>
+                            var columnName = "";
+                            for (var i = 0; i <= 11; i++) {
+                                if (i == 0) {
+                                    columnName = "Barcode";
+                                } else if (i == 1) {
+                                    columnName = "SKU Code";
+                                } else if (i == 2) {
+                                    columnName = "Description";
+                                } else if (i == 3) {
+                                    columnName = "Particulars";
+                                } else if (i == 4) {
+                                    columnName = "Inventory Code";
+                                } else if (i == 5) {
+                                    columnName = "Quantity";
+                                } else if (i == 6) {
+                                    columnName = "Unit";
+                                } else if (i == 7) {
+                                    columnName = "Cost";
+                                } else if (i == 8) {
+                                    columnName = "Amount";
+                                } else {
+                                    if (i >= 9) {
+                                        columnName = "Basic Unit Conversion";
+                                        for (var j = 9; j <= 11; j++) {
+                                            stockWithdrawalItemFlexGrid.columnHeaders.columns[j].allowMerging = true;
+                                            stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, j, columnName);
+                                        }
+                                    }
+                                }
+
+                                if (i <= 8) {
+                                    stockWithdrawalItemFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                    stockWithdrawalItemFlexGrid.columnHeaders.setCellData(0, i, columnName);
+                                }
+                            }
+                        </text>
+                    }
+                }
+            }
+
+            updateNavigateButtonsItems();
+
+            btnMoveToFirstPageGridItem.addEventListener('click', function () {
+                stockWithdrawalItemCollectionView.moveToFirstPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToPreviousPageGridItem.addEventListener('click', function () {
+                stockWithdrawalItemCollectionView.moveToPreviousPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToNextPageGridItem.addEventListener('click', function () {
+                stockWithdrawalItemCollectionView.moveToNextPage();
+                updateNavigateButtonsItems();
+            });
+
+            btnMoveToLastPageGridItem.addEventListener('click', function () {
+                stockWithdrawalItemCollectionView.moveToLastPage();
+                updateNavigateButtonsItems();
+            });
+        }
+
+        // ======================================
+        // GET Item Id, Manual Code and Component
+        // ======================================
+        function getArticleItemForManualCodeAndComponent(itemId, inventoryId, unitId) {
+            var articleInventoryItemsObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawalItem/dropdown/list/itemInventory/item',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            articleInventoryItemsObservableArray.push({
+                                Id: results[i]["Id"],
+                                ItemId: results[i]["ArticleId"],
+                                ItemCode: results[i]["ManualArticleCode"],
+                                ItemDescription: results[i]["Article"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                        $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                    } else {
+                        $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+                    }
+
+                    cboStockWithdrawalItemItemCode.dispose();
+                    cboStockWithdrawalItemItemCode = new wijmo.input.ComboBox('#cboStockWithdrawalItemItemCode', {
+                        disabled: disabled,
+                        isEditable: false,
+                        placeholder: "Select Code",
+                        itemsSource: articleInventoryItemsObservableArray,
+                        displayMemberPath: "ItemCode",
+                        selectedValuePath: "ItemId",
+                        selectedValue: itemId,
+                        onSelectedIndexChanged: function () {
+                            cboStockWithdrawalItemItemDescription.selectedValue = this.selectedValue;
+                        }
+                    });
+
+                    cboStockWithdrawalItemItemDescription.dispose();
+                    cboStockWithdrawalItemItemDescription = new wijmo.input.ComboBox('#cboStockWithdrawalItemItemDescription', {
+                        disabled: disabled,
+                        isEditable: false,
+                        placeholder: "Select Item",
+                        itemsSource: articleInventoryItemsObservableArray,
+                        displayMemberPath: "ItemDescription",
+                        selectedValuePath: "ItemId",
+                        selectedValue: itemId,
+                        onSelectedIndexChanged: function () {
+                            cboStockWithdrawalItemItemCode.selectedValue = this.selectedValue;
+                            cboStockWithdrawalItemInventoryCode.selectedValue = this.selectedItem["Id"];
+                            getArticleInventoryCode(inventoryId, unitId);
+                        }
+                    });
+
+                    getArticleInventoryCode(inventoryId, unitId);
+                }
+            });
+        }
+
+        // ==================
+        // GET Inventory Code
+        // ==================
+        function getArticleInventoryCode(inventoryId, unitId) {
+            var articleInventoriesObservableArray = new wijmo.collections.ObservableArray();
+            var itemId = cboStockWithdrawalItemItemDescription.selectedValue;
+            $.ajax({
+                url: '/api/stockWithdrawalItem/dropdown/list/itemInventoryCode/' + itemId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            articleInventoriesObservableArray.push({
+                                Id: results[i]["Id"],
+                                InventoryCode: results[i]["InventoryCode"],
+                                Cost: results[i]["Cost"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        var InventoryType = "@ViewData["InventoryType"]";
+                        if (InventoryType == "Moving Average") {
+                            disabled = true;
+                        } else {
+                            disabled = false;
+                        }
+                    } else {
+                        $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+                    }
+
+                    cboStockWithdrawalItemInventoryCode.dispose();
+                    cboStockWithdrawalItemInventoryCode = new wijmo.input.ComboBox('#cboStockWithdrawalItemInventoryCode', {
+                        disabled: disabled,
+                        isEditable: false,
+                        placeholder: "Select Inventory Code",
+                        itemsSource: articleInventoriesObservableArray,
+                        displayMemberPath: "InventoryCode",
+                        selectedValuePath: "Id",
+                        selectedValue: inventoryId,
+                        onSelectedIndexChanged: function () {
+                            if (cboStockWithdrawalItemInventoryCode.selectedValue != null) {
+                                document.getElementById("stockWithdrawalItem_Cost").value = formatDecimalValues(cboStockWithdrawalItemInventoryCode.selectedItem["Cost"]);
+                                computeSWItemAmount();
+                            }
+                        }
+                    });
+
+                    getStockWithdrawalItemUnitForComboBox(unitId);
+                }
+            });
+        }
+
+        // =============
+        // Get Item Unit
+        // =============
+        function getStockWithdrawalItemUnitForComboBox(unitId) {
+            var stockWithdrawalUnitsObservableArray = new wijmo.collections.ObservableArray();
+            var itemId = cboStockWithdrawalItemItemDescription.selectedValue;
+            $.ajax({
+                url: '/api/stockWithdrawalItem/dropdown/list/itemUnit/' + itemId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            stockWithdrawalUnitsObservableArray.push({
+                                UnitId: results[i]["UnitId"],
+                                Unit: results[i]["Unit"],
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                    } else {
+                        $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+                    }
+
+                    cboStockWithdrawalItemUnit.dispose();
+                    cboStockWithdrawalItemUnit = new wijmo.input.ComboBox('#cboStockWithdrawalItemUnit', {
+                        isEditable: false,
+                        placeholder: "Select Unit",
+                        itemsSource: stockWithdrawalUnitsObservableArray,
+                        displayMemberPath: "Unit",
+                        selectedValuePath: "UnitId",
+                        selectedValue: unitId
+                    });
+
+                    $("#loadingModalItem").hide();
+                    $("#SWItemContent").show();
+                }
+            });
+        }
+
+        // ==========================
+        // Stock Withdrawal Save - Lock
+        // ==========================
+        function btnStockWithdrawalSaveLock_OnClick() {
+            var stockWithdrawalObject = new Object();
+            stockWithdrawalObject.SWDate = cboStockWithdrawalSWDate.value.toLocaleDateString();
+            stockWithdrawalObject.SIBranchId = cboStockWithdrawalSIBranch.selectedValue;
+            stockWithdrawalObject.SIId = cboStockWithdrawalSINumber.selectedValue;
+            stockWithdrawalObject.Remarks = document.getElementById('stockWithdrawal_Remarks').value;
+            stockWithdrawalObject.DocumentReference = document.getElementById('stockWithdrawal_DocReference').value;
+            stockWithdrawalObject.ContactPerson = document.getElementById('stockWithdrawal_ContactPerson').value;
+            stockWithdrawalObject.ContactNumber = document.getElementById('stockWithdrawal_ContactNumber').value;
+            stockWithdrawalObject.Address = document.getElementById('stockWithdrawal_Address').value;
+            stockWithdrawalObject.PreparedById = cboStockWithdrawalPreparedBy.selectedValue;
+            stockWithdrawalObject.CheckedById = cboStockWithdrawalCheckedBy.selectedValue;
+            stockWithdrawalObject.ApprovedById = cboStockWithdrawalApprovedBy.selectedValue;
+            var stockWithdrawalData = JSON.stringify(stockWithdrawalObject);
+
+            var isValid = true;
+            $('.requiredStockWithdrawal').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('cmdStockWithdrawalSaveLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $("#cmdStockWithdrawalJournal").prop("disabled", true);
+                $("#cmdStockWithdrawalSaveLock").prop("disabled", true);
+                $("#cmdStockWithdrawalEdit").prop("disabled", true);
+                $("#cmdStockWithdrawalPrint").prop("disabled", true);
+                $("#cmdStockWithdrawalClose").prop("disabled", true);
+
+                var id = getParam("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockWithdrawal/lock/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: stockWithdrawalData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Lock Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('cmdStockWithdrawalSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockWithdrawalSaveLock").prop("disabled", false);
+                            $("#cmdStockWithdrawalClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('cmdStockWithdrawalSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockWithdrawalSaveLock").prop("disabled", false);
+                            $("#cmdStockWithdrawalClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('cmdStockWithdrawalSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockWithdrawalSaveLock").prop("disabled", false);
+                            $("#cmdStockWithdrawalClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ============================
+        // Edit Stock Withdrawal - Unlock
+        // ============================
+        function btnStockWithdrawalEdit_OnClick() {
+            document.getElementById('cmdStockWithdrawalEdit').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
+            $("#cmdStockWithdrawalJournal").prop("disabled", true);
+            $("#cmdStockWithdrawalSaveLock").prop("disabled", true);
+            $("#cmdStockWithdrawalEdit").prop("disabled", true);
+            $("#cmdStockWithdrawalPrint").prop("disabled", true);
+            $("#cmdStockWithdrawalClose").prop("disabled", true);
+
+            var id = getParam("id");
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/stockWithdrawal/unlock/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Unlock Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('cmdStockWithdrawalEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#cmdStockWithdrawalEdit").prop("disabled", false);
+                        $("#cmdStockWithdrawalJournal").prop("disabled", false);
+                        $("#cmdStockWithdrawalPrint").prop("disabled", false);
+                        $("#cmdStockWithdrawalClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('cmdStockWithdrawalEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#cmdStockWithdrawalEdit").prop("disabled", false);
+                        $("#cmdStockWithdrawalJournal").prop("disabled", false);
+                        $("#cmdStockWithdrawalPrint").prop("disabled", false);
+                        $("#cmdStockWithdrawalClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('cmdStockWithdrawalEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#cmdStockWithdrawalEdit").prop("disabled", false);
+                        $("#cmdStockWithdrawalJournal").prop("disabled", false);
+                        $("#cmdStockWithdrawalPrint").prop("disabled", false);
+                        $("#cmdStockWithdrawalClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ========
+        // Print SW
+        // ========
+        function btnStockWithdrawalPrint_OnClick() {
+            var stockWithdrawalId = getParam("id");
+            var pirntLink = "/RepStockWithdrawal/StockWithdrawal?StockWithdrawalId=" + stockWithdrawalId;
+            window.open(pirntLink, '_blank');
+        }
+
+        // =======================
+        // ADD Stock Withdrawal Item
+        // =======================
+        function cmdAddStockWithdrawalItem_OnClick() {
+            $('#stockWithdrawalItemsEdit').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+            $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+
+            $('.requiredStockWithdrawal').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            $("#loadingModalItem").show();
+            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#SWItemContent").hide();
+
+            stockWithdrawalItemId = 0;
+            getArticleItemForManualCodeAndComponent(0, 0, 0);
+            document.getElementById('stockWithdrawalItem_Particulars').value = "NA";
+            document.getElementById('stockWithdrawalItem_Quantity').value = formatDecimalValues(1);
+            document.getElementById('stockWithdrawalItem_Cost').value = formatDecimalValues(0);
+            document.getElementById('stockWithdrawalItem_Amount').value = formatDecimalValues(0);
+        }
+
+        // ========================
+        // EDIT Stock Withdrawal Item
+        // ========================
+        function btnEditStockWithdrawalItem_OnClick() {
+            $('#stockWithdrawalItemsEdit').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#loadingModalItem").show();
+            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#SWItemContent").hide();
+
+            document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+            $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+
+            $('.requiredStockWithdrawal').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            stockWithdrawalItemCollectionView.editItem(stockWithdrawalItemCollectionView.currentItem);
+            var item = stockWithdrawalItemCollectionView.currentEditItem;
+            stockWithdrawalItemId = item.Id;
+            getArticleItemForManualCodeAndComponent(item.ItemId, item.ItemInventoryId, item.UnitId);
+            document.getElementById('stockWithdrawalItem_Particulars').value = item.Particulars;
+            document.getElementById('stockWithdrawalItem_Quantity').value = formatDecimalValues(item.Quantity);
+            document.getElementById('stockWithdrawalItem_Cost').value = formatDecimalValues(item.Cost);
+            document.getElementById('stockWithdrawalItem_Amount').value = formatDecimalValues(item.Amount);
+        }
+
+        $('#stockWithdrawalItem_Quantity').keyup(function () {
+            computeSWItemAmount();
+        });
+
+        $('#stockWithdrawalItem_Cost').keyup(function () {
+            computeSWItemAmount();
+        });
+
+        function computeSWItemAmount() {
+            var stockWithdrawal_Quantity = document.getElementById('stockWithdrawalItem_Quantity').value.replace(/\,/g, '');
+            var stockWithdrawal_Cost = document.getElementById('stockWithdrawalItem_Cost').value.replace(/\,/g, '');
+            var totalAmount = stockWithdrawal_Quantity * stockWithdrawal_Cost;
+            document.getElementById('stockWithdrawalItem_Amount').value = formatDecimalValues(totalAmount);
+        }
+        
+        // ========================
+        // SAVE Stock Withdrawal Item
+        // ========================
+        function cmdStockWithdrawalItemSaveButton_OnClick() {
+            var SWId = getParam("id");
+            var stockWithdrawalItemObject = new Object();
+            stockWithdrawalItemObject.ItemId = cboStockWithdrawalItemItemDescription.selectedValue;
+            stockWithdrawalItemObject.ItemInventoryId = cboStockWithdrawalItemInventoryCode.selectedValue;
+            stockWithdrawalItemObject.Particulars = document.getElementById('stockWithdrawalItem_Particulars').value;
+            stockWithdrawalItemObject.UnitId = cboStockWithdrawalItemUnit.selectedValue;
+            stockWithdrawalItemObject.Quantity = document.getElementById('stockWithdrawalItem_Quantity').value;
+            stockWithdrawalItemObject.Cost = document.getElementById('stockWithdrawalItem_Cost').value;
+            stockWithdrawalItemObject.Amount = document.getElementById('stockWithdrawalItem_Amount').value;
+            var stockWithdrawalItemData = JSON.stringify(stockWithdrawalItemObject);
+
+            var isValid = true;
+            $('.requiredStockWithdrawal').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", true);
+                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", true);
+
+                if (stockWithdrawalItemId == 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/api/stockWithdrawalItem/add/' + SWId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: stockWithdrawalItemData,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Save Successful");
+                                $('#stockWithdrawalItemsEdit').modal('hide');
+
+                                stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+                                stockWithdrawalItemFlexGrid.itemsSource = stockWithdrawalItemCollectionView;
+                                stockWithdrawalItemFlexGrid.trackChanges = true;
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            }
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: "PUT",
+                        url: '/api/stockWithdrawalItem/update/' + stockWithdrawalItemId + '/' + SWId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: stockWithdrawalItemData,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Update Successful");
+
+                                $('#stockWithdrawalItemsEdit').modal('hide');
+
+                                stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+                                stockWithdrawalItemFlexGrid.itemsSource = stockWithdrawalItemCollectionView;
+                                stockWithdrawalItemFlexGrid.trackChanges = true;
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                $('#stockWithdrawalItemsEdit').modal('hide');
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#stockWithdrawalItemsEdit').modal('hide');
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                $('#stockWithdrawalItemsEdit').modal('hide');
+                                document.getElementById('cmdSaveStockWithdrawalItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#cmdSaveStockWithdrawalItemButton").prop("disabled", false);
+                                $("#cmdStockWithdrawalItemDetailCloseButton").prop("disabled", false);
+                            }
+                        }
+                    });
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ==========================
+        // DELETE Stock Withdrawal Item
+        // ==========================
+        function btnDeleteStockWithdrawalItem_OnClick() {
+            $('#deleteStockWithdrawalItemsConfirm').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmDeleteStockWithdrawalItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#cmdConfirmDeleteStockWithdrawalItems").prop("disabled", false);
+            $("#cmdConfirmDeleteStockWithdrawalItemsCloseButton").prop("disabled", false);
+        }
+
+        // Confirm Delete Stock Withdrawal item
+        function cmdStockWithdrawalItemsConfirmDeleteButton_OnClick() {
+            document.getElementById('cmdConfirmDeleteStockWithdrawalItems').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+            $("#cmdConfirmDeleteStockWithdrawalItems").prop("disabled", true);
+            $("#cmdConfirmDeleteStockWithdrawalItemsCloseButton").prop("disabled", true);
+
+            stockWithdrawalItemCollectionView.editItem(stockWithdrawalItemCollectionView.currentItem);
+            var id = stockWithdrawalItemCollectionView.currentEditItem.Id;
+            var SWId = getParam("id");
+
+            $.ajax({
+                url: '/api/stockWithdrawalItem/delete/' + id + '/' + SWId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#deleteStockWithdrawalItemsConfirm').modal('hide');
+
+                        stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+                        stockWithdrawalItemFlexGrid.itemsSource = stockWithdrawalItemCollectionView;
+                        stockWithdrawalItemFlexGrid.trackChanges = true;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#deleteStockWithdrawalItemsConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockWithdrawalItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockWithdrawalItems").prop("disabled", false);
+                        $("#cmdConfirmDeleteStockWithdrawalItemsCloseButton").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteStockWithdrawalItemsConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockWithdrawalItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockWithdrawalItems").prop("disabled", false);
+                        $("#cmdConfirmDeleteStockWithdrawalItemsCloseButton").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#deleteStockWithdrawalItemsConfirm').modal('hide');
+                        document.getElementById('cmdConfirmDeleteStockWithdrawalItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#cmdConfirmDeleteStockWithdrawalItems").prop("disabled", false);
+                        $("#cmdConfirmDeleteStockWithdrawalItemsCloseButton").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ==================
+        // GET Inventory List
+        // ==================
+        function getInventoryEntries() {
+            NProgress.start();
+            var SWId = getParam('id');
+            var inventoryObservableArray = new wijmo.collections.ObservableArray;
+
+            $.ajax({
+                url: '/api/inventory/stockWithdrawal/list/' + SWId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+
+                            var InventoryDateResult = new Date(results[i]["InventoryDate"])
+                            var InventoryDate = ('0' + (InventoryDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + InventoryDateResult.getDate()).slice(-2) + '-' + InventoryDateResult.getFullYear();
+
+                            inventoryObservableArray.push({
+                                Id: results[i]["Id"],
+                                InventoryDate: InventoryDate,
+                                Branch: results[i]["Branch"],
+                                Article: results[i]["Article"],
+                                Particulars: results[i]["Particulars"],
+                                ArticleInventoryCode: results[i]["ArticleInventoryCode"],
+                                Quantity: results[i]["Quantity"],
+                                QuantityDisplay: parseFloat(results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                ArticleUnit: results[i]["ArticleUnit"],
+                                Amount: results[i]["Amount"],
+                                AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                            });
+                        }
+                    }
+
+                    NProgress.done();
+                }
+            });
+
+            return inventoryObservableArray;
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsInventoryEntry() {
+            if (inventoryCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'block';
+            if (inventoryCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
+            } else if (inventoryCollectionView.pageIndex === (inventoryCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToNextPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridInventoryEntry.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
+                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
+            }
+            btnCurrentPageGridInventoryEntry.innerHTML = (inventoryCollectionView.pageIndex + 1) + ' / ' + inventoryCollectionView.pageCount;
+        }
+
+        // ==================================
+        // On Page Load for Inventory Entries
+        // ==================================
+        function inventoryEntryTab() {
+            inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntries());
+            inventoryCollectionView.canFilter = true;
+            inventoryCollectionView.pageSize = cboInventoryEntryShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#InventoryEntryInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                inventoryCollectionView.refresh();
+            });
+
+            inventoryCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            inventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsInventoryEntry();
+            });
+
+            inventoryFlexGrid.dispose();
+            inventoryFlexGrid = new wijmo.grid.FlexGrid('#inventoryFlexGrid');
+            inventoryFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Date",
+                        "binding": "InventoryDate",
+                        "allowSorting": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Branch",
+                        "binding": "Branch",
+                        "allowSorting": true,
+                        "width": "1.5*",
+                    },
+                    {
+                        "header": "Item",
+                        "binding": "Article",
+                        "align": "left",
+                        "allowSorting": true,
+                        "width": "1.7*",
+                    },
+                    {
+                        "header": "Particulars",
+                        "binding": "Particulars",
+                        "align": "left",
+                        "allowSorting": true,
+                        "width": "1.5*",
+                    },
+                    {
+                        "header": "Inventory Code",
+                        "binding": "ArticleInventoryCode",
+                        "allowSorting": true,
+                        "width": "1.3*",
+                    },
+                    {
+                        "header": "Quantity",
+                        "binding": "QuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "1*",
+                    },
+                    {
+                        "header": "Unit",
+                        "binding": "ArticleUnit",
+                        "allowSorting": true,
+                        "width": "1*",
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "AmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "1*",
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: inventoryCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            inventoryFlexGrid.trackChanges = true;
+
+            if (!isInventoryClicked) {
+                updateNavigateButtonsInventoryEntry();
+
+                btnMoveToFirstPageGridInventoryEntry.addEventListener('click', function () {
+                    inventoryCollectionView.moveToFirstPage();
+                    updateNavigateButtonsInventoryEntry();
+                });
+
+                btnMoveToPreviousPageGridInventoryEntry.addEventListener('click', function () {
+                    inventoryCollectionView.moveToPreviousPage();
+                    updateNavigateButtonsInventoryEntry();
+                });
+
+                btnMoveToNextPageGridInventoryEntry.addEventListener('click', function () {
+                    inventoryCollectionView.moveToNextPage();
+                    updateNavigateButtonsInventoryEntry();
+                });
+
+                btnMoveToLastPageGridInventoryEntry.addEventListener('click', function () {
+                    inventoryCollectionView.moveToLastPage();
+                    updateNavigateButtonsInventoryEntry();
+                });
+
+                isInventoryClicked = true;
+            }
+        }
+
+        // ===========
+        // Get Journal
+        // ===========
+        function getJournalListForStockWithdrawal() {
+            var journalsObservableArray = new wijmo.collections.ObservableArray;
+            var SWId = getParam("id");
+
+            $.ajax({
+                url: '/api/jounal/stockWithdrawal/list/' + SWId,
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+
+                            var journalDateResult = new Date(results[i]["JournalDate"])
+                            var journalDate = ('0' + (journalDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + journalDateResult.getDate()).slice(-2) + '-' + journalDateResult.getFullYear();
+
+                            journalsObservableArray.push({
+                                Branch: results[i]["Branch"],
+                                JournalDate: journalDate,
+                                AccountCode: results[i]["AccountCode"],
+                                Account: results[i]["Account"],
+                                Article: results[i]["Article"],
+                                DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                            });
+
+                            var debitAmountTotal = 0;
+                            var creditAmountTotal = 0;
+
+                            var a = 0;
+                            while (a < results.length) {
+                                debitAmountTotal += results[a]["DebitAmount"];
+                                creditAmountTotal += results[a]["CreditAmount"];
+                                a++;
+                            }
+                        }
+
+                        document.getElementById('totalDebitInJournal').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById('totalCreditInJournal').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        var variance = debitAmountTotal - creditAmountTotal;
+                        document.getElementById('variance').value = variance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    }
+
+                    $("#loadingJournalGridList").hide();
+                    $("#journal_Content").show();
+                }
+            });
+
+            return journalsObservableArray;
+        }
+
+        // ============
+        // Journal List
+        // ============
+        function stockWithdrawalJournal_OnClick() {
+            $('#journalDetail').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#loadingJournalGridList").show();
+            document.getElementById("loadingJournalGridList").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#journal_Content").hide();
+
+            setTimeout(function () {
+                createJournalFlexgrid();
+            }, 500)
+        }
+
+        function createJournalFlexgrid() {
+            journalCollectionView = new wijmo.collections.CollectionView(getJournalListForStockWithdrawal());
+
+            journalFlexGrid.dispose();
+            journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
+            journalFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Branch",
+                        "binding": "Branch",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "Date",
+                        "binding": "JournalDate",
+                        "allowSorting": true,
+                        "width": "1.5*"
+                    },
+                    {
+                        "header": "Code",
+                        "binding": "AccountCode",
+                        "allowSorting": true,
+                        "width": "1.8*"
+                    },
+                    {
+                        "header": "Account",
+                        "binding": "Account",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "Article",
+                        "binding": "Article",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "Debit",
+                        "binding": "DebitAmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "2*",
+                    },
+                    {
+                        "header": "Credit",
+                        "binding": "CreditAmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "2*"
+                    }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: journalCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            journalFlexGrid.trackChanges = true;
+        }
+
+        // ===========
+        // OnLoad Page
+        // ===========
+        $(document).ready(function () {
+            getBranchesForComboBox();
+        });
+    </script>
+
+    <!-- ================================ -->
+    <!-- Tab Current Page on Load Scripts -->
+    <!-- ================================ -->
+    <script type="text/javascript">
+        // ====
+        // TABS
+        // ====
+        $('#itemTabId').click(function () {
+            $('#Items').show();
+            $('#InventoryEntries').hide();
+            NProgress.start();
+            stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+            stockWithdrawalItemCollectionView.canFilter = true;
+            stockWithdrawalItemCollectionView.pageSize = cboStockWithdrawalItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#StockWithdrawalInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockWithdrawalItemCollectionView.refresh();
+            });
+
+            stockWithdrawalItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockWithdrawalItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
+            stockWithdrawalItemFlexGrid.itemsSource = stockWithdrawalItemCollectionView;
+            stockWithdrawalItemFlexGrid.trackChanges = true;
+        });
+
+        $('#inventoryEntryTabId').click(function () {
+            $('#Items').hide();
+            $('#InventoryEntries').show();
+            NProgress.start();
+            inventoryEntryTab();
+        });
+
+        $(document).ready(function () {
+            $('#Items').show();
+            $('#InventoryEntries').hide();
+
+            $(document).on('show.bs.modal', '.modal', function (event) {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                $('.modal:visible').length && $(document.body).addClass('modal-open');
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+        function getUserBranches() {
+            $("#loadingUserBranches").show();
+            document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#userBranchContent").hide();
+
+            $('#userBranchesModal').modal({ show: true, backdrop: 'static' });
+
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+            $("#updateUserBranch").prop("disabled", false);
+            $("#closeUserBranch").prop("disabled", false);
+
+            var userBranchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/userBranch/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (userBranchesresults) {
+                    if (userBranchesresults.length > 0) {
+                        for (i = 0; i < userBranchesresults.length; i++) {
+                            userBranchesObservableArray.push({
+                                BranchId: userBranchesresults[i]["BranchId"],
+                                Branch: userBranchesresults[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    var currentBranch = "@ViewData["BranchId"]";
+                    cboUserBranches.dispose();
+                    cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches', {
+                        isEditable: false,
+                        placeholder: "Select Branches",
+                        itemsSource: userBranchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "BranchId",
+                        selectedValue: currentBranch
+                    });
+
+                    setTimeout(function () {
+                        $("#loadingUserBranches").hide();
+                        $("#userBranchContent").show();
+                    }, 500)
+                }
+            });
+        }
+
+        function updateUserBranchOnclick() {
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
+            $("#updateUserBranch").prop("disabled", true);
+            $("#closeUserBranch").prop("disabled", true);
+
+            var userBranchObject = new Object();
+            userBranchObject.BranchId = cboUserBranches.selectedValue;
+            var userBranchData = JSON.stringify(userBranchObject);
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/userBranch/update',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: userBranchData,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Update Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function () {
+                        toastr.error("Not Found");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    },
+                    500: function () {
+                        toastr.error("Bad Request");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    }
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        var slideLeft = new Menu({
+            wrapper: '#o-wrapper',
+            type: 'slide-left',
+            menuOpenerClass: '.c-button',
+            maskId: '#c-mask'
+        });
+
+        var slideLeftBtn = document.querySelector('#c-button--slide-left');
+
+        slideLeftBtn.addEventListener('click', function (e) {
+            e.preventDefault;
+            slideLeft.open();
+        });
+    </script>
+</body>
+</html>
