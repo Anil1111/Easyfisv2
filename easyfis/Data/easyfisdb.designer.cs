@@ -23462,6 +23462,8 @@ namespace easyfis.Data
 		
 		private System.Nullable<int> _STId;
 		
+		private System.Nullable<int> _SWId;
+		
 		private decimal _QuantityIn;
 		
 		private decimal _QuantityOut;
@@ -23488,6 +23490,8 @@ namespace easyfis.Data
 		
 		private EntityRef<TrnStockTransfer> _TrnStockTransfer;
 		
+		private EntityRef<TrnStockWithdrawal> _TrnStockWithdrawal;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -23512,6 +23516,8 @@ namespace easyfis.Data
     partial void OnOTIdChanged();
     partial void OnSTIdChanging(System.Nullable<int> value);
     partial void OnSTIdChanged();
+    partial void OnSWIdChanging(System.Nullable<int> value);
+    partial void OnSWIdChanged();
     partial void OnQuantityInChanging(decimal value);
     partial void OnQuantityInChanged();
     partial void OnQuantityOutChanging(decimal value);
@@ -23534,6 +23540,7 @@ namespace easyfis.Data
 			this._TrnStockIn = default(EntityRef<TrnStockIn>);
 			this._TrnStockOut = default(EntityRef<TrnStockOut>);
 			this._TrnStockTransfer = default(EntityRef<TrnStockTransfer>);
+			this._TrnStockWithdrawal = default(EntityRef<TrnStockWithdrawal>);
 			OnCreated();
 		}
 		
@@ -23765,6 +23772,30 @@ namespace easyfis.Data
 					this._STId = value;
 					this.SendPropertyChanged("STId");
 					this.OnSTIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SWId", DbType="Int")]
+		public System.Nullable<int> SWId
+		{
+			get
+			{
+				return this._SWId;
+			}
+			set
+			{
+				if ((this._SWId != value))
+				{
+					if (this._TrnStockWithdrawal.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSWIdChanging(value);
+					this.SendPropertyChanging();
+					this._SWId = value;
+					this.SendPropertyChanged("SWId");
+					this.OnSWIdChanged();
 				}
 			}
 		}
@@ -24141,6 +24172,40 @@ namespace easyfis.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnStockWithdrawal_TrnInventory", Storage="_TrnStockWithdrawal", ThisKey="SWId", OtherKey="Id", IsForeignKey=true)]
+		public TrnStockWithdrawal TrnStockWithdrawal
+		{
+			get
+			{
+				return this._TrnStockWithdrawal.Entity;
+			}
+			set
+			{
+				TrnStockWithdrawal previousValue = this._TrnStockWithdrawal.Entity;
+				if (((previousValue != value) 
+							|| (this._TrnStockWithdrawal.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._TrnStockWithdrawal.Entity = null;
+						previousValue.TrnInventories.Remove(this);
+					}
+					this._TrnStockWithdrawal.Entity = value;
+					if ((value != null))
+					{
+						value.TrnInventories.Add(this);
+						this._SWId = value.Id;
+					}
+					else
+					{
+						this._SWId = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("TrnStockWithdrawal");
+				}
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -24200,6 +24265,8 @@ namespace easyfis.Data
 		
 		private System.Nullable<int> _STId;
 		
+		private System.Nullable<int> _SWId;
+		
 		private string _DocumentReference;
 		
 		private System.Nullable<int> _APRRId;
@@ -24231,6 +24298,8 @@ namespace easyfis.Data
 		private EntityRef<TrnStockOut> _TrnStockOut;
 		
 		private EntityRef<TrnStockTransfer> _TrnStockTransfer;
+		
+		private EntityRef<TrnStockWithdrawal> _TrnStockWithdrawal;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -24268,6 +24337,8 @@ namespace easyfis.Data
     partial void OnOTIdChanged();
     partial void OnSTIdChanging(System.Nullable<int> value);
     partial void OnSTIdChanged();
+    partial void OnSWIdChanging(System.Nullable<int> value);
+    partial void OnSWIdChanged();
     partial void OnDocumentReferenceChanging(string value);
     partial void OnDocumentReferenceChanged();
     partial void OnAPRRIdChanging(System.Nullable<int> value);
@@ -24291,6 +24362,7 @@ namespace easyfis.Data
 			this._TrnStockIn = default(EntityRef<TrnStockIn>);
 			this._TrnStockOut = default(EntityRef<TrnStockOut>);
 			this._TrnStockTransfer = default(EntityRef<TrnStockTransfer>);
+			this._TrnStockWithdrawal = default(EntityRef<TrnStockWithdrawal>);
 			OnCreated();
 		}
 		
@@ -24654,6 +24726,30 @@ namespace easyfis.Data
 					this._STId = value;
 					this.SendPropertyChanged("STId");
 					this.OnSTIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SWId", DbType="Int")]
+		public System.Nullable<int> SWId
+		{
+			get
+			{
+				return this._SWId;
+			}
+			set
+			{
+				if ((this._SWId != value))
+				{
+					if (this._TrnStockWithdrawal.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnSWIdChanging(value);
+					this.SendPropertyChanging();
+					this._SWId = value;
+					this.SendPropertyChanged("SWId");
+					this.OnSWIdChanged();
 				}
 			}
 		}
@@ -25164,6 +25260,40 @@ namespace easyfis.Data
 						this._STId = default(Nullable<int>);
 					}
 					this.SendPropertyChanged("TrnStockTransfer");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnStockWithdrawal_TrnJournal", Storage="_TrnStockWithdrawal", ThisKey="SWId", OtherKey="Id", IsForeignKey=true)]
+		public TrnStockWithdrawal TrnStockWithdrawal
+		{
+			get
+			{
+				return this._TrnStockWithdrawal.Entity;
+			}
+			set
+			{
+				TrnStockWithdrawal previousValue = this._TrnStockWithdrawal.Entity;
+				if (((previousValue != value) 
+							|| (this._TrnStockWithdrawal.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._TrnStockWithdrawal.Entity = null;
+						previousValue.TrnJournals.Remove(this);
+					}
+					this._TrnStockWithdrawal.Entity = value;
+					if ((value != null))
+					{
+						value.TrnJournals.Add(this);
+						this._SWId = value.Id;
+					}
+					else
+					{
+						this._SWId = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("TrnStockWithdrawal");
 				}
 			}
 		}
@@ -38093,6 +38223,10 @@ namespace easyfis.Data
 		
 		private EntitySet<TrnStockWithdrawalItem> _TrnStockWithdrawalItems;
 		
+		private EntitySet<TrnInventory> _TrnInventories;
+		
+		private EntitySet<TrnJournal> _TrnJournals;
+		
 		private EntityRef<MstBranch> _MstBranch;
 		
 		private EntityRef<MstBranch> _MstBranch1;
@@ -38156,6 +38290,8 @@ namespace easyfis.Data
 		public TrnStockWithdrawal()
 		{
 			this._TrnStockWithdrawalItems = new EntitySet<TrnStockWithdrawalItem>(new Action<TrnStockWithdrawalItem>(this.attach_TrnStockWithdrawalItems), new Action<TrnStockWithdrawalItem>(this.detach_TrnStockWithdrawalItems));
+			this._TrnInventories = new EntitySet<TrnInventory>(new Action<TrnInventory>(this.attach_TrnInventories), new Action<TrnInventory>(this.detach_TrnInventories));
+			this._TrnJournals = new EntitySet<TrnJournal>(new Action<TrnJournal>(this.attach_TrnJournals), new Action<TrnJournal>(this.detach_TrnJournals));
 			this._MstBranch = default(EntityRef<MstBranch>);
 			this._MstBranch1 = default(EntityRef<MstBranch>);
 			this._MstUser = default(EntityRef<MstUser>);
@@ -38592,6 +38728,32 @@ namespace easyfis.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnStockWithdrawal_TrnInventory", Storage="_TrnInventories", ThisKey="Id", OtherKey="SWId")]
+		public EntitySet<TrnInventory> TrnInventories
+		{
+			get
+			{
+				return this._TrnInventories;
+			}
+			set
+			{
+				this._TrnInventories.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="TrnStockWithdrawal_TrnJournal", Storage="_TrnJournals", ThisKey="Id", OtherKey="SWId")]
+		public EntitySet<TrnJournal> TrnJournals
+		{
+			get
+			{
+				return this._TrnJournals;
+			}
+			set
+			{
+				this._TrnJournals.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstBranch_TrnStockWithdrawal", Storage="_MstBranch", ThisKey="BranchId", OtherKey="Id", IsForeignKey=true)]
 		public MstBranch MstBranch
 		{
@@ -38891,6 +39053,30 @@ namespace easyfis.Data
 		}
 		
 		private void detach_TrnStockWithdrawalItems(TrnStockWithdrawalItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnStockWithdrawal = null;
+		}
+		
+		private void attach_TrnInventories(TrnInventory entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnStockWithdrawal = this;
+		}
+		
+		private void detach_TrnInventories(TrnInventory entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnStockWithdrawal = null;
+		}
+		
+		private void attach_TrnJournals(TrnJournal entity)
+		{
+			this.SendPropertyChanging();
+			entity.TrnStockWithdrawal = this;
+		}
+		
+		private void detach_TrnJournals(TrnJournal entity)
 		{
 			this.SendPropertyChanging();
 			entity.TrnStockWithdrawal = null;

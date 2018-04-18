@@ -128,5 +128,28 @@ namespace easyfis.ModifiedApiControllers
 
             return inventories.ToList();
         }
+
+        // =================================
+        // List Inventory - Stock Withdrawal
+        // =================================
+        [Authorize, HttpGet, Route("api/inventory/stockWithdrawal/list/{SWId}")]
+        public List<Entities.TrnInventory> ListInventoryStockWithdrawal(String SWId)
+        {
+            var inventories = from d in db.TrnInventories
+                              where d.SWId == Convert.ToUInt32(SWId)
+                              select new Entities.TrnInventory
+                              {
+                                  InventoryDate = d.InventoryDate.ToShortDateString(),
+                                  Branch = d.MstBranch.Branch,
+                                  Article = d.MstArticle.Article,
+                                  Particulars = d.Particulars,
+                                  ArticleInventoryCode = d.MstArticleInventory.InventoryCode,
+                                  Quantity = d.Quantity,
+                                  ArticleUnit = d.MstArticle.MstUnit.Unit,
+                                  Amount = d.Amount
+                              };
+
+            return inventories.ToList();
+        }
     }
 }

@@ -21,6 +21,7 @@ namespace easyfis.Entities
         public Int32? INId { get; set; }
         public Int32? OTId { get; set; }
         public Int32? STId { get; set; }
+        public Int32? SWId { get; set; }
         public Decimal QuantityIn { get; set; }
         public Decimal QuantityOut { get; set; }
         public Decimal Quantity { get; set; }

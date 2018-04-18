@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="easyfis" Class="easyfisdbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;Persist Security Info=True;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString1" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=innosoftserver2.eastasia.cloudapp.azure.com;Initial Catalog=easyfis;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="easyfisConnectionString" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AspNetRoles" Member="AspNetRoles">
     <Type Name="AspNetRole">
       <Column Name="Id" Type="System.String" DbType="NVarChar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -921,6 +921,7 @@
       <Column Name="INId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OTId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="STId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SWId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="QuantityIn" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="QuantityOut" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
       <Column Name="Quantity" Type="System.Decimal" DbType="Decimal(18,5) NOT NULL" CanBeNull="false" />
@@ -934,6 +935,7 @@
       <Association Name="TrnStockIn_TrnInventory" Member="TrnStockIn" ThisKey="INId" OtherKey="Id" Type="TrnStockIn" IsForeignKey="true" DeleteRule="CASCADE" />
       <Association Name="TrnStockOut_TrnInventory" Member="TrnStockOut" ThisKey="OTId" OtherKey="Id" Type="TrnStockOut" IsForeignKey="true" DeleteRule="CASCADE" />
       <Association Name="TrnStockTransfer_TrnInventory" Member="TrnStockTransfer" ThisKey="STId" OtherKey="Id" Type="TrnStockTransfer" IsForeignKey="true" DeleteRule="CASCADE" />
+      <Association Name="TrnStockWithdrawal_TrnInventory" Member="TrnStockWithdrawal" ThisKey="SWId" OtherKey="Id" Type="TrnStockWithdrawal" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.TrnJournal" Member="TrnJournals">
@@ -954,6 +956,7 @@
       <Column Name="INId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="OTId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="STId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="SWId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="DocumentReference" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
       <Column Name="APRRId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="ARSIId" Type="System.Int32" DbType="Int" CanBeNull="true" />
@@ -970,6 +973,7 @@
       <Association Name="TrnStockIn_TrnJournal" Member="TrnStockIn" ThisKey="INId" OtherKey="Id" Type="TrnStockIn" IsForeignKey="true" DeleteRule="CASCADE" />
       <Association Name="TrnStockOut_TrnJournal" Member="TrnStockOut" ThisKey="OTId" OtherKey="Id" Type="TrnStockOut" IsForeignKey="true" DeleteRule="CASCADE" />
       <Association Name="TrnStockTransfer_TrnJournal" Member="TrnStockTransfer" ThisKey="STId" OtherKey="Id" Type="TrnStockTransfer" IsForeignKey="true" DeleteRule="CASCADE" />
+      <Association Name="TrnStockWithdrawal_TrnJournal" Member="TrnStockWithdrawal" ThisKey="SWId" OtherKey="Id" Type="TrnStockWithdrawal" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.TrnJournalVoucher" Member="TrnJournalVouchers">
@@ -1485,6 +1489,8 @@
       <Column Name="UpdatedById" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="UpdatedDateTime" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
       <Association Name="TrnStockWithdrawal_TrnStockWithdrawalItem" Member="TrnStockWithdrawalItems" ThisKey="Id" OtherKey="SWId" Type="TrnStockWithdrawalItem" />
+      <Association Name="TrnStockWithdrawal_TrnInventory" Member="TrnInventories" ThisKey="Id" OtherKey="SWId" Type="TrnInventory" />
+      <Association Name="TrnStockWithdrawal_TrnJournal" Member="TrnJournals" ThisKey="Id" OtherKey="SWId" Type="TrnJournal" />
       <Association Name="MstBranch_TrnStockWithdrawal" Member="MstBranch" ThisKey="BranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
       <Association Name="MstBranch_TrnStockWithdrawal1" Member="MstBranch1" ThisKey="SIBranchId" OtherKey="Id" Type="MstBranch" IsForeignKey="true" />
       <Association Name="MstUser_TrnStockWithdrawal" Member="MstUser" ThisKey="PreparedById" OtherKey="Id" Type="MstUser" IsForeignKey="true" />

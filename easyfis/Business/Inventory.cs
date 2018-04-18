@@ -1100,5 +1100,199 @@ namespace easyfis.Business
                 Debug.WriteLine(e);
             }
         }
+
+        // =================================
+        // Insert Stock Withdrawal Inventory
+        // =================================
+        public void InsertStockWithdrawalInventory(Int32 SWId)
+        {
+            try
+            {
+                var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
+                                           where d.SWId == SWId
+                                           select d;
+
+                if (stockWithdrawalItems.Any())
+                {
+                    Int32 articleInventoryId = 0;
+
+                    foreach (var stockWithdrawalItem in stockWithdrawalItems)
+                    {
+                        // =========================================
+                        // Insert Inventory (Stock Withdrawal - Out)
+                        // =========================================
+                        Data.TrnInventory newStockWithdrawalItemOutInventory = new Data.TrnInventory
+                        {
+                            BranchId = stockWithdrawalItem.TrnStockWithdrawal.BranchId,
+                            InventoryDate = stockWithdrawalItem.TrnStockWithdrawal.SWDate,
+                            ArticleId = stockWithdrawalItem.ItemId,
+                            ArticleInventoryId = stockWithdrawalItem.ItemInventoryId,
+                            SWId = SWId,
+                            QuantityIn = 0,
+                            QuantityOut = stockWithdrawalItem.BaseQuantity,
+                            Quantity = stockWithdrawalItem.BaseQuantity * -1,
+                            Amount = stockWithdrawalItem.Amount * -1,
+                            Particulars = stockWithdrawalItem.TrnStockWithdrawal.Remarks
+                        };
+
+                        db.TrnInventories.InsertOnSubmit(newStockWithdrawalItemOutInventory);
+                        db.SubmitChanges();
+
+                        // ========================
+                        // Update Article Inventory
+                        // ========================
+                        UpdateArticleInventory(stockWithdrawalItem.ItemInventoryId, stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType);
+
+                        articleInventoryId = 0;
+
+                        var articleInventories = from d in db.MstArticleInventories
+                                                 where d.BranchId == stockWithdrawalItem.TrnStockWithdrawal.SIBranchId
+                                                 && d.ArticleId == stockWithdrawalItem.ItemId
+                                                 select d;
+
+                        if (articleInventories.Any())
+                        {
+                            if (stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType.Equals("Moving Average"))
+                            {
+                                articleInventoryId = articleInventories.FirstOrDefault().Id;
+                            }
+                            else
+                            {
+                                foreach (var articleInventory in articleInventories)
+                                {
+                                    if (articleInventory.InventoryCode.Equals("SW-" + stockWithdrawalItem.TrnStockWithdrawal.MstBranch1.BranchCode + "-" + stockWithdrawalItem.TrnStockWithdrawal.SWNumber))
+                                    {
+                                        articleInventoryId = articleInventory.Id;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (articleInventoryId == 0)
+                        {
+                            // ====================================================
+                            // Insert New Article Inventory (Stock Withdrawal - In)
+                            // ====================================================
+                            Data.MstArticleInventory newArticleInventory = new Data.MstArticleInventory
+                            {
+                                BranchId = stockWithdrawalItem.TrnStockWithdrawal.SIBranchId,
+                                ArticleId = stockWithdrawalItem.ItemId,
+                                InventoryCode = "SW-" + stockWithdrawalItem.TrnStockWithdrawal.MstBranch1.BranchCode + "-" + stockWithdrawalItem.TrnStockWithdrawal.SWNumber,
+                                Quantity = stockWithdrawalItem.Quantity,
+                                Cost = stockWithdrawalItem.BaseCost,
+                                Amount = stockWithdrawalItem.Amount,
+                                Particulars = stockWithdrawalItem.TrnStockWithdrawal.Remarks
+                            };
+
+                            db.MstArticleInventories.InsertOnSubmit(newArticleInventory);
+                            db.SubmitChanges();
+
+                            articleInventoryId = newArticleInventory.Id;
+                        }
+
+                        // ========================================
+                        // Insert Inventory (Stock Withdrawal - In)
+                        // ========================================
+                        Data.TrnInventory newStockWithdrawalItemInInventory = new Data.TrnInventory
+                        {
+                            BranchId = stockWithdrawalItem.TrnStockWithdrawal.SIBranchId,
+                            InventoryDate = Convert.ToDateTime(stockWithdrawalItem.TrnStockWithdrawal.SWDate),
+                            ArticleId = stockWithdrawalItem.ItemId,
+                            ArticleInventoryId = articleInventoryId,
+                            SWId = SWId,
+                            QuantityIn = stockWithdrawalItem.BaseQuantity,
+                            QuantityOut = 0,
+                            Quantity = stockWithdrawalItem.BaseQuantity,
+                            Amount = stockWithdrawalItem.Amount,
+                            Particulars = stockWithdrawalItem.TrnStockWithdrawal.Remarks
+                        };
+
+                        db.TrnInventories.InsertOnSubmit(newStockWithdrawalItemInInventory);
+                        db.SubmitChanges();
+
+                        // ========================
+                        // Update Article Inventory
+                        // ========================
+                        UpdateArticleInventory(articleInventoryId, stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        // =================================
+        // Delete Stock Withdrawal Inventory
+        // =================================
+        public void DeleteStockWithdrawalInventory(Int32 SWId)
+        {
+            try
+            {
+                // ==================
+                // Delete Inventories
+                // ==================
+                var inventories = from d in db.TrnInventories
+                                  where d.SWId == SWId
+                                  select d;
+
+                if (inventories.Any())
+                {
+                    db.TrnInventories.DeleteAllOnSubmit(inventories);
+                    db.SubmitChanges();
+                }
+
+                Int32 articleInventoryId = 0;
+
+                var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
+                                           where d.SWId == SWId
+                                           select d;
+
+                foreach (var stockWithdrawalItem in stockWithdrawalItems)
+                {
+                    // ==========================
+                    // Update Article Inventories
+                    // ==========================
+                    UpdateArticleInventory(stockWithdrawalItem.ItemInventoryId, stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType);
+
+                    articleInventoryId = 0;
+
+                    var articleInventories = from d in db.MstArticleInventories
+                                             where d.BranchId == stockWithdrawalItem.TrnStockWithdrawal.SIBranchId
+                                             && d.ArticleId == stockWithdrawalItem.ItemId
+                                             select d;
+
+                    if (articleInventories.Any())
+                    {
+                        if (stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType.Equals("Moving Average"))
+                        {
+                            articleInventoryId = articleInventories.FirstOrDefault().Id;
+                        }
+                        else
+                        {
+                            foreach (var articleInventory in articleInventories)
+                            {
+                                if (articleInventory.InventoryCode.Equals("SW-" + stockWithdrawalItem.TrnStockWithdrawal.MstBranch1.BranchCode + "-" + stockWithdrawalItem.TrnStockWithdrawal.SWNumber))
+                                {
+                                    articleInventoryId = articleInventory.Id;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (articleInventoryId > 0)
+                    {
+                        UpdateArticleInventory(articleInventoryId, stockWithdrawalItem.TrnStockWithdrawal.MstUser4.InventoryType);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
     }
 }

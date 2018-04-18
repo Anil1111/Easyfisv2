@@ -64,29 +64,29 @@ namespace easyfis.ModifiedApiControllers
             var branchId = currentUser.FirstOrDefault().BranchId;
 
             var stockWithdrawal = from d in db.TrnStockWithdrawals
-                                where d.BranchId == branchId
-                                && d.Id == Convert.ToInt32(id)
-                                select new Entities.TrnStockWithdrawal
-                                {
-                                    Id = d.Id,
-                                    SWNumber = d.SWNumber,
-                                    SWDate = d.SWDate.ToShortDateString(),
-                                    DocumentReference = d.DocumentReference,
-                                    SIBranchId = d.SIBranchId,
-                                    SIId = d.SIId,
-                                    Remarks = d.Remarks,
-                                    ContactPerson = d.ContactPerson,
-                                    ContactNumber = d.ContactNumber,
-                                    Address = d.Address,
-                                    PreparedById = d.PreparedById,
-                                    CheckedById = d.CheckedById,
-                                    ApprovedById = d.ApprovedById,
-                                    IsLocked = d.IsLocked,
-                                    CreatedBy = d.MstUser2.FullName,
-                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
-                                    UpdatedBy = d.MstUser4.FullName,
-                                    UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
-                                };
+                                  where d.BranchId == branchId
+                                  && d.Id == Convert.ToInt32(id)
+                                  select new Entities.TrnStockWithdrawal
+                                  {
+                                      Id = d.Id,
+                                      SWNumber = d.SWNumber,
+                                      SWDate = d.SWDate.ToShortDateString(),
+                                      DocumentReference = d.DocumentReference,
+                                      SIBranchId = d.SIBranchId,
+                                      SIId = d.SIId,
+                                      Remarks = d.Remarks,
+                                      ContactPerson = d.ContactPerson,
+                                      ContactNumber = d.ContactNumber,
+                                      Address = d.Address,
+                                      PreparedById = d.PreparedById,
+                                      CheckedById = d.CheckedById,
+                                      ApprovedById = d.ApprovedById,
+                                      IsLocked = d.IsLocked,
+                                      CreatedBy = d.MstUser2.FullName,
+                                      CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
+                                      UpdatedBy = d.MstUser4.FullName,
+                                      UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
+                                  };
 
             if (stockWithdrawal.Any())
             {
@@ -200,8 +200,7 @@ namespace easyfis.ModifiedApiControllers
 
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalList") select d;
                     IQueryable<Data.TrnSalesInvoice> salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
-                                                                     where d.BranchId == Convert.ToInt32(currentBranchId)
-                                                                     && d.BalanceAmount > 0
+                                                                     where d.BalanceAmount > 0
                                                                      && d.IsLocked == true
                                                                      select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
@@ -371,6 +370,18 @@ namespace easyfis.ModifiedApiControllers
                         lockStockWithdrawal.UpdatedDateTime = DateTime.Now;
                         db.SubmitChanges();
 
+                        // =====================
+                        // Journal and Inventory
+                        // =====================
+                        Business.Journal journal = new Business.Journal();
+                        Business.Inventory inventory = new Business.Inventory();
+
+                        if (lockStockWithdrawal.IsLocked)
+                        {
+                            journal.InsertStockWithdrawalJournal(Convert.ToInt32(id));
+                            inventory.InsertStockWithdrawalInventory(Convert.ToInt32(id));
+                        }
+
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }
                     else
@@ -438,6 +449,18 @@ namespace easyfis.ModifiedApiControllers
                         unlockStockWithdrawal.UpdatedById = currentUserId;
                         unlockStockWithdrawal.UpdatedDateTime = DateTime.Now;
                         db.SubmitChanges();
+
+                        // =====================
+                        // Journal and Inventory
+                        // =====================
+                        Business.Journal journal = new Business.Journal();
+                        Business.Inventory inventory = new Business.Inventory();
+
+                        if (!unlockStockWithdrawal.IsLocked)
+                        {
+                            journal.DeleteStockWithdrawalJournal(Convert.ToInt32(id));
+                            inventory.DeleteStockWithdrawalInventory(Convert.ToInt32(id));
+                        }
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

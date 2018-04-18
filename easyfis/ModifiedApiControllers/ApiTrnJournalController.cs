@@ -189,5 +189,27 @@ namespace easyfis.ModifiedApiControllers
 
             return journals.ToList();
         }
+
+        // ===============================
+        // List Journal - Stock Withdrawal
+        // ===============================
+        [Authorize, HttpGet, Route("api/jounal/stockWithdrawal/list/{SWId}")]
+        public List<Entities.TrnJournal> ListJournalStockWithdrawal(String SWId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.SWId == Convert.ToInt32(SWId)
+                           select new Entities.TrnJournal
+                           {
+                               Branch = d.MstBranch.Branch,
+                               JournalDate = d.JournalDate.ToShortDateString(),
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               Article = d.MstArticle.Article,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace easyfis.Entities
         public Int32? INId { get; set; }
         public Int32? OTId { get; set; }
         public Int32? STId { get; set; }
+        public Int32? SWId { get; set; }
         public String DocumentReference { get; set; }
         public Int32? APRRId { get; set; }
         public Int32? ARSIId { get; set; }

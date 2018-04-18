@@ -1135,6 +1135,105 @@ namespace easyfis.Business
             }
         }
 
+        // ===============================
+        // Insert Stock Withdrawal Journal
+        // ===============================
+        public void InsertStockWithdrawalJournal(Int32 SWId)
+        {
+            try
+            {
+                var stockWithdrawals = from d in db.TrnStockWithdrawals
+                                       where d.Id == SWId
+                                       select d;
+
+                if (stockWithdrawals.Any())
+                {
+                    var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
+                                               where d.SWId == SWId
+                                               group d by new
+                                               {
+                                                   ArticleGroup = d.MstArticle.MstArticleGroup
+                                               } into g
+                                               select new
+                                               {
+                                                   ArticleGroup = g.Key.ArticleGroup,
+                                                   Amount = g.Sum(d => d.Amount)
+                                               };
+
+                    if (stockWithdrawalItems.Any())
+                    {
+                        foreach (var stockWithdrawalItem in stockWithdrawalItems)
+                        {
+                            // ==============================
+                            // Debit: Lines (Inventory Items)
+                            // ==============================
+                            Data.TrnJournal newStockWithdrawalItemDebitJournal = new Data.TrnJournal
+                            {
+                                JournalDate = stockWithdrawals.FirstOrDefault().SWDate,
+                                BranchId = stockWithdrawals.FirstOrDefault().SIBranchId,
+                                AccountId = GetAccountId(stockWithdrawalItem.ArticleGroup.Id, stockWithdrawals.FirstOrDefault().SIBranchId, "Account"),
+                                ArticleId = stockWithdrawals.FirstOrDefault().TrnSalesInvoice.CustomerId,
+                                Particulars = stockWithdrawals.FirstOrDefault().Remarks,
+                                DebitAmount = stockWithdrawalItem.Amount,
+                                CreditAmount = 0,
+                                SWId = SWId,
+                                DocumentReference = "SW-" + stockWithdrawals.FirstOrDefault().MstBranch.BranchCode + "-" + stockWithdrawals.FirstOrDefault().SWNumber
+                            };
+
+                            db.TrnJournals.InsertOnSubmit(newStockWithdrawalItemDebitJournal);
+
+                            // ===============================
+                            // Credit: Lines (Inventory Items)
+                            // ===============================
+                            Data.TrnJournal newStockWithdrawalItemCreditJournal = new Data.TrnJournal
+                            {
+                                JournalDate = stockWithdrawals.FirstOrDefault().SWDate,
+                                BranchId = stockWithdrawals.FirstOrDefault().BranchId,
+                                AccountId = GetAccountId(stockWithdrawalItem.ArticleGroup.Id, stockWithdrawals.FirstOrDefault().BranchId, "Account"),
+                                ArticleId = stockWithdrawals.FirstOrDefault().TrnSalesInvoice.CustomerId,
+                                Particulars = stockWithdrawals.FirstOrDefault().Remarks,
+                                DebitAmount = 0,
+                                CreditAmount = stockWithdrawalItem.Amount,
+                                SWId = SWId,
+                                DocumentReference = "SW-" + stockWithdrawals.FirstOrDefault().MstBranch.BranchCode + "-" + stockWithdrawals.FirstOrDefault().SWNumber
+                            };
+
+                            db.TrnJournals.InsertOnSubmit(newStockWithdrawalItemCreditJournal);
+                        }
+
+                        db.SubmitChanges();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
+        // ===============================
+        // Delete Stock Withdrawal Journal
+        // ===============================
+        public void DeleteStockWithdrawalJournal(Int32 SWId)
+        {
+            try
+            {
+                var journals = from d in db.TrnJournals
+                               where d.SWId == SWId
+                               select d;
+
+                if (journals.Any())
+                {
+                    db.TrnJournals.DeleteAllOnSubmit(journals);
+                    db.SubmitChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+        }
+
         // ==============================
         // Insert Journal Voucher Journal
         // ==============================
