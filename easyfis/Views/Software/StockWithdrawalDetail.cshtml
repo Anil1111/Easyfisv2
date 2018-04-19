@@ -101,7 +101,12 @@
                                         <div class="form-group">
                                             <label class="control-label col-sm-4">SI Number</label>
                                             <div class="col-sm-8">
-                                                <div class="comboBox-wide" id="cboStockWithdrawalSINumber"></div>
+                                                <div class="input-group">
+                                                    <div class="comboBox-wide" id="cboStockWithdrawalSINumber"></div>
+                                                    <div class="input-group-btn">
+                                                        <button type="button" class=" btn btn-primary" id="btnSalesInvoiceStatus" onclick="btnSalesInvoiceStatusOnclick()">SI Items</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -597,14 +602,19 @@
                                     Id: results[i]["Id"],
                                     SINumber: results[i]["SINumber"],
                                     SIDetails: results[i]["SINumber"] + " (" + results[i]["SIDate"] + ")",
+                                    Customer: results[i]["Customer"],
+                                    ContactNumber: results[i]["ContactNumber"],
+                                    Address: results[i]["Address"]
                                 });
                             }
                         }
 
                         var disabled = true;
+                        $("#btnSalesInvoiceStatus").prop("disabled", true);
                         if (!isLocked) {
                             if (results.length > 0) {
                                 disabled = false;
+                                $("#btnSalesInvoiceStatus").prop("disabled", false);
                             }
                         }
 
@@ -613,10 +623,19 @@
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: articlesObservableArray,
-                            displayMemberPath: "SINumber",
+                            displayMemberPath: "SIDetails",
                             selectedValuePath: "Id",
-                            selectedValue: SIIdSelectedId
+                            selectedValue: SIIdSelectedId,
+                            onSelectedIndexChanged: function () {
+                                document.getElementById('stockWithdrawal_ContactPerson').value = this.selectedItem["Customer"];
+                                document.getElementById('stockWithdrawal_ContactNumber').value = this.selectedItem["ContactNumber"];
+                                document.getElementById('stockWithdrawal_Address').value = this.selectedItem["Address"];
+                            }
                         });
+
+                        document.getElementById('stockWithdrawal_ContactPerson').value = cboStockWithdrawalSINumber.selectedItem["Customer"];
+                        document.getElementById('stockWithdrawal_ContactNumber').value = cboStockWithdrawalSINumber.selectedItem["ContactNumber"];
+                        document.getElementById('stockWithdrawal_Address').value = cboStockWithdrawalSINumber.selectedItem["Address"];
 
                         if (!isSIBranchChanged) {
                             getUsersForComboBox();
@@ -736,6 +755,7 @@
 
                                 $("#cmdStockWithdrawalSaveLock").prop("disabled", true);
                                 $('#btnAddStockWithdrawalItem').prop('disabled', true);
+                                $("#btnSalesInvoiceStatus").prop("disabled", true);
 
                                 isLocked = true;
                             } else {
@@ -1317,20 +1337,22 @@
         // GET Item Id, Manual Code and Component
         // ======================================
         function getArticleItemForManualCodeAndComponent(itemId, inventoryId, unitId) {
-            var articleInventoryItemsObservableArray = new wijmo.collections.ObservableArray();
+            var salesInvoiceItem = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/stockWithdrawalItem/dropdown/list/itemInventory/item',
+                url: '/api/stockWithdrawalItem/dropdown/list/salesInvoice/item/' + cboStockWithdrawalSINumber.selectedValue,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            articleInventoryItemsObservableArray.push({
-                                Id: results[i]["Id"],
-                                ItemId: results[i]["ArticleId"],
-                                ItemCode: results[i]["ManualArticleCode"],
-                                ItemDescription: results[i]["Article"]
+                            salesInvoiceItem.push({
+                                ItemId: results[i]["ItemId"],
+                                ItemCode: results[i]["ItemCode"],
+                                ItemDescription: results[i]["ItemDescription"],
+                                UnitId: results[i]["UnitId"],
+                                Quantity: results[i]["Quantity"],
+                                Price: results[i]["Price"]
                             });
                         }
                     }
@@ -1348,7 +1370,7 @@
                         disabled: disabled,
                         isEditable: false,
                         placeholder: "Select Code",
-                        itemsSource: articleInventoryItemsObservableArray,
+                        itemsSource: salesInvoiceItem,
                         displayMemberPath: "ItemCode",
                         selectedValuePath: "ItemId",
                         selectedValue: itemId,
@@ -1362,14 +1384,13 @@
                         disabled: disabled,
                         isEditable: false,
                         placeholder: "Select Item",
-                        itemsSource: articleInventoryItemsObservableArray,
+                        itemsSource: salesInvoiceItem,
                         displayMemberPath: "ItemDescription",
                         selectedValuePath: "ItemId",
                         selectedValue: itemId,
                         onSelectedIndexChanged: function () {
-                            cboStockWithdrawalItemItemCode.selectedValue = this.selectedValue;
-                            cboStockWithdrawalItemInventoryCode.selectedValue = this.selectedItem["Id"];
                             getArticleInventoryCode(inventoryId, unitId);
+                            document.getElementById("stockWithdrawalItem_Quantity").value = formatDecimalValues(this.selectedItem["Quantity"]);
                         }
                     });
 
@@ -1416,7 +1437,6 @@
                     cboStockWithdrawalItemInventoryCode = new wijmo.input.ComboBox('#cboStockWithdrawalItemInventoryCode', {
                         disabled: disabled,
                         isEditable: false,
-                        placeholder: "Select Inventory Code",
                         itemsSource: articleInventoriesObservableArray,
                         displayMemberPath: "InventoryCode",
                         selectedValuePath: "Id",
@@ -1428,6 +1448,11 @@
                             }
                         }
                     });
+
+                    if (cboStockWithdrawalItemInventoryCode.selectedValue != null) {
+                        document.getElementById("stockWithdrawalItem_Cost").value = formatDecimalValues(cboStockWithdrawalItemInventoryCode.selectedItem["Cost"]);
+                        computeSWItemAmount();
+                    }
 
                     getStockWithdrawalItemUnitForComboBox(unitId);
                 }
@@ -1698,7 +1723,7 @@
             var totalAmount = stockWithdrawal_Quantity * stockWithdrawal_Cost;
             document.getElementById('stockWithdrawalItem_Amount').value = formatDecimalValues(totalAmount);
         }
-        
+
         // ========================
         // SAVE Stock Withdrawal Item
         // ========================

@@ -69,6 +69,7 @@ namespace easyfis.ModifiedApiControllers
                                   select new Entities.TrnStockWithdrawal
                                   {
                                       Id = d.Id,
+                                      BranchId = d.BranchId,
                                       SWNumber = d.SWNumber,
                                       SWDate = d.SWDate.ToShortDateString(),
                                       DocumentReference = d.DocumentReference,
@@ -120,7 +121,16 @@ namespace easyfis.ModifiedApiControllers
         [Authorize, HttpGet, Route("api/stockWithdrawal/dropdown/list/salesInvoice/branch")]
         public List<Entities.MstBranch> DropdownListStockWithdrawalSalesInvoiceBranch()
         {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var branchId = currentUser.FirstOrDefault().BranchId;
+            var companyId = currentUser.FirstOrDefault().CompanyId;
+
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == companyId
+                           && d.Id != Convert.ToInt32(branchId)
                            select new Entities.MstBranch
                            {
                                Id = d.Id,
@@ -145,7 +155,10 @@ namespace easyfis.ModifiedApiControllers
                                     Id = d.Id,
                                     SINumber = d.SINumber,
                                     SIDate = d.SIDate.ToShortDateString(),
-                                    Remarks = d.Remarks
+                                    Remarks = d.Remarks,
+                                    Customer = d.MstArticle.Article,
+                                    ContactNumber = d.MstArticle.ContactNumber,
+                                    Address = d.MstArticle.Address
                                 };
 
             return salesInvoices.ToList();
@@ -196,12 +209,13 @@ namespace easyfis.ModifiedApiControllers
                 if (currentUser.Any())
                 {
                     Int32 currentUserId = currentUser.FirstOrDefault().Id;
+                    Int32 currentCompanyId = currentUser.FirstOrDefault().CompanyId;
                     Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalList") select d;
                     IQueryable<Data.TrnSalesInvoice> salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
-                                                                     where d.BalanceAmount > 0
-                                                                     && d.IsLocked == true
+                                                                     where d.MstBranch.CompanyId == currentCompanyId && d.BranchId != currentBranchId
+                                                                     && d.BalanceAmount > 0 && d.IsLocked == true
                                                                      select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
 
@@ -247,7 +261,7 @@ namespace easyfis.ModifiedApiControllers
                             BranchId = currentBranchId,
                             SWNumber = defaultSWNumber,
                             SWDate = DateTime.Today,
-                            SIBranchId = currentBranchId,
+                            SIBranchId = salesInvoices.FirstOrDefault().BranchId,
                             SIId = salesInvoices.FirstOrDefault().Id,
                             Remarks = "NA",
                             DocumentReference = "NA",
@@ -301,17 +315,7 @@ namespace easyfis.ModifiedApiControllers
                     Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
-                    IQueryable<Data.MstBranch> salesInvoiceBranch = from d in db.MstBranches where d.Id == objStockWithdrawal.SIBranchId select d;
-                    IQueryable<Data.TrnSalesInvoice> salesInvoice = null;
-                    if (salesInvoiceBranch.Any())
-                    {
-                        salesInvoice = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
-                                       where d.BranchId == Convert.ToInt32(salesInvoiceBranch.FirstOrDefault().Id)
-                                       && d.BalanceAmount > 0
-                                       && d.IsLocked == true
-                                       && d.Id == objStockWithdrawal.SIId
-                                       select d;
-                    }
+                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.BalanceAmount > 0 && d.IsLocked == true select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
                     IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(id) select d;
 
@@ -325,10 +329,6 @@ namespace easyfis.ModifiedApiControllers
                     else if (!userForms.FirstOrDefault().CanLock)
                     {
                         returnMessage = "Sorry. You have no rights to lock stock withdrawal.";
-                    }
-                    else if (!salesInvoiceBranch.Any())
-                    {
-                        returnMessage = "No sales invoice branch found. Please setup more sales invoice branches.";
                     }
                     else if (!salesInvoice.Any())
                     {
@@ -355,8 +355,8 @@ namespace easyfis.ModifiedApiControllers
                     {
                         var lockStockWithdrawal = stockWithdrawal.FirstOrDefault();
                         lockStockWithdrawal.SWDate = Convert.ToDateTime(objStockWithdrawal.SWDate);
-                        lockStockWithdrawal.SIBranchId = salesInvoiceBranch.FirstOrDefault().Id;
-                        lockStockWithdrawal.SIId = salesInvoice.FirstOrDefault().Id;
+                        lockStockWithdrawal.SIBranchId = objStockWithdrawal.SIBranchId;
+                        lockStockWithdrawal.SIId = objStockWithdrawal.SIId;
                         lockStockWithdrawal.Remarks = objStockWithdrawal.Remarks;
                         lockStockWithdrawal.DocumentReference = objStockWithdrawal.DocumentReference;
                         lockStockWithdrawal.ContactPerson = objStockWithdrawal.ContactPerson;
@@ -370,16 +370,19 @@ namespace easyfis.ModifiedApiControllers
                         lockStockWithdrawal.UpdatedDateTime = DateTime.Now;
                         db.SubmitChanges();
 
-                        // =====================
-                        // Journal and Inventory
-                        // =====================
-                        Business.Journal journal = new Business.Journal();
-                        Business.Inventory inventory = new Business.Inventory();
-
-                        if (lockStockWithdrawal.IsLocked)
+                        if (objStockWithdrawal.SIBranchId != currentBranchId)
                         {
-                            journal.InsertStockWithdrawalJournal(Convert.ToInt32(id));
-                            inventory.InsertStockWithdrawalInventory(Convert.ToInt32(id));
+                            // =====================
+                            // Journal and Inventory
+                            // =====================
+                            Business.Journal journal = new Business.Journal();
+                            Business.Inventory inventory = new Business.Inventory();
+
+                            if (lockStockWithdrawal.IsLocked)
+                            {
+                                journal.InsertStockWithdrawalJournal(Convert.ToInt32(id));
+                                inventory.InsertStockWithdrawalInventory(Convert.ToInt32(id));
+                            }
                         }
 
                         return Request.CreateResponse(HttpStatusCode.OK);

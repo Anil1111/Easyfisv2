@@ -52,29 +52,24 @@ namespace easyfis.ModifiedApiControllers
         // ============================
         // Dropdown List - Item (Field)
         // ============================
-        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/itemInventory/item")]
-        public List<Entities.MstArticleInventory> DropdownListStockWithdrawalItemListItem()
+        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/salesInvoice/item/{SIId}")]
+        public List<Entities.TrnSalesInvoiceItem> DropdownListStockWithdrawalItemListSalesInvoiceItem(String SIId)
         {
-            var currentUser = from d in db.MstUsers
-                              where d.UserId == User.Identity.GetUserId()
-                              select d;
+            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                    where d.SIId == Convert.ToInt32(SIId)
+                                    && d.TrnSalesInvoice.IsLocked == true
+                                    select new Entities.TrnSalesInvoiceItem
+                                    {
+                                        ItemId = d.ItemId,
+                                        ItemCode = d.MstArticle.ManualArticleCode,
+                                        ItemDescription = d.MstArticle.Article,
+                                        UnitId = d.UnitId,
+                                        Quantity = d.Quantity,
+                                        Price = d.Price,
+                                        Amount = d.Amount
+                                    };
 
-            var branchId = currentUser.FirstOrDefault().BranchId;
-
-            var itemInventories = from d in db.MstArticleInventories
-                                  where d.BranchId == branchId
-                                  && d.Quantity > 0
-                                  && d.MstArticle.IsInventory == true
-                                  && d.MstArticle.IsLocked == true
-                                  select new Entities.MstArticleInventory
-                                  {
-                                      Id = d.Id,
-                                      ArticleId = d.ArticleId,
-                                      ManualArticleCode = d.MstArticle.ManualArticleCode,
-                                      Article = d.MstArticle.Article
-                                  };
-
-            return itemInventories.ToList();
+            return salesInvoiceItems.ToList();
         }
 
         // ===========================================
