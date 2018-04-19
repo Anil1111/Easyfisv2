@@ -35,5 +35,7 @@ namespace easyfis.Entities
         public Decimal BaseQuantity { get; set; }
         public Decimal BasePrice { get; set; }
         public String SalesItemTimeStamp { get; set; }
+        public Decimal WithdrawnQuantity { get; set; }
+        public Decimal BalanceQuantity { get; set; }
     }
 }

@@ -119,6 +119,214 @@ namespace easyfis.ModifiedApiControllers
             return itemUnit.ToList();
         }
 
+        // =============================================
+        // Get Withdrawn Quantity - Sales Invoice Status
+        // =============================================
+        public Decimal GetWithdrawnQuantity(Int32 SIId, Int32 ItemId)
+        {
+            var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
+                                       where d.TrnStockWithdrawal.SIId == SIId
+                                       && d.ItemId == ItemId
+                                       && d.TrnStockWithdrawal.IsLocked == true
+                                       select d;
+
+            if (stockWithdrawalItems.Any())
+            {
+                return stockWithdrawalItems.Sum(d => d.Quantity);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        // ==================================
+        // Pop-Up List - Sales Invoice Status
+        // ==================================
+        [Authorize, HttpGet, Route("api/stockWithdrawalItem/popUp/list/salesInvoiceStatus/{SIId}")]
+        public List<Entities.TrnSalesInvoiceItem> PopUpListStockWithdrawalItemSalesInvoiceStatus(String SIId)
+        {
+            var groupedSalesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                           where d.SIId == Convert.ToInt32(SIId)
+                                           && d.TrnSalesInvoice.IsLocked == true
+                                           && d.MstArticle.IsInventory == true
+                                           group d by new
+                                           {
+                                               SIId = d.SIId,
+                                               Remarks = d.TrnSalesInvoice.Remarks,
+                                               ItemId = d.ItemId,
+                                               ItemCode = d.MstArticle.ManualArticleCode,
+                                               ItemDescription = d.MstArticle.Article,
+                                               BaseUnitId = d.BaseUnitId,
+                                               BaseUnit = d.MstUnit1.Unit
+                                           }
+                                           into g
+                                           select new
+                                           {
+                                               SIId = g.Key.SIId,
+                                               Remarks = g.Key.Remarks,
+                                               ItemId = g.Key.ItemId,
+                                               ItemCode = g.Key.ItemCode,
+                                               ItemDescription = g.Key.ItemDescription,
+                                               BaseUnitId = g.Key.BaseUnitId,
+                                               BaseUnit = g.Key.BaseUnit,
+                                               BaseQuantity = g.Sum(d => d.BaseQuantity)
+                                           };
+
+            if (groupedSalesInvoiceItems.Any())
+            {
+                var salesInvoiceItems = from d in groupedSalesInvoiceItems.ToList().OrderBy(d => d.ItemDescription)
+                                        select new Entities.TrnSalesInvoiceItem
+                                        {
+                                            ItemId = d.ItemId,
+                                            ItemCode = d.ItemCode,
+                                            ItemDescription = d.ItemDescription,
+                                            Particulars = d.Remarks,
+                                            BaseUnitId = d.BaseUnitId,
+                                            BaseUnit = d.BaseUnit,
+                                            BaseQuantity = d.BaseQuantity,
+                                            WithdrawnQuantity = GetWithdrawnQuantity(d.SIId, d.ItemId),
+                                            BalanceQuantity = d.BaseQuantity - GetWithdrawnQuantity(d.SIId, d.ItemId)
+                                        };
+
+                return salesInvoiceItems.ToList();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        // ===========================================================
+        // Apply (Download) Sales Invoice Items - Sales Invoice Status
+        // ===========================================================
+        [Authorize, HttpPost, Route("api/stockWithdrawalItem/popUp/apply/salesInvoiceStatus/{SWId}")]
+        public HttpResponseMessage ApplyStockWithdrawalItemSalesInvoiceStatusItem(List<Entities.TrnSalesInvoiceItem> objSalesInvoiceItems, String SWId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
+
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("ReceivingReceiptDetail") select d;
+                    IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(SWId) select d;
+
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
+                    {
+                        returnMessage = "Sorry. You have no access in this stock withdrawal detail page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanAdd)
+                    {
+                        returnMessage = "Sorry. You have no rights to add new stock withdrawal item in this stock withdrawal detail page.";
+                    }
+                    else if (!stockWithdrawal.Any())
+                    {
+                        returnMessage = "These current stock withdrawal details are not found in the server. Please add new stock withdrawal first before proceeding.";
+                    }
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot apply sales invoice items to stock withdrawal item if the current stock withdrawal detail is locked.";
+                    }
+                    else if (!objSalesInvoiceItems.Any())
+                    {
+                        returnMessage = "There are no sales invoice items.";
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        foreach (var objSalesInvoiceItem in objSalesInvoiceItems)
+                        {
+                            var item = from d in db.MstArticles
+                                       where d.Id == objSalesInvoiceItem.ItemId
+                                       && d.ArticleTypeId == 1
+                                       && d.IsInventory == true
+                                       && d.IsLocked == true
+                                       select d;
+
+                            if (item.Any())
+                            {
+                                var itemInventories = from d in db.MstArticleInventories
+                                                      where d.ArticleId == objSalesInvoiceItem.ItemId && d.BranchId == currentBranchId
+                                                      && d.Quantity > 0 && d.MstArticle.IsInventory == true && d.MstArticle.IsLocked == true
+                                                      select d;
+
+                                if (itemInventories.Any())
+                                {
+                                    var conversionUnit = from d in db.MstArticleUnits
+                                                         where d.ArticleId == objSalesInvoiceItem.ItemId
+                                                         && d.UnitId == objSalesInvoiceItem.UnitId
+                                                         && d.MstArticle.IsLocked == true
+                                                         select d;
+
+                                    if (conversionUnit.Any())
+                                    {
+                                        Decimal baseQuantity = objSalesInvoiceItem.Quantity * 1;
+                                        if (conversionUnit.FirstOrDefault().Multiplier > 0)
+                                        {
+                                            baseQuantity = objSalesInvoiceItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
+                                        }
+
+                                        Decimal baseCost = objSalesInvoiceItem.Quantity * itemInventories.FirstOrDefault().Cost;
+                                        if (baseQuantity > 0)
+                                        {
+                                            baseCost = (objSalesInvoiceItem.Quantity * itemInventories.FirstOrDefault().Cost) / baseQuantity;
+                                        }
+
+                                        Data.TrnStockWithdrawalItem newStockWithdrawalItem = new Data.TrnStockWithdrawalItem
+                                        {
+                                            SWId = Convert.ToInt32(SWId),
+                                            ItemId = objSalesInvoiceItem.ItemId,
+                                            ItemInventoryId = itemInventories.FirstOrDefault().Id,
+                                            Particulars = objSalesInvoiceItem.Particulars,
+                                            UnitId = item.FirstOrDefault().UnitId,
+                                            Quantity = objSalesInvoiceItem.Quantity,
+                                            Cost = itemInventories.FirstOrDefault().Cost,
+                                            Amount = objSalesInvoiceItem.Quantity * itemInventories.FirstOrDefault().Cost,
+                                            BaseUnitId = item.FirstOrDefault().UnitId,
+                                            BaseQuantity = baseQuantity,
+                                            BaseCost = baseCost,
+                                        };
+
+                                        db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
+                                        db.SubmitChanges();
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                }
+                            }
+                        }
+
+                        db.SubmitChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, returnMessage);
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
         // =========================
         // Add Stock Withdrawal Item
         // =========================

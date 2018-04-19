@@ -87,6 +87,18 @@ namespace easyfis.ApiControllers
                             db.TrnStockCounts.DeleteAllOnSubmit(stockCounts);
                         }
 
+                        var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems select d;
+                        if (stockWithdrawalItems.Any())
+                        {
+                            db.TrnStockWithdrawalItems.DeleteAllOnSubmit(stockWithdrawalItems);
+                        }
+
+                        var stockWithdrawals = from d in db.TrnStockWithdrawals select d;
+                        if (stockWithdrawals.Any())
+                        {
+                            db.TrnStockWithdrawals.DeleteAllOnSubmit(stockWithdrawals);
+                        }
+
                         var journals = from d in db.TrnJournals select d;
                         if (journals.Any())
                         {

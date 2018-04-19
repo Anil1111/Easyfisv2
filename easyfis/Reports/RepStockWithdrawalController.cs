@@ -102,6 +102,9 @@ namespace easyfis.Reports
                 String SIBranch = stockWithdrawals.FirstOrDefault().MstBranch1.Branch;
                 String SINumber = stockWithdrawals.FirstOrDefault().TrnSalesInvoice.SINumber;
                 String remarks = stockWithdrawals.FirstOrDefault().Remarks;
+                String contactPerson = stockWithdrawals.FirstOrDefault().ContactPerson;
+                String contacNumber = stockWithdrawals.FirstOrDefault().ContactNumber;
+                String contactAddress = stockWithdrawals.FirstOrDefault().Address;
                 String SWNumber = stockWithdrawals.FirstOrDefault().SWNumber;
                 String SWDate = stockWithdrawals.FirstOrDefault().SWDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture); ;
                 String preparedBy = stockWithdrawals.FirstOrDefault().MstUser3.FullName;
@@ -121,11 +124,18 @@ namespace easyfis.Reports
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(SIBranch, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(SWDate, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("SI No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
-                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(SINumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
-                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("", fontArial11Bold)) { Colspan = 2, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("Remarks", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(remarks, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("SI No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(SINumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("Contact Person", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(contactPerson, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("", fontArial11Bold)) { Colspan = 2, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("Contact No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(contacNumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("", fontArial11Bold)) { Colspan = 2, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("Address", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableStockWithdrawals.AddCell(new PdfPCell(new Phrase(contactAddress, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
                 tableStockWithdrawals.AddCell(new PdfPCell(new Phrase("", fontArial11Bold)) { Colspan = 2, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 document.Add(tableStockWithdrawals);
 

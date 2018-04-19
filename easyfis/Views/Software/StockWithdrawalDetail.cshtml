@@ -104,7 +104,7 @@
                                                 <div class="input-group">
                                                     <div class="comboBox-wide" id="cboStockWithdrawalSINumber"></div>
                                                     <div class="input-group-btn">
-                                                        <button type="button" class=" btn btn-primary" id="btnSalesInvoiceStatus" onclick="btnSalesInvoiceStatusOnclick()">SI Items</button>
+                                                        <button type="button" class=" btn btn-primary" id="btnSalesInvoiceStatus" onclick="btnSalesInvoiceStatusOnclick()">SI</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -444,6 +444,98 @@
         </div>
     </div>
 
+    <!-- SI Status -->
+    <div class="modal fade" id="SIStatus" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="SIStatusModalLabel">Sales Invoice Status</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <span id="loadingSIStatus"></span>
+                    </center>
+                    <div id="loadingSIPanel">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="input-group ">
+                                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                    <input type="text" class="form-control " id="inputFilterSIItem" placeholder="Search">
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="salesInvoiceStatusFlexGrid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridSIStatus">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridSIStatus">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridSIStatus">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridSIStatus"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridSIStatus">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridSIStatus">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cmdApplySIStatusButton" class="btn btn-primary" onclick="cmdApplyAllSIStatusButton_OnClick()"><i class="fa fa-check"></i> Apply</button>
+                    <button id="cmdSIStatusCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="poStatusPickedAmountModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pick</h4>
+                </div>
+                <div class="modal-body">
+                    <dl>
+                        <dt>Quantity</dt>
+                        <dd>
+                            <input class="form-control numberField requiredPickedAmount" id="inpSISTatusPickedQuantity" placeholder="0.00" />
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnSalesInvoiceStatusPerCustomerPickAmountContinue" class="btn btn-primary" onclick="btnSalesInvoiceStatusPerCustomerPickAmountContinueOnclick()"><i class="fa fa-arrow-right"></i> Continue</button>
+                    <button id="btnSalesInvoiceStatusPerCustomerPickAmountCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RR Status PO Apply all -->
+    <div class="modal fade" id="applyAllConfirmSIStatus" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Apply</h4>
+                </div>
+                <div class="modal-body">
+                    Are you sure that you want to apply all picked sales invoice items?
+                </div>
+                <div class="modal-footer">
+                    <button id="cmdConfirmApplyAllSIStatusSWItems" class="btn btn-primary" onclick="btnConfrimApplyAllSWItems_OnClick()"><i class="fa fa-check"></i> Apply</button>
+                    <button id="cmdCloseButtonApplyAllSIStatusSWItems" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ================
@@ -483,6 +575,16 @@
         var isInventoryClicked = false;
         var isSIBranchChanged = false;
         var SIIdSelectedId = 0;
+
+        var salesInvoiceStatusCollectionView;
+        var salesInvoiceStatusFlexGrid = new wijmo.grid.FlexGrid('#salesInvoiceStatusFlexGrid');
+        var btnMoveToFirstPageGridSIStatus = document.getElementById('btnMoveToFirstPageGridSIStatus');
+        var btnMoveToPreviousPageGridSIStatus = document.getElementById('btnMoveToPreviousPageGridSIStatus');
+        var btnMoveToNextPageGridSIStatus = document.getElementById('btnMoveToNextPageGridSIStatus');
+        var btnMoveToLastPageGridSIStatus = document.getElementById('btnMoveToLastPageGridSIStatus');
+        var btnCurrentPageGridSIStatus = document.getElementById('btnCurrentPageGridSIStatus');
+        var isSIStatusClicked = false;
+        var currentSIStatusPageIndex = 0;
 
         // =======================
         // Get URL Parameter Value
@@ -2230,6 +2332,452 @@
 
             journalFlexGrid.trackChanges = true;
         }
+
+        // =========
+        // SI Status
+        // =========
+        function btnSalesInvoiceStatusOnclick() {
+            $('#SIStatus').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('#loadingSIStatus').show();
+            document.getElementById("loadingSIStatus").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
+            $('#loadingSIPanel').hide();
+            $('#cmdApplySIStatusButton').prop("disabled", true);
+
+            setTimeout(function () {
+                getSIBySupplierInSIStatus();
+            }, 500);
+        }
+
+        // ========================================
+        // Purchase Order Line / Item for SI Status
+        // ========================================
+        function getSalesInvoiceItemForSISTatus() {
+            var salesInvoiceStatusObservableArray = new wijmo.collections.ObservableArray;
+            if (cboStockWithdrawalSINumber.selectedValue != null) {
+                var SIId = cboStockWithdrawalSINumber.selectedValue;
+                $.ajax({
+                    url: '/api/stockWithdrawalItem/popUp/list/salesInvoiceStatus/' + SIId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    data: {},
+                    success: function (results) {
+                        $('#cmdApplySIStatusButton').prop("disabled", false);
+                        if (results != null) {
+                            if (results.length > 0) {
+                                for (i = 0; i < results.length; i++) {
+                                    salesInvoiceStatusObservableArray.push({
+                                        SIId: results[i]["SIId"],
+                                        ItemId: results[i]["ItemId"],
+                                        ItemCode: results[i]["ItemCode"],
+                                        ItemDescription: results[i]["ItemDescription"],
+                                        Particulars: results[i]["Particulars"],
+                                        BaseUnitId: results[i]["BaseUnitId"],
+                                        BaseUnit: results[i]["BaseUnit"],
+                                        BaseQuantity: results[i]["BaseQuantity"],
+                                        BaseQuantityDisplay: parseFloat(results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        WithdrawnQuantity: results[i]["WithdrawnQuantity"],
+                                        WithdrawnQuantityDisplay: parseFloat(results[i]["WithdrawnQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        BalanceQuantity: results[i]["BalanceQuantity"],
+                                        BalanceQuantityDisplay: parseFloat(results[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        PickButton: "<button class='btn btn-primary btn-xs btn-block' onclick='btnSIStatusPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                        Pick: (results[i]["BaseQuantity"] - results[i]["WithdrawnQuantity"]) == 0 ? "<button class='btn btn-primary btn-xs' onclick='pickQuantity_OnClick()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='pickReverseQuantity_OnClick()'><i class='fa fa-arrow-left'></i></button>",
+                                        Balance: results[i]["BaseQuantity"] - results[i]["WithdrawnQuantity"],
+                                        BalanceDisplay: parseFloat(results[i]["BaseQuantity"] - results[i]["WithdrawnQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    });
+                                }
+                            } else {
+                                $('#cmdApplySIStatusButton').prop("disabled", true);
+                            }
+                        } else {
+                            $('#cmdApplySIStatusButton').prop("disabled", true);
+                        }
+
+                        $('#loadingSIStatus').hide();
+                        $('#loadingSIPanel').show();
+                    }
+                });
+            } else {
+                $('#cmdApplySIStatusButton').prop("disabled", true);
+                $('#loadingSIStatus').hide();
+                $('#loadingSIPanel').show();
+            }
+
+            return salesInvoiceStatusObservableArray;
+        }
+
+        // ==========================
+        // Apply ALL SW Items Confirm
+        // ==========================
+        function cmdApplyAllSIStatusButton_OnClick() {
+            $('#applyAllConfirmSIStatus').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('cmdConfirmApplyAllSIStatusSWItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+            $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", false);
+            $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", false);
+        }
+
+        // Confirm Apply ALL SW
+        function btnConfrimApplyAllSWItems_OnClick() {
+            document.getElementById('cmdConfirmApplyAllSIStatusSWItems').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Applying";
+            $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", true);
+            $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", true);
+
+            var salesInvoiceArrays = new Array();
+
+            salesInvoiceStatusCollectionView.moveToFirstPage();
+
+            for (var p = 1; p <= salesInvoiceStatusCollectionView.pageCount; p++) {
+                for (var i = 0; i < salesInvoiceStatusCollectionView.items.length; i++) {
+                    var item = salesInvoiceStatusCollectionView.items[i];
+                    if (item.Balance > 0) {
+                        salesInvoiceArrays.push({
+                            SWId: item.SWId,
+                            Particulars: item.Particulars,
+                            ItemId: item.ItemId,
+                            UnitId: item.BaseUnitId,
+                            Quantity: item.Balance
+                        });
+                    }
+                }
+
+                salesInvoiceStatusCollectionView.moveToNextPage();
+                if (p == salesInvoiceStatusCollectionView.pageCount) {
+                    salesInvoiceStatusCollectionView.moveToPage(currentSIStatusPageIndex - 1);
+                }
+            }
+
+            var SWItemObject = new Object();
+            var SWItemObjectData = JSON.stringify(salesInvoiceArrays);
+
+            var SWId = getParam('id');
+
+            $.ajax({
+                url: '/api/stockWithdrawalItem/popUp/apply/salesInvoiceStatus/' + SWId,
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: SWItemObjectData,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Apply Successful");
+                        $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", true);
+                        $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", true);
+
+                        $('#applyAllConfirmSIStatus').modal('hide');
+                        $('#SIStatus').modal('hide');
+
+                        refreshSWItems();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#applyAllConfirmSIStatus').modal('hide');
+                        $('#SIStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllSIStatusSWItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#applyAllConfirmSIStatus').modal('hide');
+                        $('#SIStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllSIStatusSWItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#applyAllConfirmSIStatus').modal('hide');
+                        $('#SIStatus').modal('hide');
+                        document.getElementById('cmdConfirmApplyAllSIStatusSWItems').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#cmdConfirmApplyAllSIStatusSWItems").prop("disabled", false);
+                        $("#cmdCloseButtonApplyAllSIStatusSWItems").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        function btnSIStatusPickOnclick() {
+            $('#poStatusPickedAmountModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", false);
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", false);
+
+            salesInvoiceStatusCollectionView.editItem(salesInvoiceStatusCollectionView.currentItem);
+            var poStatusCollectionView = salesInvoiceStatusCollectionView.currentEditItem;
+            var balance = poStatusCollectionView.BalanceQuantity;
+            document.getElementById("inpSISTatusPickedQuantity").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // =================================================
+        // Sales Invoice Status Per Customer Amount Continue
+        // =================================================
+        function btnSalesInvoiceStatusPerCustomerPickAmountContinueOnclick() {
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", true);
+            $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", true);
+
+            var isValid = true;
+            $('.requiredPickedAmount').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                salesInvoiceStatusCollectionView.editItem(salesInvoiceStatusCollectionView.currentItem);
+                var poStatusCollectionView = salesInvoiceStatusCollectionView.currentEditItem;
+                var balance = document.getElementById("inpSISTatusPickedQuantity").value.split(",").join("");
+
+                if (isNaN(balance)) {
+                    toastr.error("Invalid Entry");
+
+                    $("#btnSalesInvoiceStatusPerCustomerPickAmountContinue").prop("disabled", false);
+                    $("#btnSalesInvoiceStatusPerCustomerPickAmountCloseModal").prop("disabled", false);
+                } else {
+                    poStatusCollectionView.Balance = balance;
+                    poStatusCollectionView.BalanceDisplay = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    salesInvoiceStatusCollectionView.refresh();
+                    salesInvoiceStatusFlexGrid.refresh();
+
+                    $('#poStatusPickedAmountModal').modal('hide');
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsSIStatus() {
+            if (salesInvoiceStatusCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridSIStatus').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridSIStatus').style.display = 'block';
+            if (salesInvoiceStatusCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridSIStatus.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridSIStatus.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToLastPageGridSIStatus.removeAttribute('disabled');
+            } else if (salesInvoiceStatusCollectionView.pageIndex === (salesInvoiceStatusCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToPreviousPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToNextPageGridSIStatus.setAttribute('disabled', 'disabled');
+                btnMoveToLastPageGridSIStatus.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToPreviousPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToNextPageGridSIStatus.removeAttribute('disabled');
+                btnMoveToLastPageGridSIStatus.removeAttribute('disabled');
+            }
+            btnCurrentPageGridSIStatus.innerHTML = (salesInvoiceStatusCollectionView.pageIndex + 1) + ' / ' + salesInvoiceStatusCollectionView.pageCount;
+        }
+
+        function refreshSWItems() {
+            stockWithdrawalItemCollectionView = new wijmo.collections.CollectionView(getItem());
+            stockWithdrawalItemCollectionView.canFilter = true;
+            stockWithdrawalItemCollectionView.pageSize = cboStockWithdrawalItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#StockWithdrawalInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockWithdrawalItemCollectionView.refresh();
+            });
+
+            stockWithdrawalItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockWithdrawalItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItems();
+            });
+
+            // Flex Grid for Items
+            stockWithdrawalItemFlexGrid.itemsSource = stockWithdrawalItemCollectionView;
+            stockWithdrawalItemFlexGrid.trackChanges = true;
+        }
+
+        // ===============
+        // SI In SI Status
+        // ===============
+        function getSIBySupplierInSIStatus() {
+            salesInvoiceStatusCollectionView = new wijmo.collections.CollectionView(getSalesInvoiceItemForSISTatus());
+            salesInvoiceStatusCollectionView.canFilter = true;
+            salesInvoiceStatusCollectionView.pageSize = 10;
+
+            var filterText = '';
+            $('#inputFilterSIItem').keyup(function () {
+                filterText = this.value.toLowerCase();
+                salesInvoiceStatusCollectionView.refresh();
+            });
+
+            salesInvoiceStatusCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            salesInvoiceStatusCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsSIStatus();
+            });
+
+            // Flex Grid for Item
+            salesInvoiceStatusFlexGrid.dispose();
+            salesInvoiceStatusFlexGrid = new wijmo.grid.FlexGrid('#salesInvoiceStatusFlexGrid');
+            salesInvoiceStatusFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Code",
+                        "binding": "ItemCode",
+                        "allowSorting": true,
+                        "width": "1.5*",
+                        "isReadOnly": true,
+                    },
+                    {
+                        "header": "Description",
+                        "binding": "ItemDescription",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Unit",
+                        "binding": "BaseUnit",
+                        "allowSorting": true,
+                        "isReadOnly": true,
+                        "width": "0.7*"
+                    },
+                    {
+                        "header": "Sold",
+                        "binding": "BaseQuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Withdrawn",
+                        "binding": "WithdrawnQuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "1*",
+                    },
+                    {
+                        "header": "Balance",
+                        "binding": "BalanceQuantityDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "isReadOnly": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Pick",
+                        "binding": "PickButton",
+                        "width": 60,
+                        "align": "center",
+                        "isReadOnly": true,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Quantity",
+                        "binding": "BalanceDisplay",
+                        "allowSorting": true,
+                        "width": "1*",
+                        "align": "right",
+                        "isReadOnly": true,
+                        "isContentHtml": true
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: salesInvoiceStatusCollectionView,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row,
+            });
+
+            salesInvoiceStatusFlexGrid.trackChanges = true;
+
+            // Merge column Headers
+            var hr = new wijmo.grid.Row();
+            salesInvoiceStatusFlexGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            salesInvoiceStatusFlexGrid.columnHeaders.rows.push(hr);
+            salesInvoiceStatusFlexGrid.columnHeaders.rows[0].allowMerging = true;
+
+            salesInvoiceStatusFlexGrid.columnHeaders.columns[0].allowMerging = true;
+            salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, 0, 'Code');
+
+            salesInvoiceStatusFlexGrid.columnHeaders.columns[1].allowMerging = true;
+            salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, 1, 'Description');
+
+            salesInvoiceStatusFlexGrid.columnHeaders.columns[2].allowMerging = true;
+            salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, 2, 'Unit');
+
+            for (var columnQuantityTopAssigned = 3; columnQuantityTopAssigned <= 5; columnQuantityTopAssigned++) {
+                salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Quantities');
+            }
+
+            salesInvoiceStatusFlexGrid.columnHeaders.columns[6].allowMerging = true;
+            salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, 6, 'Pick');
+
+            salesInvoiceStatusFlexGrid.columnHeaders.columns[7].allowMerging = true;
+            salesInvoiceStatusFlexGrid.columnHeaders.setCellData(0, 7, 'Quantity');
+
+            if (!isSIStatusClicked) {
+                updateNavigateButtonsSIStatus();
+
+                btnMoveToFirstPageGridSIStatus.addEventListener('click', function () {
+                    salesInvoiceStatusCollectionView.moveToFirstPage();
+                    currentSIStatusPageIndex = salesInvoiceStatusCollectionView.pageIndex + 1;
+                    updateNavigateButtonsSIStatus();
+                });
+
+                btnMoveToPreviousPageGridSIStatus.addEventListener('click', function () {
+                    salesInvoiceStatusCollectionView.moveToPreviousPage();
+                    currentSIStatusPageIndex = salesInvoiceStatusCollectionView.pageIndex + 1;
+                    updateNavigateButtonsSIStatus();
+                });
+
+                btnMoveToNextPageGridSIStatus.addEventListener('click', function () {
+                    salesInvoiceStatusCollectionView.moveToNextPage();
+                    currentSIStatusPageIndex = salesInvoiceStatusCollectionView.pageIndex + 1;
+                    updateNavigateButtonsSIStatus();
+                });
+
+                btnMoveToLastPageGridSIStatus.addEventListener('click', function () {
+                    salesInvoiceStatusCollectionView.moveToLastPage();
+                    currentSIStatusPageIndex = salesInvoiceStatusCollectionView.pageIndex + 1;
+                    updateNavigateButtonsSIStatus();
+                });
+
+                isSIStatusClicked = true;
+            }
+        }
+
 
         // ===========
         // OnLoad Page
