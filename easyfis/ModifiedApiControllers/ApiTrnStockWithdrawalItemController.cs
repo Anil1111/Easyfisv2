@@ -298,9 +298,6 @@ namespace easyfis.ModifiedApiControllers
                                         };
 
                                         db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
-                                        db.SubmitChanges();
-
-                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
                                 }
                             }
