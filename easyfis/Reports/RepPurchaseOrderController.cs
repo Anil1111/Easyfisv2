@@ -142,6 +142,7 @@ namespace easyfis.Reports
                                          select new
                                          {
                                              PO = d.TrnPurchaseOrder.PONumber,
+                                             SKUCode = d.MstArticle.ManualArticleOldCode,
                                              Item = d.MstArticle.Article,
                                              Particulars = d.Particulars,
                                              Unit = d.MstUnit.Unit,
@@ -172,10 +173,16 @@ namespace easyfis.Reports
                         count += 1;
                         totalAmount += purchaseOrderItem.Amount;
 
+                        string SKUCode = purchaseOrderItem.SKUCode;
+                        if (purchaseOrderItem.SKUCode.Equals("NA") || purchaseOrderItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(count.ToString("#,##0"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Particulars, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Cost.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tablePurchaseOrderLines.AddCell(new PdfPCell(new Phrase(purchaseOrderItem.Amount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
