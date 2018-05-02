@@ -125,12 +125,10 @@ namespace easyfis.ModifiedApiControllers
                               where d.UserId == User.Identity.GetUserId()
                               select d;
 
-            var branchId = currentUser.FirstOrDefault().BranchId;
             var companyId = currentUser.FirstOrDefault().CompanyId;
 
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
                            where d.CompanyId == companyId
-                           && d.Id != Convert.ToInt32(branchId)
                            select new Entities.MstBranch
                            {
                                Id = d.Id,
@@ -214,7 +212,7 @@ namespace easyfis.ModifiedApiControllers
 
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalList") select d;
                     IQueryable<Data.TrnSalesInvoice> salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
-                                                                     where d.MstBranch.CompanyId == currentCompanyId && d.BranchId != currentBranchId
+                                                                     where d.MstBranch.CompanyId == currentCompanyId && d.BranchId == currentBranchId
                                                                      && d.BalanceAmount > 0 && d.IsLocked == true
                                                                      select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
@@ -370,7 +368,7 @@ namespace easyfis.ModifiedApiControllers
                         lockStockWithdrawal.UpdatedDateTime = DateTime.Now;
                         db.SubmitChanges();
 
-                        if (objStockWithdrawal.SIBranchId != currentBranchId)
+                        if (currentBranchId != objStockWithdrawal.SIBranchId)
                         {
                             // =====================
                             // Journal and Inventory
