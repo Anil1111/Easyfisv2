@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Item</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpItemSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,37 +58,55 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddItem" onclick="btnAddItemOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnItemAdd" onclick="btnItemAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseItem" onclick="btnCloseItemOnclick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnItemClose" onclick="btnItemCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="ItemGrid"></div>
+                        <div id="itemFlexGrid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="itemNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnItemMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -114,12 +135,17 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Item Delete Modal -->
+    <!--
+        ===========================
+        Item Confirm Delete (Modal)
+        ===========================
+    -->
     <div class="modal fade" id="deleteItemConfirm" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -127,11 +153,11 @@
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this item?
+                    Delete Item?
                 </div>
                 <div class="modal-footer">
-                    <button id="btnConfirmDelete" class="btn btn-danger" onclick="btnConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="btnCloseConfirmDelete" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnItemConfirmDelete" class="btn btn-danger" onclick="btnItemConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnItemCloseConfirmDelete" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -139,21 +165,25 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
+        // ==================================
+        // Item Collection View and Flex Grid
+        // ==================================
         var itemCollectionView;
         var itemFlexGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
 
-        // ==============================
-        // Get Data from MstArtcile Table
-        // ==============================
-        function getArtcileForItems() {
+        // =======================
+        // Item Navigation Buttons
+        // =======================
+        var btnItemMoveToFirstPageGrid = document.getElementById('btnItemMoveToFirstPageGrid');
+        var btnItemMoveToPreviousPageGrid = document.getElementById('btnItemMoveToPreviousPageGrid');
+        var btnItemMoveToNextPageGrid = document.getElementById('btnItemMoveToNextPageGrid');
+        var btnItemMoveToLastPageGrid = document.getElementById('btnItemMoveToLastPageGrid');
+        var btnItemCurrentPageGrid = document.getElementById('btnItemCurrentPageGrid');
+
+        // =============
+        // Get Item Data
+        // =============
+        function getItemData() {
             var itemsObservableArray = new wijmo.collections.ObservableArray;
             NProgress.start();
             $.ajax({
@@ -161,29 +191,29 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (itemListResults) {
-                    if (itemListResults.length > 0) {
-                        for (i = 0; i < itemListResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             itemsObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='' onclick='cmdItemEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdItemDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
-                                Id: itemListResults[i]["Id"],
-                                ArticleCode: itemListResults[i]["ArticleCode"],
-                                ManualArticleCode: itemListResults[i]["ManualArticleCode"],
-                                Article: itemListResults[i]["Article"],
-                                Category: itemListResults[i]["Category"],
-                                Unit: itemListResults[i]["Unit"],
-                                Price: itemListResults[i]["Price"],
-                                PriceDisplay: parseFloat(itemListResults[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                IsInventory: itemListResults[i]["IsInventory"],
-                                ManualArticleOldCode: itemListResults[i]["ManualArticleOldCode"],
-                                IsLocked: itemListResults[i]["IsLocked"],
-                                CreatedById: itemListResults[i]["CreatedById"],
-                                CreatedBy: itemListResults[i]["CreatedBy"],
-                                CreatedDateTime: itemListResults[i]["CreatedDateTime"],
-                                UpdatedById: itemListResults[i]["UpdatedById"],
-                                UpdatedBy: itemListResults[i]["UpdatedBy"],
-                                UpdatedDateTime: itemListResults[i]["UpdatedDateTime"]
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='' onclick='btnItemEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnItemDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
+                                Id: results[i]["Id"],
+                                ArticleCode: results[i]["ArticleCode"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
+                                Article: results[i]["Article"],
+                                Category: results[i]["Category"],
+                                Unit: results[i]["Unit"],
+                                Price: results[i]["Price"],
+                                PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                IsInventory: results[i]["IsInventory"],
+                                ManualArticleOldCode: results[i]["ManualArticleOldCode"],
+                                IsLocked: results[i]["IsLocked"],
+                                CreatedById: results[i]["CreatedById"],
+                                CreatedBy: results[i]["CreatedBy"],
+                                CreatedDateTime: results[i]["CreatedDateTime"],
+                                UpdatedById: results[i]["UpdatedById"],
+                                UpdatedBy: results[i]["UpdatedBy"],
+                                UpdatedDateTime: results[i]["UpdatedDateTime"]
                             });
                         }
                     }
@@ -195,212 +225,16 @@
             return itemsObservableArray;
         }
 
-        // ===============
-        // Item Add Button
-        // ===============
-        function btnAddItemOnclick() {
-            document.getElementById('btnAddItem').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddItem').prop('disabled', true);
-            $('#btnCloseItem').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/item/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/ItemDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddItem').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddItem').prop('disabled', false);
-                        $('#btnCloseItem').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddItem').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddItem').prop('disabled', false);
-                        $('#btnCloseItem').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddItem').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddItem').prop('disabled', false);
-                        $('#btnCloseItem').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // =================
-        // Item Close Button
-        // =================
-        function btnCloseItemOnclick() {
-            window.location = '/Software';
-        }
-
-        // ================
-        // Item Edit Button
-        // ================
-        function cmdItemEditButton_OnClick() {
-            itemCollectionView.editItem(itemCollectionView.currentItem);
-            var item = itemCollectionView.currentEditItem;
-            var itemId = item.Id;
-            window.location = '/Software/ItemDetail?id=' + itemId;
-        }
-
-        // =====================
-        // Refresh Item Flexgrid
-        // =====================
-        function refreshItemFlexgrid() {
-            itemCollectionView = new wijmo.collections.CollectionView(getArtcileForItems());
-            itemCollectionView.canFilter = true;
-            itemCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                itemCollectionView.refresh();
-            });
-
-            itemCollectionView.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Category.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            itemCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            itemCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            itemFlexGrid.itemsSource = itemCollectionView;
-            itemFlexGrid.trackChanges = true;
-        }
-
-        // ==================
-        // Item delete Button
-        // ==================
-        function cmdItemDeleteButton_OnClick() {
-            itemCollectionView.editItem(itemCollectionView.currentItem);
-            var item = itemCollectionView.currentEditItem;
-            if (item.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteItemConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-
-                document.getElementById('btnConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $('#btnConfirmDelete').prop('disabled', false);
-                $('#btnCloseConfirmDelete').prop('disabled', false);
-            }
-        }
-
-        // ==========================
-        // Item Confirm Delete Button
-        // ==========================
-        function btnConfirmDeleteOnclick() {
-            document.getElementById('btnConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $('#btnConfirmDelete').prop('disabled', true);
-            $('#btnCloseConfirmDelete').prop('disabled', true);
-
-            itemCollectionView.editItem(itemCollectionView.currentItem);
-            var id = itemCollectionView.currentEditItem.Id;
-            $.ajax({
-                url: '/api/item/delete/' + id,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteItemConfirm').modal('hide');
-                        refreshItemFlexgrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteItemConfirm').modal('hide');
-                        document.getElementById('btnConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#btnConfirmDelete').prop('disabled', false);
-                        $('#btnCloseConfirmDelete').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteItemConfirm').modal('hide');
-                        document.getElementById('btnConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#btnConfirmDelete').prop('disabled', false);
-                        $('#btnCloseConfirmDelete').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteItemConfirm').modal('hide');
-                        document.getElementById('btnConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#btnConfirmDelete').prop('disabled', false);
-                        $('#btnCloseConfirmDelete').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            itemCollectionView.editItem(itemCollectionView.currentItem);
-            var item = itemCollectionView.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
-        }
-
-        // ===============================
-        // Navigation Buttons for Supplier
-        // ===============================
-        function updateNavigateButtonsItems() {
-            if (itemCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (itemCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (itemCollectionView.pageIndex === (itemCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (itemCollectionView.pageIndex + 1) + ' / ' + itemCollectionView.pageCount;
-        }
-
-        // =============
-        // Item FlexGrid
-        // =============
+        // ====================
+        // Create Item FlexGrid
+        // ====================
         function createItemFlexGrid() {
-            itemCollectionView = new wijmo.collections.CollectionView(getArtcileForItems());
+            itemCollectionView = new wijmo.collections.CollectionView(getItemData());
             itemCollectionView.canFilter = true;
             itemCollectionView.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpItemSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 itemCollectionView.refresh();
             });
@@ -415,14 +249,14 @@
             }
 
             itemCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updateItemNavigationButtons();
             });
 
             itemCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+                updateItemDetailsFlexGridSelection();
             });
 
-            itemFlexGrid = new wijmo.grid.FlexGrid('#ItemGrid');
+            itemFlexGrid = new wijmo.grid.FlexGrid('#itemFlexGrid');
             itemFlexGrid.initialize({
                 columns: [
                              @{
@@ -521,33 +355,223 @@
 
             itemFlexGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            updateItemNavigationButtons();
 
-            updateNavigateButtonsItems();
-
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnItemMoveToFirstPageGrid.addEventListener('click', function () {
                 itemCollectionView.moveToFirstPage();
-                updateNavigateButtonsItems();
+                updateItemNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnItemMoveToPreviousPageGrid.addEventListener('click', function () {
                 itemCollectionView.moveToPreviousPage();
-                updateNavigateButtonsItems();
+                updateItemNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnItemMoveToNextPageGrid.addEventListener('click', function () {
                 itemCollectionView.moveToNextPage();
-                updateNavigateButtonsItems();
+                updateItemNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnItemMoveToLastPageGrid.addEventListener('click', function () {
                 itemCollectionView.moveToLastPage();
-                updateNavigateButtonsItems();
+                updateItemNavigationButtons();
             });
+        }
+
+        // =======================================
+        // Update Item Details Flex Grid Selection
+        // =======================================
+        function updateItemDetailsFlexGridSelection() {
+            itemCollectionView.editItem(itemCollectionView.currentItem);
+            var item = itemCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ==============================
+        // Update Item Navigation Buttons
+        // ==============================
+        function updateItemNavigationButtons() {
+            if (itemCollectionView.pageSize <= 0) {
+                document.getElementById('itemNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('itemNavigationPageGrid').style.display = 'block';
+            if (itemCollectionView.pageIndex === 0) {
+                btnItemMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemCollectionView.pageIndex === (itemCollectionView.pageCount - 1)) {
+                btnItemMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnItemMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemCurrentPageGrid.innerHTML = (itemCollectionView.pageIndex + 1) + ' / ' + itemCollectionView.pageCount;
+        }
+
+        // =====================
+        // Refresh Item Flexgrid
+        // =====================
+        function refreshItemFlexgrid() {
+            itemCollectionView = new wijmo.collections.CollectionView(getItemData());
+            itemCollectionView.canFilter = true;
+            itemCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpItemSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                itemCollectionView.refresh();
+            });
+
+            itemCollectionView.filter = function (item) {
+                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Category.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            itemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemNavigationButtons();
+            });
+
+            itemCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateItemDetailsFlexGridSelection();
+            });
+
+            itemFlexGrid.itemsSource = itemCollectionView;
+            itemFlexGrid.trackChanges = true;
+        }
+
+        // ========
+        // Add Item
+        // ========
+        function btnItemAddOnclick() {
+            document.getElementById('btnItemAdd').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
+            $('#btnItemAdd').prop('disabled', true);
+            $('#btnItemClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/item/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/ItemDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnItemAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnItemAdd').prop('disabled', false);
+                        $('#btnItemClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnItemAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnItemAdd').prop('disabled', false);
+                        $('#btnItemClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnItemAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnItemAdd').prop('disabled', false);
+                        $('#btnItemClose').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =========
+        // Edit Item
+        // =========
+        function btnItemEditOnclick() {
+            itemCollectionView.editItem(itemCollectionView.currentItem);
+            var item = itemCollectionView.currentEditItem;
+            var itemId = item.Id;
+            window.location = '/Software/ItemDetail?id=' + itemId;
+        }
+
+        // ===========
+        // Delete Item
+        // ===========
+        function btnItemDeleteOnclick() {
+            itemCollectionView.editItem(itemCollectionView.currentItem);
+            var item = itemCollectionView.currentEditItem;
+            if (item.IsLocked) {
+                toastr.error("Delete is not allowed when the selected record is locked!");
+            } else {
+                $('#deleteItemConfirm').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                document.getElementById('btnItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $('#btnItemConfirmDelete').prop('disabled', false);
+                $('#btnItemCloseConfirmDelete').prop('disabled', false);
+            }
+        }
+
+        // ===================
+        // Confirm Delete Item
+        // ===================
+        function btnItemConfirmDeleteOnclick() {
+            document.getElementById('btnItemConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+            $('#btnItemConfirmDelete').prop('disabled', true);
+            $('#btnItemCloseConfirmDelete').prop('disabled', true);
+
+            itemCollectionView.editItem(itemCollectionView.currentItem);
+            var id = itemCollectionView.currentEditItem.Id;
+            $.ajax({
+                url: '/api/item/delete/' + id,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#deleteItemConfirm').modal('hide');
+                        refreshItemFlexgrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#deleteItemConfirm').modal('hide');
+                        document.getElementById('btnItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnItemConfirmDelete').prop('disabled', false);
+                        $('#btnItemCloseConfirmDelete').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#deleteItemConfirm').modal('hide');
+                        document.getElementById('btnItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnItemConfirmDelete').prop('disabled', false);
+                        $('#btnItemCloseConfirmDelete').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#deleteItemConfirm').modal('hide');
+                        document.getElementById('btnItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnItemConfirmDelete').prop('disabled', false);
+                        $('#btnItemCloseConfirmDelete').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // ==========
+        // Close Item
+        // ==========
+        function btnItemCloseOnclick() {
+            window.location = '/Software';
         }
 
         // ============
@@ -558,7 +582,14 @@
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -605,6 +636,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -644,6 +678,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
