@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Item Component List</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,67 +26,97 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpItemComponentListSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboItemComponentListShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboItemComponentListDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnItemComponentListReportCSVOnclick()" id="btnItemComponentListReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnItemComponentListReportPrintPDFOnclick()" id="btnItemComponentListReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnItemComponentListCSVOnclick()" id="btnItemComponentListCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnItemComponentListPDFOnclick()" id="btnItemComponentListPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =================
+                        Item Group Filter
+                        =================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Item Group</b></span>
-                                        <div class="comboBox-wide" id="cboItemGroup"></div>
+                                        <div class="comboBox-wide" id="cboItemGroupFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 50.5%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="itemComponentListReportGrid" class="grid"></div>
+                        <div id="itemComponentListFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="itemCompoentnListNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemComponentListMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemComponentListMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemComponentListCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnItemComponentListMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemComponentListMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -108,6 +135,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -115,25 +143,33 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var itemComponentListReportCollections;
-        var itemComponentListReportGrid;
-        var cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup');
-        var isCboItemGroupSelected = false;
-        var cboItemComponentListShowNumberOfRows = new wijmo.input.ComboBox('#cboItemComponentListShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var itemComponentListCollectionView;
+        var itemComponentListFlexGrid;
+        var cboItemComponentListDisplayNumberOfRows = new wijmo.input.ComboBox('#cboItemComponentListDisplayNumberOfRows');
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =================
+        // Item Group Filter
+        // =================
+        var cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter');
+        var isCboItemGroupSelected = false;
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnItemComponentListMoveToFirstPageGrid = document.getElementById('btnItemComponentListMoveToFirstPageGrid');
+        var btnItemComponentListMoveToPreviousPageGrid = document.getElementById('btnItemComponentListMoveToPreviousPageGrid');
+        var btnItemComponentListMoveToNextPageGrid = document.getElementById('btnItemComponentListMoveToNextPageGrid');
+        var btnItemComponentListMoveToLastPageGrid = document.getElementById('btnItemComponentListMoveToLastPageGrid');
+        var btnItemComponentListCurrentPageGrid = document.getElementById('btnItemComponentListCurrentPageGrid');
+        var itemComponentListCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -147,51 +183,50 @@
             }
         }
 
-        // =====================
-        // Get Artile Item Group
-        // =====================
-        function getArticleItemGroupForComboBox() {
+        // ==============================
+        // Create Combo Item Group Filter
+        // ==============================
+        function createCboItemGroupFilter() {
             NProgress.start();
-            var articleItemGroupsObservableArray = new wijmo.collections.ObservableArray();
+
+            var iItemGroupObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/listArticleGroupByArticleTypeId/1',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (itemGroupResults) {
-                    if (itemGroupResults.length > 0) {
-                        for (i = 0; i < itemGroupResults.length; i++) {
-                            articleItemGroupsObservableArray.push({
-                                Id: itemGroupResults[i]["Id"],
-                                ArticleGroup: itemGroupResults[i]["ArticleGroup"]
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            iItemGroupObservableArray.push({
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"]
                             });
                         }
                     }
 
-                    cboItemGroup.dispose();
-                    cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup', {
+                    cboItemGroupFilter.dispose();
+                    cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter', {
                         isEditable: false,
-                        itemsSource: articleItemGroupsObservableArray,
+                        itemsSource: iItemGroupObservableArray,
                         displayMemberPath: "ArticleGroup",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("ItemGroupId"),
+                        selectedValue: getURLParameterValue("ItemGroupId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            refreshItemComponentListReportFlexGrid();
+                            refreshItemComponentListFlexGrid();
                         }
                     });
 
-                    createCboShowRows();
+                    createCboDisplayNumberOfRows();
                 }
             });
-
-            NProgress.done();
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -221,8 +256,8 @@
                 });
             }
 
-            cboItemComponentListShowNumberOfRows.dispose();
-            cboItemComponentListShowNumberOfRows = new wijmo.input.ComboBox('#cboItemComponentListShowNumberOfRows', {
+            cboItemComponentListDisplayNumberOfRows.dispose();
+            cboItemComponentListDisplayNumberOfRows = new wijmo.input.ComboBox('#cboItemComponentListDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -232,10 +267,10 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboItemComponentListShowNumberOfRows.selectedValue;
-                        itemComponentListReportCollections.pageSize = parseInt(numberOfRows);
-                        itemComponentListReportCollections.refresh();
-                        itemComponentListReportGrid.refresh();
+                        var numberOfRows = cboItemComponentListDisplayNumberOfRows.selectedValue;
+                        itemComponentListCollectionView.pageSize = parseInt(numberOfRows);
+                        itemComponentListCollectionView.refresh();
+                        itemComponentListFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
@@ -243,80 +278,53 @@
             });
 
             if (!isCboItemGroupSelected) {
-                createItemComponentListReportFlexGrid();
+                createItemComponentListFlexGrid();
             } else {
-                refreshItemComponentListReportFlexGrid();
+                refreshItemComponentListFlexGrid();
             }
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (itemComponentListReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (itemComponentListReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (itemComponentListReportCollections.pageIndex === (itemComponentListReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (itemComponentListReportCollections.pageIndex + 1) + ' / ' + itemComponentListReportCollections.pageCount;
-        }
-
-        // =======================
-        // Get Item Component Data
-        // =======================
-        function getItemComponentListReport() {
-            var itemComponentListReports = new wijmo.collections.ObservableArray;
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        // ============================
+        // Get Item Component List Data
+        // ============================
+        function getItemComponentListData() {
+            var itemComponentListObservableArray = new wijmo.collections.ObservableArray;
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/itemComponentList/list/' + itemGroupId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (itemComponentListReportResult) {
+                    success: function (results) {
                         var totalAmount = 0;
-                        if (itemComponentListReportResult.length > 0) {
-                            for (i = 0; i < itemComponentListReportResult.length; i++) {
-                                var docLink = "/Software/ItemDetail?id=" + itemComponentListReportResult[i]["ArticleId"];
-                                itemComponentListReports.push({
-                                    Id: itemComponentListReportResult[i]["Id"],
-                                    ArticleId: itemComponentListReportResult[i]["ArticleId"],
-                                    Article: itemComponentListReportResult[i]["Article"],
-                                    ArticleCodeForCSV: "Component-" + itemComponentListReportResult[i]["ArticleCode"],
-                                    ArticleBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block' style='text-align: left;'> " + itemComponentListReportResult[i]["Article"] + "</a>",
-                                    ManualArticleCodeForCSV: "Component-" + itemComponentListReportResult[i]["ManualArticleCode"],
-                                    ManualArticleCode: itemComponentListReportResult[i]["ManualArticleCode"],
-                                    ComponentArticleId: itemComponentListReportResult[i]["ComponentArticleId"],
-                                    ComponentArticle: itemComponentListReportResult[i]["ComponentArticle"],
-                                    ComponentManualArticleOldCode: itemComponentListReportResult[i]["ComponentManualArticleOldCode"],
-                                    Quantity: itemComponentListReportResult[i]["Quantity"],
-                                    QuantityDisplay: parseFloat(itemComponentListReportResult[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Unit: itemComponentListReportResult[i]["Unit"],
-                                    Price: itemComponentListReportResult[i]["Price"],
-                                    PriceDisplay: parseFloat(itemComponentListReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Cost: itemComponentListReportResult[i]["Cost"],
-                                    CostDisplay: parseFloat(itemComponentListReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    AmountDisplay: parseFloat(itemComponentListReportResult[i]["Quantity"] * itemComponentListReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+
+                                var docLink = "/Software/ItemDetail?id=" + results[i]["ArticleId"];
+                                itemComponentListObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    ArticleId: results[i]["ArticleId"],
+                                    Article: results[i]["Article"],
+                                    ArticleCodeForCSV: "Component-" + results[i]["ArticleCode"],
+                                    ArticleBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block' style='text-align: left;'> " + results[i]["Article"] + "</a>",
+                                    ManualArticleCodeForCSV: "Component-" + results[i]["ManualArticleCode"],
+                                    ManualArticleCode: results[i]["ManualArticleCode"],
+                                    ComponentArticleId: results[i]["ComponentArticleId"],
+                                    ComponentArticle: results[i]["ComponentArticle"],
+                                    ComponentManualArticleOldCode: results[i]["ComponentManualArticleOldCode"],
+                                    Quantity: results[i]["Quantity"],
+                                    QuantityDisplay: parseFloat(results[i]["Quantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Unit: results[i]["Unit"],
+                                    Price: results[i]["Price"],
+                                    PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Cost: results[i]["Cost"],
+                                    CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    AmountDisplay: parseFloat(results[i]["Quantity"] * results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                                 });
 
-                                totalAmount += itemComponentListReportResult[i]["Quantity"] * itemComponentListReportResult[i]["Cost"];
+                                totalAmount += results[i]["Quantity"] * results[i]["Cost"];
                             }
                         }
 
@@ -329,35 +337,24 @@
                 NProgress.done();
             }
 
-            return itemComponentListReports;
+            return itemComponentListObservableArray;
         }
 
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshItemComponentListReportFlexGrid() {
-            itemComponentListReportCollections = new wijmo.collections.CollectionView(getItemComponentListReport());
-            itemComponentListReportCollections.canFilter = true;
-            itemComponentListReportCollections.pageSize = cboItemComponentListShowNumberOfRows.selectedValue;
+        // ====================================
+        // Create Item Component List Flex Grid
+        // ====================================
+        function createItemComponentListFlexGrid() {
+            itemComponentListCollectionView = new wijmo.collections.CollectionView(getItemComponentListData());
+            itemComponentListCollectionView.canFilter = true;
+            itemComponentListCollectionView.pageSize = cboItemComponentListDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpItemComponentListSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                itemComponentListReportCollections.refresh();
-
-                if (itemComponentListReportCollections.items.length > 0) {
-                    var totalAmount = 0;
-                    for (var i = 0; i < itemComponentListReportCollections.items.length; i++) {
-                        totalAmount += itemComponentListReportCollections.items[i].Quantity * itemComponentListReportCollections.items[i].Cost;
-                    }
-
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                itemComponentListCollectionView.refresh();
             });
 
-            itemComponentListReportCollections.filter = function (item) {
+            itemComponentListCollectionView.filter = function (item) {
                 return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ComponentManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
@@ -365,54 +362,12 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            itemComponentListReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            itemComponentListCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemComponentListNavigationButtons();
             });
 
-            itemComponentListReportGrid.itemsSource = itemComponentListReportCollections;
-            itemComponentListReportGrid.trackChanges = true;
-            NProgress.done();
-        }
-
-        // =========
-        // Flex Grid
-        // =========
-        function createItemComponentListReportFlexGrid() {
-            itemComponentListReportCollections = new wijmo.collections.CollectionView(getItemComponentListReport());
-            itemComponentListReportCollections.canFilter = true;
-            itemComponentListReportCollections.pageSize = cboItemComponentListShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                itemComponentListReportCollections.refresh();
-
-                if (itemComponentListReportCollections.items.length > 0) {
-                    var totalAmount = 0;
-                    for (var i = 0; i < itemComponentListReportCollections.items.length; i++) {
-                        totalAmount += itemComponentListReportCollections.items[i].Quantity * itemComponentListReportCollections.items[i].Cost;
-                    }
-
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
-            });
-
-            itemComponentListReportCollections.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ComponentManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ComponentArticle.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            itemComponentListReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            itemComponentListReportGrid = new wijmo.grid.FlexGrid('#itemComponentListReportGrid');
-            itemComponentListReportGrid.initialize({
+            itemComponentListFlexGrid = new wijmo.grid.FlexGrid('#itemComponentListFlexGrid');
+            itemComponentListFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Item",
@@ -468,74 +423,126 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: itemComponentListReportCollections,
+                itemsSource: itemComponentListCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            itemComponentListReportGrid.trackChanges = true;
+            itemComponentListFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateItemComponentListNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                itemComponentListReportCollections.moveToFirstPage();
-                currentPageIndex = itemComponentListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemComponentListMoveToFirstPageGrid.addEventListener('click', function () {
+                itemComponentListCollectionView.moveToFirstPage();
+                itemComponentListCurrentPageIndex = itemComponentListCollectionView.pageIndex + 1;
+                updateItemComponentListNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                itemComponentListReportCollections.moveToPreviousPage();
-                currentPageIndex = itemComponentListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemComponentListMoveToPreviousPageGrid.addEventListener('click', function () {
+                itemComponentListCollectionView.moveToPreviousPage();
+                itemComponentListCurrentPageIndex = itemComponentListCollectionView.pageIndex + 1;
+                updateItemComponentListNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                itemComponentListReportCollections.moveToNextPage();
-                currentPageIndex = itemComponentListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemComponentListMoveToNextPageGrid.addEventListener('click', function () {
+                itemComponentListCollectionView.moveToNextPage();
+                itemComponentListCurrentPageIndex = itemComponentListCollectionView.pageIndex + 1;
+                updateItemComponentListNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                itemComponentListReportCollections.moveToLastPage();
-                currentPageIndex = itemComponentListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemComponentListMoveToLastPageGrid.addEventListener('click', function () {
+                itemComponentListCollectionView.moveToLastPage();
+                itemComponentListCurrentPageIndex = itemComponentListCollectionView.pageIndex + 1;
+                updateItemComponentListNavigationButtons();
             });
+        }
+
+        // =============================================
+        // Update Item Component List Navigation Buttons
+        // =============================================
+        function updateItemComponentListNavigationButtons() {
+            if (itemComponentListCollectionView.pageSize <= 0) {
+                document.getElementById('itemCompoentnListNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('itemCompoentnListNavigationPageGrid').style.display = 'block';
+            if (itemComponentListCollectionView.pageIndex === 0) {
+                btnItemComponentListMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemComponentListMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemComponentListMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemComponentListCollectionView.pageIndex === (itemComponentListCollectionView.pageCount - 1)) {
+                btnItemComponentListMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnItemComponentListMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemComponentListMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemComponentListMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemComponentListCurrentPageGrid.innerHTML = (itemComponentListCollectionView.pageIndex + 1) + ' / ' + itemComponentListCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshItemComponentListFlexGrid() {
+            itemComponentListCollectionView = new wijmo.collections.CollectionView(getItemComponentListData());
+            itemComponentListCollectionView.canFilter = true;
+            itemComponentListCollectionView.pageSize = cboItemComponentListDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpItemComponentListSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                itemComponentListCollectionView.refresh();
+            });
+
+            itemComponentListCollectionView.filter = function (item) {
+                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ComponentManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ComponentArticle.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            itemComponentListCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemComponentListNavigationButtons();
+            });
+
+            itemComponentListFlexGrid.itemsSource = itemComponentListCollectionView;
+            itemComponentListFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnItemComponentListReportCSVOnclick() {
+        function btnItemComponentListCSVOnclick() {
             var CSV = '';
-            var itemComponentListReport = [];
-            var fileName = 'ItemComponentListReport.CSV';
+            var itemComponentList = [];
+            var fileName = 'ItemComponentList.CSV';
 
-            itemComponentListReportCollections.moveToFirstPage();
+            itemComponentListCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= itemComponentListReportCollections.pageCount; p++) {
-                for (i = 0; i < itemComponentListReportCollections.items.length; i++) {
-                    var IsClose = itemComponentListReportCollections.items[i].IsClose;
-                    var isPOClose = "Not Closed";
-                    if (IsClose) {
-                        isPOClose = "Closed"
-                    }
-
-                    itemComponentListReport.push({
-                        Article: itemComponentListReportCollections.items[i].Article,
-                        ArticleCode: itemComponentListReportCollections.items[i].ManualArticleCodeForCSV,
-                        ComponentArticle: itemComponentListReportCollections.items[i].ComponentArticle,
-                        Quantity: itemComponentListReportCollections.items[i].Quantity,
-                        Unit: itemComponentListReportCollections.items[i].Unit,
-                        Cost: itemComponentListReportCollections.items[i].Cost,
-                        Price: itemComponentListReportCollections.items[i].Price,
+            for (var p = 1; p <= itemComponentListCollectionView.pageCount; p++) {
+                for (i = 0; i < itemComponentListCollectionView.items.length; i++) {
+                    itemComponentList.push({
+                        Article: itemComponentListCollectionView.items[i].Article,
+                        ArticleCode: itemComponentListCollectionView.items[i].ManualArticleCodeForCSV,
+                        ComponentArticle: itemComponentListCollectionView.items[i].ComponentArticle,
+                        Quantity: itemComponentListCollectionView.items[i].Quantity,
+                        Unit: itemComponentListCollectionView.items[i].Unit,
+                        Cost: itemComponentListCollectionView.items[i].Cost,
+                        Price: itemComponentListCollectionView.items[i].Price,
                     });
                 }
 
-                itemComponentListReportCollections.moveToNextPage();
-                if (p == itemComponentListReportCollections.pageCount) {
-                    itemComponentListReportCollections.moveToPage(currentPageIndex - 1);
+                itemComponentListCollectionView.moveToNextPage();
+                if (p == itemComponentListCollectionView.pageCount) {
+                    itemComponentListCollectionView.moveToPage(itemComponentListCurrentPageIndex - 1);
                 }
             }
 
@@ -556,10 +563,10 @@
             }
 
             CSV = header + '\r\n';
-            for (var i = 0; i < itemComponentListReport.length; i++) {
+            for (var i = 0; i < itemComponentList.length; i++) {
                 var row = '';
-                for (var a in itemComponentListReport[i]) {
-                    row += '"' + itemComponentListReport[i][a] + '",';
+                for (var a in itemComponentList[i]) {
+                    row += '"' + itemComponentList[i][a] + '",';
                 }
 
                 row.slice(0, row.length - 1);
@@ -598,9 +605,9 @@
         // =====================
         // Preview and Print PDF
         // =====================
-        function btnItemComponentListReportPrintPDFOnclick() {
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        function btnItemComponentListPDFOnclick() {
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
                 window.location.href = '/RepItemComponentList/ItemComponentList?itemGroupId=' + itemGroupId;
             } else {
                 toastr.error("Lacking Information");
@@ -611,11 +618,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            getArticleItemGroupForComboBox();
+            createCboItemGroupFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -662,6 +676,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -701,6 +718,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
