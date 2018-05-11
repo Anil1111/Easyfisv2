@@ -823,16 +823,15 @@ namespace easyfis.Business
                     {
                         Decimal quantityIn = 0;
                         Decimal quantityOut = stockOutItem.BaseQuantity;
-                        Decimal amount = stockOutItem.Amount;
 
                         if (stockOutItem.BaseQuantity < 0)
                         {
                             quantityIn = stockOutItem.BaseQuantity * -1;
                             quantityOut = 0;
-                            amount = stockOutItem.Amount * -1;
                         }
 
                         Decimal quantity = quantityIn - quantityOut;
+                        Decimal amount = stockOutItem.Amount * -1;
 
                         // ======================
                         // Insert Inventory (Out)

@@ -56,8 +56,11 @@ namespace easyfis.ApiControllers
                                                        OutQuantity = g.Sum(d => d.OutQuantity),
                                                        BalanceQuantity = g.Sum(d => d.BalanceQuantity),
                                                        Unit = g.Key.Unit,
-                                                       Cost = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) / g.Sum(d => d.InQuantity) : 0,
-                                                       Amount = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) : 0
+                                                       //Cost = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) / g.Sum(d => d.InQuantity) : 0,
+                                                       //Amount = g.Sum(d => d.InQuantity) > 0 ? g.Sum(d => d.Amount) : 0,
+                                                       //Amount = g.Sum(d => d.BalanceQuantity) >= 0 ? g.Sum(d => d.Amount) : 0
+                                                       Cost = g.Sum(d => d.BalanceQuantity) >= 0 ? g.Sum(d => d.Amount) / g.Sum(d => d.BalanceQuantity) : 0,
+                                                       Amount = g.Sum(d => d.Amount)
                                                    };
 
             var stockCardCurrentBalance = from d in db.TrnInventories
@@ -140,7 +143,8 @@ namespace easyfis.ApiControllers
                     runningQuantity = (beginningQuantity + curBalance.InQuantity) - curBalance.OutQuantity;
 
                     cost = curBalance.Quantity != 0 ? curBalance.Amount / curBalance.Quantity : 0;
-                    amount = curBalance.InQuantity > 0 ? curBalance.Amount : 0;
+                    //amount = curBalance.InQuantity > 0 ? curBalance.Amount : 0;
+                    amount = curBalance.Amount;
 
                     listStockCardInventory.Add(new Entities.RepStockCardReport()
                     {
