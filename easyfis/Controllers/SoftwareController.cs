@@ -1084,13 +1084,29 @@ namespace easyfis.Controllers
             return UserRights("CollectionDetail");
         }
 
-        // =============
-        // Balance Sheet
-        // =============
+        // ==================
+        // View Balance Sheet
+        // ==================
         [Authorize]
         public ActionResult BalanceSheet()
         {
             if (PageAccess("ViewBalanceSheet").Equals("ViewBalanceSheet"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
+        }
+
+        // =====================
+        // View Income Statement
+        // =====================
+        [Authorize]
+        public ActionResult IncomeStatement()
+        {
+            if (PageAccess("ViewIncomeStatement").Equals("ViewIncomeStatement"))
             {
                 return View();
             }
