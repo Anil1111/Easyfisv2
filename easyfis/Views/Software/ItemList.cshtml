@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Item List</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,61 +26,85 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpItemListSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboItemListShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboItemListDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnItemListReportCSVOnclick()" id="btnItemListReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnItemListReportPrintPDFOnclick()" id="btnItemListReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnItemListCSVOnclick()" id="btnItemListCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnItemListPDFOnclick()" id="btnItemListPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =================
+                        Item Group Filter
+                        =================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Item Group</b></span>
-                                        <div class="comboBox-wide" id="cboItemGroup"></div>
+                                        <div class="comboBox-wide" id="cboItemGroupFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 50.5%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="itemListReportGrid" class="grid"></div>
+                        <div id="itemListFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="itemListNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemListMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemListMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemListCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnItemListMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnItemListMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
@@ -91,6 +112,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -98,25 +120,33 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var itemListReportCollections;
-        var itemListReportGrid;
-        var cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup');
-        var isCboItemGroupSelected = false;
-        var cboItemListShowNumberOfRows = new wijmo.input.ComboBox('#cboItemListShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var itemListCollectionView;
+        var itemListFlexGrid;
+        var cboItemListDisplayNumberOfRows = new wijmo.input.ComboBox('#cboItemListDisplayNumberOfRows');
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =================
+        // Item Group Filter
+        // =================
+        var cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter');
+        var isCboItemGroupSelected = false;
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnItemListMoveToFirstPageGrid = document.getElementById('btnItemListMoveToFirstPageGrid');
+        var btnItemListMoveToPreviousPageGrid = document.getElementById('btnItemListMoveToPreviousPageGrid');
+        var btnItemListMoveToNextPageGrid = document.getElementById('btnItemListMoveToNextPageGrid');
+        var btnItemListMoveToLastPageGrid = document.getElementById('btnItemListMoveToLastPageGrid');
+        var btnItemListCurrentPageGrid = document.getElementById('btnItemListCurrentPageGrid');
+        var itemListCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -130,49 +160,50 @@
             }
         }
 
-        // =====================
-        // Get Artile Item Group
-        // =====================
-        function getArticleItemGroupForComboBox() {
+        // ==============================
+        // Create Combo Item Group Filter
+        // ==============================
+        function createCboItemGroupFilter() {
             NProgress.start();
-            var articleItemGroupsObservableArray = new wijmo.collections.ObservableArray();
+
+            var itemGroupObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/listArticleGroupByArticleTypeId/1',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (itemGroupResults) {
-                    if (itemGroupResults.length > 0) {
-                        for (i = 0; i < itemGroupResults.length; i++) {
-                            articleItemGroupsObservableArray.push({
-                                Id: itemGroupResults[i]["Id"],
-                                ArticleGroup: itemGroupResults[i]["ArticleGroup"]
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            itemGroupObservableArray.push({
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"]
                             });
                         }
                     }
 
-                    cboItemGroup.dispose();
-                    cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup', {
+                    cboItemGroupFilter.dispose();
+                    cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter', {
                         isEditable: false,
-                        itemsSource: articleItemGroupsObservableArray,
+                        itemsSource: itemGroupObservableArray,
                         displayMemberPath: "ArticleGroup",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("ItemGroupId"),
+                        selectedValue: getURLParameterValue("ItemGroupId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            refreshItemListReportFlexGrid();
+                            refreshItemListFlexGrid();
                         }
                     });
 
-                    createCboShowRows();
+                    createCboDisplayNumberOfRows();
                 }
             });
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -202,8 +233,8 @@
                 });
             }
 
-            cboItemListShowNumberOfRows.dispose();
-            cboItemListShowNumberOfRows = new wijmo.input.ComboBox('#cboItemListShowNumberOfRows', {
+            cboItemListDisplayNumberOfRows.dispose();
+            cboItemListDisplayNumberOfRows = new wijmo.input.ComboBox('#cboItemListDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -213,10 +244,10 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboItemListShowNumberOfRows.selectedValue;
-                        itemListReportCollections.pageSize = parseInt(numberOfRows);
-                        itemListReportCollections.refresh();
-                        itemListReportGrid.refresh();
+                        var numberOfRows = cboItemListDisplayNumberOfRows.selectedValue;
+                        itemListCollectionView.pageSize = parseInt(numberOfRows);
+                        itemListCollectionView.refresh();
+                        itemListFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
@@ -224,107 +255,80 @@
             });
 
             if (!isCboItemGroupSelected) {
-                createItemListReportFlexGrid();
+                createItemListFlexGrid();
             } else {
-                refreshItemListReportFlexGrid();
+                refreshItemListFlexGrid();
             }
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (itemListReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (itemListReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (itemListReportCollections.pageIndex === (itemListReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (itemListReportCollections.pageIndex + 1) + ' / ' + itemListReportCollections.pageCount;
-        }
-        
-        // ========
-        // Get Data
-        // ========
-        function getItemListReport() {
-            var itemListReports = new wijmo.collections.ObservableArray;
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        // ==================
+        // Get Item List Data
+        // ==================
+        function getItemListData() {
+            var itemListObservableArray = new wijmo.collections.ObservableArray;
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/itemList/list/' + itemGroupId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (itemListReportResult) {
-                        if (itemListReportResult.length > 0) {
-                            for (i = 0; i < itemListReportResult.length; i++) {
-                                var docLink = "/Software/ItemDetail?id=" + itemListReportResult[i]["Id"];
-                                itemListReports.push({
-                                    Id: itemListReportResult[i]["Id"],
-                                    ArticleCode: itemListReportResult[i]["ArticleCode"],
-                                    ArticleCodeForCSV: "Item-" + itemListReportResult[i]["ArticleCode"],
-                                    ArticleCodeBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block'> " + itemListReportResult[i]["ArticleCode"] + "</a>",
-                                    ManualArticleCodeForCSV: "Item-" + itemListReportResult[i]["ManualArticleCode"],
-                                    ManualArticleCode: itemListReportResult[i]["ManualArticleCode"],
-                                    DocumentReferenceForCSV: itemListReportResult[i]["DocumentReference"],
-                                    Article: itemListReportResult[i]["Article"],
-                                    Category: itemListReportResult[i]["Category"],
-                                    ArticleTypeId: itemListReportResult[i]["ArticleTypeId"],
-                                    ArticleType: itemListReportResult[i]["ArticleType"],
-                                    ArticleGroupId: itemListReportResult[i]["ArticleGroupId"],
-                                    ArticleGroup: itemListReportResult[i]["ArticleGroup"],
-                                    AccountId: itemListReportResult[i]["AccountId"],
-                                    AccountCode: itemListReportResult[i]["AccountCode"],
-                                    Account: itemListReportResult[i]["Account"],
-                                    SalesAccountId: itemListReportResult[i]["SalesAccountId"],
-                                    SalesAccount: itemListReportResult[i]["SalesAccount"],
-                                    CostAccountId: itemListReportResult[i]["CostAccountId"],
-                                    CostAccount: itemListReportResult[i]["CostAccount"],
-                                    AssetAccountId: itemListReportResult[i]["AssetAccountId"],
-                                    AssetAccount: itemListReportResult[i]["AssetAccount"],
-                                    ExpenseAccountId: itemListReportResult[i]["ExpenseAccountId"],
-                                    ExpenseAccount: itemListReportResult[i]["ExpenseAccount"],
-                                    UnitId: itemListReportResult[i]["UnitId"],
-                                    Unit: itemListReportResult[i]["Unit"],
-                                    InputTaxId: itemListReportResult[i]["InputTaxId"],
-                                    InputTax: itemListReportResult[i]["InputTax"],
-                                    OutputTaxId: itemListReportResult[i]["OutputTaxId"],
-                                    OutputTax: itemListReportResult[i]["OutputTax"],
-                                    WTaxTypeId: itemListReportResult[i]["WTaxTypeId"],
-                                    WTaxType: itemListReportResult[i]["WTaxType"],
-                                    Price: itemListReportResult[i]["Price"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    PriceAmountDisplay: parseFloat(itemListReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Cost: itemListReportResult[i]["Cost"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    CostAmountDisplay: parseFloat(itemListReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    IsInventory: itemListReportResult[i]["IsInventory"],
-                                    Particulars: itemListReportResult[i]["Particulars"],
-                                    Address: itemListReportResult[i]["Address"],
-                                    TermId: itemListReportResult[i]["TermId"],
-                                    Term: itemListReportResult[i]["Term"],
-                                    ContactNumber: itemListReportResult[i]["ContactNumber"],
-                                    ContactPerson: itemListReportResult[i]["ContactPerson"],
-                                    TaxNumber: itemListReportResult[i]["TaxNumber"],
-                                    CreditLimit: itemListReportResult[i]["CreditLimit"],
-                                    DateAcquired: itemListReportResult[i]["DateAcquired"],
-                                    UsefulLife: itemListReportResult[i]["UsefulLife"],
-                                    SalvageValue: itemListReportResult[i]["SalvageValue"],
-                                    ManualArticleOldCode: itemListReportResult[i]["ManualArticleOldCode"],
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var docLink = "/Software/ItemDetail?id=" + results[i]["Id"];
+
+                                itemListObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    ArticleCode: results[i]["ArticleCode"],
+                                    ArticleCodeForCSV: "Item-" + results[i]["ArticleCode"],
+                                    ArticleCodeBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block'> " + results[i]["ArticleCode"] + "</a>",
+                                    ManualArticleCodeForCSV: "Item-" + results[i]["ManualArticleCode"],
+                                    ManualArticleCode: results[i]["ManualArticleCode"],
+                                    DocumentReferenceForCSV: results[i]["DocumentReference"],
+                                    Article: results[i]["Article"],
+                                    Category: results[i]["Category"],
+                                    ArticleTypeId: results[i]["ArticleTypeId"],
+                                    ArticleType: results[i]["ArticleType"],
+                                    ArticleGroupId: results[i]["ArticleGroupId"],
+                                    ArticleGroup: results[i]["ArticleGroup"],
+                                    AccountId: results[i]["AccountId"],
+                                    AccountCode: results[i]["AccountCode"],
+                                    Account: results[i]["Account"],
+                                    SalesAccountId: results[i]["SalesAccountId"],
+                                    SalesAccount: results[i]["SalesAccount"],
+                                    CostAccountId: results[i]["CostAccountId"],
+                                    CostAccount: results[i]["CostAccount"],
+                                    AssetAccountId: results[i]["AssetAccountId"],
+                                    AssetAccount: results[i]["AssetAccount"],
+                                    ExpenseAccountId: results[i]["ExpenseAccountId"],
+                                    ExpenseAccount: results[i]["ExpenseAccount"],
+                                    UnitId: results[i]["UnitId"],
+                                    Unit: results[i]["Unit"],
+                                    InputTaxId: results[i]["InputTaxId"],
+                                    InputTax: results[i]["InputTax"],
+                                    OutputTaxId: results[i]["OutputTaxId"],
+                                    OutputTax: results[i]["OutputTax"],
+                                    WTaxTypeId: results[i]["WTaxTypeId"],
+                                    WTaxType: results[i]["WTaxType"],
+                                    Price: results[i]["Price"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    PriceAmountDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Cost: results[i]["Cost"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    CostAmountDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsInventory: results[i]["IsInventory"],
+                                    Particulars: results[i]["Particulars"],
+                                    Address: results[i]["Address"],
+                                    TermId: results[i]["TermId"],
+                                    Term: results[i]["Term"],
+                                    ContactNumber: results[i]["ContactNumber"],
+                                    ContactPerson: results[i]["ContactPerson"],
+                                    TaxNumber: results[i]["TaxNumber"],
+                                    CreditLimit: results[i]["CreditLimit"],
+                                    DateAcquired: results[i]["DateAcquired"],
+                                    UsefulLife: results[i]["UsefulLife"],
+                                    SalvageValue: results[i]["SalvageValue"],
+                                    ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 });
                             }
                         }
@@ -334,24 +338,24 @@
                 });
             }
 
-            return itemListReports;
+            return itemListObservableArray;
         }
 
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshItemListReportFlexGrid() {
-            itemListReportCollections = new wijmo.collections.CollectionView(getItemListReport());
-            itemListReportCollections.canFilter = true;
-            itemListReportCollections.pageSize = cboItemListShowNumberOfRows.selectedValue;
+        // ==========================
+        // Create Item List Flex Grid
+        // ==========================
+        function createItemListFlexGrid() {
+            itemListCollectionView = new wijmo.collections.CollectionView(getItemListData());
+            itemListCollectionView.canFilter = true;
+            itemListCollectionView.pageSize = cboItemListDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpItemListSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                itemListReportCollections.refresh();
+                itemListCollectionView.refresh();
             });
 
-            itemListReportCollections.filter = function (item) {
+            itemListCollectionView.filter = function (item) {
                 return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
@@ -359,42 +363,12 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            itemListReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            itemListCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemListNavigationButtons();
             });
 
-            itemListReportGrid.itemsSource = itemListReportCollections;
-            itemListReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
-        function createItemListReportFlexGrid() {
-            itemListReportCollections = new wijmo.collections.CollectionView(getItemListReport());
-            itemListReportCollections.canFilter = true;
-            itemListReportCollections.pageSize = cboItemListShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                itemListReportCollections.refresh();
-            });
-
-            itemListReportCollections.filter = function (item) {
-                return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            itemListReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            itemListReportGrid = new wijmo.grid.FlexGrid('#itemListReportGrid');
-            itemListReportGrid.initialize({
+            itemListFlexGrid = new wijmo.grid.FlexGrid('#itemListFlexGrid');
+            itemListFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Code",
@@ -443,67 +417,125 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: itemListReportCollections,
+                itemsSource: itemListCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            itemListReportGrid.trackChanges = true;
+            itemListFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateItemListNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                itemListReportCollections.moveToFirstPage();
-                currentPageIndex = itemListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemListMoveToFirstPageGrid.addEventListener('click', function () {
+                itemListCollectionView.moveToFirstPage();
+                itemListCurrentPageIndex = itemListCollectionView.pageIndex + 1;
+                updateItemListNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                itemListReportCollections.moveToPreviousPage();
-                currentPageIndex = itemListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemListMoveToPreviousPageGrid.addEventListener('click', function () {
+                itemListCollectionView.moveToPreviousPage();
+                itemListCurrentPageIndex = itemListCollectionView.pageIndex + 1;
+                updateItemListNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                itemListReportCollections.moveToNextPage();
-                currentPageIndex = itemListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemListMoveToNextPageGrid.addEventListener('click', function () {
+                itemListCollectionView.moveToNextPage();
+                itemListCurrentPageIndex = itemListCollectionView.pageIndex + 1;
+                updateItemListNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                itemListReportCollections.moveToLastPage();
-                currentPageIndex = itemListReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnItemListMoveToLastPageGrid.addEventListener('click', function () {
+                itemListCollectionView.moveToLastPage();
+                itemListCurrentPageIndex = itemListCollectionView.pageIndex + 1;
+                updateItemListNavigationButtons();
             });
+        }
+
+        // ===================================
+        // Update Item List Navigation Buttons
+        // ===================================
+        function updateItemListNavigationButtons() {
+            if (itemListCollectionView.pageSize <= 0) {
+                document.getElementById('itemListNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('itemListNavigationPageGrid').style.display = 'block';
+            if (itemListCollectionView.pageIndex === 0) {
+                btnItemListMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemListMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemListMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemListMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemListCollectionView.pageIndex === (itemListCollectionView.pageCount - 1)) {
+                btnItemListMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemListMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemListMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnItemListMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemListMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemListMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemListMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemListMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemListCurrentPageGrid.innerHTML = (itemListCollectionView.pageIndex + 1) + ' / ' + itemListCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshItemListFlexGrid() {
+            itemListCollectionView = new wijmo.collections.CollectionView(getItemListData());
+            itemListCollectionView.canFilter = true;
+            itemListCollectionView.pageSize = cboItemListDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpItemListSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                itemListCollectionView.refresh();
+            });
+
+            itemListCollectionView.filter = function (item) {
+                return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            itemListCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemListNavigationButtons();
+            });
+
+            itemListFlexGrid.itemsSource = itemListCollectionView;
+            itemListFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnItemListReportCSVOnclick() {
+        function btnItemListCSVOnclick() {
             var CSV = '';
             var itemListReport = [];
-            var fileName = 'ItemListReport.CSV';
+            var fileName = 'ItemList.CSV';
 
-            itemListReportCollections.moveToFirstPage();
+            itemListCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= itemListReportCollections.pageCount; p++) {
-                for (i = 0; i < itemListReportCollections.items.length; i++) {
+            for (var p = 1; p <= itemListCollectionView.pageCount; p++) {
+                for (i = 0; i < itemListCollectionView.items.length; i++) {
                     itemListReport.push({
-                        ArticleCode: itemListReportCollections.items[i].ArticleCodeForCSV,
-                        ManualArticleCode: itemListReportCollections.items[i].ManualArticleCodeForCSV,
-                        Article: itemListReportCollections.items[i].Article,
-                        Unit: itemListReportCollections.items[i].Unit,
-                        Cost: itemListReportCollections.items[i].Cost,
-                        Price: itemListReportCollections.items[i].Price,
+                        ArticleCode: itemListCollectionView.items[i].ArticleCodeForCSV,
+                        ManualArticleCode: itemListCollectionView.items[i].ManualArticleCodeForCSV,
+                        Article: itemListCollectionView.items[i].Article,
+                        Unit: itemListCollectionView.items[i].Unit,
+                        Cost: itemListCollectionView.items[i].Cost,
+                        Price: itemListCollectionView.items[i].Price,
                     });
                 }
 
-                itemListReportCollections.moveToNextPage();
-                if (p == itemListReportCollections.pageCount) {
-                    itemListReportCollections.moveToPage(currentPageIndex - 1);
+                itemListCollectionView.moveToNextPage();
+                if (p == itemListCollectionView.pageCount) {
+                    itemListCollectionView.moveToPage(itemListCurrentPageIndex - 1);
                 }
             }
 
@@ -565,9 +597,9 @@
         // =====================
         // Preview and Print PDF
         // =====================
-        function btnItemListReportPrintPDFOnclick() {
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        function btnItemListPDFOnclick() {
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
                 window.location.href = '/RepItemList/ItemList?itemGroupId=' + itemGroupId;
             } else {
                 toastr.error("Lacking Information");
@@ -578,11 +610,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            getArticleItemGroupForComboBox();
+            createCboItemGroupFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -629,6 +668,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -668,6 +710,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
