@@ -1084,6 +1084,16 @@ namespace easyfis.Controllers
             return UserRights("CollectionDetail");
         }
 
+        // =============
+        // Balance Sheet
+        // =============
+        [Authorize]
+        public ActionResult BalanceSheet()
+        {
+            return View();
+            //return UserRights("CollectionDetail");
+        }
+
         // =======================
         // POS Integration Reports
         // =======================

@@ -1,0 +1,811 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
+    <title>Balance Sheet</title>
+
+    @Styles.Render("~/Content/Software-css")
+</head>
+<body>
+    <div id="o-wrapper" class="o-wrapper">
+        <main class="o-content">
+            @Html.Partial("_SoftwareHeader")
+
+            <section class="content-header">
+                <div class="container">
+                    <h3>
+                        Balance Sheet
+                    </h3>
+                    <p>
+                        <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
+                        <i class="fa fa-home fa-fw"></i> &nbsp; <a href="#" onclick="getUserBranches()" style="color: white;">@ViewData["Branch"]</a>
+                    </p>
+                </div>
+            </section>
+            <section class="container">
+                <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 49.5%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                        <input type="text" class="form-control" id="inpBalanceSheetSearchFilter" placeholder="Search...">
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboBalanceSheetDisplayNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
+                                    <button onclick="btnBalanceSheetDownloadCSVOnclick()" id="btnBalanceSheetDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnBalanceSheetPrintPDFOnclick()" id="btnBalanceSheetPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 24%">
+                                    <div class="input-group ">
+                                        <span class="input-group-addon"><b>Start Date</b></span>
+                                        <div class="comboBox-wide" id="cboBalanceSheetDateAsOfFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%" align="right">
+                                    <div class="input-group ">
+                                        <span class="input-group-addon"><b>Company</b></span>
+                                        <div class="comboBox-wide" id="cboBalanceSheetCompanyFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 51%"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
+                    <div class="panel-body">
+                        <div id="balanceSheetFlexGrid" style="font-size: 12px;"></div>
+                    </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="btnBalanceSheetNaviagtionPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnBalanceSheetMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBalanceSheetMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnBalanceSheetCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBalanceSheetMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBalanceSheetMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <dl class="dl-horizontal dl-custom">
+                                    <dt>
+                                        <b>Total Asset</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="inpTotalAsset" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Liability</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="inpTotalLiability" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Equity</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="inpTotalEquity" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Total Liability and Equity</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="inpTotalLiabilityAndEquity" placeholder="0.00" disabled />
+                                    </dd>
+                                    <dt>
+                                        <b>Balance</b>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField" id="inpBalance" placeholder="0.00" disabled />
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            @Html.Partial("_SoftwareFooter")
+        </main>
+    </div>
+    <div id="c-mask" class="c-mask"></div>
+
+    @Scripts.Render("~/Scripts/Software-js")
+    <script type="text/javascript">
+        // ============
+        // Date Filters
+        // ============
+        var cboBalanceSheetDateAsOfFilter = new wijmo.input.InputDate('#cboBalanceSheetDateAsOfFilter');
+        var isCboBalanceSheetDateAsOfFilterSelected = false;
+
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboBalanceSheetCompanyFilter = new wijmo.input.ComboBox('#cboBalanceSheetCompanyFilter');
+        var isCboBalanceSheetCompanyFilterSelected = false;
+
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var balanceSheetCollectionView;
+        var balanceSheetFlexGrid;
+        var cboBalanceSheetDisplayNumberOfRows = new wijmo.input.ComboBox('#cboBalanceSheetDisplayNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnBalanceSheetMoveToFirstPageGrid = document.getElementById('btnBalanceSheetMoveToFirstPageGrid');
+        var btnBalanceSheetMoveToPreviousPageGrid = document.getElementById('btnBalanceSheetMoveToPreviousPageGrid');
+        var btnBalanceSheetMoveToNextPageGrid = document.getElementById('btnBalanceSheetMoveToNextPageGrid');
+        var btnBalanceSheetMoveToLastPageGrid = document.getElementById('btnBalanceSheetMoveToLastPageGrid');
+        var btnBalanceSheetCurrentPageGrid = document.getElementById('btnBalanceSheetCurrentPageGrid');
+        var balanceSheetCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+            var regexS = "[\\?&]" + name + "=([^&#]*)";
+            var regex = new RegExp(regexS);
+
+            var results = regex.exec(window.location.href);
+            if (results == null) {
+                return "";
+            } else {
+                return results[1];
+            }
+        }
+
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
+            NProgress.start();
+
+            cboBalanceSheetDateAsOfFilter.dispose();
+            cboBalanceSheetDateAsOfFilter = new wijmo.input.InputDate('#cboBalanceSheetDateAsOfFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(getURLParameterValue("DateAsOf")),
+                onValueChanged: function () {
+                    if (!isCboBalanceSheetDateAsOfFilterSelected) {
+                        NProgress.start();
+                        refreshBalanceSheetFlexGrid();
+                    } else {
+                        isCboBalanceSheetDateAsOfFilterSelected = false;
+                    }
+                }
+            });
+
+            createCboCompanyFilter();
+        }
+
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
+            var companyObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/balanceSheet/dropdown/list/company',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            companyObservableArray.push({
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                    } else {
+                        $("#btnBalanceSheetDownloadCSV").prop("disabled", true);
+                        $("#btnBalanceSheetPrintPDF").prop("disabled", true);
+                    }
+
+                    cboBalanceSheetCompanyFilter.dispose();
+                    cboBalanceSheetCompanyFilter = new wijmo.input.ComboBox('#cboBalanceSheetCompanyFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: companyObservableArray,
+                        displayMemberPath: "Company",
+                        selectedValuePath: "Id",
+                        selectedValue: getURLParameterValue("CompanyId"),
+                        onSelectedIndexChanged: function () {
+                            NProgress.start();
+                            $("#btnBalanceSheetDownloadCSV").prop("disabled", false);
+                            $("#btnBalanceSheetPrintPDF").prop("disabled", false);
+                            isCboBalanceSheetCompanyFilterSelected = true;
+                            refreshBalanceSheetFlexGrid();
+                        }
+                    });
+
+                    createCboDisplayNumberOfRows();
+                }
+            });
+        }
+
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboBalanceSheetDisplayNumberOfRows.dispose();
+            cboBalanceSheetDisplayNumberOfRows = new wijmo.input.ComboBox('#cboBalanceSheetDisplayNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboBalanceSheetDisplayNumberOfRows.selectedValue;
+                        balanceSheetCollectionView.pageSize = parseInt(numberOfRows);
+                        balanceSheetCollectionView.refresh();
+                        balanceSheetFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isCboBalanceSheetCompanyFilterSelected) {
+                createBalanceSheetFlexGrid();
+            } else {
+                refreshBalanceSheetFlexGrid();
+            }
+        }
+
+        // ======================
+        // Get Balance Sheet Data
+        // ======================
+        function getBalanceSheetData() {
+            var balanceSheets = new wijmo.collections.ObservableArray;
+            if (cboBalanceSheetCompanyFilter.selectedValue != null) {
+
+                var dateAsOf = cboBalanceSheetDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                var companyId = cboBalanceSheetCompanyFilter.selectedValue;
+
+                $.ajax({
+                    url: '/api/balanceSheet/list/' + dateAsOf + '/' + companyId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var totalAsset = 0;
+                        var totalLiability = 0;
+                        var totalEquity = 0;
+                        var totalLiabilityAndEquity = 0;
+                        var balance = 0;
+
+                        if (results != null) {
+                            if (results.length > 0) {
+                                for (i = 0; i < results.length; i++) {
+
+                                    if (results[i]["DocumentReference"] === "1 - Asset") {
+                                        totalAsset += results[i]["Balance"];
+                                    }
+
+                                    if (results[i]["DocumentReference"] === "2 - Liability") {
+                                        totalLiability += results[i]["Balance"];
+                                    }
+
+                                    if (results[i]["DocumentReference"] === "3 - Equity") {
+                                        totalEquity += results[i]["Balance"];
+                                    }
+
+                                    balanceSheets.push({
+                                        DocumentReference: results[i]["DocumentReference"],
+                                        AccountCategoryCode: results[i]["AccountCategoryCode"],
+                                        AccountCategory: results[i]["AccountCategoryCode"] + " - " + results[i]["AccountCategory"],
+                                        SubCategoryDescription: results[i]["SubCategoryDescription"],
+                                        AccountTypeCode: results[i]["AccountTypeCode"],
+                                        AccountType: results[i]["AccountTypeCode"] + " - " + results[i]["AccountType"],
+                                        AccountCode: results[i]["AccountCode"],
+                                        Account: results[i]["AccountCode"] + " - " + results[i]["Account"],
+                                        DebitAmount: results[i]["DebitAmount"],
+                                        DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        CreditAmount: results[i]["CreditAmount"],
+                                        CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Balance: results[i]["Balance"],
+                                        BalanceDisplay: parseFloat(results[i]["Balance"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    });
+                                }
+
+                                totalLiabilityAndEquity = totalLiability + totalEquity;
+                                balance = totalAsset - totalLiabilityAndEquity;
+                            }
+                        }
+
+                        document.getElementById("inpTotalAsset").value = parseFloat(totalAsset).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalLiability").value = parseFloat(totalLiability).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalEquity").value = parseFloat(totalEquity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalLiabilityAndEquity").value = parseFloat(totalLiabilityAndEquity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpBalance").value = parseFloat(balance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        NProgress.done();
+                    }
+                });
+            } else {
+                document.getElementById("inpTotalAsset").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalLiability").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalEquity").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalLiabilityAndEquity").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                NProgress.done();
+            }
+
+            return balanceSheets;
+        }
+
+        // ============================================
+        // Create Disbursement Summary Report Flex Grid
+        // ============================================
+        function createBalanceSheetFlexGrid() {
+            balanceSheetCollectionView = new wijmo.collections.CollectionView(getBalanceSheetData());
+            balanceSheetCollectionView.canFilter = true;
+            balanceSheetCollectionView.pageSize = cboBalanceSheetDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpBalanceSheetSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                balanceSheetCollectionView.refresh();
+            });
+
+            balanceSheetCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            balanceSheetCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateBalanceSheetNavigationButtons();
+            });
+
+            balanceSheetFlexGrid = new wijmo.grid.FlexGrid('#balanceSheetFlexGrid');
+            balanceSheetFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Category",
+                        "binding": "AccountCategory",
+                        "allowSorting": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Sub Category",
+                        "binding": "SubCategoryDescription",
+                        "allowSorting": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Account Type",
+                        "binding": "AccountType",
+                        "allowSorting": true,
+                        "width": "1*"
+                    },
+                    {
+                        "header": "Account",
+                        "binding": "Account",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "BalanceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "1*"
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: balanceSheetCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            balanceSheetFlexGrid.trackChanges = true;
+
+            updateBalanceSheetNavigationButtons();
+
+            btnBalanceSheetMoveToFirstPageGrid.addEventListener('click', function () {
+                balanceSheetCollectionView.moveToFirstPage();
+                balanceSheetCurrentPageIndex = balanceSheetCollectionView.pageIndex + 1;
+                updateBalanceSheetNavigationButtons();
+            });
+
+            btnBalanceSheetMoveToPreviousPageGrid.addEventListener('click', function () {
+                balanceSheetCollectionView.moveToPreviousPage();
+                balanceSheetCurrentPageIndex = balanceSheetCollectionView.pageIndex + 1;
+                updateBalanceSheetNavigationButtons();
+            });
+
+            btnBalanceSheetMoveToNextPageGrid.addEventListener('click', function () {
+                balanceSheetCollectionView.moveToNextPage();
+                balanceSheetCurrentPageIndex = balanceSheetCollectionView.pageIndex + 1;
+                updateBalanceSheetNavigationButtons();
+            });
+
+            btnBalanceSheetMoveToLastPageGrid.addEventListener('click', function () {
+                balanceSheetCollectionView.moveToLastPage();
+                balanceSheetCurrentPageIndex = balanceSheetCollectionView.pageIndex + 1;
+                updateBalanceSheetNavigationButtons();
+            });
+        }
+
+        // =====================================================
+        // Update Disbursement Summary Report Navigation Buttons
+        // =====================================================
+        function updateBalanceSheetNavigationButtons() {
+            if (balanceSheetCollectionView.pageSize <= 0) {
+                document.getElementById('btnBalanceSheetNaviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('btnBalanceSheetNaviagtionPageGrid').style.display = 'block';
+            if (balanceSheetCollectionView.pageIndex === 0) {
+                btnBalanceSheetMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnBalanceSheetMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnBalanceSheetMoveToNextPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (balanceSheetCollectionView.pageIndex === (balanceSheetCollectionView.pageCount - 1)) {
+                btnBalanceSheetMoveToFirstPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnBalanceSheetMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnBalanceSheetMoveToFirstPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToNextPageGrid.removeAttribute('disabled');
+                btnBalanceSheetMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnBalanceSheetCurrentPageGrid.innerHTML = (balanceSheetCollectionView.pageIndex + 1) + ' / ' + balanceSheetCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshBalanceSheetFlexGrid() {
+            balanceSheetCollectionView = new wijmo.collections.CollectionView(getBalanceSheetData());
+            balanceSheetCollectionView.canFilter = true;
+            balanceSheetCollectionView.pageSize = cboBalanceSheetDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpBalanceSheetSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                balanceSheetCollectionView.refresh();
+            });
+
+            balanceSheetCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CVNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Payee.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.CheckNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            balanceSheetCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateBalanceSheetNavigationButtons();
+            });
+
+            balanceSheetFlexGrid.itemsSource = balanceSheetCollectionView;
+            balanceSheetFlexGrid.trackChanges = true;
+        }
+
+        // ============
+        // Download CSV
+        // ============
+        function btnBalanceSheetDownloadCSVOnclick() {
+            var CSV = '';
+            var balanceSheet = [];
+            var fileName = 'BalanceSheet.CSV';
+
+            balanceSheetCollectionView.moveToFirstPage();
+
+            for (var p = 1; p <= balanceSheetCollectionView.pageCount; p++) {
+                for (i = 0; i < balanceSheetCollectionView.items.length; i++) {
+                    balanceSheet.push({
+                        AccountCategory: balanceSheetCollectionView.items[i].AccountCategory,
+                        SubCategoryDescription: balanceSheetCollectionView.items[i].SubCategoryDescription,
+                        AccountType: balanceSheetCollectionView.items[i].AccountType,
+                        Account: balanceSheetCollectionView.items[i].Account,
+                        Amount: balanceSheetCollectionView.items[i].Balance,
+                    });
+                }
+
+                balanceSheetCollectionView.moveToNextPage();
+                if (p == balanceSheetCollectionView.pageCount) {
+                    balanceSheetCollectionView.moveToPage(balanceSheetCurrentPageIndex - 1);
+                }
+            }
+
+            var Headers = [];
+            Headers.push({
+                AccountCategory: "Account Category",
+                SubCategoryDescription: "Sub Category Description",
+                AccountType: "Account Type",
+                Account: "Account",
+                Amount: "Amount"
+            });
+
+            var header = '';
+            for (var b in Headers[0]) {
+                header += '"' + Headers[0][b] + '",';
+            }
+
+            CSV = header + '\r\n';
+            for (var i = 0; i < balanceSheet.length; i++) {
+                var row = '';
+                for (var a in balanceSheet[i]) {
+                    row += '"' + balanceSheet[i][a] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            if (CSV == '') {
+                toastr.error("No data.");
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) {
+                    var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", fileName);
+                    link.style = "visibility:hidden";
+                }
+
+                if (navigator.msSaveBlob) {
+                    link.addEventListener("click", function (event) {
+                        var blob = new Blob([CSV], {
+                            "type": "text/csv;charset=utf-8;"
+                        });
+                        navigator.msSaveBlob(blob, fileName);
+                    }, false);
+                }
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toastr.success("Download successful.");
+            }
+        }
+
+        // =========
+        // Print PDF
+        // =========
+        function btnBalanceSheetPrintPDFOnclick() {
+            if (cboBalanceSheetCompanyFilter.selectedValue != null) {
+                var dateAsOf = cboBalanceSheetDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                var companyId = cboBalanceSheetCompanyFilter.selectedValue;
+
+                window.location.href = '/RepBalanceSheet/BalanceSheet?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId;
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // ============
+        // On Load Page
+        // ============
+        $(document).ready(function () {
+            createCboDateRangeFilters();
+        });
+    </script>
+    <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
+        var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
+        function getUserBranches() {
+            $("#loadingUserBranches").show();
+            document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#userBranchContent").hide();
+
+            $('#userBranchesModal').modal({ show: true, backdrop: 'static' });
+
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+            $("#updateUserBranch").prop("disabled", false);
+            $("#closeUserBranch").prop("disabled", false);
+
+            var userBranchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/userBranch/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
+                            userBranchesObservableArray.push({
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    var currentBranch = "@ViewData["BranchId"]";
+                    cboUserBranches.dispose();
+                    cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches', {
+                        isEditable: false,
+                        placeholder: "Select Branches",
+                        itemsSource: userBranchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "BranchId",
+                        selectedValue: currentBranch
+                    });
+
+                    setTimeout(function () {
+                        $("#loadingUserBranches").hide();
+                        $("#userBranchContent").show();
+                    }, 500)
+                }
+            });
+        }
+
+        // ==========================
+        // Update Current User Branch
+        // ==========================
+        function updateUserBranchOnclick() {
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
+            $("#updateUserBranch").prop("disabled", true);
+            $("#closeUserBranch").prop("disabled", true);
+
+            var userBranchObject = new Object();
+            userBranchObject.BranchId = cboUserBranches.selectedValue;
+            var userBranchData = JSON.stringify(userBranchObject);
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/userBranch/update',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: userBranchData,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Update Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function () {
+                        toastr.error("Not Found");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    },
+                    500: function () {
+                        toastr.error("Bad Request");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    }
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
+        var slideLeft = new Menu({
+            wrapper: '#o-wrapper',
+            type: 'slide-left',
+            menuOpenerClass: '.c-button',
+            maskId: '#c-mask'
+        });
+
+        var slideLeftBtn = document.querySelector('#c-button--slide-left');
+
+        slideLeftBtn.addEventListener('click', function (e) {
+            e.preventDefault;
+            slideLeft.open();
+        });
+    </script>
+</body>
+</html>
