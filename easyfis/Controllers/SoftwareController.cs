@@ -1090,8 +1090,14 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BalanceSheet()
         {
-            return View();
-            //return UserRights("CollectionDetail");
+            if (PageAccess("ViewBalanceSheet").Equals("ViewBalanceSheet"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
         // =======================

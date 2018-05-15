@@ -18,7 +18,7 @@ namespace easyfis.ModifiedApiControllers
         // ==================
         // Balance Sheet List 
         // ==================
-        [HttpGet, Route("api/balanceSheet/list/{dateAsOf}/{companyId}")]
+        [Authorize, HttpGet, Route("api/balanceSheet/list/{dateAsOf}/{companyId}")]
         public List<Entities.RepBalanceSheet> ListBalanceSheet(String dateAsOf, String companyId)
         {
             List<Entities.RepBalanceSheet> listBalanceSheet = new List<Entities.RepBalanceSheet>();
