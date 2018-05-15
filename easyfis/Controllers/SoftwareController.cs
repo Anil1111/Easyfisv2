@@ -1116,6 +1116,22 @@ namespace easyfis.Controllers
             }
         }
 
+        // ==============
+        // View Cash Flow
+        // ==============
+        [Authorize]
+        public ActionResult CashFlow()
+        {
+            if (PageAccess("ViewCashFlow").Equals("ViewCashFlow"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
+        }
+
         // =======================
         // POS Integration Reports
         // =======================

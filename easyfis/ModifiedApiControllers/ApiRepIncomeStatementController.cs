@@ -32,7 +32,7 @@ namespace easyfis.ModifiedApiControllers
                           && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                           && d.BranchId == Convert.ToInt32(branchId)
                           group d by d.MstAccount into g
-                          select new Models.TrnJournal
+                          select new Entities.RepIncomeStatement
                           {
                               DocumentReference = "5 - incomes",
                               AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
@@ -78,7 +78,7 @@ namespace easyfis.ModifiedApiControllers
                            && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                            && d.BranchId == Convert.ToInt32(branchId)
                            group d by d.MstAccount into g
-                           select new Models.TrnJournal
+                           select new Entities.RepIncomeStatement
                            {
                                DocumentReference = "6 - Expenses",
                                AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
