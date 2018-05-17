@@ -68,7 +68,7 @@
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
-                                        <span class="input-group-addon"><b>Start Date</b></span>
+                                        <span class="input-group-addon"><b>Date as of</b></span>
                                         <div class="comboBox-wide" id="cboBalanceSheetDateAsOfFilter"></div>
                                     </div>
                                 </td>
@@ -392,7 +392,10 @@
                                         totalEquity += results[i]["Balance"];
                                     }
 
+                                    var docAccountLedgerLink = '/Software/AccountLedger?StartDate=' + dateAsOf + '&EndDate=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&AccountId=' + results[i]["AccountId"];;
+
                                     balanceSheets.push({
+                                        BtnAccountLedgerDetail: "<a href='" + docAccountLedgerLink +"' class='btn btn-primary btn-xs btn-block' style='font-size: 9.5px;'><i class='fa fa-list fa-fw'></i> Ledger</a>",
                                         DocumentReference: results[i]["DocumentReference"],
                                         AccountCategoryCode: results[i]["AccountCategoryCode"],
                                         AccountCategory: results[i]["AccountCategoryCode"] + " - " + results[i]["AccountCategory"],
@@ -463,6 +466,12 @@
             balanceSheetFlexGrid = new wijmo.grid.FlexGrid('#balanceSheetFlexGrid');
             balanceSheetFlexGrid.initialize({
                 columns: [
+                    {
+                        "header": "Ledger",
+                        "binding": "BtnAccountLedgerDetail",
+                        "width": 70,
+                        "isContentHtml": true
+                    },
                     {
                         "header": "Category",
                         "binding": "AccountCategory",

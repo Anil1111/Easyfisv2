@@ -378,7 +378,10 @@
                                 for (i = 0; i < results.length; i++) {
                                     totalCashBalance += results[i]["Balance"];
 
+                                    var docAccountLedgerLink = '/Software/AccountLedger?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&AccountId=' + results[i]["AccountId"];;
+
                                     cashFlows.push({
+                                        BtnAccountLedgerDetail: "<a href='" + docAccountLedgerLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 9.5px;'><i class='fa fa-list fa-fw'></i> Ledger</a>",
                                         DocumentReference: results[i]["DocumentReference"],
                                         AccountCashFlowCode: results[i]["AccountCashFlowCode"],
                                         AccountCashFlow: results[i]["AccountCashFlowCode"] + " - " + results[i]["AccountCashFlow"],
@@ -436,6 +439,12 @@
             cashFlowFlexGrid = new wijmo.grid.FlexGrid('#cashFlowFlexGrid');
             cashFlowFlexGrid.initialize({
                 columns: [
+                    {
+                        "header": "Ledger",
+                        "binding": "BtnAccountLedgerDetail",
+                        "width": 70,
+                        "isContentHtml": true
+                    },
                     {
                         "header": "Cash Flow",
                         "binding": "AccountCashFlow",

@@ -13,6 +13,7 @@ namespace easyfis.Entities
         public String SubCategoryDescription { get; set; }
         public String AccountTypeCode { get; set; }
         public String AccountType { get; set; }
+        public Int32 AccountId { get; set; }
         public String AccountCode { get; set; }
         public String Account { get; set; }
         public Decimal DebitAmount { get; set; }
