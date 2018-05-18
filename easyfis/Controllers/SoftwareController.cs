@@ -1132,6 +1132,15 @@ namespace easyfis.Controllers
             }
         }
 
+        // ==============================
+        // View Inventory Report Per Item
+        // ==============================
+        [Authorize]
+        public ActionResult InventoryReportItem()
+        {
+            return View();
+        }
+
         // =======================
         // POS Integration Reports
         // =======================
