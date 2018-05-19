@@ -36,6 +36,7 @@
                         -->
                         <ul class="nav nav-pills nav-stacked pill-custom pill-report-custom" role="tablist" id="myTab">
                             <li class="active"><a data-toggle="pill" href="#tabPillInventory">Inventory</a></li>
+                            <li><a data-toggle="pill" href="#tabPillInventoryPerItem">Inventory Per Item</a></li>
                             <li><a data-toggle="pill" href="#tabPillStockCard">Stock Card</a></li>
                             <li class="reportDivider"></li>
                             <li><a data-toggle="pill" href="#tabPillStockInDetailReport">Stock-In Detail Report</a></li>
@@ -96,7 +97,49 @@
                                     </div>
                                 </div>
                             </div>
-
+                            
+                            <!--
+                                ================================
+                                Tab Content - Inventory Per Item
+                                ================================
+                            -->
+                            <div id="tabPillInventoryPerItem" class="tab-pane">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div align="right">
+                                            <button onclick="btnInventoryReportPerItemViewOnclick()" class="btn btn-primary "><i class="fa fa-table"></i> View</button>
+                                            <button onclick="btnInventoryReportPerItemPrintOnclick()" class="btn btn-primary "><i class="fa fa-print"></i> Print</button>
+                                            <a href="/Software" class="btn btn-danger" id=""><i class="fa fa-times"></i> Close</a>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <form class="form-horizontal" role="form">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Company</label>
+                                                <div class="col-sm-8">
+                                                    <div class="comboBox-wide" id="cboInventoryReportPerItemCompanyFilter"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Item</label>
+                                                <div class="col-sm-8">
+                                                    <table style="width: 100%" border="0">
+                                                        <tr>
+                                                            <td style="width: 30%">
+                                                                <div class="comboBox-wide" id="cboInventoryReportPerItemItemCodeFilter"></div>
+                                                            </td>
+                                                            <td style="width: 1%"></td>
+                                                            <td style="width: 69%">
+                                                                <div class="comboBox-wide" id="cbInventoryReportPerItemItemDescriptionFilter"></div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             <!--
                                 ========================
                                 Tab Content - Stock Card
@@ -444,6 +487,13 @@
         var cboInventoryBranchFilter = new wijmo.input.ComboBox('#cboInventoryBranchFilter');
 
         // =========================
+        // Inventory Report Per Item
+        // =========================
+        var cboInventoryReportPerItemItemCodeFilter = new wijmo.input.ComboBox('#cboInventoryReportPerItemItemCodeFilter');
+        var cbInventoryReportPerItemItemDescriptionFilter = new wijmo.input.ComboBox('#cbInventoryReportPerItemItemDescriptionFilter');
+        var cboInventoryReportPerItemCompanyFilter = new wijmo.input.ComboBox('#cboInventoryReportPerItemCompanyFilter');
+
+        // =========================
         // Stock Card Report Filters
         // =========================
         var cboStockCardStartDateFilter = new wijmo.input.InputDate('#cboStockCardStartDateFilter');
@@ -739,6 +789,17 @@
                             }
                         }
                     });
+                    
+
+                    cboInventoryReportPerItemCompanyFilter.dispose();
+                    cboInventoryReportPerItemCompanyFilter = new wijmo.input.ComboBox('#cboInventoryReportPerItemCompanyFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: companyObservableArray,
+                        displayMemberPath: "Company",
+                        selectedValuePath: "Id",
+                        selectedValue: @ViewData["CompanyId"]
+                    });
 
                     if (cboInventoryCompanyFilter.selectedValue != null) {
                         createCboInventoryReportBranchFilters(cboInventoryCompanyFilter.selectedValue);
@@ -979,6 +1040,30 @@
                         }
                     });
 
+                    cboInventoryReportPerItemItemCodeFilter.dispose();
+                    cboInventoryReportPerItemItemCodeFilter = new wijmo.input.ComboBox('#cboInventoryReportPerItemItemCodeFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: itemsObservableArray,
+                        displayMemberPath: "ManualArticleCode",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            cbInventoryReportPerItemItemDescriptionFilter.selectedValue = this.selectedValue;
+                        }
+                    });
+
+                    cbInventoryReportPerItemItemDescriptionFilter.dispose();
+                    cbInventoryReportPerItemItemDescriptionFilter = new wijmo.input.ComboBox('#cbInventoryReportPerItemItemDescriptionFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: itemsObservableArray,
+                        displayMemberPath: "Article",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            cboInventoryReportPerItemItemCodeFilter.selectedValue = this.selectedValue;
+                        }
+                    });
+
                     createCboInventoryReportItemGroupFilters();
                 }
             });
@@ -1047,7 +1132,7 @@
         // Inventory Report View
         // =====================
         function btnInventoryReportViewOnclick() {
-            if (cboInventoryCompanyFilter.selectedValue != null) {
+            if (cboInventoryReportPerItemCompanyFilter.selectedValue != null) {
                 if (cboInventoryBranchFilter.selectedValue != null) {
                     var startDate = cboInventoryStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
                     var endDate = cboInventoryEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
@@ -1075,6 +1160,24 @@
                     var branchId = cboInventoryBranchFilter.selectedValue;
 
                     window.location.href = '/RepInventoryReport/InventoryReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
+                } else {
+                    toastr.error("Lacking Information");
+                }
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // ==============================
+        // Inventory Report Per Item View
+        // ==============================
+        function btnInventoryReportPerItemViewOnclick() {
+            if (cboInventoryReportPerItemCompanyFilter.selectedValue != null) {
+                if (cbInventoryReportPerItemItemDescriptionFilter.selectedValue != null) {
+                    var companyId = cboInventoryReportPerItemCompanyFilter.selectedValue;
+                    var itemId = cbInventoryReportPerItemItemDescriptionFilter.selectedValue;
+
+                    window.location.href = '/Software/InventoryReportItem?ItemId=' + itemId + '&CompanyId=' + companyId;
                 } else {
                     toastr.error("Lacking Information");
                 }

@@ -68,15 +68,15 @@
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
-                                        <span class="input-group-addon"><b>Item code </b></span>
-                                        <div class="comboBox-wide" id="cboInventoryReportStartDateFilter"></div>
+                                        <span class="input-group-addon"><b>Barcode</b></span>
+                                        <div class="comboBox-wide" id="cboInventoryReportItemCodeFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
-                                <td style="width: 24%" align="right">
+                                <td style="width: 49%" align="right">
                                     <div class="input-group ">
-                                        <span class="input-group-addon"><b>Item description</b></span>
-                                        <div class="comboBox-wide" id="cboInventoryReportEndDateFilter"></div>
+                                        <span class="input-group-addon"><b>Item Description</b></span>
+                                        <div class="comboBox-wide" id="cboInventoryReportItemDescriptionFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -86,8 +86,6 @@
                                         <div class="comboBox-wide" id="cboInventoryReportCompanyFilter"></div>
                                     </div>
                                 </td>
-                                <td style="width: 1%"></td>
-                            
                             </tr>
                         </table>
                     </div>
@@ -96,20 +94,20 @@
                         =========================================
                         Stock Count Number for Variances (Filter)
                         =========================================
+                        <div class="panel-heading">
+                            <table style="width: 100%" border="0">
+                                <tr>
+                                    <td style="width: 24%">
+                                        <div class="input-group ">
+                                            <span class="input-group-addon"><b>SC Number</b></span>
+                                            <div class="comboBox-wide" id="cboInventoryReportSCFilter"></div>
+                                        </div>
+                                    </td>
+                                    <td style="width: 76%"></td>
+                                </tr>
+                            </table>
+                        </div>
                     -->
-                    <div class="panel-heading">
-                        <table style="width: 100%" border="0">
-                            <tr>
-                                <td style="width: 24%">
-                                    <div class="input-group ">
-                                        <span class="input-group-addon"><b>SC Number</b></span>
-                                        <div class="comboBox-wide" id="cboInventoryReportSCFilter"></div>
-                                    </div>
-                                </td>
-                                <td style="width: 76%"></td>
-                            </tr>
-                        </table>
-                    </div>
 
                     <!--
                         =========
@@ -177,21 +175,17 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ============
-        // Date Filters
-        // ============
-        var cboInventoryReportStartDateFilter = new wijmo.input.InputDate('#cboInventoryReportStartDateFilter');
-        var cboInventoryReportEndDateFilter = new wijmo.input.InputDate('#cboInventoryReportEndDateFilter');
-        var isCboInventoryReportStartDateSelected = false;
-        var isCboInventoryReportEndDateSelected = false;
-
+        // =====================================
+        // Item Code Filters
+        // =====================================
+        var cboInventoryReportItemCodeFilter = new wijmo.input.ComboBox('#cboInventoryReportItemCodeFilter');
+        var cboInventoryReportItemDescriptionFilter = new wijmo.input.ComboBox('#cboInventoryReportItemDescriptionFilter');
         // =====================================
         // Company, Branch and SC Number Filters
         // =====================================
         var cboInventoryReportCompanyFilter = new wijmo.input.ComboBox('#cboInventoryReportCompanyFilter');
-        var cboInventoryReportBranchFilter = new wijmo.input.ComboBox('#cboInventoryReportBranchFilter');
         var isCboInventoryReportCompanySelected = false;
-        var cboInventoryReportSCFilter = new wijmo.input.ComboBox('#cboInventoryReportSCFilter');
+        //var cboInventoryReportSCFilter = new wijmo.input.ComboBox('#cboInventoryReportSCFilter');
 
         // =============================
         // Collection View and Flex Grid
@@ -227,45 +221,62 @@
             }
         }
 
-        // ================================
-        // Create Combo Date Ranged Filters
-        // ================================
-        function createCboDateRangeFilters() {
+        // ==========================
+        // Create Combo Item Code Filter
+        // ==========================
+        function createCboItemFilter() {
             NProgress.start();
-            cboInventoryReportStartDateFilter.dispose();
-            cboInventoryReportStartDateFilter = new wijmo.input.InputDate('#cboInventoryReportStartDateFilter', {
-                format: 'MM-dd-yyyy',
-                value: new Date(getURLParameterValue("StartDate")),
-                onValueChanged: function () {
-                    if (!isCboInventoryReportStartDateSelected) {
-                        NProgress.start();
-                        refreshInventoryReportFlexGrid();
-                        createCboStockCountListFilter();
-                    } else {
-                        isCboInventoryReportStartDateSelected = false;
+
+            var itemObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/inventoryReportItem/dropdown/item',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (itemResults) {
+                    if (itemResults.length > 0) {
+                        for (i = 0; i < itemResults.length; i++) {
+                            itemObservableArray.push({
+                                Id: itemResults[i]["Id"],
+                                ManualArticleCode: itemResults[i]["ManualArticleCode"],
+                                Article: itemResults[i]["Article"]
+                            });
+                        }
                     }
+
+                    cboInventoryReportItemCodeFilter.dispose();
+                    cboInventoryReportItemCodeFilter = new wijmo.input.ComboBox('#cboInventoryReportItemCodeFilter', {
+                        isEditable: false,
+                        itemsSource: itemObservableArray,
+                        displayMemberPath: "ManualArticleCode",
+                        selectedValuePath: "Id",
+                        selectedValue: getURLParameterValue("ItemId"),
+                        onSelectedIndexChanged: function () {
+                            NProgress.start();
+                            cboInventoryReportItemDescriptionFilter.selectedValue = this.selectedValue;
+                            refreshInventoryReportFlexGrid();
+                        }
+                    });
+
+                    cboInventoryReportItemDescriptionFilter.dispose();
+                    cboInventoryReportItemDescriptionFilter = new wijmo.input.ComboBox('#cboInventoryReportItemDescriptionFilter', {
+                        isEditable: false,
+                        itemsSource: itemObservableArray,
+                        displayMemberPath: "Article",
+                        selectedValuePath: "Id",
+                        selectedValue: getURLParameterValue("ItemId"),
+                        onSelectedIndexChanged: function () {
+                            NProgress.start();
+                            cboInventoryReportItemCodeFilter.selectedValue = this.selectedValue;
+                            refreshInventoryReportFlexGrid();
+                            //createCboCompanyFilter();
+                        }
+                    });
+
+                    createCboCompanyFilter();
                 }
             });
-
-            cboInventoryReportEndDateFilter.dispose();
-            cboInventoryReportEndDateFilter = new wijmo.input.InputDate('#cboInventoryReportEndDateFilter', {
-                format: 'MM-dd-yyyy',
-                value: new Date(getURLParameterValue("EndDate")),
-                onValueChanged: function () {
-                    if (!isCboInventoryReportEndDateSelected) {
-                        NProgress.start();
-                        refreshInventoryReportFlexGrid();
-                        createCboStockCountListFilter();
-                    } else {
-                        isCboInventoryReportEndDateSelected = false;
-                    }
-                }
-            });
-
-            createCboCompanyFilter();
         }
-
-
 
         // ===========================
         // Create Combo Company Filter
@@ -273,7 +284,7 @@
         function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
-                url: '/api/company/list',
+                url: '/api/inventoryReportItem/dropdown/company',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
@@ -308,167 +319,114 @@
                             $("#btnInventoryReportCSV").prop("disabled", false);
                             $("#btnInventoryReportPDF").prop("disabled", false);
                             isCboInventoryReportCompanySelected = true;
-                            createCboBranchFilter();
+                            //createCboStockCountListFilter();
+                            refreshInventoryReportFlexGrid();
                         }
                     });
 
-                    createCboBranchFilter();
+                    //createCboStockCountListFilter();
+                    createCboDisplayNumberOfRows();
                 }
             });
         }
 
-        // ==========================
-        // Create Combo Branch Filter
-        // ==========================
-        function createCboBranchFilter() {
-            var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboInventoryReportCompanyFilter.selectedValue != null) {
-                $.ajax({
-                    url: '/api/branch/byCompanyId/list/locked/' + cboInventoryReportCompanyFilter.selectedValue,
-                    cache: false,
-                    type: 'GET',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (branchResults) {
-                        if (branchResults.length > 0) {
-                            for (i = 0; i < branchResults.length; i++) {
-                                branchObservableArray.push({
-                                    Id: branchResults[i]["Id"],
-                                    CompanyId: branchResults[i]["CompanyId"],
-                                    Branch: branchResults[i]["Branch"],
-                                    Address: branchResults[i]["Address"],
-                                    ContactNumber: branchResults[i]["ContactNumber"],
-                                    TaxNumber: branchResults[i]["TaxNumber"]
-                                });
-                            }
-                        }
-
-                        var disabled = true;
-                        if (branchResults.length > 0) {
-                            disabled = false;
-                        } else {
-                            $("#btnInventoryReportCSV").prop("disabled", true);
-                            $("#btnInventoryReportPDF").prop("disabled", true);
-                        }
-
-                        cboInventoryReportBranchFilter.dispose();
-                        cboInventoryReportBranchFilter = new wijmo.input.ComboBox('#cboInventoryReportBranchFilter', {
-                            disabled: disabled,
-                            isEditable: false,
-                            itemsSource: branchObservableArray,
-                            displayMemberPath: "Branch",
-                            selectedValuePath: "Id",
-                            selectedValue: getURLParameterValue("BranchId"),
-                            onSelectedIndexChanged: function () {
-                                NProgress.start();
-                                refreshInventoryReportFlexGrid();
-                                cboInventoryReportSCFilter.disabled = true;
-                                createCboStockCountListFilter();
-                            }
-                        });
-
-                        createCboStockCountListFilter();
-                        createCboDisplayNumberOfRows();
-                    }
-                });
-            }
-        }
 
         // ====================================
         // Create Combo Stock Count List Filter
         // ====================================
-        function createCboStockCountListFilter() {
-            var stockCountObservableArray = new wijmo.collections.ObservableArray();
-            var branchId = cboInventoryReportBranchFilter.selectedValue;
+        //function createCboStockCountListFilter() {
+        //    var stockCountObservableArray = new wijmo.collections.ObservableArray();
+        //    var branchId = cboInventoryReportBranchFilter.selectedValue;
 
-            $.ajax({
-                url: '/api/inventoryReport/dropdown/list/stockCount/' + branchId,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (results) {
-                    var disabled = true;
-                    if (results.length > 0) {
-                        for (i = 0; i < results.length; i++) {
-                            stockCountObservableArray.push({
-                                Id: results[i]["Id"],
-                                SCNumber: results[i]["SCNumber"],
-                                StockCountItem: results[i]["StockCountItem"]
-                            });
-                        }
+        //    $.ajax({
+        //        url: '/api/inventoryReport/dropdown/list/stockCount/' + branchId,
+        //        cache: false,
+        //        type: 'GET',
+        //        contentType: 'application/json; charset=utf-8',
+        //        success: function (results) {
+        //            var disabled = true;
+        //            if (results.length > 0) {
+        //                for (i = 0; i < results.length; i++) {
+        //                    stockCountObservableArray.push({
+        //                        Id: results[i]["Id"],
+        //                        SCNumber: results[i]["SCNumber"],
+        //                        StockCountItem: results[i]["StockCountItem"]
+        //                    });
+        //                }
 
-                        disabled = false;
-                    }
+        //                disabled = false;
+        //            }
 
-                    cboInventoryReportSCFilter.dispose();
-                    cboInventoryReportSCFilter = new wijmo.input.ComboBox('#cboInventoryReportSCFilter', {
-                        disabled: disabled,
-                        isEditable: false,
-                        required: false,
-                        itemsSource: stockCountObservableArray,
-                        displayMemberPath: "SCNumber",
-                        selectedValue: "",
-                        onSelectedIndexChanged: function () {
-                            NProgress.start();
-                            if (this.selectedValue != null) {
-                                inventoryReportCollectionView.moveToFirstPage();
+        //            cboInventoryReportSCFilter.dispose();
+        //            cboInventoryReportSCFilter = new wijmo.input.ComboBox('#cboInventoryReportSCFilter', {
+        //                disabled: disabled,
+        //                isEditable: false,
+        //                required: false,
+        //                itemsSource: stockCountObservableArray,
+        //                displayMemberPath: "SCNumber",
+        //                selectedValue: "",
+        //                onSelectedIndexChanged: function () {
+        //                    NProgress.start();
+        //                    if (this.selectedValue != null) {
+        //                        inventoryReportCollectionView.moveToFirstPage();
 
-                                for (var p = 1; p <= inventoryReportCollectionView.pageCount; p++) {
-                                    for (i = 0; i < inventoryReportCollectionView.items.length; i++) {
-                                        inventoryReportCollectionView.items[i].Count = 0;
-                                        inventoryReportCollectionView.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        inventoryReportCollectionView.items[i].Variance = parseFloat(0);
-                                        inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                        for (var p = 1; p <= inventoryReportCollectionView.pageCount; p++) {
+        //                            for (i = 0; i < inventoryReportCollectionView.items.length; i++) {
+        //                                inventoryReportCollectionView.items[i].Count = 0;
+        //                                inventoryReportCollectionView.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                                inventoryReportCollectionView.items[i].Variance = parseFloat(0);
+        //                                inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-                                        var inventoryArticleId = inventoryReportCollectionView.items[i].ArticleId;
-                                        var inventoryEndQuantity = inventoryReportCollectionView.items[i].EndQuantity;
+        //                                var inventoryArticleId = inventoryReportCollectionView.items[i].ArticleId;
+        //                                var inventoryEndQuantity = inventoryReportCollectionView.items[i].EndQuantity;
 
-                                        for (var c = 0; c < this.selectedItem["StockCountItem"].length; c++) {
-                                            var countItemId = this.selectedItem["StockCountItem"][c].ItemId;
-                                            var countQuantity = this.selectedItem["StockCountItem"][c].Quantity;
-                                            if (countItemId === inventoryArticleId) {
-                                                inventoryReportCollectionView.items[i].Count = countQuantity;
-                                                inventoryReportCollectionView.items[i].CountDisplay = parseFloat(countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                                inventoryReportCollectionView.items[i].Variance = parseFloat(inventoryEndQuantity - countQuantity);
-                                                inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(inventoryEndQuantity - countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                            }
-                                        }
-                                    }
+        //                                for (var c = 0; c < this.selectedItem["StockCountItem"].length; c++) {
+        //                                    var countItemId = this.selectedItem["StockCountItem"][c].ItemId;
+        //                                    var countQuantity = this.selectedItem["StockCountItem"][c].Quantity;
+        //                                    if (countItemId === inventoryArticleId) {
+        //                                        inventoryReportCollectionView.items[i].Count = countQuantity;
+        //                                        inventoryReportCollectionView.items[i].CountDisplay = parseFloat(countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                                        inventoryReportCollectionView.items[i].Variance = parseFloat(inventoryEndQuantity - countQuantity);
+        //                                        inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(inventoryEndQuantity - countQuantity).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                                    }
+        //                                }
+        //                            }
 
-                                    inventoryReportCollectionView.moveToNextPage();
-                                    if (p == inventoryReportCollectionView.pageCount) {
-                                        inventoryReportCollectionView.moveToPage(inventoryReportCurrentPageIndex - 1);
-                                    }
-                                }
+        //                            inventoryReportCollectionView.moveToNextPage();
+        //                            if (p == inventoryReportCollectionView.pageCount) {
+        //                                inventoryReportCollectionView.moveToPage(inventoryReportCurrentPageIndex - 1);
+        //                            }
+        //                        }
 
-                                inventoryReportCollectionView.refresh();
-                                inventoryReportFlexGrid.refresh();
-                            } else {
-                                inventoryReportCollectionView.moveToFirstPage();
+        //                        inventoryReportCollectionView.refresh();
+        //                        inventoryReportFlexGrid.refresh();
+        //                    } else {
+        //                        inventoryReportCollectionView.moveToFirstPage();
 
-                                for (var p = 1; p <= inventoryReportCollectionView.pageCount; p++) {
-                                    for (i = 0; i < inventoryReportCollectionView.items.length; i++) {
-                                        inventoryReportCollectionView.items[i].Count = 0;
-                                        inventoryReportCollectionView.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        inventoryReportCollectionView.items[i].Variance = parseFloat(0);
-                                        inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    }
+        //                        for (var p = 1; p <= inventoryReportCollectionView.pageCount; p++) {
+        //                            for (i = 0; i < inventoryReportCollectionView.items.length; i++) {
+        //                                inventoryReportCollectionView.items[i].Count = 0;
+        //                                inventoryReportCollectionView.items[i].CountDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                                inventoryReportCollectionView.items[i].Variance = parseFloat(0);
+        //                                inventoryReportCollectionView.items[i].VarianceDisplay = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        //                            }
 
-                                    inventoryReportCollectionView.moveToNextPage();
-                                    if (p == inventoryReportCollectionView.pageCount) {
-                                        inventoryReportCollectionView.moveToPage(inventoryReportCurrentPageIndex - 1);
-                                    }
-                                }
+        //                            inventoryReportCollectionView.moveToNextPage();
+        //                            if (p == inventoryReportCollectionView.pageCount) {
+        //                                inventoryReportCollectionView.moveToPage(inventoryReportCurrentPageIndex - 1);
+        //                            }
+        //                        }
 
-                                inventoryReportCollectionView.refresh();
-                                inventoryReportFlexGrid.refresh();
-                            }
+        //                        inventoryReportCollectionView.refresh();
+        //                        inventoryReportFlexGrid.refresh();
+        //                    }
 
-                            NProgress.done();
-                        }
-                    });
-                }
-            });
-        }
+        //                    NProgress.done();
+        //                }
+        //            });
+        //        }
+        //    });
+        //}
 
         // ===================================
         // Create Combo Display Number of Rows
@@ -538,86 +496,77 @@
         function getInventoryReportData() {
             var inventoryReports = new wijmo.collections.ObservableArray;
             if (cboInventoryReportCompanyFilter.selectedValue != null) {
-                if (cboInventoryReportBranchFilter.selectedValue != null) {
+                var itemId = cboInventoryReportItemDescriptionFilter.selectedValue;
+                var companyId = cboInventoryReportCompanyFilter.selectedValue;
 
-                    var startDate = cboInventoryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboInventoryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboInventoryReportCompanyFilter.selectedValue;
-                    var branchId = cboInventoryReportBranchFilter.selectedValue;
+                $.ajax({
+                    url: '/api/inventoryReportItem/list/' + itemId + '/' + companyId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (inventoryReportResult) {
+                        var totalAllAmount = 0;
+                        var totalVarianceAmount = 0;
 
-                    $.ajax({
-                        url: '/api/inventoryReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
-                        cache: false,
-                        type: 'GET',
-                        contentType: 'application/json; charset=utf-8',
-                        success: function (inventoryReportResult) {
-                            var totalAllAmount = 0;
-                            var totalVarianceAmount = 0;
+                        if (inventoryReportResult != null) {
+                            if (inventoryReportResult.length > 0) {
+                                for (i = 0; i < inventoryReportResult.length; i++) {
+                                    var itemId = inventoryReportResult[i]["ArticleId"];
 
-                            if (inventoryReportResult != null) {
-                                if (inventoryReportResult.length > 0) {
-                                    for (i = 0; i < inventoryReportResult.length; i++) {
-                                        var branchId = inventoryReportResult[i]["BranchId"];
-                                        var itemId = inventoryReportResult[i]["ArticleId"];
+                                    var totalAmount = inventoryReportResult[i]["Cost"] * inventoryReportResult[i]["EndQuantity"];
+                                    var quantityVariance = inventoryReportResult[i]["EndQuantity"] - 0;
+                                    var varianceAmount = inventoryReportResult[i]["Cost"] * quantityVariance;
 
-                                        var articleLink = '/Software/StockCard?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&ItemId=' + itemId;
+                                    var articleLink = "";
 
-                                        var totalAmount = inventoryReportResult[i]["Cost"] * inventoryReportResult[i]["EndQuantity"];
-                                        var quantityVariance = inventoryReportResult[i]["EndQuantity"] - 0;
-                                        var varianceAmount = inventoryReportResult[i]["Cost"] * quantityVariance;
+                                    inventoryReports.push({
+                                        Branch: inventoryReportResult[i]["Branch"],
+                                        ArticleId: inventoryReportResult[i]["ArticleId"],
+                                        BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 7px;'>SC</a>",
+                                        ManualArticleCode: inventoryReportResult[i]["ManualArticleCode"],
+                                        ManualArticleOldCode: inventoryReportResult[i]["ManualArticleOldCode"],
+                                        Article: inventoryReportResult[i]["Article"],
+                                        ArticleForCSV: inventoryReportResult[i]["Article"],
+                                        InventoryCode: inventoryReportResult[i]["InventoryCode"],
+                                        Cost: inventoryReportResult[i]["Cost"],
+                                        CostDisplay: parseFloat(inventoryReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        UnitId: inventoryReportResult[i]["UnitId"],
+                                        Unit: inventoryReportResult[i]["Unit"],
+                                        BegQuantity: inventoryReportResult[i]["BegQuantity"],
+                                        BegQuantityDisplay: parseFloat(inventoryReportResult[i]["BegQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        InQuantity: inventoryReportResult[i]["InQuantity"],
+                                        InQuantityDisplay: parseFloat(inventoryReportResult[i]["InQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        OutQuantity: inventoryReportResult[i]["OutQuantity"],
+                                        OutQuantityDisplay: parseFloat(inventoryReportResult[i]["OutQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        EndQuantity: inventoryReportResult[i]["EndQuantity"],
+                                        EndQuantityDisplay: parseFloat(inventoryReportResult[i]["EndQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Amount: inventoryReportResult[i]["Amount"],
+                                        AmountDisplay: parseFloat(inventoryReportResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        TotalAmount: totalAmount,
+                                        TotalAmountDisplay: parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        QuantityVariance: quantityVariance,
+                                        QuantityVarianceDisplay: parseFloat(quantityVariance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        VarianceAmount: varianceAmount,
+                                        VarianceAmountDisplay: parseFloat(varianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Count: 0,
+                                        CountDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Variance: 0,
+                                        VarianceDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Category: inventoryReportResult[i]["Category"],
+                                        Price: inventoryReportResult[i]["Price"],
+                                        PriceDisplay: parseFloat(inventoryReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    });
 
-                                        inventoryReports.push({
-                                            Branch: inventoryReportResult[i]["Branch"],
-                                            ArticleId: inventoryReportResult[i]["ArticleId"],
-                                            BtnDetail: "<a href='" + articleLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 7px;'>SC</a>",
-                                            ManualArticleCode: inventoryReportResult[i]["ManualArticleCode"],
-                                            ManualArticleOldCode: inventoryReportResult[i]["ManualArticleOldCode"],
-                                            Article: inventoryReportResult[i]["Article"],
-                                            ArticleForCSV: inventoryReportResult[i]["Article"],
-                                            InventoryCode: inventoryReportResult[i]["InventoryCode"],
-                                            Cost: inventoryReportResult[i]["Cost"],
-                                            CostDisplay: parseFloat(inventoryReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            UnitId: inventoryReportResult[i]["UnitId"],
-                                            Unit: inventoryReportResult[i]["Unit"],
-                                            BegQuantity: inventoryReportResult[i]["BegQuantity"],
-                                            BegQuantityDisplay: parseFloat(inventoryReportResult[i]["BegQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            InQuantity: inventoryReportResult[i]["InQuantity"],
-                                            InQuantityDisplay: parseFloat(inventoryReportResult[i]["InQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            OutQuantity: inventoryReportResult[i]["OutQuantity"],
-                                            OutQuantityDisplay: parseFloat(inventoryReportResult[i]["OutQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            EndQuantity: inventoryReportResult[i]["EndQuantity"],
-                                            EndQuantityDisplay: parseFloat(inventoryReportResult[i]["EndQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Amount: inventoryReportResult[i]["Amount"],
-                                            AmountDisplay: parseFloat(inventoryReportResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            TotalAmount: totalAmount,
-                                            TotalAmountDisplay: parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            QuantityVariance: quantityVariance,
-                                            QuantityVarianceDisplay: parseFloat(quantityVariance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            VarianceAmount: varianceAmount,
-                                            VarianceAmountDisplay: parseFloat(varianceAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Count: 0,
-                                            CountDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Variance: 0,
-                                            VarianceDisplay: parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Category: inventoryReportResult[i]["Category"],
-                                            Price: inventoryReportResult[i]["Price"],
-                                            PriceDisplay: parseFloat(inventoryReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                        });
-
-                                        totalAllAmount += totalAmount;
-                                        totalVarianceAmount += varianceAmount;
-                                    }
+                                    totalAllAmount += totalAmount;
+                                    totalVarianceAmount += varianceAmount;
                                 }
                             }
-
-                            document.getElementById("totalAmount").value = parseFloat(totalAllAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            NProgress.done();
                         }
-                    });
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    NProgress.done();
-                }
+
+                        document.getElementById("totalAmount").value = parseFloat(totalAllAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        NProgress.done();
+                    }
+                });
             } else {
                 document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
@@ -641,11 +590,8 @@
             });
 
             inventoryReportCollectionView.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Category.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -664,26 +610,8 @@
                         "isContentHtml": true
                     },
                     {
-                        "header": "Barcode",
-                        "binding": "ManualArticleCode",
-                        "allowSorting": true,
-                        "width": "1.5*"
-                    },
-                    {
-                        "header": "SKU Code",
-                        "binding": "ManualArticleOldCode",
-                        "allowSorting": true,
-                        "width": "1.2*"
-                    },
-                    {
-                        "header": "Item",
-                        "binding": "Article",
-                        "allowSorting": true,
-                        "width": "1.7*"
-                    },
-                    {
-                        "header": "Category",
-                        "binding": "Category",
+                        "header": "Branch",
+                        "binding": "Branch",
                         "allowSorting": true,
                         "width": "1.5*"
                     },
@@ -782,38 +710,29 @@
             inventoryReportFlexGrid.columnHeaders.setCellData(0, 0, 'SC');
 
             inventoryReportFlexGrid.columnHeaders.columns[1].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 1, 'Barcode');
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 1, 'Branch');
 
             inventoryReportFlexGrid.columnHeaders.columns[2].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 2, 'SKU Code');
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 2, 'Code');
 
             inventoryReportFlexGrid.columnHeaders.columns[3].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 3, 'Item');
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 3, 'Unit');
 
             inventoryReportFlexGrid.columnHeaders.columns[4].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 4, 'Category');
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 4, 'Price');
 
             inventoryReportFlexGrid.columnHeaders.columns[5].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 5, 'Code');
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 5, 'Cost');
 
-            inventoryReportFlexGrid.columnHeaders.columns[6].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 6, 'Unit');
-
-            inventoryReportFlexGrid.columnHeaders.columns[7].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 7, 'Price');
-
-            inventoryReportFlexGrid.columnHeaders.columns[8].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 8, 'Cost');
-
-            for (var columnBasicUnitConversion = 9; columnBasicUnitConversion <= 13; columnBasicUnitConversion++) {
+            for (var columnBasicUnitConversion = 6; columnBasicUnitConversion <= 10; columnBasicUnitConversion++) {
                 inventoryReportFlexGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            inventoryReportFlexGrid.columnHeaders.columns[14].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 14, 'Variance');
+            inventoryReportFlexGrid.columnHeaders.columns[11].allowMerging = true;
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 11, 'Variance');
 
-            inventoryReportFlexGrid.columnHeaders.columns[15].allowMerging = true;
-            inventoryReportFlexGrid.columnHeaders.setCellData(0, 15, 'Amount');
+            inventoryReportFlexGrid.columnHeaders.columns[12].allowMerging = true;
+            inventoryReportFlexGrid.columnHeaders.setCellData(0, 12, 'Amount');
 
             updateInventoryReportNavigationButtons();
 
@@ -885,11 +804,8 @@
             });
 
             inventoryReportCollectionView.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.InventoryCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Category.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
@@ -1028,7 +944,7 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            createCboDateRangeFilters();
+            createCboItemFilter();
         });
     </script>
     <script type="text/javascript">
