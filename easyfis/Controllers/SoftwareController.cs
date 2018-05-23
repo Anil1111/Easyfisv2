@@ -1132,6 +1132,15 @@ namespace easyfis.Controllers
             }
         }
 
+        // ==================================
+        // View Inventory Report Per Supplier
+        // ==================================
+        [Authorize]
+        public ActionResult ItemListSupplier()
+        {
+            return View();
+        }
+
         // ==============================
         // View Inventory Report Per Item
         // ==============================

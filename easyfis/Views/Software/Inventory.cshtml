@@ -44,6 +44,7 @@
                             <li><a data-toggle="pill" href="#tabPillStockTransferDetailReport">Stock Transfer Detail Report</a></li>
                             <li class="reportDivider"></li>
                             <li><a data-toggle="pill" href="#tabPillItemList">Item List</a></li>
+                            <li><a data-toggle="pill" href="#tabPillItemListPerSupplier">Item List Per Supplier</a></li>
                             <li><a data-toggle="pill" href="#tabPillItemComponentList">Item Component List</a></li>
                             <li><a data-toggle="pill" href="#tabPillPhysicalCountSheet">Physical Count Sheet</a></li>
                             <li class="reportDivider"></li>
@@ -97,7 +98,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!--
                                 ================================
                                 Tab Content - Inventory Per Item
@@ -366,6 +367,33 @@
                             </div>
 
                             <!--
+                                ===============================
+                                Tab Content - Item Per Supplier
+                                ===============================
+                            -->
+                            <div id="tabPillItemListPerSupplier" class="tab-pane">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div align="right">
+                                            <button onclick="btnItemListPerSupplierViewOnclick()" class="btn btn-primary "><i class="fa fa-table"></i> View</button>
+                                            <button onclick="btnItemListPerSupplierPrintOnclick()" class="btn btn-primary "><i class="fa fa-print"></i> Print</button>
+                                            <a href="/Software" class="btn btn-danger" id=""><i class="fa fa-times"></i> Close</a>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <form class="form-horizontal" role="form">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Supplier</label>
+                                                <div class="col-sm-8">
+                                                    <div class="comboBox-wide" id="cboItemListPerSupplierListSupplier"></div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--
                                 =================================
                                 Tab Content - Item Component List
                                 =================================
@@ -531,6 +559,7 @@
         // Item List, Item Component List, and Physical Count Sheet Filters
         // ================================================================
         var cboItemListItemGroupFilter = new wijmo.input.ComboBox('#cboItemListItemGroupFilter');
+        var cboItemListPerSupplierListSupplier = new wijmo.input.ComboBox('#cboItemListPerSupplierListSupplier');
         var cboItemComponentListItemGroupFilter = new wijmo.input.ComboBox('#cboItemComponentListItemGroupFilter');
         var cboPhysicalCountSheetItemGroupFilter = new wijmo.input.ComboBox('#cboPhysicalCountSheetItemGroupFilter');
 
@@ -789,7 +818,7 @@
                             }
                         }
                     });
-                    
+
 
                     cboInventoryReportPerItemCompanyFilter.dispose();
                     cboInventoryReportPerItemCompanyFilter = new wijmo.input.ComboBox('#cboInventoryReportPerItemCompanyFilter', {
@@ -1123,6 +1152,47 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboInventoryReportSupplierFilters();
+                }
+            });
+        }
+
+        // =================================================
+        // Create Combo All Inventory Report Supplier Filter
+        // =================================================
+        function createCboInventoryReportSupplierFilters() {
+            var supplierObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/itemListPerSupplier/dropdown/list/supplier',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            supplierObservableArray.push({
+                                Id: results[i]["Id"],
+                                Article: results[i]["Article"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                    } else {
+
+                    }
+
+                    cboItemListPerSupplierListSupplier.dispose();
+                    cboItemListPerSupplierListSupplier = new wijmo.input.ComboBox('#cboItemListPerSupplierListSupplier', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: supplierObservableArray,
+                        displayMemberPath: "Article",
+                        selectedValuePath: "Id"
+                    });
+
                     NProgress.done();
                 }
             });
@@ -1375,6 +1445,30 @@
             if (cboItemListItemGroupFilter.selectedValue != null) {
                 var itemGroupId = cboItemListItemGroupFilter.selectedValue;
                 window.location.href = '/RepItemList/ItemList?ItemGroupId=' + itemGroupId;
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // ===========================
+        // Item List Per Supplier View
+        // ===========================
+        function btnItemListPerSupplierViewOnclick() {
+            if (cboItemListPerSupplierListSupplier.selectedValue != null) {
+                var supplierId = cboItemListPerSupplierListSupplier.selectedValue;
+                window.location.href = '/Software/ItemListSupplier?SupplierId=' + supplierId;
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // ============================
+        // Item List Per Supplier Print
+        // ============================
+        function btnItemListPerSupplierPrintOnclick() {
+            if (cboItemListPerSupplierListSupplier.selectedValue != null) {
+                var supplierId = cboItemListPerSupplierListSupplier.selectedValue;
+                window.location.href = '/RepItemListPerSupplier/ItemListPerSupplier?SupplierId=' + supplierId;
             } else {
                 toastr.error("Lacking Information");
             }

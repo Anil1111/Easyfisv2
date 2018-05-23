@@ -122,6 +122,24 @@ namespace easyfis.ModifiedApiControllers
             return itemTaxTypes.ToList();
         }
 
+        // =====================================
+        // Dropdown List - Item Supplier (Field)
+        // =====================================
+        [Authorize, HttpGet, Route("api/item/dropdown/list/supplier")]
+        public List<Entities.MstArticle> DropdownListItemSupplier()
+        {
+            var itemSuppliers = from d in db.MstArticles.OrderBy(d => d.Article)
+                                where d.IsLocked == true
+                                && d.ArticleTypeId == 3
+                                select new Entities.MstArticle
+                                {
+                                    Id = d.Id,
+                                    Article = d.Article
+                                };
+
+            return itemSuppliers.ToList();
+        }
+
         // ===========
         // Detail Item
         // ===========
@@ -157,6 +175,7 @@ namespace easyfis.ModifiedApiControllers
                            DateAcquired = d.DateAcquired.ToShortDateString(),
                            UsefulLife = d.UsefulLife,
                            SalvageValue = d.SalvageValue,
+                           DefaultSupplierId = d.DefaultSupplierId,
                            IsLocked = d.IsLocked,
                            CreatedById = d.CreatedById,
                            CreatedBy = d.MstUser.FullName,
@@ -275,6 +294,7 @@ namespace easyfis.ModifiedApiControllers
                                                 SalvageValue = 0,
                                                 ManualArticleOldCode = "NA",
                                                 Kitting = 0,
+                                                DefaultSupplierId = null,
                                                 IsLocked = false,
                                                 CreatedById = currentUserId,
                                                 CreatedDateTime = DateTime.Now,
@@ -395,6 +415,7 @@ namespace easyfis.ModifiedApiControllers
                                                 lockItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
                                                 lockItem.Cost = objItem.Cost;
                                                 lockItem.Kitting = objItem.Kitting;
+                                                lockItem.DefaultSupplierId = objItem.DefaultSupplierId;
                                                 lockItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
                                                 lockItem.UsefulLife = objItem.UsefulLife;
                                                 lockItem.SalvageValue = objItem.SalvageValue;
