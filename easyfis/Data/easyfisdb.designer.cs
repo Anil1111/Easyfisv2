@@ -5105,6 +5105,8 @@ namespace easyfis.Data
 		
 		private int _Kitting;
 		
+		private System.Nullable<int> _DefaultSupplierId;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -5178,6 +5180,8 @@ namespace easyfis.Data
 		private EntitySet<TrnStockTransfer> _TrnStockTransfers;
 		
 		private EntitySet<TrnStockTransferItem> _TrnStockTransferItems;
+		
+		private EntitySet<TrnStockWithdrawal> _TrnStockWithdrawals;
 		
 		private EntityRef<MstAccount> _MstAccount;
 		
@@ -5275,6 +5279,8 @@ namespace easyfis.Data
     partial void OnManualArticleOldCodeChanged();
     partial void OnKittingChanging(int value);
     partial void OnKittingChanged();
+    partial void OnDefaultSupplierIdChanging(System.Nullable<int> value);
+    partial void OnDefaultSupplierIdChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -5321,6 +5327,7 @@ namespace easyfis.Data
 			this._TrnStockOutItems = new EntitySet<TrnStockOutItem>(new Action<TrnStockOutItem>(this.attach_TrnStockOutItems), new Action<TrnStockOutItem>(this.detach_TrnStockOutItems));
 			this._TrnStockTransfers = new EntitySet<TrnStockTransfer>(new Action<TrnStockTransfer>(this.attach_TrnStockTransfers), new Action<TrnStockTransfer>(this.detach_TrnStockTransfers));
 			this._TrnStockTransferItems = new EntitySet<TrnStockTransferItem>(new Action<TrnStockTransferItem>(this.attach_TrnStockTransferItems), new Action<TrnStockTransferItem>(this.detach_TrnStockTransferItems));
+			this._TrnStockWithdrawals = new EntitySet<TrnStockWithdrawal>(new Action<TrnStockWithdrawal>(this.attach_TrnStockWithdrawals), new Action<TrnStockWithdrawal>(this.detach_TrnStockWithdrawals));
 			this._MstAccount = default(EntityRef<MstAccount>);
 			this._MstAccount1 = default(EntityRef<MstAccount>);
 			this._MstAccount2 = default(EntityRef<MstAccount>);
@@ -6026,6 +6033,26 @@ namespace easyfis.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_DefaultSupplierId", DbType="Int")]
+		public System.Nullable<int> DefaultSupplierId
+		{
+			get
+			{
+				return this._DefaultSupplierId;
+			}
+			set
+			{
+				if ((this._DefaultSupplierId != value))
+				{
+					this.OnDefaultSupplierIdChanging(value);
+					this.SendPropertyChanging();
+					this._DefaultSupplierId = value;
+					this.SendPropertyChanged("DefaultSupplierId");
+					this.OnDefaultSupplierIdChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsLocked", DbType="Bit NOT NULL")]
 		public bool IsLocked
 		{
@@ -6547,6 +6574,19 @@ namespace easyfis.Data
 			set
 			{
 				this._TrnStockTransferItems.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstArticle_TrnStockWithdrawal", Storage="_TrnStockWithdrawals", ThisKey="Id", OtherKey="CustomerId")]
+		public EntitySet<TrnStockWithdrawal> TrnStockWithdrawals
+		{
+			get
+			{
+				return this._TrnStockWithdrawals;
+			}
+			set
+			{
+				this._TrnStockWithdrawals.Assign(value);
 			}
 		}
 		
@@ -7425,6 +7465,18 @@ namespace easyfis.Data
 		}
 		
 		private void detach_TrnStockTransferItems(TrnStockTransferItem entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstArticle = null;
+		}
+		
+		private void attach_TrnStockWithdrawals(TrnStockWithdrawal entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstArticle = this;
+		}
+		
+		private void detach_TrnStockWithdrawals(TrnStockWithdrawal entity)
 		{
 			this.SendPropertyChanging();
 			entity.MstArticle = null;
@@ -38191,6 +38243,8 @@ namespace easyfis.Data
 		
 		private System.DateTime _SWDate;
 		
+		private int _CustomerId;
+		
 		private int _SIBranchId;
 		
 		private int _SIId;
@@ -38227,6 +38281,8 @@ namespace easyfis.Data
 		
 		private EntitySet<TrnJournal> _TrnJournals;
 		
+		private EntityRef<MstArticle> _MstArticle;
+		
 		private EntityRef<MstBranch> _MstBranch;
 		
 		private EntityRef<MstBranch> _MstBranch1;
@@ -38255,6 +38311,8 @@ namespace easyfis.Data
     partial void OnSWNumberChanged();
     partial void OnSWDateChanging(System.DateTime value);
     partial void OnSWDateChanged();
+    partial void OnCustomerIdChanging(int value);
+    partial void OnCustomerIdChanged();
     partial void OnSIBranchIdChanging(int value);
     partial void OnSIBranchIdChanged();
     partial void OnSIIdChanging(int value);
@@ -38292,6 +38350,7 @@ namespace easyfis.Data
 			this._TrnStockWithdrawalItems = new EntitySet<TrnStockWithdrawalItem>(new Action<TrnStockWithdrawalItem>(this.attach_TrnStockWithdrawalItems), new Action<TrnStockWithdrawalItem>(this.detach_TrnStockWithdrawalItems));
 			this._TrnInventories = new EntitySet<TrnInventory>(new Action<TrnInventory>(this.attach_TrnInventories), new Action<TrnInventory>(this.detach_TrnInventories));
 			this._TrnJournals = new EntitySet<TrnJournal>(new Action<TrnJournal>(this.attach_TrnJournals), new Action<TrnJournal>(this.detach_TrnJournals));
+			this._MstArticle = default(EntityRef<MstArticle>);
 			this._MstBranch = default(EntityRef<MstBranch>);
 			this._MstBranch1 = default(EntityRef<MstBranch>);
 			this._MstUser = default(EntityRef<MstUser>);
@@ -38387,6 +38446,30 @@ namespace easyfis.Data
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CustomerId", DbType="Int NOT NULL")]
+		public int CustomerId
+		{
+			get
+			{
+				return this._CustomerId;
+			}
+			set
+			{
+				if ((this._CustomerId != value))
+				{
+					if (this._MstArticle.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCustomerIdChanging(value);
+					this.SendPropertyChanging();
+					this._CustomerId = value;
+					this.SendPropertyChanged("CustomerId");
+					this.OnCustomerIdChanged();
+				}
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_SIBranchId", DbType="Int NOT NULL")]
 		public int SIBranchId
 		{
@@ -38435,7 +38518,7 @@ namespace easyfis.Data
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Remarks", DbType="NVarChar(MAX) NOT NULL", CanBeNull=false)]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Remarks", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
 		public string Remarks
 		{
 			get
@@ -38751,6 +38834,40 @@ namespace easyfis.Data
 			set
 			{
 				this._TrnJournals.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstArticle_TrnStockWithdrawal", Storage="_MstArticle", ThisKey="CustomerId", OtherKey="Id", IsForeignKey=true)]
+		public MstArticle MstArticle
+		{
+			get
+			{
+				return this._MstArticle.Entity;
+			}
+			set
+			{
+				MstArticle previousValue = this._MstArticle.Entity;
+				if (((previousValue != value) 
+							|| (this._MstArticle.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstArticle.Entity = null;
+						previousValue.TrnStockWithdrawals.Remove(this);
+					}
+					this._MstArticle.Entity = value;
+					if ((value != null))
+					{
+						value.TrnStockWithdrawals.Add(this);
+						this._CustomerId = value.Id;
+					}
+					else
+					{
+						this._CustomerId = default(int);
+					}
+					this.SendPropertyChanged("MstArticle");
+				}
 			}
 		}
 		
