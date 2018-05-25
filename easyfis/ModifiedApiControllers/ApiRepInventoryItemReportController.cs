@@ -48,51 +48,28 @@ namespace easyfis.ModifiedApiControllers
         {
             try
             {
-                var unionInventories = (from d in db.TrnInventories
-                                        where d.MstArticleInventory.ArticleId == Convert.ToInt32(itemId)
-                                        && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                        && d.MstArticleInventory.MstArticle.IsInventory == true
-                                        select new Models.MstArticleInventory
-                                        {
-                                            Id = d.Id,
-                                            Document = "Beginning Balance",
-                                            BranchId = d.BranchId,
-                                            Branch = d.MstBranch.Branch,
-                                            InventoryCode = d.MstArticleInventory.InventoryCode,
-                                            Quantity = d.MstArticleInventory.Quantity,
-                                            Cost = d.MstArticleInventory.Cost,
-                                            Amount = d.MstArticleInventory.Amount,
-                                            UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                            Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                            BegQuantity = d.Quantity,
-                                            InQuantity = d.QuantityIn,
-                                            OutQuantity = d.QuantityOut,
-                                            EndQuantity = d.Quantity,
-                                            Category = d.MstArticle.Category,
-                                            Price = d.MstArticle.Price
-                                        }).Union(from d in db.TrnInventories
-                                                 where d.MstArticleInventory.ArticleId == Convert.ToInt32(itemId)
-                                                 && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                                 && d.MstArticleInventory.MstArticle.IsInventory == true
-                                                 select new Models.MstArticleInventory
-                                                 {
-                                                     Id = d.Id,
-                                                     Document = "Current",
-                                                     BranchId = d.BranchId,
-                                                     Branch = d.MstBranch.Branch,
-                                                     InventoryCode = d.MstArticleInventory.InventoryCode,
-                                                     Quantity = d.MstArticleInventory.Quantity,
-                                                     Cost = d.MstArticleInventory.Cost,
-                                                     Amount = d.MstArticleInventory.Amount,
-                                                     UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                                     Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                                     BegQuantity = d.Quantity,
-                                                     InQuantity = d.QuantityIn,
-                                                     OutQuantity = d.QuantityOut,
-                                                     EndQuantity = d.Quantity,
-                                                     Category = d.MstArticle.Category,
-                                                     Price = d.MstArticle.Price
-                                                 });
+                var unionInventories = from d in db.TrnInventories
+                                       where d.MstArticleInventory.ArticleId == Convert.ToInt32(itemId)
+                                       && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                       && d.MstArticleInventory.MstArticle.IsInventory == true
+                                       select new Models.MstArticleInventory
+                                       {
+                                           Id = d.Id,
+                                           BranchId = d.BranchId,
+                                           Branch = d.MstBranch.Branch,
+                                           InventoryCode = d.MstArticleInventory.InventoryCode,
+                                           Quantity = d.MstArticleInventory.Quantity,
+                                           Cost = d.MstArticleInventory.Cost,
+                                           Amount = d.MstArticleInventory.Amount,
+                                           UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
+                                           Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
+                                           BegQuantity = d.Quantity,
+                                           InQuantity = d.QuantityIn,
+                                           OutQuantity = d.QuantityOut,
+                                           EndQuantity = d.Quantity,
+                                           Category = d.MstArticle.Category,
+                                           Price = d.MstArticle.Price
+                                       };
 
                 if (unionInventories.Any())
                 {
@@ -116,9 +93,9 @@ namespace easyfis.ModifiedApiControllers
                                           Cost = g.Key.Cost,
                                           UnitId = g.Key.UnitId,
                                           Unit = g.Key.Unit,
-                                          BegQuantity = g.Sum(d => d.Document == "Current" ? 0 : d.BegQuantity),
-                                          InQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.InQuantity),
-                                          OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
+                                          BegQuantity = g.Sum(d => d.BegQuantity),
+                                          InQuantity = g.Sum(d => d.InQuantity),
+                                          OutQuantity = g.Sum(d => d.OutQuantity),
                                           EndQuantity = g.Sum(d => d.EndQuantity),
                                           Amount = g.Sum(d => d.Quantity * d.Cost),
                                           Category = g.Key.Category,

@@ -74,51 +74,28 @@ namespace easyfis.Reports
             // Data
             // ====
 
-            var unionInventories = (from d in db.TrnInventories
-                                    where d.MstArticleInventory.ArticleId == Convert.ToInt32(ItemId)
-                                    && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
-                                    && d.MstArticleInventory.MstArticle.IsInventory == true
-                                    select new Models.MstArticleInventory
-                                    {
-                                        Id = d.Id,
-                                        Document = "Beginning Balance",
-                                        BranchId = d.BranchId,
-                                        Branch = d.MstBranch.Branch,
-                                        InventoryCode = d.MstArticleInventory.InventoryCode,
-                                        Quantity = d.MstArticleInventory.Quantity,
-                                        Cost = d.MstArticleInventory.Cost,
-                                        Amount = d.MstArticleInventory.Amount,
-                                        UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                        Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                        BegQuantity = d.Quantity,
-                                        InQuantity = d.QuantityIn,
-                                        OutQuantity = d.QuantityOut,
-                                        EndQuantity = d.Quantity,
-                                        Category = d.MstArticle.Category,
-                                        Price = d.MstArticle.Price
-                                    }).Union(from d in db.TrnInventories
-                                             where d.MstArticleInventory.ArticleId == Convert.ToInt32(ItemId)
-                                             && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
-                                             && d.MstArticleInventory.MstArticle.IsInventory == true
-                                             select new Models.MstArticleInventory
-                                             {
-                                                 Id = d.Id,
-                                                 Document = "Current",
-                                                 BranchId = d.BranchId,
-                                                 Branch = d.MstBranch.Branch,
-                                                 InventoryCode = d.MstArticleInventory.InventoryCode,
-                                                 Quantity = d.MstArticleInventory.Quantity,
-                                                 Cost = d.MstArticleInventory.Cost,
-                                                 Amount = d.MstArticleInventory.Amount,
-                                                 UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
-                                                 Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
-                                                 BegQuantity = d.Quantity,
-                                                 InQuantity = d.QuantityIn,
-                                                 OutQuantity = d.QuantityOut,
-                                                 EndQuantity = d.Quantity,
-                                                 Category = d.MstArticle.Category,
-                                                 Price = d.MstArticle.Price
-                                             });
+            var unionInventories = from d in db.TrnInventories
+                                   where d.MstArticleInventory.ArticleId == Convert.ToInt32(ItemId)
+                                   && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                                   && d.MstArticleInventory.MstArticle.IsInventory == true
+                                   select new Models.MstArticleInventory
+                                   {
+                                       Id = d.Id,
+                                       BranchId = d.BranchId,
+                                       Branch = d.MstBranch.Branch,
+                                       InventoryCode = d.MstArticleInventory.InventoryCode,
+                                       Quantity = d.MstArticleInventory.Quantity,
+                                       Cost = d.MstArticleInventory.Cost,
+                                       Amount = d.MstArticleInventory.Amount,
+                                       UnitId = d.MstArticleInventory.MstArticle.MstUnit.Id,
+                                       Unit = d.MstArticleInventory.MstArticle.MstUnit.Unit,
+                                       BegQuantity = d.Quantity,
+                                       InQuantity = d.QuantityIn,
+                                       OutQuantity = d.QuantityOut,
+                                       EndQuantity = d.Quantity,
+                                       Category = d.MstArticle.Category,
+                                       Price = d.MstArticle.Price
+                                   };
 
             if (unionInventories.Any())
             {
@@ -142,9 +119,9 @@ namespace easyfis.Reports
                                       Cost = g.Key.Cost,
                                       UnitId = g.Key.UnitId,
                                       Unit = g.Key.Unit,
-                                      BegQuantity = g.Sum(d => d.Document == "Current" ? 0 : d.BegQuantity),
-                                      InQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.InQuantity),
-                                      OutQuantity = g.Sum(d => d.Document == "Beginning Balance" ? 0 : d.OutQuantity),
+                                      BegQuantity = g.Sum(d => d.BegQuantity),
+                                      InQuantity = g.Sum(d => d.InQuantity),
+                                      OutQuantity = g.Sum(d => d.OutQuantity),
                                       EndQuantity = g.Sum(d => d.EndQuantity),
                                       Amount = g.Sum(d => d.Quantity * d.Cost),
                                       Category = g.Key.Category,
@@ -178,8 +155,8 @@ namespace easyfis.Reports
                     // ===========
                     // Data Tables
                     // ===========
-                    PdfPTable data = new PdfPTable(10);
-                    float[] widthsCellsData = new float[] { 35f, 20f, 10f, 10f, 10f, 16f, 16f, 16f, 16f, 16f };
+                    PdfPTable data = new PdfPTable(9);
+                    float[] widthsCellsData = new float[] { 35f, 20f, 10f, 10f, 10f, 16f, 16f, 16f, 16f };
                     data.SetWidths(widthsCellsData);
                     data.WidthPercentage = 100;
                     data.AddCell(new PdfPCell(new Phrase("Branch", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
@@ -187,9 +164,8 @@ namespace easyfis.Reports
                     data.AddCell(new PdfPCell(new Phrase("Unit", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Price", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Cost", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { Colspan = 4, HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                    data.AddCell(new PdfPCell(new Phrase("Quantity", fontArial11Bold)) { Colspan = 3, HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, Rowspan = 2, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    data.AddCell(new PdfPCell(new Phrase("Beg", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("In", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("Out", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     data.AddCell(new PdfPCell(new Phrase("End", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
@@ -216,7 +192,6 @@ namespace easyfis.Reports
                         data.AddCell(new PdfPCell(new Phrase(inventory.Unit, fontArial9)) { HorizontalAlignment = 0, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.Price.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.Cost.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                        data.AddCell(new PdfPCell(new Phrase(inventory.BegQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.InQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.OutQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         data.AddCell(new PdfPCell(new Phrase(inventory.EndQuantity.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
