@@ -1824,6 +1824,7 @@
                                 purchaseOrderStatusObservableArray.push({
                                     POId: results[i]["POId"],
                                     ItemId: results[i]["ItemId"],
+                                    ManualArticleOldCode: results[i]["ItemManualOldCode"],
                                     ItemCode: results[i]["ItemCode"],
                                     ItemDescription: results[i]["ItemDescription"],
                                     Particulars: results[i]["Particulars"],
@@ -1966,6 +1967,7 @@
 
             purchaseOrderStatusCollectionView.filter = function (item) {
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1);
             }
@@ -1980,6 +1982,13 @@
             purchasrOrderStatusFlexGrid.initialize({
                 columns: [
                             {
+                                "header": "SKU",
+                                "binding": "ManualArticleOldCode",
+                                "allowSorting": true,
+                                "width": "1*",
+                                "isReadOnly": true,
+                            },
+                            {
                                 "header": "Code",
                                 "binding": "ItemCode",
                                 "allowSorting": true,
@@ -1991,7 +2000,7 @@
                                 "binding": "ItemDescription",
                                 "allowSorting": true,
                                 "isReadOnly": true,
-                                "width": "2*"
+                                "width": "3*"
                             },
                             {
                                 "header": "Unit",
@@ -2058,23 +2067,26 @@
             purchasrOrderStatusFlexGrid.columnHeaders.rows[0].allowMerging = true;
 
             purchasrOrderStatusFlexGrid.columnHeaders.columns[0].allowMerging = true;
-            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 0, 'Code');
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 0, 'SKU');
 
             purchasrOrderStatusFlexGrid.columnHeaders.columns[1].allowMerging = true;
-            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 1, 'Description');
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 1, 'Code');
 
             purchasrOrderStatusFlexGrid.columnHeaders.columns[2].allowMerging = true;
-            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 2, 'Unit');
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 2, 'Description');
 
-            for (var columnQuantityTopAssigned = 3; columnQuantityTopAssigned <= 5; columnQuantityTopAssigned++) {
+            purchasrOrderStatusFlexGrid.columnHeaders.columns[3].allowMerging = true;
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 3, 'Unit');
+
+            for (var columnQuantityTopAssigned = 4; columnQuantityTopAssigned <= 6; columnQuantityTopAssigned++) {
                 purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, columnQuantityTopAssigned, 'Quantities');
             }
 
-            purchasrOrderStatusFlexGrid.columnHeaders.columns[6].allowMerging = true;
-            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 6, 'Pick');
-
             purchasrOrderStatusFlexGrid.columnHeaders.columns[7].allowMerging = true;
-            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 7, 'Quantity');
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 7, 'Pick');
+
+            purchasrOrderStatusFlexGrid.columnHeaders.columns[8].allowMerging = true;
+            purchasrOrderStatusFlexGrid.columnHeaders.setCellData(0, 8, 'Quantity');
 
             if (!isPOStatusClicked) {
                 updateNavigateButtonsPOStatus();

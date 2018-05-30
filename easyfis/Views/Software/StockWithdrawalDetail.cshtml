@@ -93,6 +93,12 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
+                                            <label class="control-label col-sm-4">Customer</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockWithdrawalCustomer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label class="control-label col-sm-4">SI Branch</label>
                                             <div class="col-sm-8">
                                                 <div class="comboBox-wide" id="cboStockWithdrawalSIBranch"></div>
@@ -542,6 +548,7 @@
         // Global Variables
         // ================
         var cboStockWithdrawalBranch = new wijmo.input.ComboBox('#cboStockWithdrawalBranch');
+        var cboStockWithdrawalCustomer = new wijmo.input.ComboBox('#cboStockWithdrawalCustomer');
         var cboStockWithdrawalSIBranch = new wijmo.input.ComboBox('#cboStockWithdrawalSIBranch');
         var cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber');
         var cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy');
@@ -634,14 +641,62 @@
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
                             if (isFromBranchSelect) {
-                                getToBranchesForComboBox();
+                                getCustomerForComboBox();
                             }
                         }
                     });
 
                     if (!isFromBranchSelect) {
-                        getToBranchesForComboBox();
+                        getCustomerForComboBox();
                     }
+                }
+            });
+        }
+
+        // ==========================
+        // GET Customer for Combo Box
+        // ==========================
+        function getCustomerForComboBox() {
+            NProgress.start();
+            var customerObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawal/dropdown/list/customer',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            customerObservableArray.push({
+                                Id: results[i]["Id"],
+                                Article: results[i]["Article"],
+                                ContactNumber: results[i]["ContactNumber"],
+                                Address: results[i]["Address"]
+                            });
+                        }
+                    }
+
+                    cboStockWithdrawalCustomer.dispose();
+                    cboStockWithdrawalCustomer = new wijmo.input.ComboBox('#cboStockWithdrawalCustomer', {
+                        isEditable: false,
+                        placeholder: "Select Customer",
+                        itemsSource: customerObservableArray,
+                        displayMemberPath: "Article",
+                        selectedValuePath: "Id",
+                        onSelectedIndexChanged: function () {
+                            document.getElementById('stockWithdrawal_ContactPerson').value = this.selectedItem["Article"];
+                            document.getElementById('stockWithdrawal_ContactNumber').value = this.selectedItem["ContactNumber"];
+                            document.getElementById('stockWithdrawal_Address').value = this.selectedItem["Address"];
+                            if (cboStockWithdrawalSIBranch.selectedValue != null) {
+                                getSINumberForComboBox();
+                            }
+                        }
+                    });
+
+                    document.getElementById('stockWithdrawal_ContactPerson').value = cboStockWithdrawalCustomer.selectedItem["Article"];
+                    document.getElementById('stockWithdrawal_ContactNumber').value = cboStockWithdrawalCustomer.selectedItem["ContactNumber"];
+                    document.getElementById('stockWithdrawal_Address').value = cboStockWithdrawalCustomer.selectedItem["Address"];
+                    getSIBranchesForComboBox();
                 }
             });
         }
@@ -649,7 +704,7 @@
         // ===========================
         // GET To Branch for Combo Box
         // ===========================
-        function getToBranchesForComboBox() {
+        function getSIBranchesForComboBox() {
             NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
@@ -676,12 +731,11 @@
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
                             isSIBranchChanged = true;
-
-                            getArticleForComboBox();
+                            getSINumberForComboBox();
                         }
                     });
 
-                    getArticleForComboBox();
+                    getSINumberForComboBox();
                 }
             });
         }
@@ -689,61 +743,62 @@
         // =========================
         // GET Article for Combo Box
         // =========================
-        function getArticleForComboBox() {
+        function getSINumberForComboBox() {
             var articlesObservableArray = new wijmo.collections.ObservableArray();
-            if (cboStockWithdrawalSIBranch.selectedValue != null) {
-                $.ajax({
-                    url: '/api/stockWithdrawal/dropdown/list/salesInvoice/' + cboStockWithdrawalSIBranch.selectedValue,
-                    cache: false,
-                    type: 'GET',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (results) {
-                        if (results.length > 0) {
-                            for (i = 0; i < results.length; i++) {
-                                articlesObservableArray.push({
-                                    Id: results[i]["Id"],
-                                    SINumber: results[i]["SINumber"],
-                                    SIDetails: results[i]["SINumber"] + " (" + results[i]["SIDate"] + ")",
-                                    Customer: results[i]["Customer"],
-                                    ContactNumber: results[i]["ContactNumber"],
-                                    Address: results[i]["Address"]
-                                });
-                            }
-                        }
-
-                        var disabled = true;
-                        $("#btnSalesInvoiceStatus").prop("disabled", true);
-                        if (!isLocked) {
+            if (cboStockWithdrawalCustomer.selectedValue != null) {
+                if (cboStockWithdrawalSIBranch.selectedValue != null) {
+                    $.ajax({
+                        url: '/api/stockWithdrawal/dropdown/list/salesInvoice/' + cboStockWithdrawalSIBranch.selectedValue + "/" + cboStockWithdrawalCustomer.selectedValue,
+                        cache: false,
+                        type: 'GET',
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (results) {
                             if (results.length > 0) {
-                                disabled = false;
-                                $("#btnSalesInvoiceStatus").prop("disabled", false);
+                                for (i = 0; i < results.length; i++) {
+                                    articlesObservableArray.push({
+                                        Id: results[i]["Id"],
+                                        SINumber: results[i]["SINumber"],
+                                        SIDetails: results[i]["SINumber"] + " (" + results[i]["SIDate"] + ")"
+                                    });
+                                }
+                            }
+
+                            var disabled = true;
+                            $("#btnSalesInvoiceStatus").prop("disabled", true);
+                            if (!isLocked) {
+                                if (results.length > 0) {
+                                    disabled = false;
+                                    $("#btnSalesInvoiceStatus").prop("disabled", false);
+                                }
+                            }
+
+                            cboStockWithdrawalSINumber.dispose();
+                            cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
+                                disabled: disabled,
+                                isEditable: false,
+                                itemsSource: articlesObservableArray,
+                                displayMemberPath: "SIDetails",
+                                selectedValuePath: "Id",
+                                selectedValue: SIIdSelectedId
+                            });
+
+                            if (!isSIBranchChanged) {
+                                getUsersForComboBox();
                             }
                         }
+                    });
+                } else {
+                    cboStockWithdrawalSINumber.dispose();
+                    cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
+                        disabled: true,
+                        isEditable: false,
+                        itemsSource: articlesObservableArray,
+                    });
 
-                        cboStockWithdrawalSINumber.dispose();
-                        cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
-                            disabled: disabled,
-                            isEditable: false,
-                            itemsSource: articlesObservableArray,
-                            displayMemberPath: "SIDetails",
-                            selectedValuePath: "Id",
-                            selectedValue: SIIdSelectedId,
-                            onSelectedIndexChanged: function () {
-                                document.getElementById('stockWithdrawal_ContactPerson').value = this.selectedItem["Customer"];
-                                document.getElementById('stockWithdrawal_ContactNumber').value = this.selectedItem["ContactNumber"];
-                                document.getElementById('stockWithdrawal_Address').value = this.selectedItem["Address"];
-                            }
-                        });
-
-                        document.getElementById('stockWithdrawal_ContactPerson').value = cboStockWithdrawalSINumber.selectedItem["Customer"];
-                        document.getElementById('stockWithdrawal_ContactNumber').value = cboStockWithdrawalSINumber.selectedItem["ContactNumber"];
-                        document.getElementById('stockWithdrawal_Address').value = cboStockWithdrawalSINumber.selectedItem["Address"];
-
-                        if (!isSIBranchChanged) {
-                            getUsersForComboBox();
-                        }
+                    if (!isSIBranchChanged) {
+                        getUsersForComboBox();
                     }
-                });
+                }
             } else {
                 cboStockWithdrawalSINumber.dispose();
                 cboStockWithdrawalSINumber = new wijmo.input.ComboBox('#cboStockWithdrawalSINumber', {
@@ -832,6 +887,7 @@
                                 value: new Date(results.SWDate),
                             });
                             document.getElementById('stockWithdrawal_DocReference').value = results.DocumentReference;
+                            cboStockWithdrawalCustomer.selectedValue = results.CustomerId;
                             cboStockWithdrawalSIBranch.selectedValue = results.SIBranchId;
                             cboStockWithdrawalSINumber.selectedValue = results.SIId;
                             SIIdSelectedId = results.SIId;
@@ -845,6 +901,7 @@
 
                             if (results.IsLocked == true) {
                                 cboStockWithdrawalSWDate.disabled = true;
+                                cboStockWithdrawalCustomer.disabled = true;
                                 cboStockWithdrawalSIBranch.disabled = true;
                                 cboStockWithdrawalSINumber.disabled = true;
                                 document.getElementById('stockWithdrawal_Remarks').disabled = true;
@@ -1611,6 +1668,7 @@
         function btnStockWithdrawalSaveLock_OnClick() {
             var stockWithdrawalObject = new Object();
             stockWithdrawalObject.SWDate = cboStockWithdrawalSWDate.value.toLocaleDateString();
+            stockWithdrawalObject.CustomerId = cboStockWithdrawalCustomer.selectedValue;
             stockWithdrawalObject.SIBranchId = cboStockWithdrawalSIBranch.selectedValue;
             stockWithdrawalObject.SIId = cboStockWithdrawalSINumber.selectedValue;
             stockWithdrawalObject.Remarks = document.getElementById('stockWithdrawal_Remarks').value;

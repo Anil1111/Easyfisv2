@@ -135,6 +135,7 @@ namespace easyfis.Views.Software
                                        INId = d.INId,
                                        IN = d.TrnStockIn.INNumber,
                                        ItemId = d.ItemId,
+                                       SKUCode = d.MstArticle.ManualArticleOldCode,
                                        ItemCode = d.MstArticle.ManualArticleCode,
                                        Item = d.MstArticle.Article,
                                        Particulars = d.Particulars,
@@ -178,10 +179,16 @@ namespace easyfis.Views.Software
 
                     foreach (var stockInItem in stockInItems)
                     {
+                        string SKUCode = stockInItem.SKUCode;
+                        if (stockInItem.SKUCode.Equals("NA") || stockInItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableStockInItems.AddCell(new PdfPCell(new Phrase(stockInItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockInItems.AddCell(new PdfPCell(new Phrase(stockInItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockInItems.AddCell(new PdfPCell(new Phrase(stockInItem.ItemCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableStockInItems.AddCell(new PdfPCell(new Phrase(stockInItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableStockInItems.AddCell(new PdfPCell(new Phrase(stockInItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         if (currentIsIncludeCostStockReports)
                         {

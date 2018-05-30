@@ -115,6 +115,26 @@ namespace easyfis.ModifiedApiControllers
             return branches.ToList();
         }
 
+        // ================================
+        // Dropdown List - Customer (Field)
+        // ================================
+        [Authorize, HttpGet, Route("api/stockWithdrawal/dropdown/list/customer")]
+        public List<Entities.MstArticle> DropdownListStockWithdrawalCustomer()
+        {
+            var customers = from d in db.MstArticles.OrderBy(d => d.Article)
+                            where d.ArticleTypeId == 2
+                            && d.IsLocked == true
+                            select new Entities.MstArticle
+                            {
+                                Id = d.Id,
+                                Article = d.Article,
+                                ContactNumber = d.ContactNumber,
+                                Address = d.Address
+                            };
+
+            return customers.ToList();
+        }
+
         // =============================================
         // Dropdown List - Sales Invovice Branch (Field)
         // =============================================
@@ -141,22 +161,19 @@ namespace easyfis.ModifiedApiControllers
         // ======================================
         // Dropdown List - Sales Invovice (Field)
         // ======================================
-        [Authorize, HttpGet, Route("api/stockWithdrawal/dropdown/list/salesInvoice/{branchId}")]
-        public List<Entities.TrnSalesInvoice> DropdownListStockWithdrawalSalesInvoice(String branchId)
+        [Authorize, HttpGet, Route("api/stockWithdrawal/dropdown/list/salesInvoice/{branchId}/{customerId}")]
+        public List<Entities.TrnSalesInvoice> DropdownListStockWithdrawalSalesInvoice(String branchId, String customerId)
         {
             var salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
                                 where d.BranchId == Convert.ToInt32(branchId)
+                                && d.CustomerId == Convert.ToInt32(customerId)
                                 && d.BalanceAmount > 0
                                 && d.IsLocked == true
                                 select new Entities.TrnSalesInvoice
                                 {
                                     Id = d.Id,
                                     SINumber = d.SINumber,
-                                    SIDate = d.SIDate.ToShortDateString(),
-                                    Remarks = d.Remarks,
-                                    Customer = d.MstArticle.Article,
-                                    ContactNumber = d.MstArticle.ContactNumber,
-                                    Address = d.MstArticle.Address
+                                    SIDate = d.SIDate.ToShortDateString()
                                 };
 
             return salesInvoices.ToList();
@@ -260,12 +277,13 @@ namespace easyfis.ModifiedApiControllers
                             SWNumber = defaultSWNumber,
                             SWDate = DateTime.Today,
                             SIBranchId = salesInvoices.FirstOrDefault().BranchId,
+                            CustomerId = salesInvoices.FirstOrDefault().CustomerId,
                             SIId = salesInvoices.FirstOrDefault().Id,
                             Remarks = "NA",
                             DocumentReference = "NA",
-                            ContactPerson = "NA",
-                            ContactNumber = "NA",
-                            Address = "NA",
+                            ContactPerson = salesInvoices.FirstOrDefault().MstArticle.Article,
+                            ContactNumber = salesInvoices.FirstOrDefault().MstArticle.ContactNumber,
+                            Address = salesInvoices.FirstOrDefault().MstArticle.Address,
                             PreparedById = currentUserId,
                             CheckedById = currentUserId,
                             ApprovedById = currentUserId,
@@ -353,6 +371,7 @@ namespace easyfis.ModifiedApiControllers
                     {
                         var lockStockWithdrawal = stockWithdrawal.FirstOrDefault();
                         lockStockWithdrawal.SWDate = Convert.ToDateTime(objStockWithdrawal.SWDate);
+                        lockStockWithdrawal.CustomerId = objStockWithdrawal.CustomerId;
                         lockStockWithdrawal.SIBranchId = objStockWithdrawal.SIBranchId;
                         lockStockWithdrawal.SIId = objStockWithdrawal.SIId;
                         lockStockWithdrawal.Remarks = objStockWithdrawal.Remarks;

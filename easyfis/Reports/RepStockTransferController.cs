@@ -139,6 +139,7 @@ namespace easyfis.Reports
                                              STId = d.STId,
                                              ST = d.TrnStockTransfer.STNumber,
                                              ItemId = d.ItemId,
+                                             SKUCode = d.MstArticle.ManualArticleOldCode,
                                              ItemCode = d.MstArticle.ManualArticleCode,
                                              Item = d.MstArticle.Article,
                                              ItemInventoryId = d.ItemInventoryId,
@@ -184,10 +185,16 @@ namespace easyfis.Reports
 
                     foreach (var stockTransferItem in stockTransferItems)
                     {
+                        string SKUCode = stockTransferItem.SKUCode;
+                        if (stockTransferItem.SKUCode.Equals("NA") || stockTransferItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.ItemCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableStockTransferItems.AddCell(new PdfPCell(new Phrase(stockTransferItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         if (currentIsIncludeCostStockReports)
                         {

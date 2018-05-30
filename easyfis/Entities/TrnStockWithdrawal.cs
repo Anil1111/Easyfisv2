@@ -11,6 +11,7 @@ namespace easyfis.Entities
         public Int32 BranchId { get; set; }
         public String SWNumber { get; set; }
         public String SWDate { get; set; }
+        public Int32 CustomerId { get; set; }
         public Int32 SIBranchId { get; set; }
         public Int32 SIId { get; set; }
         public String SIBranch { get; set; }

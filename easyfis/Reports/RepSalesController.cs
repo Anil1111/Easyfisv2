@@ -144,6 +144,7 @@ namespace easyfis.Reports
                                             SIId = d.SIId,
                                             SI = d.TrnSalesInvoice.SINumber,
                                             ItemId = d.ItemId,
+                                            SKUCode = d.MstArticle.ManualArticleOldCode,
                                             ItemCode = d.MstArticle.ManualArticleCode,
                                             Item = d.MstArticle.Article,
                                             ItemInventoryId = d.ItemInventoryId,
@@ -197,9 +198,15 @@ namespace easyfis.Reports
                             }
                         }
 
+                        string SKUCode = salesInvoiceItem.SKUCode;
+                        if (salesInvoiceItem.SKUCode.Equals("NA") || salesInvoiceItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Quantity.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Unit, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Item, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Item + " " + SKUCode, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(particulars, fontArial10)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Price.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableSalesInvoiceItems.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.DiscountAmount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });

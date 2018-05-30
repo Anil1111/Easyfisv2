@@ -153,6 +153,7 @@ namespace easyfis.Reports
                                                SWId = d.SWId,
                                                SW = d.TrnStockWithdrawal.SWNumber,
                                                ItemId = d.ItemId,
+                                               SKUCode = d.MstArticle.ManualArticleOldCode,
                                                ItemCode = d.MstArticle.ManualArticleCode,
                                                Item = d.MstArticle.Article,
                                                ItemInventoryId = d.ItemInventoryId,
@@ -198,10 +199,16 @@ namespace easyfis.Reports
 
                     foreach (var stockWithdrawalItem in stockWithdrawalItems)
                     {
+                        string SKUCode = stockWithdrawalItem.SKUCode;
+                        if (stockWithdrawalItem.SKUCode.Equals("NA") || stockWithdrawalItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableStockWithdrawalItems.AddCell(new PdfPCell(new Phrase(stockWithdrawalItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockWithdrawalItems.AddCell(new PdfPCell(new Phrase(stockWithdrawalItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockWithdrawalItems.AddCell(new PdfPCell(new Phrase(stockWithdrawalItem.ItemCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableStockWithdrawalItems.AddCell(new PdfPCell(new Phrase(stockWithdrawalItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableStockWithdrawalItems.AddCell(new PdfPCell(new Phrase(stockWithdrawalItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         if (currentIsIncludeCostStockReports)
                         {

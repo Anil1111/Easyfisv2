@@ -207,6 +207,7 @@ namespace easyfis.ModifiedApiControllers
                                                 d.POId,
                                                 d.TrnPurchaseOrder.Remarks,
                                                 d.ItemId,
+                                                d.MstArticle.ManualArticleOldCode,
                                                 d.MstArticle.ManualArticleCode,
                                                 d.MstArticle.Article,
                                                 d.BaseUnitId,
@@ -217,6 +218,7 @@ namespace easyfis.ModifiedApiControllers
                                             {
                                                 g.Key.POId,
                                                 g.Key.Remarks,
+                                                g.Key.ManualArticleOldCode,
                                                 g.Key.ItemId,
                                                 g.Key.ManualArticleCode,
                                                 g.Key.Article,
@@ -233,6 +235,7 @@ namespace easyfis.ModifiedApiControllers
                                          {
                                              POId = d.POId,
                                              ItemId = d.ItemId,
+                                             ItemManualOldCode = d.ManualArticleOldCode,
                                              ItemCode = d.ManualArticleCode,
                                              ItemDescription = d.Article,
                                              Particulars = d.Remarks,

@@ -143,6 +143,7 @@ namespace easyfis.Reports
                                                 POId = d.POId,
                                                 PO = d.TrnPurchaseOrder.PONumber,
                                                 ItemId = d.ItemId,
+                                                SKUCode = d.MstArticle.ManualArticleOldCode,
                                                 Item = d.MstArticle.Article,
                                                 ItemCode = d.MstArticle.ManualArticleCode,
                                                 Particulars = d.Particulars,
@@ -189,10 +190,16 @@ namespace easyfis.Reports
                         count += 1;
                         totalAmount += receivingReceiptItem.Amount;
 
+                        string SKUCode = receivingReceiptItem.SKUCode;
+                        if (receivingReceiptItem.SKUCode.Equals("NA") || receivingReceiptItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(count.ToString("#,##0"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Branch, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Cost.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableReceivingReceiptItems.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.Amount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });

@@ -134,6 +134,7 @@ namespace easyfis.Reports
                                         ExpenseAccountId = d.ExpenseAccountId,
                                         ExpenseAccount = d.MstAccount.Account,
                                         ItemId = d.ItemId,
+                                        SKUCode = d.MstArticle.ManualArticleOldCode,
                                         ItemCode = d.MstArticle.ManualArticleCode,
                                         Item = d.MstArticle.Article,
                                         ItemInventoryId = d.ItemInventoryId,
@@ -179,10 +180,16 @@ namespace easyfis.Reports
 
                     foreach (var stockOutItem in stockOutItems)
                     {
+                        string SKUCode = stockOutItem.SKUCode;
+                        if (stockOutItem.SKUCode.Equals("NA") || stockOutItem.SKUCode.Equals("na"))
+                        {
+                            SKUCode = " ";
+                        }
+
                         tableStockOutItems.AddCell(new PdfPCell(new Phrase(stockOutItem.Quantity.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockOutItems.AddCell(new PdfPCell(new Phrase(stockOutItem.Unit, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableStockOutItems.AddCell(new PdfPCell(new Phrase(stockOutItem.ItemCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
-                        tableStockOutItems.AddCell(new PdfPCell(new Phrase(stockOutItem.Item, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableStockOutItems.AddCell(new PdfPCell(new Phrase(stockOutItem.Item + " " + SKUCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
                         if (currentIsIncludeCostStockReports)
                         {
