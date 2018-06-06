@@ -267,7 +267,7 @@ namespace easyfis.Controllers
                 secretKey = "6LdKs00UAAAAAM6LrdHJ3nvp8OJzG3G9lPIFmWxS";
             }
 
-            if (host.Equals("quita.easyfis.com"))
+            if (host.Equals("quinta.easyfis.com"))
             {
                 secretKey = "6LemUF0UAAAAAGG-ZG848xlLi0Or04W3zKFRaeTh";
             }
