@@ -367,50 +367,103 @@ namespace easyfis.Business
             {
                 var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                         where d.SIId == SIId
-                                        && d.MstArticle.IsInventory == true
                                         select new
                                         {
                                             SIId = d.SIId,
                                             SINumber = d.TrnSalesInvoice.SINumber,
                                             SIDate = d.TrnSalesInvoice.SIDate,
                                             BranchId = d.TrnSalesInvoice.BranchId,
+                                            Item = d.MstArticle,
                                             ItemId = d.ItemId,
                                             ItemInventoryId = d.ItemInventoryId,
                                             Particulars = d.Particulars,
                                             Quantity = d.Quantity,
                                             BaseQuantity = d.BaseQuantity,
-                                            Cost = d.MstArticleInventory.Cost
+                                            Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0
                                         };
 
                 if (salesInvoiceItems.Any())
                 {
                     foreach (var salesInvoiceItem in salesInvoiceItems)
                     {
-                        if (salesInvoiceItem.ItemInventoryId != null)
+                        if (salesInvoiceItem.Item.IsInventory == true)
                         {
-                            if (salesInvoiceItem.BaseQuantity > 0)
+                            if (salesInvoiceItem.ItemInventoryId != null)
                             {
-                                // ==========================
-                                // Insert New Inventory (Out)
-                                // ==========================
-                                Data.TrnInventory newInventory = new Data.TrnInventory
+                                if (salesInvoiceItem.BaseQuantity > 0)
                                 {
-                                    BranchId = salesInvoiceItem.BranchId,
-                                    InventoryDate = salesInvoiceItem.SIDate,
-                                    ArticleId = salesInvoiceItem.ItemId,
-                                    ArticleInventoryId = Convert.ToInt32(salesInvoiceItem.ItemInventoryId),
-                                    SIId = SIId,
-                                    QuantityIn = 0,
-                                    QuantityOut = salesInvoiceItem.BaseQuantity,
-                                    Quantity = salesInvoiceItem.BaseQuantity * -1,
-                                    Amount = (salesInvoiceItem.Cost * salesInvoiceItem.BaseQuantity) * -1,
-                                    Particulars = salesInvoiceItem.Particulars
-                                };
+                                    // ==========================
+                                    // Insert New Inventory (Out)
+                                    // ==========================
+                                    Data.TrnInventory newInventory = new Data.TrnInventory
+                                    {
+                                        BranchId = salesInvoiceItem.BranchId,
+                                        InventoryDate = salesInvoiceItem.SIDate,
+                                        ArticleId = salesInvoiceItem.ItemId,
+                                        ArticleInventoryId = Convert.ToInt32(salesInvoiceItem.ItemInventoryId),
+                                        SIId = SIId,
+                                        QuantityIn = 0,
+                                        QuantityOut = salesInvoiceItem.BaseQuantity,
+                                        Quantity = salesInvoiceItem.BaseQuantity * -1,
+                                        Amount = (salesInvoiceItem.Cost * salesInvoiceItem.BaseQuantity) * -1,
+                                        Particulars = salesInvoiceItem.Particulars
+                                    };
 
-                                db.TrnInventories.InsertOnSubmit(newInventory);
-                                db.SubmitChanges();
+                                    db.TrnInventories.InsertOnSubmit(newInventory);
+                                    db.SubmitChanges();
 
-                                UpdateArticleInventory(Convert.ToInt32(salesInvoiceItem.ItemInventoryId), "");
+                                    UpdateArticleInventory(Convert.ToInt32(salesInvoiceItem.ItemInventoryId), "");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (salesInvoiceItem.Item.Kitting == 1)
+                            {
+                                if (salesInvoiceItem.Item.MstArticleComponents.Any())
+                                {
+                                    foreach (var componentItem in salesInvoiceItem.Item.MstArticleComponents)
+                                    {
+                                        if (componentItem.Quantity > 0)
+                                        {
+                                            var articleInventories = from d in db.MstArticleInventories
+                                                                     where d.BranchId == salesInvoiceItem.BranchId
+                                                                     && d.ArticleId == componentItem.ComponentArticleId
+                                                                     select d;
+
+                                            Int32 componentItemInventoryId = 0;
+                                            if (articleInventories.Any())
+                                            {
+                                                componentItemInventoryId = articleInventories.FirstOrDefault().Id;
+                                            }
+
+                                            if (componentItemInventoryId != 0)
+                                            {
+                                                // ==========================
+                                                // Insert New Inventory (Out)
+                                                // ==========================
+                                                Data.TrnInventory newInventory = new Data.TrnInventory
+                                                {
+                                                    BranchId = salesInvoiceItem.BranchId,
+                                                    InventoryDate = salesInvoiceItem.SIDate,
+                                                    ArticleId = componentItem.ComponentArticleId,
+                                                    ArticleInventoryId = componentItemInventoryId,
+                                                    SIId = SIId,
+                                                    QuantityIn = 0,
+                                                    QuantityOut = salesInvoiceItem.BaseQuantity * componentItem.Quantity,
+                                                    Quantity = (salesInvoiceItem.BaseQuantity * componentItem.Quantity) * -1,
+                                                    Amount = (salesInvoiceItem.Cost * (salesInvoiceItem.BaseQuantity * componentItem.Quantity)) * -1,
+                                                    Particulars = salesInvoiceItem.Particulars
+                                                };
+
+                                                db.TrnInventories.InsertOnSubmit(newInventory);
+                                                db.SubmitChanges();
+
+                                                UpdateArticleInventory(Convert.ToInt32(salesInvoiceItem.ItemInventoryId), "");
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
