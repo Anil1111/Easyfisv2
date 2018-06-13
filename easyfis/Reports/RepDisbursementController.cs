@@ -121,7 +121,7 @@ namespace easyfis.Reports
                 tableDisbursement.AddCell(new PdfPCell(new Phrase("No.", fontArial11Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tableDisbursement.AddCell(new PdfPCell(new Phrase(CVNumber, fontArial11)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
 
-                tableDisbursement.AddCell(new PdfPCell(new Phrase("Particulars", fontArial11Bold)) { Rowspan = 3, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableDisbursement.AddCell(new PdfPCell(new Phrase("Particulars", fontArial11Bold)) { Rowspan = 4, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
 
                 var particularsPhrase = new Phrase();
                 particularsPhrase.Add(new Chunk(particulars, fontArial11));
@@ -133,6 +133,9 @@ namespace easyfis.Reports
                 particularsCell.AddElement(particularsParagraph);
 
                 tableDisbursement.AddCell(new PdfPCell(particularsCell) { Rowspan = 4, Border = 0, PaddingTop = 0f, PaddingLeft = 5f, PaddingRight = 5f });
+
+                tableDisbursement.AddCell(new PdfPCell(new Phrase("Manual No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tableDisbursement.AddCell(new PdfPCell(new Phrase(ManualCVNumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
 
                 tableDisbursement.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tableDisbursement.AddCell(new PdfPCell(new Phrase(CVDate, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
@@ -320,7 +323,7 @@ namespace easyfis.Reports
                     amountString = GetMoneyWord(paidAmount).ToUpper();
                 }
 
-                amountTablePhrase.Add(new Chunk("Representing Payment from " + companyName + "the amount of ", fontArial11));
+                amountTablePhrase.Add(new Chunk("Representing Payment from " + companyName + " the amount of ", fontArial11));
                 amountTablePhrase.Add(new Chunk(amountString + "(P " + disbursements.FirstOrDefault().Amount.ToString("#,##0.00") + ")", fontArial11Bold));
 
                 Paragraph paragraphAmountTable = new Paragraph();
