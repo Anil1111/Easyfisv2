@@ -103,6 +103,7 @@ namespace easyfis.Reports
                                where d.JournalDate >= Convert.ToDateTime(StartDate)
                                && d.JournalDate <= Convert.ToDateTime(EndDate)
                                && d.MstBranch.CompanyId == CompanyId
+                               && d.BranchId == Convert.ToInt32(BranchId)
                                && d.AccountId == AccountId
                                select new
                                {
