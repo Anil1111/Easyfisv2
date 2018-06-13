@@ -107,6 +107,14 @@ namespace easyfis.Reports
                                select new
                                {
                                    JournalDate = d.JournalDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture),
+                                   ManualNo = d.ORId != null ? d.TrnCollection.ManualORNumber :
+                                              d.CVId != null ? d.TrnDisbursement.ManualCVNumber :
+                                              d.JVId != null ? d.TrnJournalVoucher.ManualJVNumber :
+                                              d.RRId != null ? d.TrnReceivingReceipt.ManualRRNumber :
+                                              d.SIId != null ? d.TrnSalesInvoice.ManualSINumber :
+                                              d.INId != null ? d.TrnStockIn.ManualINNumber :
+                                              d.OTId != null ? d.TrnStockOut.ManualOTNumber :
+                                              d.STId != null ? d.TrnStockTransfer.ManualSTNumber : " ",
                                    DocumentReference = d.DocumentReference,
                                    Article = d.MstArticle.Article,
                                    Particulars = d.Particulars,
@@ -119,13 +127,14 @@ namespace easyfis.Reports
                     // ====
                     // Data
                     // ====
-                    PdfPTable tableData = new PdfPTable(7);
+                    PdfPTable tableData = new PdfPTable(8);
                     PdfPCell Cell = new PdfPCell();
-                    float[] widthCellsTableData = new float[] { 65f, 125f, 130f, 150f, 100f, 100f, 100f };
+                    float[] widthCellsTableData = new float[] { 65f, 125f, 125f, 130f, 150f, 100f, 100f, 100f };
                     tableData.SetWidths(widthCellsTableData);
                     tableData.WidthPercentage = 100;
                     tableData.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
-                    tableData.AddCell(new PdfPCell(new Phrase("Document Reference", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                    tableData.AddCell(new PdfPCell(new Phrase("Manual No", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
+                    tableData.AddCell(new PdfPCell(new Phrase("Doc. Reference", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     tableData.AddCell(new PdfPCell(new Phrase("Article", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     tableData.AddCell(new PdfPCell(new Phrase("Particulars", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
                     tableData.AddCell(new PdfPCell(new Phrase("Debit", fontArial11Bold)) { HorizontalAlignment = 1, Rowspan = 2, PaddingTop = 3f, PaddingBottom = 5f, BackgroundColor = BaseColor.LIGHT_GRAY });
@@ -141,6 +150,7 @@ namespace easyfis.Reports
                         Decimal balance = journal.DebitAmount - journal.CreditAmount;
 
                         tableData.AddCell(new PdfPCell(new Phrase(journal.JournalDate, fontArial10)) { HorizontalAlignment = 0, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableData.AddCell(new PdfPCell(new Phrase(journal.ManualNo, fontArial10)) { HorizontalAlignment = 0, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableData.AddCell(new PdfPCell(new Phrase(journal.DocumentReference, fontArial10)) { HorizontalAlignment = 0, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableData.AddCell(new PdfPCell(new Phrase(journal.Article, fontArial10)) { HorizontalAlignment = 0, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableData.AddCell(new PdfPCell(new Phrase(journal.Particulars, fontArial10)) { HorizontalAlignment = 0, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -153,7 +163,7 @@ namespace easyfis.Reports
                         totalBalance += journal.DebitAmount - journal.CreditAmount;
                     }
 
-                    tableData.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Colspan = 4, HorizontalAlignment = 2, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                    tableData.AddCell(new PdfPCell(new Phrase("Total", fontArial10Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                     tableData.AddCell(new PdfPCell(new Phrase(totalDebitAmount.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                     tableData.AddCell(new PdfPCell(new Phrase(totalCreditAmount.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                     tableData.AddCell(new PdfPCell(new Phrase(totalBalance.ToString("#,##0.00"), fontArial10Bold)) { HorizontalAlignment = 2, PaddingBottom = 5f, PaddingLeft = 5f, PaddingRight = 5f });

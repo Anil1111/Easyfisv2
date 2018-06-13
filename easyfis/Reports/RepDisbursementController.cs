@@ -104,6 +104,7 @@ namespace easyfis.Reports
                 String checkNo = disbursements.FirstOrDefault().CheckNumber;
                 String CVNumber = disbursements.FirstOrDefault().CVNumber;
                 String CVDate = disbursements.FirstOrDefault().CVDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
+                String ManualCVNumber = disbursements.FirstOrDefault().ManualCVNumber;
                 String checkDate = disbursements.FirstOrDefault().CheckDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
                 String preparedBy = disbursements.FirstOrDefault().MstUser3.FullName;
                 String checkedBy = disbursements.FirstOrDefault().MstUser1.FullName;
@@ -115,7 +116,7 @@ namespace easyfis.Reports
                 tableDisbursement.WidthPercentage = 100;
 
                 tableDisbursement.AddCell(new PdfPCell(new Phrase("Payee", fontArial11Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
-                tableDisbursement.AddCell(new PdfPCell(new Phrase(payee, fontArial11)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableDisbursement.AddCell(new PdfPCell(new Phrase(payee, fontArial11Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
 
                 tableDisbursement.AddCell(new PdfPCell(new Phrase("No.", fontArial11Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tableDisbursement.AddCell(new PdfPCell(new Phrase(CVNumber, fontArial11)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
@@ -320,7 +321,7 @@ namespace easyfis.Reports
                 }
 
                 amountTablePhrase.Add(new Chunk("Representing Payment from " + companyName + "the amount of ", fontArial11));
-                amountTablePhrase.Add(new Chunk(amountString, fontArial11Bold));
+                amountTablePhrase.Add(new Chunk(amountString + "(P " + disbursements.FirstOrDefault().Amount.ToString("#,##0.00") + ")", fontArial11Bold));
 
                 Paragraph paragraphAmountTable = new Paragraph();
                 paragraphAmountTable.SetLeading(0, 1.4f);
@@ -330,11 +331,13 @@ namespace easyfis.Reports
                 chunkyAmountTable.AddElement(paragraphAmountTable);
                 chunkyAmountTable.BorderWidth = PdfPCell.NO_BORDER;
 
-                tableMoneyWord.AddCell(new PdfPCell(chunkyAmountTable) { Rowspan = 3, Border = 0, PaddingTop = 0f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
+                tableMoneyWord.AddCell(new PdfPCell(chunkyAmountTable) { Rowspan = 4, Border = 0, PaddingTop = 0f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 0 });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase("Check Date", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase(checkDate, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase("Bank", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase(bank, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableMoneyWord.AddCell(new PdfPCell(new Phrase("Manual No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableMoneyWord.AddCell(new PdfPCell(new Phrase(ManualCVNumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 document.Add(tableMoneyWord);
 
                 document.Add(Chunk.NEWLINE);

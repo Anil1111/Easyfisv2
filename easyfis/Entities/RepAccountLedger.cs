@@ -8,6 +8,7 @@ namespace easyfis.Entities
     public class RepAccountLedger
     {
         public String JournalDate { get; set; }
+        public String ManualNo { get; set; }
         public String DocumentReference { get; set; }
         public String Article { get; set; }
         public String Particulars { get; set; }

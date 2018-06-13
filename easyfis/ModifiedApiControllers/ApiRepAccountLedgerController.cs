@@ -31,6 +31,14 @@ namespace easyfis.ApiControllers
                                select new Entities.RepAccountLedger
                                {
                                    JournalDate = d.JournalDate.ToShortDateString(),
+                                   ManualNo = d.ORId != null ? d.TrnCollection.ManualORNumber :
+                                              d.CVId != null ? d.TrnDisbursement.ManualCVNumber :
+                                              d.JVId != null ? d.TrnJournalVoucher.ManualJVNumber :
+                                              d.RRId != null ? d.TrnReceivingReceipt.ManualRRNumber :
+                                              d.SIId != null ? d.TrnSalesInvoice.ManualSINumber :
+                                              d.INId != null ? d.TrnStockIn.ManualINNumber :
+                                              d.OTId != null ? d.TrnStockOut.ManualOTNumber :
+                                              d.STId != null ? d.TrnStockTransfer.ManualSTNumber : " ",
                                    DocumentReference = d.DocumentReference,
                                    Article = d.MstArticle.Article,
                                    Particulars = d.Particulars,
