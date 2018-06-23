@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Physical Count Sheet</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,61 +26,85 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpPhysicalCountSheetSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboPhysicalCountSheetReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboPhysicalCountSheetDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnPhysicalCountSheetReportCSVOnclick()" id="btnPhysicalCountSheetReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnPhysicalCountSheetReportPrintPDFOnclick()" id="btnPhysicalCountSheetReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnPhysicalCountSheetCSVOnclick()" id="btnPhysicalCountSheetCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnPhysicalCountSheetPDFOnclick()" id="btnPhysicalCountSheetPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =================
+                        Item Group Filter
+                        =================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Item Group</b></span>
-                                        <div class="comboBox-wide" id="cboItemGroup"></div>
+                                        <div class="comboBox-wide" id="cboItemGroupFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 50.5%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="physicalCountSheetReportGrid" class="grid"></div>
+                        <div id="physicalCountSheetFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="physicalCountSheetNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnPhysicalCountSheetMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnPhysicalCountSheetMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnPhysicalCountSheetCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnPhysicalCountSheetMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnPhysicalCountSheetMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
@@ -91,6 +112,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -98,25 +120,33 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var physicalCountSheetReportCollections;
-        var physicalCountSheetReportGrid;
-        var cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup');
-        var isCboItemGroupSelected = false;
-        var cboPhysicalCountSheetReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPhysicalCountSheetReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var physicalCountSheetCollectionView;
+        var physicalCountSheetFlexGrid;
+        var cboPhysicalCountSheetDisplayNumberOfRows = new wijmo.input.ComboBox('#cboPhysicalCountSheetDisplayNumberOfRows');
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =================
+        // Item Group Filter
+        // =================
+        var cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter');
+        var isCboItemGroupSelected = false;
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnPhysicalCountSheetMoveToFirstPageGrid = document.getElementById('btnPhysicalCountSheetMoveToFirstPageGrid');
+        var btnPhysicalCountSheetMoveToPreviousPageGrid = document.getElementById('btnPhysicalCountSheetMoveToPreviousPageGrid');
+        var btnPhysicalCountSheetMoveToNextPageGrid = document.getElementById('btnPhysicalCountSheetMoveToNextPageGrid');
+        var btnPhysicalCountSheetMoveToLastPageGrid = document.getElementById('btnPhysicalCountSheetMoveToLastPageGrid');
+        var btnPhysicalCountSheetCurrentPageGrid = document.getElementById('btnPhysicalCountSheetCurrentPageGrid');
+        var physicalCountSheetCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -130,51 +160,50 @@
             }
         }
 
-        // =====================
-        // Get Artile Item Group
-        // =====================
-        function getArticleItemGroupForComboBox() {
+        // ==============================
+        // Create Combo Item Group Filter
+        // ==============================
+        function createCboItemGroupFilter() {
             NProgress.start();
-            var articleItemGroupsObservableArray = new wijmo.collections.ObservableArray();
+
+            var itemGroupObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/listArticleGroupByArticleTypeId/1',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (itemGroupResults) {
-                    if (itemGroupResults.length > 0) {
-                        for (i = 0; i < itemGroupResults.length; i++) {
-                            articleItemGroupsObservableArray.push({
-                                Id: itemGroupResults[i]["Id"],
-                                ArticleGroup: itemGroupResults[i]["ArticleGroup"]
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            itemGroupObservableArray.push({
+                                Id: results[i]["Id"],
+                                ArticleGroup: results[i]["ArticleGroup"]
                             });
                         }
                     }
 
-                    cboItemGroup.dispose();
-                    cboItemGroup = new wijmo.input.ComboBox('#cboItemGroup', {
+                    cboItemGroupFilter.dispose();
+                    cboItemGroupFilter = new wijmo.input.ComboBox('#cboItemGroupFilter', {
                         isEditable: false,
-                        itemsSource: articleItemGroupsObservableArray,
+                        itemsSource: itemGroupObservableArray,
                         displayMemberPath: "ArticleGroup",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("ItemGroupId"),
+                        selectedValue: getURLParameterValue("ItemGroupId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            refreshPhysicalCountSheetReportFlexGrid();
+                            refreshPhysicalCountSheetFlexGrid();
                         }
                     });
 
-                    createCboShowRows();
+                    createCboDisplayNumberOfRows();
                 }
             });
-
-            NProgress.done();
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -204,8 +233,8 @@
                 });
             }
 
-            cboPhysicalCountSheetReportShowNumberOfRows.dispose();
-            cboPhysicalCountSheetReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPhysicalCountSheetReportShowNumberOfRows', {
+            cboPhysicalCountSheetDisplayNumberOfRows.dispose();
+            cboPhysicalCountSheetDisplayNumberOfRows = new wijmo.input.ComboBox('#cboPhysicalCountSheetDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -215,10 +244,10 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboPhysicalCountSheetReportShowNumberOfRows.selectedValue;
-                        physicalCountSheetReportCollections.pageSize = parseInt(numberOfRows);
-                        physicalCountSheetReportCollections.refresh();
-                        physicalCountSheetReportGrid.refresh();
+                        var numberOfRows = cboPhysicalCountSheetDisplayNumberOfRows.selectedValue;
+                        physicalCountSheetCollectionView.pageSize = parseInt(numberOfRows);
+                        physicalCountSheetCollectionView.refresh();
+                        physicalCountSheetFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
@@ -226,108 +255,80 @@
             });
 
             if (!isCboItemGroupSelected) {
-                createPhysicalCountSheetReportFlexGrid();
+                createPhysicalCountSheetFlexGrid();
             } else {
-                refreshPhysicalCountSheetReportFlexGrid();
+                refreshPhysicalCountSheetFlexGrid();
             }
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (physicalCountSheetReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (physicalCountSheetReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (physicalCountSheetReportCollections.pageIndex === (physicalCountSheetReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (physicalCountSheetReportCollections.pageIndex + 1) + ' / ' + physicalCountSheetReportCollections.pageCount;
-        }
-
-        // ======================
-        // Get Trial Balance Data
-        // ======================
-        function getPhysicalCountSheetReport() {
-            var physicalCountSheetReports = new wijmo.collections.ObservableArray;
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        // =============================
+        // Get Physical Count Sheet Data
+        // =============================
+        function getPhysicalCountSheetData() {
+            var physicalCountSheetObservableArray = new wijmo.collections.ObservableArray;
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/physicalCountSheet/list/' + itemGroupId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (physicalCountSheetReportResult) {
-                        if (physicalCountSheetReportResult.length > 0) {
-                            for (i = 0; i < physicalCountSheetReportResult.length; i++) {
-                                var docLink = "/Software/ItemDetail?id=" + physicalCountSheetReportResult[i]["Id"];
-                                physicalCountSheetReports.push({
-                                    Id: physicalCountSheetReportResult[i]["Id"],
-                                    ArticleCode: physicalCountSheetReportResult[i]["ArticleCode"],
-                                    ArticleCodeForCSV: "Item-" + physicalCountSheetReportResult[i]["ArticleCode"],
-                                    ArticleCodeBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block'> " + physicalCountSheetReportResult[i]["ArticleCode"] + "</a>",
-                                    ManualArticleCodeForCSV: "Item-" + physicalCountSheetReportResult[i]["ManualArticleCode"],
-                                    ManualArticleCode: physicalCountSheetReportResult[i]["ManualArticleCode"],
-                                    DocumentReferenceForCSV: physicalCountSheetReportResult[i]["DocumentReference"],
-                                    Article: physicalCountSheetReportResult[i]["Article"],
-                                    Category: physicalCountSheetReportResult[i]["Category"],
-                                    ArticleTypeId: physicalCountSheetReportResult[i]["ArticleTypeId"],
-                                    ArticleType: physicalCountSheetReportResult[i]["ArticleType"],
-                                    ArticleGroupId: physicalCountSheetReportResult[i]["ArticleGroupId"],
-                                    ArticleGroup: physicalCountSheetReportResult[i]["ArticleGroup"],
-                                    AccountId: physicalCountSheetReportResult[i]["AccountId"],
-                                    AccountCode: physicalCountSheetReportResult[i]["AccountCode"],
-                                    Account: physicalCountSheetReportResult[i]["Account"],
-                                    SalesAccountId: physicalCountSheetReportResult[i]["SalesAccountId"],
-                                    SalesAccount: physicalCountSheetReportResult[i]["SalesAccount"],
-                                    CostAccountId: physicalCountSheetReportResult[i]["CostAccountId"],
-                                    CostAccount: physicalCountSheetReportResult[i]["CostAccount"],
-                                    AssetAccountId: physicalCountSheetReportResult[i]["AssetAccountId"],
-                                    AssetAccount: physicalCountSheetReportResult[i]["AssetAccount"],
-                                    ExpenseAccountId: physicalCountSheetReportResult[i]["ExpenseAccountId"],
-                                    ExpenseAccount: physicalCountSheetReportResult[i]["ExpenseAccount"],
-                                    Quantity: "",
-                                    UnitId: physicalCountSheetReportResult[i]["UnitId"],
-                                    Unit: physicalCountSheetReportResult[i]["Unit"],
-                                    InputTaxId: physicalCountSheetReportResult[i]["InputTaxId"],
-                                    InputTax: physicalCountSheetReportResult[i]["InputTax"],
-                                    OutputTaxId: physicalCountSheetReportResult[i]["OutputTaxId"],
-                                    OutputTax: physicalCountSheetReportResult[i]["OutputTax"],
-                                    WTaxTypeId: physicalCountSheetReportResult[i]["WTaxTypeId"],
-                                    WTaxType: physicalCountSheetReportResult[i]["WTaxType"],
-                                    Price: physicalCountSheetReportResult[i]["Price"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    PriceAmountDisplay: parseFloat(physicalCountSheetReportResult[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    Cost: physicalCountSheetReportResult[i]["Cost"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    CostAmountDisplay: parseFloat(physicalCountSheetReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    IsInventory: physicalCountSheetReportResult[i]["IsInventory"],
-                                    Particulars: physicalCountSheetReportResult[i]["Particulars"],
-                                    Address: physicalCountSheetReportResult[i]["Address"],
-                                    TermId: physicalCountSheetReportResult[i]["TermId"],
-                                    Term: physicalCountSheetReportResult[i]["Term"],
-                                    ContactNumber: physicalCountSheetReportResult[i]["ContactNumber"],
-                                    ContactPerson: physicalCountSheetReportResult[i]["ContactPerson"],
-                                    TaxNumber: physicalCountSheetReportResult[i]["TaxNumber"],
-                                    CreditLimit: physicalCountSheetReportResult[i]["CreditLimit"],
-                                    DateAcquired: physicalCountSheetReportResult[i]["DateAcquired"],
-                                    UsefulLife: physicalCountSheetReportResult[i]["UsefulLife"],
-                                    SalvageValue: physicalCountSheetReportResult[i]["SalvageValue"],
-                                    ManualArticleOldCode: physicalCountSheetReportResult[i]["ManualArticleOldCode"],
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var docLink = "/Software/ItemDetail?id=" + results[i]["Id"];
+
+                                physicalCountSheetObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    ArticleCode: results[i]["ArticleCode"],
+                                    ArticleCodeForCSV: "Item-" + results[i]["ArticleCode"],
+                                    ArticleCodeBtn: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block'> " + results[i]["ArticleCode"] + "</a>",
+                                    ManualArticleCodeForCSV: "Item-" + results[i]["ManualArticleCode"],
+                                    ManualArticleCode: results[i]["ManualArticleCode"],
+                                    DocumentReferenceForCSV: results[i]["DocumentReference"],
+                                    Article: results[i]["Article"],
+                                    Category: results[i]["Category"],
+                                    ArticleTypeId: results[i]["ArticleTypeId"],
+                                    ArticleType: results[i]["ArticleType"],
+                                    ArticleGroupId: results[i]["ArticleGroupId"],
+                                    ArticleGroup: results[i]["ArticleGroup"],
+                                    AccountId: results[i]["AccountId"],
+                                    AccountCode: results[i]["AccountCode"],
+                                    Account: results[i]["Account"],
+                                    SalesAccountId: results[i]["SalesAccountId"],
+                                    SalesAccount: results[i]["SalesAccount"],
+                                    CostAccountId: results[i]["CostAccountId"],
+                                    CostAccount: results[i]["CostAccount"],
+                                    AssetAccountId: results[i]["AssetAccountId"],
+                                    AssetAccount: results[i]["AssetAccount"],
+                                    ExpenseAccountId: results[i]["ExpenseAccountId"],
+                                    ExpenseAccount: results[i]["ExpenseAccount"],
+                                    UnitId: results[i]["UnitId"],
+                                    Unit: results[i]["Unit"],
+                                    InputTaxId: results[i]["InputTaxId"],
+                                    InputTax: results[i]["InputTax"],
+                                    OutputTaxId: results[i]["OutputTaxId"],
+                                    OutputTax: results[i]["OutputTax"],
+                                    WTaxTypeId: results[i]["WTaxTypeId"],
+                                    WTaxType: results[i]["WTaxType"],
+                                    Price: results[i]["Price"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    PriceAmountDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    Cost: results[i]["Cost"].toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    CostAmountDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    IsInventory: results[i]["IsInventory"],
+                                    Particulars: results[i]["Particulars"],
+                                    Address: results[i]["Address"],
+                                    TermId: results[i]["TermId"],
+                                    Term: results[i]["Term"],
+                                    ContactNumber: results[i]["ContactNumber"],
+                                    ContactPerson: results[i]["ContactPerson"],
+                                    TaxNumber: results[i]["TaxNumber"],
+                                    CreditLimit: results[i]["CreditLimit"],
+                                    DateAcquired: results[i]["DateAcquired"],
+                                    UsefulLife: results[i]["UsefulLife"],
+                                    SalvageValue: results[i]["SalvageValue"],
+                                    ManualArticleOldCode: results[i]["ManualArticleOldCode"],
                                 });
                             }
                         }
@@ -337,67 +338,37 @@
                 });
             }
 
-            return physicalCountSheetReports;
+            return physicalCountSheetObservableArray;
         }
 
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshPhysicalCountSheetReportFlexGrid() {
-            physicalCountSheetReportCollections = new wijmo.collections.CollectionView(getPhysicalCountSheetReport());
-            physicalCountSheetReportCollections.canFilter = true;
-            physicalCountSheetReportCollections.pageSize = cboPhysicalCountSheetReportShowNumberOfRows.selectedValue;
+        // =====================================
+        // Create Physical Count Sheet Flex Grid
+        // =====================================
+        function createPhysicalCountSheetFlexGrid() {
+            physicalCountSheetCollectionView = new wijmo.collections.CollectionView(getPhysicalCountSheetData());
+            physicalCountSheetCollectionView.canFilter = true;
+            physicalCountSheetCollectionView.pageSize = cboPhysicalCountSheetDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpPhysicalCountSheetSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                physicalCountSheetReportCollections.refresh();
+                physicalCountSheetCollectionView.refresh();
             });
 
-            physicalCountSheetReportCollections.filter = function (item) {
+            physicalCountSheetCollectionView.filter = function (item) {
                 return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            physicalCountSheetReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            physicalCountSheetCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updatePhysicalCountSheetNavigationButtons();
             });
 
-            physicalCountSheetReportGrid.itemsSource = physicalCountSheetReportCollections;
-            physicalCountSheetReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
-        function createPhysicalCountSheetReportFlexGrid() {
-            physicalCountSheetReportCollections = new wijmo.collections.CollectionView(getPhysicalCountSheetReport());
-            physicalCountSheetReportCollections.canFilter = true;
-            physicalCountSheetReportCollections.pageSize = cboPhysicalCountSheetReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                physicalCountSheetReportCollections.refresh();
-            });
-
-            physicalCountSheetReportCollections.filter = function (item) {
-                return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            physicalCountSheetReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            physicalCountSheetReportGrid = new wijmo.grid.FlexGrid('#physicalCountSheetReportGrid');
-            physicalCountSheetReportGrid.initialize({
+            physicalCountSheetFlexGrid = new wijmo.grid.FlexGrid('#physicalCountSheetFlexGrid');
+            physicalCountSheetFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Code",
@@ -409,103 +380,148 @@
                     {
                         "header": "Barcode",
                         "binding": "ManualArticleCode",
-                        "width": "2*",
-                        "allowSorting": false
+                        "allowSorting": false,
+                        "width": "1.5*"
                     },
                     {
                         "header": "SKU Code",
                         "binding": "ManualArticleOldCode",
-                        "width": "2*",
-                        "allowSorting": false
+                        "allowSorting": false,
+                        "width": "1.5*"
                     },
                     {
                         "header": "Item",
                         "binding": "Article",
                         "allowSorting": true,
-                        "width": "3*"
+                        "width": "1.5*"
                     },
                     {
                         "header": "Unit",
                         "binding": "Unit",
                         "allowSorting": true,
-                        "width": "1*"
-                    },
-                    {
-                        "header": "Quantity",
-                        "binding": "Quantity",
-                        "align": "right",
-                        "allowSorting": true,
-                        "width": "1*"
+                        "width": "1.5*"
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: physicalCountSheetReportCollections,
+                itemsSource: physicalCountSheetCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            physicalCountSheetReportGrid.trackChanges = true;
+            physicalCountSheetFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updatePhysicalCountSheetNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                physicalCountSheetReportCollections.moveToFirstPage();
-                currentPageIndex = physicalCountSheetReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnPhysicalCountSheetMoveToFirstPageGrid.addEventListener('click', function () {
+                physicalCountSheetCollectionView.moveToFirstPage();
+                physicalCountSheetCurrentPageIndex = physicalCountSheetCollectionView.pageIndex + 1;
+                updatePhysicalCountSheetNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                physicalCountSheetReportCollections.moveToPreviousPage();
-                currentPageIndex = physicalCountSheetReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnPhysicalCountSheetMoveToPreviousPageGrid.addEventListener('click', function () {
+                physicalCountSheetCollectionView.moveToPreviousPage();
+                physicalCountSheetCurrentPageIndex = physicalCountSheetCollectionView.pageIndex + 1;
+                updatePhysicalCountSheetNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                physicalCountSheetReportCollections.moveToNextPage();
-                currentPageIndex = physicalCountSheetReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnPhysicalCountSheetMoveToNextPageGrid.addEventListener('click', function () {
+                physicalCountSheetCollectionView.moveToNextPage();
+                physicalCountSheetCurrentPageIndex = physicalCountSheetCollectionView.pageIndex + 1;
+                updatePhysicalCountSheetNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                physicalCountSheetReportCollections.moveToLastPage();
-                currentPageIndex = physicalCountSheetReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnPhysicalCountSheetMoveToLastPageGrid.addEventListener('click', function () {
+                physicalCountSheetCollectionView.moveToLastPage();
+                physicalCountSheetCurrentPageIndex = physicalCountSheetCollectionView.pageIndex + 1;
+                updatePhysicalCountSheetNavigationButtons();
             });
+        }
+
+        // ==============================================
+        // Update Physical Count Sheet Navigation Buttons
+        // ==============================================
+        function updatePhysicalCountSheetNavigationButtons() {
+            if (physicalCountSheetCollectionView.pageSize <= 0) {
+                document.getElementById('physicalCountSheetNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('physicalCountSheetNavigationPageGrid').style.display = 'block';
+            if (physicalCountSheetCollectionView.pageIndex === 0) {
+                btnPhysicalCountSheetMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPhysicalCountSheetMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnPhysicalCountSheetMoveToNextPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (physicalCountSheetCollectionView.pageIndex === (physicalCountSheetCollectionView.pageCount - 1)) {
+                btnPhysicalCountSheetMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnPhysicalCountSheetMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnPhysicalCountSheetMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToNextPageGrid.removeAttribute('disabled');
+                btnPhysicalCountSheetMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnPhysicalCountSheetCurrentPageGrid.innerHTML = (physicalCountSheetCollectionView.pageIndex + 1) + ' / ' + physicalCountSheetCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshPhysicalCountSheetFlexGrid() {
+            physicalCountSheetCollectionView = new wijmo.collections.CollectionView(getPhysicalCountSheetData());
+            physicalCountSheetCollectionView.canFilter = true;
+            physicalCountSheetCollectionView.pageSize = cboPhysicalCountSheetDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpPhysicalCountSheetSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                physicalCountSheetCollectionView.refresh();
+            });
+
+            physicalCountSheetCollectionView.filter = function (item) {
+                return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            physicalCountSheetCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updatePhysicalCountSheetNavigationButtons();
+            });
+
+            physicalCountSheetFlexGrid.itemsSource = physicalCountSheetCollectionView;
+            physicalCountSheetFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnPhysicalCountSheetReportCSVOnclick() {
+        function btnPhysicalCountSheetCSVOnclick() {
             var CSV = '';
             var physicalCountSheetReport = [];
-            var fileName = 'PhysicalCountSheetReport.CSV';
+            var fileName = 'PhysicalCountSheet.CSV';
 
-            physicalCountSheetReportCollections.moveToFirstPage();
+            physicalCountSheetCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= physicalCountSheetReportCollections.pageCount; p++) {
-                for (i = 0; i < physicalCountSheetReportCollections.items.length; i++) {
-                    var IsClose = physicalCountSheetReportCollections.items[i].IsClose;
-                    var isPOClose = "Not Closed";
-                    if (IsClose) {
-                        isPOClose = "Closed"
-                    }
-
+            for (var p = 1; p <= physicalCountSheetCollectionView.pageCount; p++) {
+                for (i = 0; i < physicalCountSheetCollectionView.items.length; i++) {
                     physicalCountSheetReport.push({
-                        ArticleCode: physicalCountSheetReportCollections.items[i].ArticleCodeForCSV,
-                        Barcode: physicalCountSheetReportCollections.items[i].ManualArticleCodeForCSV,
-                        SKUCode: physicalCountSheetReportCollections.items[i].ManualArticleOldCode,
-                        Article: physicalCountSheetReportCollections.items[i].Article,
-                        Unit: physicalCountSheetReportCollections.items[i].Unit,
-                        Quantity: physicalCountSheetReportCollections.items[i].Quantity,
+                        ArticleCode: physicalCountSheetCollectionView.items[i].ArticleCodeForCSV,
+                        Barcode: physicalCountSheetCollectionView.items[i].ManualArticleCode,
+                        SKUCode: physicalCountSheetCollectionView.items[i].ManualArticleOldCode,
+                        Item: physicalCountSheetCollectionView.items[i].Article,
+                        Unit: physicalCountSheetCollectionView.items[i].Unit,
+                        Quantity: ""
                     });
                 }
 
-                physicalCountSheetReportCollections.moveToNextPage();
-                if (p == physicalCountSheetReportCollections.pageCount) {
-                    physicalCountSheetReportCollections.moveToPage(currentPageIndex - 1);
+                physicalCountSheetCollectionView.moveToNextPage();
+                if (p == physicalCountSheetCollectionView.pageCount) {
+                    physicalCountSheetCollectionView.moveToPage(physicalCountSheetCurrentPageIndex - 1);
                 }
             }
 
@@ -514,9 +530,9 @@
                 ArticleCode: "Code",
                 Barcode: "Barcode",
                 SKUCode: "SKU Code",
-                Article: "Item",
+                Item: "Item",
                 Unit: "Unit",
-                Quantity: "Quantity",
+                Quantity: "Quantity"
             });
 
             var header = '';
@@ -567,9 +583,9 @@
         // =====================
         // Preview and Print PDF
         // =====================
-        function btnPhysicalCountSheetReportPrintPDFOnclick() {
-            if (cboItemGroup.selectedValue != null) {
-                var itemGroupId = cboItemGroup.selectedValue;
+        function btnPhysicalCountSheetPDFOnclick() {
+            if (cboItemGroupFilter.selectedValue != null) {
+                var itemGroupId = cboItemGroupFilter.selectedValue;
                 window.location.href = '/RepPhysicalCountSheet/PhysicalCountSheet?itemGroupId=' + itemGroupId;
             } else {
                 toastr.error("Lacking Information");
@@ -580,11 +596,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            getArticleItemGroupForComboBox();
+            createCboItemGroupFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -631,6 +654,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -670,6 +696,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
