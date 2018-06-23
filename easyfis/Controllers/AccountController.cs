@@ -272,6 +272,11 @@ namespace easyfis.Controllers
                 secretKey = "6LemUF0UAAAAAGG-ZG848xlLi0Or04W3zKFRaeTh";
             }
 
+            if (host.Equals("skyshine.easyfis.com"))
+            {
+                secretKey = "6Lepp18UAAAAAF_rLUhgfZxT1WIeDonXK-VtJl_5";
+            }
+
             var client = new System.Net.WebClient();
             var verificationResultJson = client.DownloadString(string.Format("https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}", secretKey, response));
             var verificationResult = JsonConvert.DeserializeObject<CaptchaVerificationResult>(verificationResultJson);
