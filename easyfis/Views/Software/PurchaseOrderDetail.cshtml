@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Purchase Order Detail</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body class="">
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,28 +38,40 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        =============================================
+                        Options: Lock, Unlock, Print and Close Button
+                        =============================================
+                    -->
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                <!-- <button class="btn btn-primary" id="btnEmailPO" onclick="btnEmailPOOnclick()"><i class="fa fa-envelope"></i> Email</button> -->
+                                @*<button class="btn btn-primary" id="btnEmailPO" onclick="btnPurchaseOrderEmailOnclick()"><i class="fa fa-envelope"></i> Email</button>*@
                                 @{
                                     if (canLock)
                                     {
-                                        <button class="btn btn-primary" id="btnLockPO" onclick="btnLockPOOnclick()"><i class="fa fa-lock"></i> Lock</button>
+                                        <button class="btn btn-primary" id="btnPurchaseOrderLock" onclick="btnPurchaseOrderLockOnclick()"><i class="fa fa-lock"></i> Lock</button>
                                     }
                                     if (canUnlock)
                                     {
-                                        <button class="btn btn-primary" id="btnUnlockPO" onclick="btnUnlockPOOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                        <button class="btn btn-primary" id="btnPurchaseOrderUnlock" onclick="btnPurchaseOrderUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
                                     if (canPrint)
                                     {
-                                        <button class="btn btn-primary" id="btnPrintPO" onclick="btnPrintPOOnclick()"><i class="fa fa-print"></i> Print</button>
+                                        <button class="btn btn-primary" id="btnPurchaseOrderPrint" onclick="btnPurchaseOrderPrintOnclick()"><i class="fa fa-print"></i> Print</button>
                                     }
                                 }
-                                <button class="btn btn-danger" id="btnClosePO" onclick="window.location.href = '/Software/PurchaseOrder'"><i class="fa fa-times"></i> Close</button>
+                                <button class="btn btn-danger" id="btnPurchaseOrderClose" onclick="window.location.href = '/Software/PurchaseOrder'"><i class="fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
+
+                    <!--
+                        ======================================
+                        Details, Fields and Other Informations
+                        ======================================
+                    -->
                     <div class="panel-body">
                         <div class="form-horizontal">
                             <div class="row">
@@ -70,43 +79,43 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Branch</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOBranch"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderBranch"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">PO Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredPO" id="PONumber" disabled />
+                                            <input type="text" class="form-control requiredPO" id="inpPurchaseOrderPONumber" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">PO Date</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPODate"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderPODate"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Manual PO Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredPO" id="POManualPONumber" placeholder="Manual PO Number" />
+                                            <input type="text" class="form-control requiredPO" id="inpPurchaseOrderManualPONumber" placeholder="Manual PO Number" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Supplier</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOSupplier"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderSupplier"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Term</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOTerm"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderTerm"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Remarks</label>
                                         <div class="col-sm-8">
-                                            <textarea rows="5" class="form-control textarea-custom requiredPO" id="PORemarks" placeholder="Remarks"></textarea>
+                                            <textarea rows="5" class="form-control textarea-custom requiredPO" id="inpPurchaseOrderRemarks" placeholder="Remarks"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -115,9 +124,9 @@
                                         <label class="control-label col-sm-4">Manual Request No.</label>
                                         <div class="col-sm-8">
                                             <div class="input-group">
-                                                <input type="text" class="form-control requiredPO" id="PORequestNumber" placeholder="Request Number">
+                                                <input type="text" class="form-control requiredPO" id="inpPurchaseRequestNumber" placeholder="Request Number">
                                                 <div class="input-group-btn">
-                                                    <button type="button" class=" btn btn-primary" id="btnManualRequestNo" onclick="ManualRequestNoOnclick()">PR</button>
+                                                    <button type="button" class=" btn btn-primary" id="btnpurchaseRequestModal" onclick="btnPurchaseRequestNumberOnclick()">PR</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -125,37 +134,37 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Date Needed</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPODateNeeded"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderDateNeeded"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Requested by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPORequestedBy"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderRequestedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Prepared by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOPreparedBy"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderPreparedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Checked by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOCheckedBy"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderCheckedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Approved by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboPOApprovedBy"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderApprovedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Is Close</label>
                                         <div class="col-sm-8">
-                                            <input type="checkbox" id="POClosePO">
+                                            <input type="checkbox" id="inpPurchaseOrderIsClose">
                                         </div>
                                     </div>
                                 </div>
@@ -163,20 +172,32 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ===================
+                    Purchase Order Item
+                    ===================
+                -->
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
-                    <li role="presentation" class="active"><a data-toggle="tab" href="#Item" id="itemTabId">Items</a></li>
+                    <li role="presentation" class="active"><a data-toggle="tab" href="#Item" id="itemTabId">Purchase Order Items</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
                     <div id="Item" class="tab-pane fade in active">
                         <div class="panel panel-default">
+
+                            <!--
+                                ========================================================================
+                                Purchase Order Item: Search, Filter, Display Number of Rows and  Buttons
+                                ========================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpPurchaseOrderItemSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -191,37 +212,55 @@
                                             @{
                                                 if (canAdd)
                                                 {
-                                                    <button class="btn btn-primary" id="btnAddPOItem" onclick="btnAddPOItemOnclick()"><i class="fa fa-plus"></i> Add</button>
-                                                    <button class="btn btn-primary" id="btnItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
+                                                    <button class="btn btn-primary" id="btnPurchaseOrderItemAdd" onclick="btnPurchaseOrderItemAddOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnPurchaseOrderItemItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
                                                 }
                                             }
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ==============================
+                                Purchase Order Item: Flex Grid
+                                ==============================
+                            -->
                             <div class="panel-body">
-                                <div id="POItemGrid"></div>
+                                <div id="purchaseOrderItemFlexGrid"></div>
                             </div>
+
+                            <!--
+                                =======================================
+                                Purchase Order Item: Navigation Buttons
+                                =======================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                                    <div class="btn-group col-md-7" id="purchaseOrderItemNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseOrderItemMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseOrderItemMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnPurchaseOrderItemCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseOrderItemMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseOrderItemMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!--
+                            ===========================
+                            Purchase Order Item: Totals
+                            ===========================
+                        -->
                         <div class="panel panel-default">
                             <div class="panel-body" style="padding-bottom: 0px;">
                                 <div class="row">
@@ -243,6 +282,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -271,21 +316,26 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Modal for POLines -->
-    <div class="modal fade" id="POLinesEdit" role="dialog">
+    <!--
+        =================================
+        Purchase Order Item: Detail Modal
+        =================================
+    -->
+    <div class="modal fade" id="purchaseOrderItemDetailModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="POLinesNameModalLabel">Purchase Order Item</h4>
+                    <h4 class="modal-title" id="purchaseOrderItemModalTitle">Purchase Order Item</h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingModalItem"></span>
+                        <span id="purchaseOrderItemLoading"></span>
                     </center>
                     <div id="POItemContent">
                         <dl class="dl-horizontal">
@@ -294,40 +344,74 @@
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 30%">
-                                            <div class="comboBox-wide" id="cboPOLineItemCode"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderItemCode"></div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 69%">
-                                            <div class="comboBox-wide" id="cboPOLineItemDescription"></div>
+                                            <div class="comboBox-wide" id="cboPurchaseOrderItemDescription"></div>
                                         </td>
                                     </tr>
                                 </table>
                             </dd>
                             <dt>Particulars</dt>
-                            <dd><textarea rows="5" class="form-control textarea-custom requiredPOLine" id="POLine_Particulars" placeholder="Particulars"></textarea></dd>
+                            <dd>
+                                <textarea rows="5" class="form-control textarea-custom requiredPurchaseOrderItem" id="inpPurchaseOrderItemParticulars" placeholder="Particulars"></textarea>
+                            </dd>
                             <dt>Quantity</dt>
-                            <dd><input type="text" class="form-control numberField requiredPOLine" id="POLine_Quantity" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control numberField requiredPurchaseOrderItem" id="inpPurchaseOrderItemQuantity" placeholder="0.00" />
+                            </dd>
                             <dt>Unit</dt>
                             <dd>
-                                <div class="comboBox-wide" id="cboPOLineUnit"></div>
+                                <div class="comboBox-wide" id="cboPurchaseOrderItemUnit"></div>
                             </dd>
                             <dt>Cost</dt>
-                            <dd><input type="text" class="form-control numberField requiredPOLine" id="POLine_Cost" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control numberField requiredPurchaseOrderItem" id="inpPurchaseOrderItemCost" placeholder="0.00" />
+                            </dd>
                             <dt>Amount</dt>
-                            <dd><input type="text" class="form-control numberField requiredPOLine" id="POLine_Amount" placeholder="0.00" disabled /></dd>
+                            <dd>
+                                <input type="text" class="form-control numberField requiredPurchaseOrderItem" id="inpPurchaseOrderItemAmount" placeholder="0.00" disabled />
+                            </dd>
                         </dl>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary " id="cmdSavePOLinesButton" onclick="cmdPOLinesSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
-                    <button id="cmdPOLinesDetailCloseButton" class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-primary" id="btnPurchaseOrderItemSave" onclick="btnPurchaseOrderItemSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="btnPurchaseOrderItemCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal for Item Query -->
-    <div class="modal fade" id="POLinesItemQuery" role="dialog">
+    <!--
+        =================================
+        Purchase Order Item: Delete Modal
+        =================================
+    -->
+    <div class="modal fade" id="purchaseOrderItemDeleteModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete</h4>
+                </div>
+                <div class="modal-body">
+                    Delete Purchase Order Item?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" id="btnPurchaseOrderItemConfirmDelete" onclick="btnPurchaseOrderItemConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnPurchaseOrderItemConfirmDeleteCloseModal" class="btn btn-primary " data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        =====================================
+        Purchase Order Item: Item Query Modal
+        =====================================
+    -->
+    <div class="modal fade" id="purchaseOrderItemQueryModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -335,33 +419,51 @@
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingItemQuery"></span>
+                        <span id="itemQueryLoading"></span>
                     </center>
-                    <div id="itemQueryPanel">
+                    <div id="itemQueryContent">
                         <div class="panel panel-default">
+
+                            <!--
+                                ========================================
+                                Purchase Order Item Query: Search Filter
+                                ========================================
+                            -->
                             <div class="panel-heading">
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control " id="itemQueryFilter" placeholder="Search">
+                                    <input type="text" class="form-control" id="inpItemQuerySearchFilter" placeholder="Search...">
                                 </div>
                             </div>
+
+                            <!--
+                                ====================================
+                                Purchase Order Item Query: Flex Grid
+                                ====================================
+                            -->
                             <div class="panel-body">
-                                <div id="itemQueryGrid"></div>
+                                <div id="itemQueryFlexGrid"></div>
                             </div>
+
+                            <!--
+                                =============================================
+                                Purchase Order Item Query: Navigation Buttons
+                                =============================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridItemQuery">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItemQuery">
+                                    <div class="btn-group col-md-7" id="purchaseOrderItemQueryNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItemQuery"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemQueryCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -371,14 +473,18 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal for Manual Request No -->
-    <div class="modal fade" id="ManualRequestNo" role="dialog">
+    <!--
+        =======================
+        Purchase Request: Modal
+        =======================
+    -->
+    <div class="modal fade" id="purchaseRequestModal" role="dialog">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -386,14 +492,20 @@
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingManualRequestNo"></span>
+                        <span id="purchaseRequestLoading"></span>
                     </center>
-                    <div id="ManualRequestNoPanel">
+                    <div id="purchaseRequestContent">
                         <div class="panel panel-default">
+
+                            <!--
+                                ==============================================
+                                Purchase Request: Search Filter and Date Range
+                                ==============================================
+                            -->
                             <div class="panel-heading">
                                 <div class="input-group ">
                                     <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control" id="InputPRFilter" placeholder="Search...">
+                                    <input type="text" class="form-control" id="inpPurchaseRequestSearchFilter" placeholder="Search...">
                                 </div>
                             </div>
                             <div class="panel-heading">
@@ -402,43 +514,55 @@
                                         <td style="width: 24%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>Start Date</b></span>
-                                                <div class="comboBox-wide" id="cboPurchaseRequestStartDate"></div>
+                                                <div class="comboBox-wide" id="cboPurchaseRequestStartDateFilter"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>End Date</b></span>
-                                                <div class="comboBox-wide" id="cboPurchaseRequestEndDate"></div>
+                                                <div class="comboBox-wide" id="cboPurchaseRequestEndDateFilter"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 50%">
                                             <div class="input-group ">
                                                 <span class="input-group-addon"><b>Branch</b></span>
-                                                <div class="comboBox-wide" id="cboPRBranchList"></div>
+                                                <div class="comboBox-wide" id="cboPurchaseRequestBranchFilter"></div>
                                             </div>
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ===========================
+                                Purchase Request: Flex Grid
+                                ===========================
+                            -->
                             <div class="panel-body">
-                                <div id="PRGrid" class="grid" align="left"></div>
+                                <div id="purchaseRequestFlexGrid" class="grid" align="left"></div>
                             </div>
+
+                            <!--
+                                ======================================
+                                Purchase Request: Navigation Page Grid
+                                ======================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridPR">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridPR">
+                                    <div class="btn-group col-md-7" id="purchaseRequestNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseRequestMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridPR">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseRequestMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridPR"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridPR">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnPurchaseRequestCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseRequestMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridPR">
+                                        <button type="button" class="btn btn-default border-custom" id="btnPurchaseRequestMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -448,43 +572,29 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-danger " data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PRLines Pick Request Modal Confirmation -->
-    <div class="modal fade" id="pickPRLinesConfirm" role="dialog">
+    <!--
+        =============================
+        Purchase Request: Apply Modal
+        =============================
+    -->
+    <div class="modal fade" id="purchaseRequestApplyModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Apply PR</h4>
+                    <h4 class="modal-title">Apply</h4>
                 </div>
                 <div class="modal-body">
                     Apply Purchase Request?
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="cmdConfirmPickPRLines" onclick="cmdPRLinesConfirmPicButton_OnClick()"><i class="fa fa-check"></i> Apply</button>
-                    <button id="cmdConfirmPickPRLinesCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- POLines Delete Modal Confirmation -->
-    <div class="modal fade" id="deletePOLinesConfirm" role="dialog">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete</h4>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this purchased item?
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-danger " id="cmdConfirmDeletePOLines" onclick="cmdPOLinesConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary " data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnPurchaseRequestApply" class="btn btn-primary" onclick="btnPurchaseRequestApplyOnclick()"><i class="fa fa-check"></i> Apply</button>
+                    <button id="btnPurchaseRequestApplyCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -492,57 +602,73 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboPOBranch = new wijmo.input.ComboBox('#cboPOBranch');
-        var cboPODate = new wijmo.input.InputDate('#cboPODate');
-        var cboPOSupplier = new wijmo.input.ComboBox('#cboPOSupplier');
-        var cboPOTerm = new wijmo.input.ComboBox('#cboPOTerm');
-        var cboPODateNeeded = new wijmo.input.InputDate('#cboPODateNeeded');
-        var cboPORequestedBy = new wijmo.input.InputDate('#cboPORequestedBy');
-        var cboPOPreparedBy = new wijmo.input.InputDate('#cboPOPreparedBy');
-        var cboPOCheckedBy = new wijmo.input.InputDate('#cboPOCheckedBy');
-        var cboPOApprovedBy = new wijmo.input.InputDate('#cboPOApprovedBy');
+        // ===========================================
+        // Purchase Order Detail Combo Data and Fields
+        // ===========================================
+        var cboPurchaseOrderBranch = new wijmo.input.ComboBox('#cboPurchaseOrderBranch');
+        var cboPurchaseOrderPODate = new wijmo.input.InputDate('#cboPurchaseOrderPODate');
+        var cboPurchaseOrderSupplier = new wijmo.input.ComboBox('#cboPurchaseOrderSupplier');
+        var cboPurchaseOrderTerm = new wijmo.input.ComboBox('#cboPurchaseOrderTerm');
+        var cboPurchaseOrderDateNeeded = new wijmo.input.InputDate('#cboPurchaseOrderDateNeeded');
+        var cboPurchaseOrderRequestedBy = new wijmo.input.InputDate('#cboPurchaseOrderRequestedBy');
+        var cboPurchaseOrderPreparedBy = new wijmo.input.InputDate('#cboPurchaseOrderPreparedBy');
+        var cboPurchaseOrderCheckedBy = new wijmo.input.InputDate('#cboPurchaseOrderCheckedBy');
+        var cboPurchaseOrderApprovedBy = new wijmo.input.InputDate('#cboPurchaseOrderApprovedBy');
         var isLocked = false;
+
+        // =====================================================================
+        // Purchase Order Item Collection View, Flex Grid and Navigation Buttons
+        // =====================================================================
         var purchaseOrderItemCollectionView;
         var purchaseOrderItemFlexGrid;
-        var cboPOLineItemCode = new wijmo.input.ComboBox('#cboPOLineItemCode');
-        var cboPOLineItemDescription = new wijmo.input.ComboBox('#cboPOLineItemDescription');
-        var cboPOLineUnit = new wijmo.input.ComboBox('#cboPOLineUnit');
-        var purchaseOrderItemId = 0;
-        var itemQueryItemsCollection;
-        var itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
         var cboPurchaseOrderItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseOrderItemsShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var btnMoveToFirstPageGridItemQuery = document.getElementById('btnMoveToFirstPageGridItemQuery');
-        var btnMoveToPreviousPageGridItemQuery = document.getElementById('btnMoveToPreviousPageGridItemQuery');
-        var btnMoveToNextPageGridItemQuery = document.getElementById('btnMoveToNextPageGridItemQuery');
-        var btnMoveToLastPageGridItemQuery = document.getElementById('btnMoveToLastPageGridItemQuery');
-        var btnCurrentPageGridItemQuery = document.getElementById('btnCurrentPageGridItemQuery');
-        var isItemQueryClicked = false;
-        var cboPurchaseRequestStartDate = new wijmo.input.InputDate('#cboPurchaseRequestStartDate');
-        var cboPurchaseRequestEndDate = new wijmo.input.InputDate('#cboPurchaseRequestEndDate');
-        var isStartDateFirstSelect = true;
-        var isEndDateFirstSelect = true;
-        var cboPRBranchList = new wijmo.input.ComboBox('#cboPRBranchList');
+        var btnPurchaseOrderItemMoveToFirstPageGrid = document.getElementById('btnPurchaseOrderItemMoveToFirstPageGrid');
+        var btnPurchaseOrderItemMoveToPreviousPageGrid = document.getElementById('btnPurchaseOrderItemMoveToPreviousPageGrid');
+        var btnPurchaseOrderItemMoveToNextPageGrid = document.getElementById('btnPurchaseOrderItemMoveToNextPageGrid');
+        var btnPurchaseOrderItemMoveToLastPageGrid = document.getElementById('btnPurchaseOrderItemMoveToLastPageGrid');
+        var btnPurchaseOrderItemCurrentPageGrid = document.getElementById('btnPurchaseOrderItemCurrentPageGrid');
+
+        // =========================================
+        // Purchase Order Item Combo Data and Fields
+        // =========================================
+        var purchaseOrderItemId = 0;
+        var cboPurchaseOrderItemCode = new wijmo.input.ComboBox('#cboPurchaseOrderItemCode');
+        var cboPurchaseOrderItemDescription = new wijmo.input.ComboBox('#cboPurchaseOrderItemDescription');
+        var cboPurchaseOrderItemUnit = new wijmo.input.ComboBox('#cboPurchaseOrderItemUnit');
+
+        // ============================================================
+        // Item Query Collection View, Flex Grid and Navigation Buttons
+        // ============================================================
+        var itemQueryItemsCollectionView;
+        var itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+        var btnItemQueryMoveToFirstPageGrid = document.getElementById('btnItemQueryMoveToFirstPageGrid');
+        var btnItemQueryMoveToPreviousPageGrid = document.getElementById('btnItemQueryMoveToPreviousPageGrid');
+        var btnItemQueryMoveToNextPageGrid = document.getElementById('btnItemQueryMoveToNextPageGrid');
+        var btnItemQueryMoveToLastPageGrid = document.getElementById('btnItemQueryMoveToLastPageGrid');
+        var btnItemQueryCurrentPageGrid = document.getElementById('btnItemQueryCurrentPageGrid');
+        var isBtnItemQueryClicked = false;
+
+        // ==============================================================================================
+        // Purchase Order Manual Request Search Filter, Collection View, Flex Grid and Navigation Buttons
+        // ==============================================================================================
+        var cboPurchaseRequestStartDateFilter = new wijmo.input.InputDate('#cboPurchaseRequestStartDateFilter');
+        var cboPurchaseRequestEndDateFilter = new wijmo.input.InputDate('#cboPurchaseRequestEndDateFilter');
+        var isCboStartDateFilterSelected = true;
+        var isCboEndDateFilterSelected = true;
+        var cboPurchaseRequestBranchFilter = new wijmo.input.ComboBox('#cboPurchaseRequestBranchFilter');
         var purchaseRequestCollectionView;
-        var PRGrid = new wijmo.grid.FlexGrid('#PRGrid');
-        var isPRClicked = false;
-        var btnFirstPageGridPR = document.getElementById('btnMoveToFirstPageGridPR');
-        var btnPreviousPageGridPR = document.getElementById('btnMoveToPreviousPageGridPR');
-        var btnNextPageGridPR = document.getElementById('btnMoveToNextPageGridPR');
-        var btnLastPageGridPR = document.getElementById('btnMoveToLastPageGridPR');
-        var btnCurrentPageGridPR = document.getElementById('btnCurrentPageGridPR');
+        var purchaseRequestFlexGrid = new wijmo.grid.FlexGrid('#purchaseRequestFlexGrid');
+        var isPurchaseRequestClicked = false;
+        var btnPurchaseRequestMoveToFirstPageGrid = document.getElementById('btnPurchaseRequestMoveToFirstPageGrid');
+        var btnPurchaseRequestMoveToPreviousPageGrid = document.getElementById('btnPurchaseRequestMoveToPreviousPageGrid');
+        var btnPurchaseRequestMoveToNextPageGrid = document.getElementById('btnPurchaseRequestMoveToNextPageGrid');
+        var btnPurchaseRequestMoveToLastPageGrid = document.getElementById('btnPurchaseRequestMoveToLastPageGrid');
+        var btnPurchaseRequestCurrentPageGrid = document.getElementById('btnPurchaseRequestCurrentPageGrid');
 
         // =======================
         // Get URL Parameter Value
         // =======================
-        function getParam(name) {
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -556,369 +682,10 @@
             }
         }
 
-        // ==================================
-        // Manual Purchase Request No - Click
-        // ==================================
-        function ManualRequestNoOnclick() {
-            $('#ManualRequestNo').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $("#ManualRequestNoPanel").hide();
-            document.getElementById("loadingManualRequestNo").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-            $("#loadingManualRequestNo").show();
-
-            setTimeout(function () {
-                cboPurchaseRequestDateFilters();
-            }, 500);
-        }
-
-        // ==============
-        // PR Date Filter
-        // ==============
-        function cboPurchaseRequestDateFilters() {
-            cboPurchaseRequestStartDate.dispose();
-            cboPurchaseRequestStartDate = new wijmo.input.InputDate('#cboPurchaseRequestStartDate', {
-                format: 'MM-dd-yyyy',
-                value: new Date(),
-                onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
-                        createPurchaseRequestFlexGrid();
-                    } else {
-                        isStartDateFirstSelect = false;
-                    }
-                }
-            });
-
-            cboPurchaseRequestEndDate.dispose();
-            cboPurchaseRequestEndDate = new wijmo.input.InputDate('#cboPurchaseRequestEndDate', {
-                format: 'MM-dd-yyyy',
-                value: new Date(),
-                onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
-                        createPurchaseRequestFlexGrid();
-                    } else {
-                        isEndDateFirstSelect = false;
-                    }
-                }
-            });
-
-            createCboPurchaseRequestBranch();
-        }
-
-        // ===============
-        // CBO PR - Branch
-        // ===============
-        function createCboPurchaseRequestBranch() {
-            var branchesObservableArray = new wijmo.collections.ObservableArray();
-            $.ajax({
-                url: '/api/purchaseOrder/purchaseRequest/dropdown/list/branch',
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                data: {},
-                success: function (results) {
-                    if (results.length > 0) {
-                        for (i = 0; i < results.length; i++) {
-                            branchesObservableArray.push({
-                                Id: results[i]["Id"],
-                                Branch: results[i]["Branch"]
-                            });
-                        }
-                    }
-
-                    cboPRBranchList.dispose();
-                    cboPRBranchList = new wijmo.input.ComboBox('#cboPRBranchList', {
-                        isEditable: false,
-                        placeholder: "Select Branch",
-                        itemsSource: branchesObservableArray,
-                        displayMemberPath: "Branch",
-                        selectedValuePath: "Id",
-                        selectedValue: cboPOBranch.selectedValue,
-                        onSelectedIndexChanged: function () {
-                            createPurchaseRequestFlexGrid();
-                        }
-                    });
-
-                    createPurchaseRequestFlexGrid();
-                }
-            });
-        }
-
-        // ====================
-        // GET Purchase Request
-        // ====================
-        function getPurchaseRequestFilterByDates() {
-            NProgress.start();
-            var startDate = cboPurchaseRequestStartDate.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboPurchaseRequestEndDate.value.toLocaleDateString().replace(/\//g, '-');
-
-            var purchaseRequestObservableArray = new wijmo.collections.ObservableArray;
-            if (cboPRBranchList.selectedValue != null) {
-                var branchId = cboPRBranchList.selectedValue;
-                $.ajax({
-                    url: '/api/purchaseOrder/purchaseRequest/list/' + startDate + '/' + endDate + '/' + branchId,
-                    cache: false,
-                    type: 'GET',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (results) {
-                        if (results.length > 0) {
-                            for (i = 0; i < results.length; i++) {
-                                var PRDateResult = new Date(results[i]["PRDate"])
-                                var PRDate = ('0' + (PRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + PRDateResult.getDate()).slice(-2) + '-' + PRDateResult.getFullYear();
-
-                                purchaseRequestObservableArray.push({
-                                    Detail: "<button class='btn btn-info btn-xs btn-block' onclick='detailPROnClick()'><i class='fa fa-edit'></i> Detail</button>",
-                                    Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyPROnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
-                                    Id: results[i]["Id"],
-                                    PRNumber: results[i]["PRNumber"],
-                                    PRDate: PRDate,
-                                    ManualPRNumber: results[i]["ManualPRNumber"],
-                                    Supplier: results[i]["Supplier"],
-                                    Remarks: results[i]["Remarks"],
-                                    Amount: results[i]["Amount"],
-                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                });
-                            }
-                        }
-
-                        $("#loadingManualRequestNo").hide();
-                        $("#ManualRequestNoPanel").show();
-                        NProgress.done();
-                    }
-                });
-            }
-
-            return purchaseRequestObservableArray;
-        }
-
-        // =========================
-        // Purchase Request FlexGrid
-        // =========================
-        function createPurchaseRequestFlexGrid() {
-            purchaseRequestCollectionView = new wijmo.collections.CollectionView(getPurchaseRequestFilterByDates());
-            purchaseRequestCollectionView.canFilter = true;
-            purchaseRequestCollectionView.pageSize = 7;
-
-            var filterText = '';
-            $('#InputPRFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                purchaseRequestCollectionView.refresh();
-            });
-
-            purchaseRequestCollectionView.filter = function (item) {
-                return !filterText || (item.PRNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualPRNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Supplier.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            purchaseRequestCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsPR();
-            });
-
-            PRGrid.dispose();
-            PRGrid = new wijmo.grid.FlexGrid('#PRGrid');
-            PRGrid.initialize({
-                columns: [
-                    {
-                        "header": "Detail",
-                        "binding": "Detail",
-                        "width": "0.8*",
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
-                    {
-                        "header": "Pick",
-                        "binding": "Pick",
-                        "width": "0.8*",
-                        "align": "center",
-                        "allowResizing": false,
-                        "allowSorting": false,
-                        "isContentHtml": true
-                    },
-                    {
-                        "header": "PR Number",
-                        "binding": "PRNumber",
-                        "allowSorting": true,
-                        "width": 100
-                    },
-                    {
-                        "header": "PR Date",
-                        "binding": "PRDate",
-                        "allowSorting": true,
-                        "width": 90
-                    },
-                    {
-                        "header": "Manual PR No.",
-                        "binding": "ManualPRNumber",
-                        "allowSorting": true,
-                        "width": 120
-                    },
-                    {
-                        "header": "Supplier",
-                        "binding": "Supplier",
-                        "allowSorting": true,
-                        "width": "3*"
-                    },
-                    {
-                        "header": "Remarks",
-                        "binding": "Remarks",
-                        "allowSorting": true,
-                        "width": "2.5*"
-                    },
-                    {
-                        "header": "Amount",
-                        "binding": "AmountDisplay",
-                        "allowSorting": true,
-                        "align": "right",
-                        "width": "2*"
-                    },
-                ],
-                autoGenerateColumns: false,
-                itemsSource: purchaseRequestCollectionView,
-                isReadOnly: true,
-                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
-                allowDragging: wijmo.grid.AllowDragging.None,
-                selectionMode: wijmo.grid.SelectionMode.Row
-            });
-
-            PRGrid.trackChanges = true;
-
-            btnFirstPageGridPR = document.getElementById('btnMoveToFirstPageGridPR');
-            btnPreviousPageGridPR = document.getElementById('btnMoveToPreviousPageGridPR');
-            btnNextPageGridPR = document.getElementById('btnMoveToNextPageGridPR');
-            btnLastPageGridPR = document.getElementById('btnMoveToLastPageGridPR');
-            btnCurrentPageGridPR = document.getElementById('btnCurrentPageGridPR');
-
-            if (!isPRClicked) {
-                updateNavigateButtonsPR();
-
-                btnFirstPageGridPR.addEventListener('click', function () {
-                    purchaseRequestCollectionView.moveToFirstPage();
-                    updateNavigateButtonsPR();
-                });
-
-                btnPreviousPageGridPR.addEventListener('click', function () {
-                    purchaseRequestCollectionView.moveToPreviousPage();
-                    updateNavigateButtonsPR();
-                });
-
-                btnNextPageGridPR.addEventListener('click', function () {
-                    purchaseRequestCollectionView.moveToNextPage();
-                    updateNavigateButtonsPR();
-                });
-
-                btnLastPageGridPR.addEventListener('click', function () {
-                    purchaseRequestCollectionView.moveToLastPage();
-                    updateNavigateButtonsPR();
-                });
-
-                isPRClicked = true;
-            }
-        }
-
-        // =====================
-        // Navigation Buttons PR
-        // =====================
-        function updateNavigateButtonsPR() {
-            if (purchaseRequestCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridPR').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridPR').style.display = 'block';
-            if (purchaseRequestCollectionView.pageIndex === 0) {
-                btnFirstPageGridPR.setAttribute('disabled', 'disabled');
-                btnPreviousPageGridPR.setAttribute('disabled', 'disabled');
-                btnNextPageGridPR.removeAttribute('disabled');
-                btnLastPageGridPR.removeAttribute('disabled');
-            } else if (purchaseRequestCollectionView.pageIndex === (purchaseRequestCollectionView.pageCount - 1)) {
-                btnFirstPageGridPR.removeAttribute('disabled');
-                btnPreviousPageGridPR.removeAttribute('disabled');
-                btnLastPageGridPR.setAttribute('disabled', 'disabled');
-                btnNextPageGridPR.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGridPR.removeAttribute('disabled');
-                btnPreviousPageGridPR.removeAttribute('disabled');
-                btnNextPageGridPR.removeAttribute('disabled');
-                btnLastPageGridPR.removeAttribute('disabled');
-            }
-            btnCurrentPageGridPR.innerHTML = (purchaseRequestCollectionView.pageIndex + 1) + ' / ' + purchaseRequestCollectionView.pageCount;
-        }
-
-        // ==========================
-        // Purchase Request - Detail
-        // =========================
-        function detailPROnClick() {
-            purchaseRequestCollectionView.editItem(purchaseRequestCollectionView.currentItem);
-            var PRId = purchaseRequestCollectionView.currentEditItem.Id;
-            var PRLink = '/Software/PurchaseRequestDetail?id=' + PRId;
-            window.open(PRLink, '_blank');
-        }
-
-        // ============================
-        // Purchase Request - Pick Item
-        // ============================
-        function pickToApplyPROnClick() {
-            $('#pickPRLinesConfirm').modal({ show: true, backdrop: 'static' });
-
-            document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-check'></i> Apply";
-            $("#cmdConfirmPickPRLines").prop("disabled", false);
-            $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
-        }
-
-        // ================================
-        // Confirm Pick Purchase Order Item
-        // ================================
-        function cmdPRLinesConfirmPicButton_OnClick() {
-            document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Applying...";
-            $("#cmdConfirmPickPRLines").prop("disabled", true);
-            $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", true);
-
-            purchaseRequestCollectionView.editItem(purchaseRequestCollectionView.currentItem);
-            var PRId = purchaseRequestCollectionView.currentEditItem.Id;
-            var POId = getParam('id');
-
-            $.ajax({
-                type: "POST",
-                url: '/api/purchaseOrder/load/purchaseRequest/' + POId + '/' + PRId,
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        toastr.success("Apply Successful");
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1000);
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmPickPRLines").prop("disabled", false);
-                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmPickPRLines").prop("disabled", false);
-                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdConfirmPickPRLines').innerHTML = "<i class='fa fa-check'></i> Apply";
-                        $("#cmdConfirmPickPRLines").prop("disabled", false);
-                        $("#cmdConfirmPickPRLinesCloseButton").prop("disabled", false);
-                    }
-                }
-            });
-        }
-
-        // ========================
-        // GET Branch for Combo Box
-        // ========================
-        function getBranchesForComboBox() {
+        // =========================================
+        // Create Purchase Order Detail Combo Branch
+        // =========================================
+        function createCboPurchaseOrderDetailBranch() {
             NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
@@ -937,8 +704,8 @@
                         }
                     }
 
-                    cboPOBranch.dispose();
-                    cboPOBranch = new wijmo.input.ComboBox('#cboPOBranch', {
+                    cboPurchaseOrderBranch.dispose();
+                    cboPurchaseOrderBranch = new wijmo.input.ComboBox('#cboPurchaseOrderBranch', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select Branch",
@@ -946,15 +713,16 @@
                         displayMemberPath: "Branch",
                         selectedValuePath: "Id"
                     });
-                    getSupplierForComboBox();
+
+                    createCboPurchaseOrderDetailSupplier();
                 }
             });
         }
 
-        // ==========================
-        // GET Supplier for Combo Box
-        // ==========================
-        function getSupplierForComboBox() {
+        // ===========================================
+        // Create Purchase Order Detail Combo Supplier
+        // ===========================================
+        function createCboPurchaseOrderDetailSupplier() {
             var suppliersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrder/dropdown/list/supplier',
@@ -973,29 +741,29 @@
                         }
                     }
 
-                    cboPOSupplier.dispose();
-                    cboPOSupplier = new wijmo.input.ComboBox('#cboPOSupplier', {
+                    cboPurchaseOrderSupplier.dispose();
+                    cboPurchaseOrderSupplier = new wijmo.input.ComboBox('#cboPurchaseOrderSupplier', {
                         isEditable: false,
                         placeholder: "Select Supplier",
                         itemsSource: suppliersObservableArray,
                         displayMemberPath: "Supplier",
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
-                            if (cboPOTerm.selectedValue != null) {
-                                cboPOTerm.selectedValue = cboPOSupplier.selectedItem["TermId"];
+                            if (cboPurchaseOrderTerm.selectedValue != null) {
+                                cboPurchaseOrderTerm.selectedValue = cboPurchaseOrderSupplier.selectedItem["TermId"];
                             }
                         }
                     });
 
-                    getTermForComboBox();
+                    createCboPurchaseOrderDetailTerm();
                 }
             });
         }
 
-        // =======================
-        // GET Terms for Combo Box
-        // =======================
-        function getTermForComboBox() {
+        // =======================================
+        // Create Purchase Order Detail Combo Term
+        // =======================================
+        function createCboPurchaseOrderDetailTerm() {
             var termsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrder/dropdown/list/term',
@@ -1013,8 +781,8 @@
                         }
                     }
 
-                    cboPOTerm.dispose();
-                    cboPOTerm = new wijmo.input.ComboBox('#cboPOTerm', {
+                    cboPurchaseOrderTerm.dispose();
+                    cboPurchaseOrderTerm = new wijmo.input.ComboBox('#cboPurchaseOrderTerm', {
                         isEditable: false,
                         placeholder: "Select Term",
                         itemsSource: termsObservableArray,
@@ -1022,15 +790,15 @@
                         selectedValuePath: "Id"
                     });
 
-                    getUsersForComboBox();
+                    createCboPurchaseOrderDetailUsers();
                 }
             });
         }
 
-        // =======================
-        // GET Users for Combo Box
-        // =======================
-        function getUsersForComboBox() {
+        // ========================================
+        // Create Purchase Order Detail Combo Users
+        // ========================================
+        function createCboPurchaseOrderDetailUsers() {
             var usersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrder/dropdown/list/users',
@@ -1048,8 +816,8 @@
                         }
                     }
 
-                    cboPORequestedBy.dispose();
-                    cboPORequestedBy = new wijmo.input.ComboBox('#cboPORequestedBy', {
+                    cboPurchaseOrderRequestedBy.dispose();
+                    cboPurchaseOrderRequestedBy = new wijmo.input.ComboBox('#cboPurchaseOrderRequestedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -1057,8 +825,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboPOPreparedBy.dispose();
-                    cboPOPreparedBy = new wijmo.input.ComboBox('#cboPOPreparedBy', {
+                    cboPurchaseOrderPreparedBy.dispose();
+                    cboPurchaseOrderPreparedBy = new wijmo.input.ComboBox('#cboPurchaseOrderPreparedBy', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select User",
@@ -1067,8 +835,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboPOCheckedBy.dispose();
-                    cboPOCheckedBy = new wijmo.input.ComboBox('#cboPOCheckedBy', {
+                    cboPurchaseOrderCheckedBy.dispose();
+                    cboPurchaseOrderCheckedBy = new wijmo.input.ComboBox('#cboPurchaseOrderCheckedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -1076,8 +844,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboPOApprovedBy.dispose();
-                    cboPOApprovedBy = new wijmo.input.ComboBox('#cboPOApprovedBy', {
+                    cboPurchaseOrderApprovedBy.dispose();
+                    cboPurchaseOrderApprovedBy = new wijmo.input.ComboBox('#cboPurchaseOrderApprovedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -1085,17 +853,17 @@
                         selectedValuePath: "Id"
                     });
 
-                    getPurchaseOrderDetail();
+                    getPurchaseOrderDetailData();
                 }
             });
         }
 
-        // =========================
-        // GET Purchase Order Detail
-        // =========================
-        function getPurchaseOrderDetail() {
+        // ==============================
+        // Get Purchase Order Detail Data
+        // ==============================
+        function getPurchaseOrderDetailData() {
             if (document.location.search.length > 0) {
-                var id = getParam('id');
+                var id = getURLParameterValue('id');
                 $.ajax({
                     url: '/api/purchaseOrder/detail/' + id,
                     cache: false,
@@ -1103,62 +871,59 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
                         if (results != null) {
-                            cboPOBranch.selectedValue = results.BranchId;
-                            document.getElementById('PONumber').value = results.PONumber;
-                            cboPODate.dispose();
-                            cboPODate = new wijmo.input.InputDate('#cboPODate', {
+                            cboPurchaseOrderBranch.selectedValue = results.BranchId;
+                            document.getElementById('inpPurchaseOrderPONumber').value = results.PONumber;
+                            cboPurchaseOrderPODate.dispose();
+                            cboPurchaseOrderPODate = new wijmo.input.InputDate('#cboPurchaseOrderPODate', {
                                 format: 'MM-dd-yyyy',
                                 value: new Date(results.PODate)
                             });
-                            document.getElementById('POManualPONumber').value = results.ManualPONumber;
-                            cboPOSupplier.selectedValue = results.SupplierId;
-                            cboPOTerm.selectedValue = results.TermId;
-                            document.getElementById('PORemarks').value = results.Remarks;
-                            document.getElementById('PORequestNumber').value = results.ManualRequestNumber;
-                            cboPODateNeeded.dispose();
-                            cboPODateNeeded = new wijmo.input.InputDate('#cboPODateNeeded', {
+                            document.getElementById('inpPurchaseOrderManualPONumber').value = results.ManualPONumber;
+                            cboPurchaseOrderSupplier.selectedValue = results.SupplierId;
+                            cboPurchaseOrderTerm.selectedValue = results.TermId;
+                            document.getElementById('inpPurchaseOrderRemarks').value = results.Remarks;
+                            document.getElementById('inpPurchaseRequestNumber').value = results.ManualRequestNumber;
+                            cboPurchaseOrderDateNeeded.dispose();
+                            cboPurchaseOrderDateNeeded = new wijmo.input.InputDate('#cboPurchaseOrderDateNeeded', {
                                 format: 'MM-dd-yyyy',
                                 value: new Date(results.DateNeeded)
                             });
-                            cboPORequestedBy.selectedValue = results.RequestedById;
-                            cboPOPreparedBy.selectedValue = results.PreparedById;
-                            cboPOCheckedBy.selectedValue = results.CheckedById;
-                            cboPOApprovedBy.selectedValue = results.ApprovedById;
-                            document.getElementById('POClosePO').checked = results.IsClose;
+                            cboPurchaseOrderRequestedBy.selectedValue = results.RequestedById;
+                            cboPurchaseOrderPreparedBy.selectedValue = results.PreparedById;
+                            cboPurchaseOrderCheckedBy.selectedValue = results.CheckedById;
+                            cboPurchaseOrderApprovedBy.selectedValue = results.ApprovedById;
+                            document.getElementById('inpPurchaseOrderIsClose').checked = results.IsClose;
 
-                            // user stamp
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
                             document.getElementById('updatedBy').innerHTML = results.UpdatedBy;
                             document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
                             if (results.IsLocked) {
-                                // fields
-                                document.getElementById('PONumber').disabled = true;
-                                cboPODate.disabled = true;
-                                document.getElementById('POManualPONumber').disabled = true;
-                                cboPOSupplier.disabled = true;
-                                cboPOTerm.disabled = true;
-                                document.getElementById('PORemarks').disabled = true;
-                                document.getElementById('PORequestNumber').disabled = true;
-                                cboPODateNeeded.disabled = true;
-                                cboPORequestedBy.disabled = true;
-                                cboPOPreparedBy.disabled = true;
-                                cboPOCheckedBy.disabled = true;
-                                cboPOApprovedBy.disabled = true;
-                                document.getElementById('POClosePO').disabled = true;
+                                document.getElementById('inpPurchaseOrderPONumber').disabled = true;
+                                cboPurchaseOrderPODate.disabled = true;
+                                document.getElementById('inpPurchaseOrderManualPONumber').disabled = true;
+                                cboPurchaseOrderSupplier.disabled = true;
+                                cboPurchaseOrderTerm.disabled = true;
+                                document.getElementById('inpPurchaseOrderRemarks').disabled = true;
+                                document.getElementById('inpPurchaseRequestNumber').disabled = true;
+                                cboPurchaseOrderDateNeeded.disabled = true;
+                                cboPurchaseOrderRequestedBy.disabled = true;
+                                cboPurchaseOrderPreparedBy.disabled = true;
+                                cboPurchaseOrderCheckedBy.disabled = true;
+                                cboPurchaseOrderApprovedBy.disabled = true;
+                                document.getElementById('inpPurchaseOrderIsClose').disabled = true;
 
-                                // buttons
-                                $("#btnLockPO").prop("disabled", true);
-                                $("#btnAddPOItem").prop("disabled", true);
-                                $("#btnItemQuery").prop("disabled", true);
-                                $("#btnManualRequestNo").prop("disabled", true);
+                                $("#btnPurchaseOrderLock").prop("disabled", true);
+                                $("#btnPurchaseOrderItemAdd").prop("disabled", true);
+                                $("#btnPurchaseOrderItemItemQuery").prop("disabled", true);
+                                $("#btnpurchaseRequestModal").prop("disabled", true);
 
                                 isLocked = true;
                             } else {
                                 $("#btnEmailPO").prop("disabled", true);
-                                $("#btnUnlockPO").prop("disabled", true);
-                                $("#btnPrintPO").prop("disabled", true);
+                                $("#btnPurchaseOrderUnlock").prop("disabled", true);
+                                $("#btnPurchaseOrderPrint").prop("disabled", true);
                             }
 
                             createCboShowRows();
@@ -1175,22 +940,53 @@
             }
         }
 
+        // ====================
+        // Email Purchase Order
+        // ====================
+        function btnPurchaseOrderEmailOnclick() {
+            $("#btnEmailPO").prop("disabled", true);
+            document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Sending...";
+            $.ajax({
+                type: "PUT",
+                url: '/api/purchaseOrder/sendEmail/' + getURLParameterValue("PurchaseOrderId") + "/" + document.getElementById("PO_Supplier_data").value,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
+                        $("#btnEmailPO").prop("disabled", false);
+                        toastr.info("Send Email Successful");
+                    },
+                    404: function () {
+                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
+                        $("#btnEmailPO").prop("disabled", false);
+                        toastr.error("Email Not Found");
+                    },
+                    400: function () {
+                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
+                        $("#btnEmailPO").prop("disabled", false);
+                        toastr.error("Bad Request");
+                    }
+                }
+            });
+        }
+
         // ===================
         // Lock Purchase Order
         // ===================
-        function btnLockPOOnclick() {
+        function btnPurchaseOrderLockOnclick() {
             var purchaseOrderObject = new Object();
-            purchaseOrderObject.PODate = cboPODate.value.toLocaleDateString();
-            purchaseOrderObject.SupplierId = cboPOSupplier.selectedValue;
-            purchaseOrderObject.TermId = cboPOTerm.selectedValue;
-            purchaseOrderObject.ManualRequestNumber = document.getElementById('PORequestNumber').value;
-            purchaseOrderObject.ManualPONumber = document.getElementById('POManualPONumber').value;
-            purchaseOrderObject.DateNeeded = cboPODateNeeded.value.toLocaleDateString();
-            purchaseOrderObject.Remarks = document.getElementById('PORemarks').value;
-            purchaseOrderObject.IsClose = document.getElementById('POClosePO').checked;
-            purchaseOrderObject.RequestedById = cboPORequestedBy.selectedValue;
-            purchaseOrderObject.CheckedById = cboPOCheckedBy.selectedValue;
-            purchaseOrderObject.ApprovedById = cboPOApprovedBy.selectedValue;
+            purchaseOrderObject.PODate = cboPurchaseOrderPODate.value.toLocaleDateString();
+            purchaseOrderObject.SupplierId = cboPurchaseOrderSupplier.selectedValue;
+            purchaseOrderObject.TermId = cboPurchaseOrderTerm.selectedValue;
+            purchaseOrderObject.ManualRequestNumber = document.getElementById('inpPurchaseRequestNumber').value;
+            purchaseOrderObject.ManualPONumber = document.getElementById('inpPurchaseOrderManualPONumber').value;
+            purchaseOrderObject.DateNeeded = cboPurchaseOrderDateNeeded.value.toLocaleDateString();
+            purchaseOrderObject.Remarks = document.getElementById('inpPurchaseOrderRemarks').value;
+            purchaseOrderObject.IsClose = document.getElementById('inpPurchaseOrderIsClose').checked;
+            purchaseOrderObject.RequestedById = cboPurchaseOrderRequestedBy.selectedValue;
+            purchaseOrderObject.CheckedById = cboPurchaseOrderCheckedBy.selectedValue;
+            purchaseOrderObject.ApprovedById = cboPurchaseOrderApprovedBy.selectedValue;
             var purchaseOrderData = JSON.stringify(purchaseOrderObject);
 
             var isValid = true;
@@ -1209,13 +1005,13 @@
             });
 
             if (isValid) {
-                document.getElementById('btnLockPO').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
-                $("#btnLockPO").prop("disabled", true);
-                $("#btnUnlockPO").prop("disabled", true);
-                $("#btnPrintPO").prop("disabled", true);
-                $("#btnClosePO").prop("disabled", true);
+                document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $("#btnPurchaseOrderLock").prop("disabled", true);
+                $("#btnPurchaseOrderUnlock").prop("disabled", true);
+                $("#btnPurchaseOrderPrint").prop("disabled", true);
+                $("#btnPurchaseOrderClose").prop("disabled", true);
 
-                var id = getParam('id');
+                var id = getURLParameterValue('id');
 
                 $.ajax({
                     type: "PUT",
@@ -1232,21 +1028,21 @@
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('btnLockPO').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockPO").prop("disabled", false);
-                            $("#btnClosePO").prop("disabled", false);
+                            document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseOrderLock").prop("disabled", false);
+                            $("#btnPurchaseOrderClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('btnLockPO').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockPO").prop("disabled", false);
-                            $("#btnClosePO").prop("disabled", false);
+                            document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseOrderLock").prop("disabled", false);
+                            $("#btnPurchaseOrderClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('btnLockPO').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnLockPO").prop("disabled", false);
-                            $("#btnClosePO").prop("disabled", false);
+                            document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseOrderLock").prop("disabled", false);
+                            $("#btnPurchaseOrderClose").prop("disabled", false);
                         }
                     },
                 });
@@ -1258,14 +1054,14 @@
         // =====================
         // Unlock Purchase Order
         // =====================
-        function btnUnlockPOOnclick() {
-            document.getElementById("btnUnlockPO").innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
-            $("#btnLockPO").prop("disabled", true);
-            $("#btnUnlockPO").prop("disabled", true);
-            $("#btnPrintPO").prop("disabled", true);
-            $("#btnClosePO").prop("disabled", true);
+        function btnPurchaseOrderUnlockOnclick() {
+            document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $("#btnPurchaseOrderLock").prop("disabled", true);
+            $("#btnPurchaseOrderUnlock").prop("disabled", true);
+            $("#btnPurchaseOrderPrint").prop("disabled", true);
+            $("#btnPurchaseOrderClose").prop("disabled", true);
 
-            var id = getParam('id');
+            var id = getURLParameterValue('id');
 
             $.ajax({
                 type: "PUT",
@@ -1281,24 +1077,24 @@
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnUnlockPO').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnUnlockPO").prop("disabled", false);
-                        $("#btnPrintPO").prop("disabled", false);
-                        $("#btnClosePO").prop("disabled", false);
+                        document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnUnlockPO').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnUnlockPO").prop("disabled", false);
-                        $("#btnPrintPO").prop("disabled", false);
-                        $("#btnClosePO").prop("disabled", false);
+                        document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnUnlockPO').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnUnlockPO").prop("disabled", false);
-                        $("#btnPrintPO").prop("disabled", false);
-                        $("#btnClosePO").prop("disabled", false);
+                        document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
                     }
                 }
             });
@@ -1307,19 +1103,20 @@
         // ====================
         // Print Purchase Order
         // ====================
-        function btnPrintPOOnclick() {
-            var PurchaseOrderId = getParam('id');
+        function btnPurchaseOrderPrintOnclick() {
+            var PurchaseOrderId = getURLParameterValue('id');
             var pirntLink = "/RepPurchaseOrder/PurchaseOrder?POId=" + PurchaseOrderId;
+
             window.open(pirntLink, '_blank');
         }
 
-        // ========================
-        // Get Purchase Order Items
-        // ========================
-        function getPurchaseOrderItem() {
+        // ============================
+        // Get Purchase Order Item Data
+        // ============================
+        function getPurchaseOrderItemData() {
             var purchaseOrderItemsObservableArray = new wijmo.collections.ObservableArray;
             if (document.location.search.length > 0) {
-                var POId = getParam('id');
+                var POId = getURLParameterValue('id');
                 $.ajax({
                     url: '/api/purchaseOrderItem/list/' + POId,
                     cache: false,
@@ -1328,11 +1125,11 @@
                     success: function (results) {
                         var totalAmount = 0;
                         if (results.length > 0) {
-                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditPOLines_OnClick()'><i class='fa fa-edit'></i> Edit</button>";
-                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeletePOLines_OnClick()'><i class='fa fa-trash'></i> Delete</button>";
+                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnPurchaseOrderItemEditOnclick()'><i class='fa fa-edit'></i> Edit</button>";
+                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnPurchaseOrderItemDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>";
                             if (isLocked) {
-                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditPOLines_OnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
-                                btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeletePOLines_OnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnPurchaseOrderItemEditOnclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnPurchaseOrderItemDeleteOnclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
                             }
 
                             for (i = 0; i < results.length; i++) {
@@ -1374,99 +1171,16 @@
             return purchaseOrderItemsObservableArray;
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
-            var rowsObservableArray = new wijmo.collections.ObservableArray();
-
-            for (var i = 0; i <= 4; i++) {
-                var rows = 0;
-                var rowsString = "";
-
-                if (i == 0) {
-                    rows = 15;
-                    rowsString = "Show 15 Rows";
-                } else if (i == 1) {
-                    rows = 50;
-                    rowsString = "Show 50 Rows";
-                } else if (i == 2) {
-                    rows = 100;
-                    rowsString = "Show 100 Rows";
-                } else if (i == 3) {
-                    rows = 150;
-                    rowsString = "Show 150 Rows";
-                } else {
-                    rows = 200;
-                    rowsString = "Show 200 Rows";
-                }
-
-                rowsObservableArray.push({
-                    rowNumber: rows,
-                    rowString: rowsString
-                });
-            }
-
-            cboPurchaseOrderItemsShowNumberOfRows.dispose();
-            cboPurchaseOrderItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseOrderItemsShowNumberOfRows', {
-                isEditable: false,
-                itemsSource: rowsObservableArray,
-                displayMemberPath: "rowString",
-                selectedValuePath: "rowNumber",
-                selectedValue: 50,
-                onSelectedIndexChanged: function () {
-                    NProgress.start();
-
-                    setTimeout(function () {
-                        var numberOfRows = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
-                        purchaseOrderItemCollectionView.pageSize = parseInt(numberOfRows);
-                        purchaseOrderItemCollectionView.refresh();
-                        purchaseOrderItemFlexGrid.refresh();
-
-                        NProgress.done();
-                    }, 300);
-                }
-            });
-        }
-
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (purchaseOrderItemCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (purchaseOrderItemCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (purchaseOrderItemCollectionView.pageIndex === (purchaseOrderItemCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (purchaseOrderItemCollectionView.pageIndex + 1) + ' / ' + purchaseOrderItemCollectionView.pageCount;
-        }
-
-        // =====================================
-        // Create Purchase Order Item - FlexGrid
-        // =====================================
+        // ===================================
+        // Create Purchase Order Item FlexGrid
+        // ===================================
         function createPurchaseOrderItemFlexGrid() {
-            purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
+            purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItemData());
             purchaseOrderItemCollectionView.canFilter = true;
             purchaseOrderItemCollectionView.pageSize = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpPurchaseOrderItemSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 purchaseOrderItemCollectionView.refresh();
             });
@@ -1481,10 +1195,10 @@
             }
 
             purchaseOrderItemCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updatePurchaseOrderItemNavigationButtons();
             });
 
-            purchaseOrderItemFlexGrid = new wijmo.grid.FlexGrid('#POItemGrid');
+            purchaseOrderItemFlexGrid = new wijmo.grid.FlexGrid('#purchaseOrderItemFlexGrid');
             purchaseOrderItemFlexGrid.initialize({
                 columns: [
                     @{
@@ -1775,55 +1489,147 @@
                 }
             }
 
-            updateNavigateButtonsItems();
+            updatePurchaseOrderItemNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnPurchaseOrderItemMoveToFirstPageGrid.addEventListener('click', function () {
                 purchaseOrderItemCollectionView.moveToFirstPage();
-                updateNavigateButtonsItems();
+                updatePurchaseOrderItemNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnPurchaseOrderItemMoveToPreviousPageGrid.addEventListener('click', function () {
                 purchaseOrderItemCollectionView.moveToPreviousPage();
-                updateNavigateButtonsItems();
+                updatePurchaseOrderItemNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnPurchaseOrderItemMoveToNextPageGrid.addEventListener('click', function () {
                 purchaseOrderItemCollectionView.moveToNextPage();
-                updateNavigateButtonsItems();
+                updatePurchaseOrderItemNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnPurchaseOrderItemMoveToLastPageGrid.addEventListener('click', function () {
                 purchaseOrderItemCollectionView.moveToLastPage();
-                updateNavigateButtonsItems();
+                updatePurchaseOrderItemNavigationButtons();
             });
         }
 
-        // ========================
-        // Add Purchase Order Items
-        // ========================
-        function btnAddPOItemOnclick() {
-            $('#POLinesEdit').modal({ show: true, backdrop: 'static' });
-
-            document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSavePOLinesButton").prop("disabled", true);
-            $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
-
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#POItemContent").hide();
-
-            purchaseOrderItemId = 0;
-            getItem(0, 0);
-            document.getElementById('POLine_Particulars').value = "NA";
-            document.getElementById('POLine_Quantity').value = formatDecimalValues(1);
-            document.getElementById('POLine_Cost').value = formatDecimalValues(0);
-            document.getElementById('POLine_Amount').value = formatDecimalValues(0);
+        // =============================================
+        // Update Purchase Order Item Navigation Buttons
+        // =============================================
+        function updatePurchaseOrderItemNavigationButtons() {
+            if (purchaseOrderItemCollectionView.pageSize <= 0) {
+                document.getElementById('purchaseOrderItemNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('purchaseOrderItemNavigationPageGrid').style.display = 'block';
+            if (purchaseOrderItemCollectionView.pageIndex === 0) {
+                btnPurchaseOrderItemMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseOrderItemMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseOrderItemMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (purchaseOrderItemCollectionView.pageIndex === (purchaseOrderItemCollectionView.pageCount - 1)) {
+                btnPurchaseOrderItemMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseOrderItemMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnPurchaseOrderItemMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseOrderItemMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnPurchaseOrderItemCurrentPageGrid.innerHTML = (purchaseOrderItemCollectionView.pageIndex + 1) + ' / ' + purchaseOrderItemCollectionView.pageCount;
         }
 
-        // =============================
-        // Get Item Code and Description
-        // =============================
-        function getItem(itemIdSelectedValue, articleUnitIdSelectedValue) {
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboPurchaseOrderItemsShowNumberOfRows.dispose();
+            cboPurchaseOrderItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseOrderItemsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
+                        purchaseOrderItemCollectionView.pageSize = parseInt(numberOfRows);
+                        purchaseOrderItemCollectionView.refresh();
+                        purchaseOrderItemFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // ================================
+        // Refresh Purchase Order Item Grid
+        // ================================
+        function refreshPurchaseOrderItemFlexGrid() {
+            purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItemData());
+            purchaseOrderItemCollectionView.canFilter = true;
+            purchaseOrderItemCollectionView.pageSize = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpPurchaseOrderItemSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                purchaseOrderItemCollectionView.refresh();
+            });
+
+            purchaseOrderItemCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            purchaseOrderItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updatePurchaseOrderItemNavigationButtons();
+            });
+
+            purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
+            purchaseOrderItemFlexGrid.trackChanges = true;
+        }
+
+        // =======================================
+        // Create Purchase Order Item Combo - Item
+        // =======================================
+        function createCboPurchaseOrderItem(itemIdSelectedValue, articleUnitIdSelectedValue) {
             var itemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrderItem/dropdown/list/item',
@@ -1842,8 +1648,8 @@
                         }
                     }
 
-                    cboPOLineItemCode.dispose();
-                    cboPOLineItemCode = new wijmo.input.ComboBox('#cboPOLineItemCode', {
+                    cboPurchaseOrderItemCode.dispose();
+                    cboPurchaseOrderItemCode = new wijmo.input.ComboBox('#cboPurchaseOrderItemCode', {
                         isEditable: false,
                         placeholder: "Select Item Code",
                         itemsSource: itemsObservableArray,
@@ -1851,13 +1657,13 @@
                         selectedValuePath: "Id",
                         selectedValue: itemIdSelectedValue,
                         onSelectedIndexChanged: function () {
-                            cboPOLineItemDescription.selectedValue = this.selectedValue;
-                            getItemUnitForComboBox(this.selectedValue);
+                            cboPurchaseOrderItemDescription.selectedValue = this.selectedValue;
+                            createCboPurchaseOrderItemUnit(this.selectedValue);
                         }
                     });
 
-                    cboPOLineItemDescription.dispose();
-                    cboPOLineItemDescription = new wijmo.input.ComboBox('#cboPOLineItemDescription', {
+                    cboPurchaseOrderItemDescription.dispose();
+                    cboPurchaseOrderItemDescription = new wijmo.input.ComboBox('#cboPurchaseOrderItemDescription', {
                         isEditable: false,
                         placeholder: "Select Item",
                         itemsSource: itemsObservableArray,
@@ -1865,20 +1671,20 @@
                         selectedValuePath: "Id",
                         selectedValue: itemIdSelectedValue,
                         onSelectedIndexChanged: function () {
-                            cboPOLineItemCode.selectedValue = this.selectedValue;
-                            getItemUnitForComboBox(this.selectedValue);
+                            cboPurchaseOrderItemCode.selectedValue = this.selectedValue;
+                            createCboPurchaseOrderItemUnit(this.selectedValue);
                         }
                     });
 
-                    getItemUnitForComboBox(cboPOLineItemDescription.selectedValue, articleUnitIdSelectedValue);
+                    createCboPurchaseOrderItemUnit(cboPurchaseOrderItemDescription.selectedValue, articleUnitIdSelectedValue);
                 }
             });
         }
 
-        // =============
-        // Get Item Unit
-        // =============
-        function getItemUnitForComboBox(itemId, articleUnitIdSelectedValue) {
+        // =======================================
+        // Create Purchase Order Item Combo - Unit
+        // =======================================
+        function createCboPurchaseOrderItemUnit(itemId, articleUnitIdSelectedValue) {
             var unitsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrderItem/dropdown/list/itemUnit/' + itemId,
@@ -1897,8 +1703,8 @@
                         }
                     }
 
-                    cboPOLineUnit.dispose();
-                    cboPOLineUnit = new wijmo.input.ComboBox('#cboPOLineUnit', {
+                    cboPurchaseOrderItemUnit.dispose();
+                    cboPurchaseOrderItemUnit = new wijmo.input.ComboBox('#cboPurchaseOrderItemUnit', {
                         isEditable: false,
                         placeholder: "Select Unit",
                         itemsSource: unitsObservableArray,
@@ -1907,91 +1713,82 @@
                         selectedValue: articleUnitIdSelectedValue
                     });
 
-                    $("#loadingModalItem").hide();
-                    $("#cmdSavePOLinesButton").prop("disabled", false);
+                    $("#purchaseOrderItemLoading").hide();
+                    $("#btnPurchaseOrderItemSave").prop("disabled", false);
                     $("#POItemContent").show();
                 }
             });
         }
 
+        // =======================
+        // Add Purchase Order Item
+        // =======================
+        function btnPurchaseOrderItemAddOnclick() {
+            $('#purchaseOrderItemDetailModal').modal({ show: true, backdrop: 'static' });
+
+            document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnPurchaseOrderItemSave").prop("disabled", true);
+            $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
+
+            $("#purchaseOrderItemLoading").show();
+            document.getElementById("purchaseOrderItemLoading").innerHTML = 'Loading...';
+            $("#POItemContent").hide();
+
+            purchaseOrderItemId = 0;
+            createCboPurchaseOrderItem(0, 0);
+            document.getElementById('inpPurchaseOrderItemParticulars').value = "NA";
+            document.getElementById('inpPurchaseOrderItemQuantity').value = formatDecimalValues(1);
+            document.getElementById('inpPurchaseOrderItemCost').value = formatDecimalValues(0);
+            document.getElementById('inpPurchaseOrderItemAmount').value = formatDecimalValues(0);
+        }
+
         // ========================
         // Edit Purchase Order Item
         // ========================
-        function btnEditPOLines_OnClick() {
-            $('#POLinesEdit').modal({ show: true, backdrop: 'static' });
+        function btnPurchaseOrderItemEditOnclick() {
+            $('#purchaseOrderItemDetailModal').modal({ show: true, backdrop: 'static' });
 
-            document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSavePOLinesButton").prop("disabled", true);
-            $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+            document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnPurchaseOrderItemSave").prop("disabled", true);
+            $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
 
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#purchaseOrderItemLoading").show();
+            document.getElementById("purchaseOrderItemLoading").innerHTML = 'Loading...';
             $("#POItemContent").hide();
 
             purchaseOrderItemCollectionView.editItem(purchaseOrderItemCollectionView.currentItem);
             var purchaseOrderItem = purchaseOrderItemCollectionView.currentEditItem;
             purchaseOrderItemId = purchaseOrderItem.Id;
-            getItem(purchaseOrderItem.ItemId, purchaseOrderItem.UnitId);
-            document.getElementById('POLine_Particulars').value = purchaseOrderItem.Particulars;
-            document.getElementById('POLine_Quantity').value = formatDecimalValues(purchaseOrderItem.Quantity);
-            document.getElementById('POLine_Cost').value = formatDecimalValues(purchaseOrderItem.Cost);
-            document.getElementById('POLine_Amount').value = formatDecimalValues(purchaseOrderItem.Amount);
-        }
-
-        // ================================
-        // Refresh Purchase Order Item Grid
-        // ================================
-        function refreshPurchaseOrderItemFlexGrid() {
-            purchaseOrderItemCollectionView = new wijmo.collections.CollectionView(getPurchaseOrderItem());
-            purchaseOrderItemCollectionView.canFilter = true;
-            purchaseOrderItemCollectionView.pageSize = cboPurchaseOrderItemsShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                purchaseOrderItemCollectionView.refresh();
-            });
-
-            purchaseOrderItemCollectionView.filter = function (item) {
-                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemManualOldCode.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            purchaseOrderItemCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            purchaseOrderItemFlexGrid.itemsSource = purchaseOrderItemCollectionView;
-            purchaseOrderItemFlexGrid.trackChanges = true;
+            createCboPurchaseOrderItem(purchaseOrderItem.ItemId, purchaseOrderItem.UnitId);
+            document.getElementById('inpPurchaseOrderItemParticulars').value = purchaseOrderItem.Particulars;
+            document.getElementById('inpPurchaseOrderItemQuantity').value = formatDecimalValues(purchaseOrderItem.Quantity);
+            document.getElementById('inpPurchaseOrderItemCost').value = formatDecimalValues(purchaseOrderItem.Cost);
+            document.getElementById('inpPurchaseOrderItemAmount').value = formatDecimalValues(purchaseOrderItem.Amount);
         }
 
         // ==========================
         // Delete Purchase Order Item
         // ==========================
-        function btnDeletePOLines_OnClick() {
-            $('#deletePOLinesConfirm').modal({ show: true, backdrop: 'static' });
+        function btnPurchaseOrderItemDeleteOnclick() {
+            $('#purchaseOrderItemDeleteModal').modal({ show: true, backdrop: 'static' });
 
-            document.getElementById('cmdConfirmDeletePOLines').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $("#cmdConfirmDeletePOLines").prop("disabled", false);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+            document.getElementById('btnPurchaseOrderItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", false);
+            $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", false);
         }
 
         // ==================================
         // Confirm Delete Purchase Order Item
         // ==================================
-        function cmdPOLinesConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeletePOLines').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeletePOLines").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
+        function btnPurchaseOrderItemConfirmDeleteOnclick() {
+            document.getElementById('btnPurchaseOrderItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", true);
+            $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", true);
 
             purchaseOrderItemCollectionView.editItem(purchaseOrderItemCollectionView.currentItem);
 
             var id = purchaseOrderItemCollectionView.currentEditItem.Id;
-            var POId = getParam('id');
+            var POId = getURLParameterValue('id');
 
             $.ajax({
                 url: '/api/purchaseOrderItem/delete/' + id + '/' + POId,
@@ -2002,32 +1799,32 @@
                     200: function () {
                         toastr.success("Delete Successful");
 
-                        $("#cmdConfirmDeletePOLines").prop("disabled", true);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
+                        $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", true);
+                        $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", true);
 
-                        $('#deletePOLinesConfirm').modal('hide');
+                        $('#purchaseOrderItemDeleteModal').modal('hide');
                         refreshPurchaseOrderItemFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deletePOLinesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeletePOLines').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeletePOLines").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#purchaseOrderItemDeleteModal').modal('hide');
+                        document.getElementById('btnPurchaseOrderItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", false);
+                        $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deletePOLinesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeletePOLines').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeletePOLines").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#purchaseOrderItemDeleteModal').modal('hide');
+                        document.getElementById('btnPurchaseOrderItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", false);
+                        $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deletePOLinesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeletePOLines').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeletePOLines").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#purchaseOrderItemDeleteModal').modal('hide');
+                        document.getElementById('btnPurchaseOrderItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnPurchaseOrderItemConfirmDelete").prop("disabled", false);
+                        $("#btnPurchaseOrderItemConfirmDeleteCloseModal").prop("disabled", false);
                     }
                 }
             });
@@ -2036,21 +1833,21 @@
         // ========================
         // Save Purchase Order Item
         // ========================
-        function cmdPOLinesSaveButton_OnClick() {
-            var POId = getParam('id');
+        function btnPurchaseOrderItemSaveOnclick() {
+            var POId = getURLParameterValue('id');
 
             var purchaserOrderItemObject = new Object();
             purchaserOrderItemObject.POId = POId;
-            purchaserOrderItemObject.ItemId = cboPOLineItemDescription.selectedValue;
-            purchaserOrderItemObject.Particulars = document.getElementById('POLine_Particulars').value;
-            purchaserOrderItemObject.UnitId = cboPOLineUnit.selectedValue;
-            purchaserOrderItemObject.Quantity = document.getElementById('POLine_Quantity').value;
-            purchaserOrderItemObject.Cost = document.getElementById('POLine_Cost').value;
-            purchaserOrderItemObject.Amount = document.getElementById('POLine_Amount').value;
+            purchaserOrderItemObject.ItemId = cboPurchaseOrderItemDescription.selectedValue;
+            purchaserOrderItemObject.Particulars = document.getElementById('inpPurchaseOrderItemParticulars').value;
+            purchaserOrderItemObject.UnitId = cboPurchaseOrderItemUnit.selectedValue;
+            purchaserOrderItemObject.Quantity = document.getElementById('inpPurchaseOrderItemQuantity').value;
+            purchaserOrderItemObject.Cost = document.getElementById('inpPurchaseOrderItemCost').value;
+            purchaserOrderItemObject.Amount = document.getElementById('inpPurchaseOrderItemAmount').value;
             var purchaserOrderItemData = JSON.stringify(purchaserOrderItemObject);
 
             var isValid = true;
-            $('.requiredPOLine').each(function () {
+            $('.requiredPurchaseOrderItem').each(function () {
                 if ($.trim($(this).val()) == '') {
                     isValid = false;
                     $(this).css({
@@ -2064,9 +1861,9 @@
             });
 
             if (isValid) {
-                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $("#cmdSavePOLinesButton").prop("disabled", true);
-                $("#cmdPOLinesDetailCloseButton").prop("disabled", true);
+                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnPurchaseOrderItemSave").prop("disabled", true);
+                $("#btnPurchaseOrderItemCloseModal").prop("disabled", true);
 
                 if (purchaseOrderItemId == 0) {
                     $.ajax({
@@ -2079,30 +1876,30 @@
                             200: function () {
                                 toastr.success("Save Successful");
 
-                                $('#POLinesEdit').modal('hide');
+                                $('#purchaseOrderItemDetailModal').modal('hide');
 
-                                $("#cmdSavePOLinesButton").prop("disabled", true);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", true);
+                                $("#btnPurchaseOrderItemSave").prop("disabled", true);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", true);
 
                                 refreshPurchaseOrderItemFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             }
                         }
                     });
@@ -2117,30 +1914,30 @@
                             200: function () {
                                 toastr.success("Update Successful");
 
-                                $('#POLinesEdit').modal('hide');
+                                $('#purchaseOrderItemDetailModal').modal('hide');
 
-                                $("#cmdSavePOLinesButton").prop("disabled", true);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", true);
+                                $("#btnPurchaseOrderItemSave").prop("disabled", true);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", true);
 
                                 refreshPurchaseOrderItemFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSavePOLinesButton").prop("disabled", false);
-                                $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnPurchaseOrderItemSave").prop("disabled", false);
+                                $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
                             }
                         }
                     });
@@ -2153,91 +1950,30 @@
         // ==========
         // Key Events
         // ==========
-        $('#POLine_Quantity').keyup(function () {
-            computePOItemAmount();
+        $('#inpPurchaseOrderItemQuantity').keyup(function () {
+            computePurchaseOrderItemAmount();
         });
 
-        $('#POLine_Cost').keyup(function () {
-            computePOItemAmount();
+        $('#inpPurchaseOrderItemCost').keyup(function () {
+            computePurchaseOrderItemAmount();
         });
 
         // ==================================
         // Compute Purchase Order Item Amount
         // ==================================
-        function computePOItemAmount() {
-            var inputQuantity = document.getElementById('POLine_Quantity').value;
-            var inputCost = document.getElementById('POLine_Cost').value;
+        function computePurchaseOrderItemAmount() {
+            var inputQuantity = document.getElementById('inpPurchaseOrderItemQuantity').value;
+            var inputCost = document.getElementById('inpPurchaseOrderItemCost').value;
             var replacedCost = inputCost.replace(/\,/g, '');
             var replacedQuantity = inputQuantity.replace(/\,/g, '');
             var amount = replacedCost * replacedQuantity;
-            document.getElementById('POLine_Amount').value = formatDecimalValues(amount);
+            document.getElementById('inpPurchaseOrderItemAmount').value = formatDecimalValues(amount);
         }
 
-        $(document).on('show.bs.modal', '.modal', function (event) {
-            var zIndex = 1040 + (10 * $('.modal:visible').length);
-            $(this).css('z-index', zIndex);
-            setTimeout(function () {
-                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-            }, 0);
-        });
-
-        $(document).on('hidden.bs.modal', '.modal', function () {
-            $('.modal:visible').length && $(document.body).addClass('modal-open');
-        });
-
-        // ====================
-        // Email Purchase Order
-        // ====================
-        function btnEmailPOOnclick() {
-            $("#btnEmailPO").prop("disabled", true);
-            document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-spinner fa-spin'></i> Sending E-mail";
-            $.ajax({
-                type: "PUT",
-                url: '/api/purchaseOrder/sendEmail/' + getParam("PurchaseOrderId") + "/" + document.getElementById("PO_Supplier_data").value,
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
-                        $("#btnEmailPO").prop("disabled", false);
-                        toastr.info("Send Email Successful");
-                    },
-                    404: function () {
-                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
-                        $("#btnEmailPO").prop("disabled", false);
-                        toastr.error("Email Not Found");
-                    },
-                    400: function () {
-                        document.getElementById("btnEmailPO").innerHTML = "<i class='fa fa-envelope'></i> Send E-mail";
-                        $("#btnEmailPO").prop("disabled", false);
-                        toastr.error("Bad Request");
-                    }
-                }
-            });
-        }
-
-        // ====================
-        // Item Query Pop Modal
-        // ====================
-        function btnItemQueryOnclick() {
-            $('#POLinesItemQuery').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $("#itemQueryPanel").hide();
-            $("#loadingItemQuery").show();
-            document.getElementById("loadingItemQuery").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-
-            setTimeout(function () {
-                createItemQueryFlexGrid();
-            }, 500);
-        }
-
-        // =============================
-        // Get Purchase Order Item Query
-        // =============================
-        function getArticleItemForItemQuery() {
+        // ===================
+        // Get Item Query Data
+        // ===================
+        function getItemQueryData() {
             var itemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrderItem/popUp/list/itemQuery',
@@ -2254,72 +1990,44 @@
                             Particulars: results[i]["Particulars"],
                             Cost: results[i]["Cost"],
                             CostDisplay: parseFloat(results[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                            Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyOnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                            Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnItemQueryPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
                         });
                     }
 
-                    $("#itemQueryPanel").show();
-                    $("#loadingItemQuery").hide();
+                    $("#itemQueryContent").show();
+                    $("#itemQueryLoading").hide();
                 }
             });
 
             return itemsObservableArray;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItemQuery() {
-            if (itemQueryItemsCollection.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridItemQuery').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridItemQuery').style.display = 'block';
-            if (itemQueryItemsCollection.pageIndex === 0) {
-                btnMoveToFirstPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
-            } else if (itemQueryItemsCollection.pageIndex === (itemQueryItemsCollection.pageCount - 1)) {
-                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToNextPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToLastPageGridItemQuery.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
-            }
-            btnCurrentPageGridItemQuery.innerHTML = (itemQueryItemsCollection.pageIndex + 1) + ' / ' + itemQueryItemsCollection.pageCount;
-        }
-
-        // ==========================
-        // Create Item Query Flexgrid
-        // ==========================
+        // ===========================
+        // Create Item Query Flex Grid
+        // ===========================
         function createItemQueryFlexGrid() {
-            itemQueryItemsCollection = new wijmo.collections.CollectionView(getArticleItemForItemQuery());
-            itemQueryItemsCollection.canFilter = true;
-            itemQueryItemsCollection.pageSize = 10;
+            itemQueryItemsCollectionView = new wijmo.collections.CollectionView(getItemQueryData());
+            itemQueryItemsCollectionView.canFilter = true;
+            itemQueryItemsCollectionView.pageSize = 10;
 
             var filterText = '';
-            $('#itemQueryFilter').keyup(function () {
+            $('#inpItemQuerySearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                itemQueryItemsCollection.refresh();
+                itemQueryItemsCollectionView.refresh();
             });
 
-            itemQueryItemsCollection.filter = function (item) {
+            itemQueryItemsCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
 
-            itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemQuery();
+            itemQueryItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemQueryNavigationButtons();
             });
 
-            itemQueryGrid.dispose();
-            itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
-            itemQueryGrid.initialize({
+            itemQueryFlexGrid.dispose();
+            itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+            itemQueryFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Barcode",
@@ -2357,76 +2065,508 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: itemQueryItemsCollection,
+                itemsSource: itemQueryItemsCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            itemQueryGrid.trackChanges = true;
+            itemQueryFlexGrid.trackChanges = true;
 
-            if (!isItemQueryClicked) {
-                updateNavigateButtonsItemQuery();
+            if (!isBtnItemQueryClicked) {
+                updateItemQueryNavigationButtons();
 
-                btnMoveToFirstPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToFirstPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToFirstPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToFirstPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToPreviousPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToPreviousPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToPreviousPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToPreviousPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToNextPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToNextPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToNextPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToNextPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToLastPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToLastPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToLastPageGrid.addEventListener('click', function () {
+                    itemQueryItemsCollectionView.moveToLastPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                isItemQueryClicked = true;
+                isBtnItemQueryClicked = true;
             }
-
         }
 
-        // ======================
-        // Item Query - Pick Item
-        // ======================
-        function pickToApplyOnClick() {
-            $('#POLinesEdit').modal({ show: true, backdrop: 'static' });
+        // ====================================
+        // Update Item Query Navigation Buttons
+        // ====================================
+        function updateItemQueryNavigationButtons() {
+            if (itemQueryItemsCollectionView.pageSize <= 0) {
+                document.getElementById('purchaseOrderItemQueryNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('purchaseOrderItemQueryNavigationPageGrid').style.display = 'block';
+            if (itemQueryItemsCollectionView.pageIndex === 0) {
+                btnItemQueryMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemQueryItemsCollectionView.pageIndex === (itemQueryItemsCollectionView.pageCount - 1)) {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemQueryCurrentPageGrid.innerHTML = (itemQueryItemsCollectionView.pageIndex + 1) + ' / ' + itemQueryItemsCollectionView.pageCount;
+        }
 
-            document.getElementById('cmdSavePOLinesButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSavePOLinesButton").prop("disabled", true);
-            $("#cmdPOLinesDetailCloseButton").prop("disabled", false);
+        // =======================
+        // Launch Item Query Modal
+        // =======================
+        function btnItemQueryOnclick() {
+            $('#purchaseOrderItemQueryModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
 
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#itemQueryContent").hide();
+            $("#itemQueryLoading").show();
+            document.getElementById("itemQueryLoading").innerHTML = "Loading...";
+
+            setTimeout(function () {
+                createItemQueryFlexGrid();
+            }, 500);
+        }
+
+        // ===============
+        // Pick Item Query
+        // ===============
+        function btnItemQueryPickOnclick() {
+            $('#purchaseOrderItemDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnPurchaseOrderItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnPurchaseOrderItemSave").prop("disabled", true);
+            $("#btnPurchaseOrderItemCloseModal").prop("disabled", false);
+
+            $("#purchaseOrderItemLoading").show();
+            document.getElementById("purchaseOrderItemLoading").innerHTML = 'Loading...';
             $("#POItemContent").hide();
 
-            itemQueryItemsCollection.editItem(itemQueryItemsCollection.currentItem);
-            var item = itemQueryItemsCollection.currentEditItem;
+            itemQueryItemsCollectionView.editItem(itemQueryItemsCollectionView.currentItem);
+            var item = itemQueryItemsCollectionView.currentEditItem;
             purchaseOrderItemId = 0;
-            getItem(item.Id, 0);
-            document.getElementById('POLine_Particulars').value = item.Particulars;
-            document.getElementById('POLine_Quantity').value = formatDecimalValues(1);
-            document.getElementById('POLine_Cost').value = formatDecimalValues(item.Cost);
-            document.getElementById('POLine_Amount').value = formatDecimalValues(item.Cost * 1);
+            createCboPurchaseOrderItem(item.Id, 0);
+            document.getElementById('inpPurchaseOrderItemParticulars').value = item.Particulars;
+            document.getElementById('inpPurchaseOrderItemQuantity').value = formatDecimalValues(1);
+            document.getElementById('inpPurchaseOrderItemCost').value = formatDecimalValues(item.Cost);
+            document.getElementById('inpPurchaseOrderItemAmount').value = formatDecimalValues(item.Cost * 1);
         }
 
-        // ===========
-        // OnLoad Page
-        // ===========
+        // =========================
+        // Get Purchase Request Data
+        // =========================
+        function getPurchaseRequestData() {
+            NProgress.start();
+            var startDate = cboPurchaseRequestStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboPurchaseRequestEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+
+            var purchaseRequestObservableArray = new wijmo.collections.ObservableArray;
+            if (cboPurchaseRequestBranchFilter.selectedValue != null) {
+                var branchId = cboPurchaseRequestBranchFilter.selectedValue;
+                $.ajax({
+                    url: '/api/purchaseOrder/purchaseRequest/list/' + startDate + '/' + endDate + '/' + branchId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var PRDateResult = new Date(results[i]["PRDate"])
+                                var PRDate = ('0' + (PRDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + PRDateResult.getDate()).slice(-2) + '-' + PRDateResult.getFullYear();
+
+                                purchaseRequestObservableArray.push({
+                                    Detail: "<button class='btn btn-info btn-xs btn-block' onclick='detailPROnClick()'><i class='fa fa-edit'></i> Detail</button>",
+                                    Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyPROnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                    Id: results[i]["Id"],
+                                    PRNumber: results[i]["PRNumber"],
+                                    PRDate: PRDate,
+                                    ManualPRNumber: results[i]["ManualPRNumber"],
+                                    Supplier: results[i]["Supplier"],
+                                    Remarks: results[i]["Remarks"],
+                                    Amount: results[i]["Amount"],
+                                    AmountDisplay: parseFloat(results[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                });
+                            }
+                        }
+
+                        $("#purchaseRequestLoading").hide();
+                        $("#purchaseRequestContent").show();
+                        NProgress.done();
+                    }
+                });
+            }
+
+            return purchaseRequestObservableArray;
+        }
+
+        // ================================
+        // Create Purchase Request FlexGrid
+        // ================================
+        function createPurchaseRequestFlexGrid() {
+            purchaseRequestCollectionView = new wijmo.collections.CollectionView(getPurchaseRequestData());
+            purchaseRequestCollectionView.canFilter = true;
+            purchaseRequestCollectionView.pageSize = 7;
+
+            var filterText = '';
+            $('#inpPurchaseRequestSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                purchaseRequestCollectionView.refresh();
+            });
+
+            purchaseRequestCollectionView.filter = function (item) {
+                return !filterText || (item.PRNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualPRNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Supplier.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            purchaseRequestCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updatePurchaseRequestNavigationButtons();
+            });
+
+            purchaseRequestFlexGrid.dispose();
+            purchaseRequestFlexGrid = new wijmo.grid.FlexGrid('#purchaseRequestFlexGrid');
+            purchaseRequestFlexGrid.initialize({
+                columns: [
+                    {
+                        "header": "Detail",
+                        "binding": "Detail",
+                        "width": "0.8*",
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "Pick",
+                        "binding": "Pick",
+                        "width": "0.8*",
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
+                    {
+                        "header": "PR Number",
+                        "binding": "PRNumber",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "PR Date",
+                        "binding": "PRDate",
+                        "allowSorting": true,
+                        "width": 90
+                    },
+                    {
+                        "header": "Manual PR No.",
+                        "binding": "ManualPRNumber",
+                        "allowSorting": true,
+                        "width": 120
+                    },
+                    {
+                        "header": "Supplier",
+                        "binding": "Supplier",
+                        "allowSorting": true,
+                        "width": "3*"
+                    },
+                    {
+                        "header": "Remarks",
+                        "binding": "Remarks",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "AmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "2*"
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: purchaseRequestCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            purchaseRequestFlexGrid.trackChanges = true;
+
+            btnPurchaseRequestMoveToFirstPageGrid = document.getElementById('btnPurchaseRequestMoveToFirstPageGrid');
+            btnPurchaseRequestMoveToPreviousPageGrid = document.getElementById('btnPurchaseRequestMoveToPreviousPageGrid');
+            btnPurchaseRequestMoveToNextPageGrid = document.getElementById('btnPurchaseRequestMoveToNextPageGrid');
+            btnPurchaseRequestMoveToLastPageGrid = document.getElementById('btnPurchaseRequestMoveToLastPageGrid');
+            btnPurchaseRequestCurrentPageGrid = document.getElementById('btnPurchaseRequestCurrentPageGrid');
+
+            if (!isPurchaseRequestClicked) {
+                updatePurchaseRequestNavigationButtons();
+
+                btnPurchaseRequestMoveToFirstPageGrid.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToFirstPage();
+                    updatePurchaseRequestNavigationButtons();
+                });
+
+                btnPurchaseRequestMoveToPreviousPageGrid.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToPreviousPage();
+                    updatePurchaseRequestNavigationButtons();
+                });
+
+                btnPurchaseRequestMoveToNextPageGrid.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToNextPage();
+                    updatePurchaseRequestNavigationButtons();
+                });
+
+                btnPurchaseRequestMoveToLastPageGrid.addEventListener('click', function () {
+                    purchaseRequestCollectionView.moveToLastPage();
+                    updatePurchaseRequestNavigationButtons();
+                });
+
+                isPurchaseRequestClicked = true;
+            }
+        }
+
+        // ==========================================
+        // Update Purchase Request Navigation Buttons
+        // ==========================================
+        function updatePurchaseRequestNavigationButtons() {
+            if (purchaseRequestCollectionView.pageSize <= 0) {
+                document.getElementById('purchaseRequestNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('purchaseRequestNavigationPageGrid').style.display = 'block';
+            if (purchaseRequestCollectionView.pageIndex === 0) {
+                btnPurchaseRequestMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseRequestMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseRequestMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (purchaseRequestCollectionView.pageIndex === (purchaseRequestCollectionView.pageCount - 1)) {
+                btnPurchaseRequestMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseRequestMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnPurchaseRequestMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseRequestMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnPurchaseRequestCurrentPageGrid.innerHTML = (purchaseRequestCollectionView.pageIndex + 1) + ' / ' + purchaseRequestCollectionView.pageCount;
+        }
+
+        // =======================
+        // Launch Purchase Request
+        // =======================
+        function btnPurchaseRequestNumberOnclick() {
+            $('#purchaseRequestModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#purchaseRequestContent").hide();
+            document.getElementById("purchaseRequestLoading").innerHTML = "Loading...";
+            $("#purchaseRequestLoading").show();
+
+            setTimeout(function () {
+                createCboPurchaseRequestDateFilters();
+            }, 500);
+        }
+
+        // ==========================================
+        // Create Purchase Request Date Range Filters
+        // ==========================================
+        function createCboPurchaseRequestDateFilters() {
+            cboPurchaseRequestStartDateFilter.dispose();
+            cboPurchaseRequestStartDateFilter = new wijmo.input.InputDate('#cboPurchaseRequestStartDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isCboStartDateFilterSelected) {
+                        createPurchaseRequestFlexGrid();
+                    } else {
+                        isCboStartDateFilterSelected = false;
+                    }
+                }
+            });
+
+            cboPurchaseRequestEndDateFilter.dispose();
+            cboPurchaseRequestEndDateFilter = new wijmo.input.InputDate('#cboPurchaseRequestEndDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(),
+                onValueChanged: function () {
+                    if (!isCboStartDateFilterSelected) {
+                        createPurchaseRequestFlexGrid();
+                    } else {
+                        isCboEndDateFilterSelected = false;
+                    }
+                }
+            });
+
+            createCboPurchaseRequestBranchFilter();
+        }
+
+        // =====================================
+        // Create Purchase Request Branch Filter
+        // =====================================
+        function createCboPurchaseRequestBranchFilter() {
+            var branchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/purchaseOrder/purchaseRequest/dropdown/list/branch',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            branchesObservableArray.push({
+                                Id: results[i]["Id"],
+                                Branch: results[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    cboPurchaseRequestBranchFilter.dispose();
+                    cboPurchaseRequestBranchFilter = new wijmo.input.ComboBox('#cboPurchaseRequestBranchFilter', {
+                        isEditable: false,
+                        placeholder: "Select Branch",
+                        itemsSource: branchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "Id",
+                        selectedValue: cboPurchaseOrderBranch.selectedValue,
+                        onSelectedIndexChanged: function () {
+                            createPurchaseRequestFlexGrid();
+                        }
+                    });
+
+                    createPurchaseRequestFlexGrid();
+                }
+            });
+        }
+
+        // =========================
+        // Purchase Request - Detail
+        // =========================
+        function detailPROnClick() {
+            purchaseRequestCollectionView.editItem(purchaseRequestCollectionView.currentItem);
+            var PRId = purchaseRequestCollectionView.currentEditItem.Id;
+            var PRLink = '/Software/PurchaseRequestDetail?id=' + PRId;
+            window.open(PRLink, '_blank');
+        }
+
+        // ============================
+        // Purchase Request - Pick Item
+        // ============================
+        function pickToApplyPROnClick() {
+            $('#purchaseRequestApplyModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnPurchaseRequestApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+            $("#btnPurchaseRequestApply").prop("disabled", false);
+            $("#btnPurchaseRequestApplyCloseModal").prop("disabled", false);
+        }
+
+        // ====================================
+        // Purchase Request - Apply Picked Item
+        // ====================================
+        function btnPurchaseRequestApplyOnclick() {
+            document.getElementById('btnPurchaseRequestApply').innerHTML = "<i class='fa fa-check'></i> Applying...";
+            $("#btnPurchaseRequestApply").prop("disabled", true);
+            $("#btnPurchaseRequestApplyCloseModal").prop("disabled", true);
+
+            purchaseRequestCollectionView.editItem(purchaseRequestCollectionView.currentItem);
+            var PRId = purchaseRequestCollectionView.currentEditItem.Id;
+            var POId = getURLParameterValue('id');
+
+            $.ajax({
+                type: "POST",
+                url: '/api/purchaseOrder/load/purchaseRequest/' + POId + '/' + PRId,
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        toastr.success("Apply Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnPurchaseRequestApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnPurchaseRequestApply").prop("disabled", false);
+                        $("#btnPurchaseRequestApplyCloseModal").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnPurchaseRequestApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnPurchaseRequestApply").prop("disabled", false);
+                        $("#btnPurchaseRequestApplyCloseModal").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnPurchaseRequestApply').innerHTML = "<i class='fa fa-check'></i> Apply";
+                        $("#btnPurchaseRequestApply").prop("disabled", false);
+                        $("#btnPurchaseRequestApplyCloseModal").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ======================
+        // Launch Multiple Modals
+        // ======================
+        $(document).on('show.bs.modal', '.modal', function (event) {
+            var zIndex = 1040 + (10 * $('.modal:visible').length);
+            $(this).css('z-index', zIndex);
+            setTimeout(function () {
+                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            }, 0);
+        });
+
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            $('.modal:visible').length && $(document.body).addClass('modal-open');
+        });
+
+        // ============
+        // On Load Page
+        // ============
         $(document).ready(function () {
-            getBranchesForComboBox();
+            createCboPurchaseOrderDetailBranch();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -2444,12 +2584,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -2473,6 +2613,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -2512,6 +2655,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
