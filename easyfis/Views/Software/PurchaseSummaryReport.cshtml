@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Purchase Summary Report</title>
+
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
@@ -25,67 +26,91 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="puchaseSummaryReportFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpPurchaseSummaryReportFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboPuchaseSummaryReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportShowNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
                                     <button onclick="btnPurchaseOrderSummaryReportCSVOnclick()" id="btnPurchaseOrderSummaryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnPurchaseOrderSummaryReportPrintPDFOnclick()" id="btnPurchaseOrderSummaryReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnPurchaseOrderSummaryReportPDFOnclick()" id="btnPurchaseOrderSummaryReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsPayable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboPurchaseOrderSummaryReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboPurchaseSummaryReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
                         <div id="purchaseSummaryReportFlexGrid" style="font-size: 12px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
                             <div class="btn-group col-md-7" id="purchaseSummaryReportNaviagtionPageGrid">
@@ -106,6 +131,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -132,35 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboPurchaseSummaryReportStartDate = new wijmo.input.InputDate('#cboPurchaseSummaryReportStartDate');
-        var cboPurchaseSummaryReportEndDate = new wijmo.input.InputDate('#cboPurchaseSummaryReportEndDate');
-        var isPurchaseSummaryReportStartDateSelected = false;
-        var isPurchaseSummaryReportEndDateSelected = false;
+        // ============
+        // Date Filters
+        // ============
+        var cboPurchaseSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboPurchaseSummaryReportStartDateFilter');
+        var cboPurchaseSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboPurchaseSummaryReportEndDateFilter');
+        var isCboPurchaseSummaryReportStartDateSelected = false;
+        var isCboPurchaseSummaryReportEndDateSelected = false;
 
-        var cboPurchaseSummaryReportCompany = new wijmo.input.ComboBox('#cboPurchaseSummaryReportCompany');
-        var cboPurchaseOrderSummaryReportBranch = new wijmo.input.ComboBox('#cboPurchaseOrderSummaryReportBranch');
-        var isPurchaseSummaryReportCompanySelected = false;
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboPurchaseSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboPurchaseSummaryReportCompanyFilter');
+        var cboPurchaseSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboPurchaseSummaryReportBranchFilter');
+        var isCboPurchaseSummaryReportCompanySelected = false;
 
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
         var purchaseSummaryReportCollections;
         var purchaseSummaryReportFlexGrid;
+        var cboPurchaseSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseSummaryReportShowNumberOfRows');
 
-        var cboPuchaseSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPuchaseSummaryReportShowNumberOfRows');
-
+        // ==================
+        // Navigation Buttons
+        // ==================
         var btnPurchaseSummaryReportMoveToFirstPageGrid = document.getElementById('btnPurchaseSummaryReportMoveToFirstPageGrid');
         var btnPurchaseSummaryReportMoveToPreviousPageGrid = document.getElementById('btnPurchaseSummaryReportMoveToPreviousPageGrid');
         var btnPurchaseSummaryReportMoveToNextPageGrid = document.getElementById('btnPurchaseSummaryReportMoveToNextPageGrid');
         var btnPurchaseSummaryReportMoveToLastPageGrid = document.getElementById('btnPurchaseSummaryReportMoveToLastPageGrid');
         var btnPurchaseSummaryReportCurrentPageGrid = document.getElementById('btnPurchaseSummaryReportCurrentPageGrid');
+        var purchaseSummaryReportCurrentPageIndex = 0;
 
-        var currentPageIndex = 0;
-
-        // =============
-        // Get Parameter
-        // =============
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -174,47 +212,47 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function purchaseOrderSummaryReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
 
-            cboPurchaseSummaryReportStartDate.dispose();
-            cboPurchaseSummaryReportStartDate = new wijmo.input.InputDate('#cboPurchaseSummaryReportStartDate', {
+            cboPurchaseSummaryReportStartDateFilter.dispose();
+            cboPurchaseSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboPurchaseSummaryReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isPurchaseSummaryReportStartDateSelected) {
+                    if (!isCboPurchaseSummaryReportStartDateSelected) {
                         NProgress.start();
                         refreshPurchaseOrderSummaryReportFlexGrid();
                     } else {
-                        isPurchaseSummaryReportStartDateSelected = false;
+                        isCboPurchaseSummaryReportStartDateSelected = false;
                     }
                 }
             });
 
-            cboPurchaseSummaryReportEndDate.dispose();
-            cboPurchaseSummaryReportEndDate = new wijmo.input.InputDate('#cboPurchaseSummaryReportEndDate', {
+            cboPurchaseSummaryReportEndDateFilter.dispose();
+            cboPurchaseSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboPurchaseSummaryReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isPurchaseSummaryReportEndDateSelected) {
+                    if (!isCboPurchaseSummaryReportEndDateSelected) {
                         NProgress.start();
                         refreshPurchaseOrderSummaryReportFlexGrid();
                     } else {
-                        isPurchaseSummaryReportEndDateSelected = false;
+                        isCboPurchaseSummaryReportEndDateSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseSummaryReport/dropdown/list/company',
@@ -239,40 +277,39 @@
                         disabled = false;
                     } else {
                         $("#btnPurchaseOrderSummaryReportCSV").prop("disabled", true);
-                        $("#btnPurchaseOrderSummaryReportPrintPDF").prop("disabled", true);
+                        $("#btnPurchaseOrderSummaryReportPDF").prop("disabled", true);
                     }
 
-                    cboPurchaseSummaryReportCompany.dispose();
-                    cboPurchaseSummaryReportCompany = new wijmo.input.ComboBox('#cboPurchaseSummaryReportCompany', {
+                    cboPurchaseSummaryReportCompanyFilter.dispose();
+                    cboPurchaseSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboPurchaseSummaryReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
                             $("#btnPurchaseOrderSummaryReportCSV").prop("disabled", false);
-                            $("#btnPurchaseOrderSummaryReportPrintPDF").prop("disabled", false);
-
-                            isPurchaseSummaryReportCompanySelected = true;
-                            createCboBranch();
+                            $("#btnPurchaseOrderSummaryReportPDF").prop("disabled", false);
+                            isCboPurchaseSummaryReportCompanySelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboPurchaseSummaryReportCompany.selectedValue != null) {
+            if (cboPurchaseSummaryReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/purchaseSummaryReport/dropdown/list/branch/' + cboPurchaseSummaryReportCompany.selectedValue,
+                    url: '/api/purchaseSummaryReport/dropdown/list/branch/' + cboPurchaseSummaryReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -295,17 +332,17 @@
                             disabled = false;
                         } else {
                             $("#btnPurchaseOrderSummaryReportCSV").prop("disabled", true);
-                            $("#btnPurchaseOrderSummaryReportPrintPDF").prop("disabled", true);
+                            $("#btnPurchaseOrderSummaryReportPDF").prop("disabled", true);
                         }
 
-                        cboPurchaseOrderSummaryReportBranch.dispose();
-                        cboPurchaseOrderSummaryReportBranch = new wijmo.input.ComboBox('#cboPurchaseOrderSummaryReportBranch', {
+                        cboPurchaseSummaryReportBranchFilter.dispose();
+                        cboPurchaseSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboPurchaseSummaryReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshPurchaseOrderSummaryReportFlexGrid();
@@ -318,9 +355,9 @@
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
         function createCboShowRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
@@ -351,8 +388,8 @@
                 });
             }
 
-            cboPuchaseSummaryReportShowNumberOfRows.dispose();
-            cboPuchaseSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPuchaseSummaryReportShowNumberOfRows', {
+            cboPurchaseSummaryReportShowNumberOfRows.dispose();
+            cboPurchaseSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboPurchaseSummaryReportShowNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -362,7 +399,7 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboPuchaseSummaryReportShowNumberOfRows.selectedValue;
+                        var numberOfRows = cboPurchaseSummaryReportShowNumberOfRows.selectedValue;
                         purchaseSummaryReportCollections.pageSize = parseInt(numberOfRows);
                         purchaseSummaryReportCollections.refresh();
                         purchaseSummaryReportFlexGrid.refresh();
@@ -372,25 +409,24 @@
                 }
             });
 
-            if (!isPurchaseSummaryReportCompanySelected) {
+            if (!isCboPurchaseSummaryReportCompanySelected) {
                 createPurchaseOrderSummaryReportFlexGrid();
             } else {
                 refreshPurchaseOrderSummaryReportFlexGrid();
             }
         }
 
-        // =================================
-        // Get Purchase Order Summary Report
-        // =================================
-        function getPurchaseSummaryReport() {
+        // ===============================
+        // Get Purchase Order Summary Data
+        // ===============================
+        function getPurchaseSummaryReportData() {
             var purchaseSummaryReports = new wijmo.collections.ObservableArray;
-            if (cboPurchaseSummaryReportCompany.selectedValue != null) {
-                if (cboPurchaseOrderSummaryReportBranch.selectedValue != null) {
-
-                    var startDate = cboPurchaseSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboPurchaseSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboPurchaseSummaryReportCompany.selectedValue;
-                    var branchId = cboPurchaseOrderSummaryReportBranch.selectedValue;
+            if (cboPurchaseSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboPurchaseSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboPurchaseSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboPurchaseSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboPurchaseSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboPurchaseSummaryReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/purchaseSummaryReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -446,75 +482,16 @@
             return purchaseSummaryReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (purchaseSummaryReportCollections.pageSize <= 0) {
-                document.getElementById('purchaseSummaryReportNaviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('purchaseSummaryReportNaviagtionPageGrid').style.display = 'block';
-            if (purchaseSummaryReportCollections.pageIndex === 0) {
-                btnPurchaseSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPurchaseSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnPurchaseSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (purchaseSummaryReportCollections.pageIndex === (purchaseSummaryReportCollections.pageCount - 1)) {
-                btnPurchaseSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnPurchaseSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnPurchaseSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnPurchaseSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-            btnPurchaseSummaryReportCurrentPageGrid.innerHTML = (purchaseSummaryReportCollections.pageIndex + 1) + ' / ' + purchaseSummaryReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshPurchaseOrderSummaryReportFlexGrid() {
-            purchaseSummaryReportCollections = new wijmo.collections.CollectionView(getPurchaseSummaryReport());
-            purchaseSummaryReportCollections.canFilter = true;
-            purchaseSummaryReportCollections.pageSize = cboPuchaseSummaryReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#puchaseSummaryReportFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                purchaseSummaryReportCollections.refresh();
-            });
-
-            purchaseSummaryReportCollections.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.PONumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Term.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualRequestNumber.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            purchaseSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            purchaseSummaryReportFlexGrid.itemsSource = purchaseSummaryReportCollections;
-            purchaseSummaryReportFlexGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ========================================
+        // Create Purchase Summary Report Flex Grid
+        // ========================================
         function createPurchaseOrderSummaryReportFlexGrid() {
-            purchaseSummaryReportCollections = new wijmo.collections.CollectionView(getPurchaseSummaryReport());
+            purchaseSummaryReportCollections = new wijmo.collections.CollectionView(getPurchaseSummaryReportData());
             purchaseSummaryReportCollections.canFilter = true;
-            purchaseSummaryReportCollections.pageSize = cboPuchaseSummaryReportShowNumberOfRows.selectedValue;
+            purchaseSummaryReportCollections.pageSize = cboPurchaseSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#puchaseSummaryReportFilter').keyup(function () {
+            $('#inpPurchaseSummaryReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 purchaseSummaryReportCollections.refresh();
             });
@@ -529,7 +506,7 @@
             }
 
             purchaseSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+                updatePurchaseOrderSummaryReportNavigationButtons();
             });
 
             purchaseSummaryReportFlexGrid = new wijmo.grid.FlexGrid('#purchaseSummaryReportFlexGrid');
@@ -607,31 +584,90 @@
 
             purchaseSummaryReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updatePurchaseOrderSummaryReportNavigationButtons();
 
             btnPurchaseSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
                 purchaseSummaryReportCollections.moveToFirstPage();
-                currentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                purchaseSummaryReportCurrentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
+                updatePurchaseOrderSummaryReportNavigationButtons();
             });
 
             btnPurchaseSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
                 purchaseSummaryReportCollections.moveToPreviousPage();
-                currentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                purchaseSummaryReportCurrentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
+                updatePurchaseOrderSummaryReportNavigationButtons();
             });
 
             btnPurchaseSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
                 purchaseSummaryReportCollections.moveToNextPage();
-                currentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                purchaseSummaryReportCurrentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
+                updatePurchaseOrderSummaryReportNavigationButtons();
             });
 
             btnPurchaseSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
                 purchaseSummaryReportCollections.moveToLastPage();
-                currentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                purchaseSummaryReportCurrentPageIndex = purchaseSummaryReportCollections.pageIndex + 1;
+                updatePurchaseOrderSummaryReportNavigationButtons();
             });
+        }
+
+        // =======================================================
+        // Update Purchase Order Summary Report Navigation Buttons
+        // =======================================================
+        function updatePurchaseOrderSummaryReportNavigationButtons() {
+            if (purchaseSummaryReportCollections.pageSize <= 0) {
+                document.getElementById('purchaseSummaryReportNaviagtionPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('purchaseSummaryReportNaviagtionPageGrid').style.display = 'block';
+            if (purchaseSummaryReportCollections.pageIndex === 0) {
+                btnPurchaseSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (purchaseSummaryReportCollections.pageIndex === (purchaseSummaryReportCollections.pageCount - 1)) {
+                btnPurchaseSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnPurchaseSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnPurchaseSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnPurchaseSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnPurchaseSummaryReportCurrentPageGrid.innerHTML = (purchaseSummaryReportCollections.pageIndex + 1) + ' / ' + purchaseSummaryReportCollections.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshPurchaseOrderSummaryReportFlexGrid() {
+            purchaseSummaryReportCollections = new wijmo.collections.CollectionView(getPurchaseSummaryReportData());
+            purchaseSummaryReportCollections.canFilter = true;
+            purchaseSummaryReportCollections.pageSize = cboPurchaseSummaryReportShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpPurchaseSummaryReportFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                purchaseSummaryReportCollections.refresh();
+            });
+
+            purchaseSummaryReportCollections.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.PONumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Term.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualRequestNumber.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            purchaseSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+                updatePurchaseOrderSummaryReportNavigationButtons();
+            });
+
+            purchaseSummaryReportFlexGrid.itemsSource = purchaseSummaryReportCollections;
+            purchaseSummaryReportFlexGrid.trackChanges = true;
         }
 
         // ============
@@ -671,7 +707,7 @@
                 purchaseSummaryReportCollections.moveToNextPage();
 
                 if (p == purchaseSummaryReportCollections.pageCount) {
-                    purchaseSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                    purchaseSummaryReportCollections.moveToPage(purchaseSummaryReportCurrentPageIndex - 1);
                 }
             }
 
@@ -737,13 +773,13 @@
         // =====================
         // Preview and Print PDF
         // =====================
-        function btnPurchaseOrderSummaryReportPrintPDFOnclick() {
-            if (cboPurchaseSummaryReportCompany.selectedValue != null) {
-                if (cboPurchaseOrderSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboPurchaseSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboPurchaseSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboPurchaseSummaryReportCompany.selectedValue;
-                    var branchId = cboPurchaseOrderSummaryReportBranch.selectedValue;
+        function btnPurchaseOrderSummaryReportPDFOnclick() {
+            if (cboPurchaseSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboPurchaseSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboPurchaseSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboPurchaseSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboPurchaseSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboPurchaseSummaryReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepPurchaseSummaryReport/PurchaseSummaryReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -758,11 +794,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            purchaseOrderSummaryReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -809,6 +852,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -848,6 +894,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

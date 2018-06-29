@@ -37,7 +37,7 @@ namespace easyfis.ApiControllers
                                      ManualRequestNumber = d.ManualRequestNumber,
                                      DateNeeded = d.DateNeeded.ToShortDateString(),
                                      IsClose = d.IsClose,
-                                     Amount = d.TrnPurchaseOrderItems != null ? d.TrnPurchaseOrderItems.Sum(a => a.Amount) : 0
+                                     Amount = d.TrnPurchaseOrderItems.Any() ? d.TrnPurchaseOrderItems.Sum(a => a.Amount) : 0
                                  };
 
             return purchaseOrders.ToList();
