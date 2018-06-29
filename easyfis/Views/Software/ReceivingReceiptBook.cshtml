@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Receiving Receipt Book</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,87 +26,117 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpReceivingReceiptBookSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboARReceivingReceiptBookShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptBookDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnReceivingReceiptBookCSVOnclick()" id="btnReceivingReceiptBookCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnReceivingReceiptBookDownloadCSVOnclick()" id="btnReceivingReceiptBookDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnReceivingReceiptBookPrintPDFOnclick()" id="btnReceivingReceiptBookPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/FinancialStatements" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboARReceivingReceiptBookStartDate"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptBookStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboARReceivingReceiptBookEndDate"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptBookEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboARReceivingReceiptBookCompany"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptBookCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboARReceivingReceiptBookBranch"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptBookBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="receivingReceiptBookGrid" class="grid"></div>
+                        <div id="receivingReceiptBookFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="receivingReceiptBookNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptBookMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptBookMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnReceivingReceiptBookCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptBookMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnReceivingReceiptBookMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -120,19 +147,19 @@
                                         <b>Total Debit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalDebitAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalDebitAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Credit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalCreditAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalCreditAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Balance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalBalanceAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalBalanceAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -140,6 +167,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -147,30 +175,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboARReceivingReceiptBookStartDate = new wijmo.input.InputDate('#cboARReceivingReceiptBookStartDate');
-        var cboARReceivingReceiptBookEndDate = new wijmo.input.InputDate('#cboARReceivingReceiptBookEndDate');
-        var isARReceivingReceiptBookStartDateSelected = false;
-        var isARReceivingReceiptBookEndDateSelected = false;
-        var cboARReceivingReceiptBookCompany = new wijmo.input.ComboBox('#cboARReceivingReceiptBookCompany');
-        var cboARReceivingReceiptBookBranch = new wijmo.input.ComboBox('#cboARReceivingReceiptBookBranch');
-        var receivingReceiptBookCollections;
-        var receivingReceiptBookGrid;
-        var isARReceivingReceiptBookCompanySelected = false;
-        var cboARReceivingReceiptBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARReceivingReceiptBookShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // ====================================
+        // Receiving Receipt Date Range Filters
+        // ====================================
+        var cboReceivingReceiptBookStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptBookStartDateFilter');
+        var cboReceivingReceiptBookEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptBookEndDateFilter');
+        var isCboReceivingReceiptBookStartDateFilterSelected = false;
+        var isCboReceivingReceiptBookEndDateFilterSelected = false;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // ==========================
+        // Company and Branch Filters
+        // ==========================
+        var cboReceivingReceiptBookCompanyFilter = new wijmo.input.ComboBox('#cboReceivingReceiptBookCompanyFilter');
+        var isCboReceivingReceiptBookCompanyFilterSelected = false;
+        var cboReceivingReceiptBookBranchFilter = new wijmo.input.ComboBox('#cboReceivingReceiptBookBranchFilter');
+
+        // ============================================
+        // Receiving Receipt Collection View, Flex Grid
+        // ============================================
+        var receivingReceiptBookCollectionView;
+        var receivingReceiptBookFlexGrid;
+        var cboReceivingReceiptBookDisplayNumberOfRows = new wijmo.input.ComboBox('#cboReceivingReceiptBookDisplayNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnReceivingReceiptBookMoveToFirstPageGrid = document.getElementById('btnReceivingReceiptBookMoveToFirstPageGrid');
+        var btnReceivingReceiptBookMoveToPreviousPageGrid = document.getElementById('btnReceivingReceiptBookMoveToPreviousPageGrid');
+        var btnReceivingReceiptBookMoveToNextPageGrid = document.getElementById('btnReceivingReceiptBookMoveToNextPageGrid');
+        var btnReceivingReceiptBookMoveToLastPageGrid = document.getElementById('btnReceivingReceiptBookMoveToLastPageGrid');
+        var btnReceivingReceiptBookCurrentPageGrid = document.getElementById('btnReceivingReceiptBookCurrentPageGrid');
+        var receivingReceiptBookCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -184,46 +224,46 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function receivingReceiptBookDateFilters() {
+        // =========================
+        // Create Combo Date Filters
+        // =========================
+        function createCboReceivingReceiptBookDateFilters() {
             NProgress.start();
-            cboARReceivingReceiptBookStartDate.dispose();
-            cboARReceivingReceiptBookStartDate = new wijmo.input.InputDate('#cboARReceivingReceiptBookStartDate', {
+            cboReceivingReceiptBookStartDateFilter.dispose();
+            cboReceivingReceiptBookStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptBookStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isARReceivingReceiptBookStartDateSelected) {
+                    if (!isCboReceivingReceiptBookStartDateFilterSelected) {
                         NProgress.start();
                         refreshReceivingReceiptBookFlexGrid();
                     } else {
-                        isARReceivingReceiptBookStartDateSelected = false;
+                        isCboReceivingReceiptBookStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboARReceivingReceiptBookEndDate.dispose();
-            cboARReceivingReceiptBookEndDate = new wijmo.input.InputDate('#cboARReceivingReceiptBookEndDate', {
+            cboReceivingReceiptBookEndDateFilter.dispose();
+            cboReceivingReceiptBookEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptBookEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isARReceivingReceiptBookEndDateSelected) {
+                    if (!isCboReceivingReceiptBookEndDateFilterSelected) {
                         NProgress.start();
                         refreshReceivingReceiptBookFlexGrid();
                     } else {
-                        isARReceivingReceiptBookEndDateSelected = false;
+                        isCboReceivingReceiptBookEndDateFilterSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboReceivingReceiptBookCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboReceivingReceiptBookCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/company/list',
@@ -247,40 +287,40 @@
                     if (companyResults.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnReceivingReceiptBookCSV").prop("disabled", true);
+                        $("#btnReceivingReceiptBookDownloadCSV").prop("disabled", true);
                         $("#btnReceivingReceiptBookPrintPDF").prop("disabled", true);
                     }
 
-                    cboARReceivingReceiptBookCompany.dispose();
-                    cboARReceivingReceiptBookCompany = new wijmo.input.ComboBox('#cboARReceivingReceiptBookCompany', {
+                    cboReceivingReceiptBookCompanyFilter.dispose();
+                    cboReceivingReceiptBookCompanyFilter = new wijmo.input.ComboBox('#cboReceivingReceiptBookCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnReceivingReceiptBookCSV").prop("disabled", false);
+                            $("#btnReceivingReceiptBookDownloadCSV").prop("disabled", false);
                             $("#btnReceivingReceiptBookPrintPDF").prop("disabled", false);
-                            isARReceivingReceiptBookCompanySelected = true;
-                            createCboBranch();
+                            isCboReceivingReceiptBookCompanyFilterSelected = true;
+                            createCboReceivingReceiptBookBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboReceivingReceiptBookBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboReceivingReceiptBookBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboARReceivingReceiptBookCompany.selectedValue != null) {
+            if (cboReceivingReceiptBookCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/branch/byCompanyId/list/locked/' + cboARReceivingReceiptBookCompany.selectedValue,
+                    url: '/api/branch/byCompanyId/list/locked/' + cboReceivingReceiptBookCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -302,34 +342,34 @@
                         if (branchResults.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnReceivingReceiptBookCSV").prop("disabled", true);
+                            $("#btnReceivingReceiptBookDownloadCSV").prop("disabled", true);
                             $("#btnReceivingReceiptBookPrintPDF").prop("disabled", true);
                         }
 
-                        cboARReceivingReceiptBookBranch.dispose();
-                        cboARReceivingReceiptBookBranch = new wijmo.input.ComboBox('#cboARReceivingReceiptBookBranch', {
+                        cboReceivingReceiptBookBranchFilter.dispose();
+                        cboReceivingReceiptBookBranchFilter = new wijmo.input.ComboBox('#cboReceivingReceiptBookBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshReceivingReceiptBookFlexGrid();
                             }
                         });
 
-                        createCboShowRows();
+                        createCboReceivingReceiptBookDisplayNumberOfRows();
                     }
                 });
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // =============================
+        // Create Display Number of Rows
+        // =============================
+        function createCboReceivingReceiptBookDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -359,8 +399,8 @@
                 });
             }
 
-            cboARReceivingReceiptBookShowNumberOfRows.dispose();
-            cboARReceivingReceiptBookShowNumberOfRows = new wijmo.input.ComboBox('#cboARReceivingReceiptBookShowNumberOfRows', {
+            cboReceivingReceiptBookDisplayNumberOfRows.dispose();
+            cboReceivingReceiptBookDisplayNumberOfRows = new wijmo.input.ComboBox('#cboReceivingReceiptBookDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -370,199 +410,125 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboARReceivingReceiptBookShowNumberOfRows.selectedValue;
-                        receivingReceiptBookCollections.pageSize = parseInt(numberOfRows);
-                        receivingReceiptBookCollections.refresh();
-                        receivingReceiptBookGrid.refresh();
+                        var numberOfRows = cboReceivingReceiptBookDisplayNumberOfRows.selectedValue;
+                        receivingReceiptBookCollectionView.pageSize = parseInt(numberOfRows);
+                        receivingReceiptBookCollectionView.refresh();
+                        receivingReceiptBookFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isARReceivingReceiptBookCompanySelected) {
+            if (!isCboReceivingReceiptBookCompanyFilterSelected) {
                 createReceivingReceiptBookFlexGrid();
             } else {
                 refreshReceivingReceiptBookFlexGrid();
             }
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (receivingReceiptBookCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (receivingReceiptBookCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (receivingReceiptBookCollections.pageIndex === (receivingReceiptBookCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (receivingReceiptBookCollections.pageIndex + 1) + ' / ' + receivingReceiptBookCollections.pageCount;
-        }
-
         // ===============================
         // Get Receiving Receipt Book Data
         // ===============================
-        function getReceivingReceiptBook() {
+        function getCollecitonBookData() {
             var receivingReceiptBooks = new wijmo.collections.ObservableArray;
-            if (cboARReceivingReceiptBookCompany.selectedValue != null) {
-                if (cboARReceivingReceiptBookBranch.selectedValue != null) {
-                    var startDate = cboARReceivingReceiptBookStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboARReceivingReceiptBookEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboARReceivingReceiptBookCompany.selectedValue;
-                    var branchId = cboARReceivingReceiptBookBranch.selectedValue;
+            if (cboReceivingReceiptBookCompanyFilter.selectedValue != null) {
+                if (cboReceivingReceiptBookBranchFilter.selectedValue != null) {
+
+                    var startDate = cboReceivingReceiptBookStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboReceivingReceiptBookEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboReceivingReceiptBookCompanyFilter.selectedValue;
+                    var branchId = cboReceivingReceiptBookBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/ReceivingReceiptBook/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
                         cache: false,
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
-                        success: function (receivingReceiptBookResult) {
+                        success: function (results) {
+
                             var totalDebit = 0;
                             var totalCredit = 0;
                             var totalBalance = 0;
-                            if (receivingReceiptBookResult.length > 0) {
-                                for (i = 0; i < receivingReceiptBookResult.length; i++) {
+
+                            if (results.length > 0) {
+                                for (i = 0; i < results.length; i++) {
                                     receivingReceiptBooks.push({
-                                        DocumentReference: receivingReceiptBookResult[i]["DocumentReference"],
-                                        ManualDocumentCode: receivingReceiptBookResult[i]["ManualDocumentCode"],
-                                        AccountCode: receivingReceiptBookResult[i]["AccountCode"],
-                                        Account: receivingReceiptBookResult[i]["Account"],
-                                        Article: receivingReceiptBookResult[i]["Article"],
-                                        DebitAmount: receivingReceiptBookResult[i]["DebitAmount"],
-                                        DebitAmountDisplay: parseFloat(receivingReceiptBookResult[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                        CreditAmount: receivingReceiptBookResult[i]["CreditAmount"],
-                                        CreditAmountDisplay: parseFloat(receivingReceiptBookResult[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                        Balance: receivingReceiptBookResult[i]["DebitAmount"] - receivingReceiptBookResult[i]["CreditAmount"],
-                                        BalanceDisplay: parseFloat(receivingReceiptBookResult[i]["DebitAmount"] - receivingReceiptBookResult[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        DocumentReference: results[i]["DocumentReference"],
+                                        ManualDocumentCode: results[i]["ManualDocumentCode"],
+                                        AccountCode: results[i]["AccountCode"],
+                                        Account: results[i]["Account"],
+                                        Article: results[i]["Article"],
+                                        DebitAmount: results[i]["DebitAmount"],
+                                        DebitAmountDisplay: parseFloat(results[i]["DebitAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        CreditAmount: results[i]["CreditAmount"],
+                                        CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        Balance: results[i]["DebitAmount"] - results[i]["CreditAmount"],
+                                        BalanceDisplay: parseFloat(results[i]["DebitAmount"] - results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                     });
 
-                                    totalDebit += receivingReceiptBookResult[i]["DebitAmount"];
-                                    totalCredit += receivingReceiptBookResult[i]["CreditAmount"];
-                                    totalBalance += receivingReceiptBookResult[i]["DebitAmount"] - receivingReceiptBookResult[i]["CreditAmount"];
+                                    totalDebit += results[i]["DebitAmount"];
+                                    totalCredit += results[i]["CreditAmount"];
+                                    totalBalance += results[i]["DebitAmount"] - results[i]["CreditAmount"];
                                 }
                             }
 
-                            document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return receivingReceiptBooks;
         }
 
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshReceivingReceiptBookFlexGrid() {
-            receivingReceiptBookCollections = new wijmo.collections.CollectionView(getReceivingReceiptBook());
-            receivingReceiptBookCollections.canFilter = true;
-            receivingReceiptBookCollections.pageSize = cboARReceivingReceiptBookShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                receivingReceiptBookCollections.refresh();
-
-                if (receivingReceiptBookCollections.items.length > 0) {
-                    var totalDebit = 0;
-                    var totalCredit = 0;
-                    var totalBalance = 0;
-                    for (var i = 0; i < receivingReceiptBookCollections.items.length; i++) {
-                        totalDebit += receivingReceiptBookCollections.items[i].DebitAmount;
-                        totalCredit += receivingReceiptBookCollections.items[i].CreditAmount;
-                        totalBalance += receivingReceiptBookCollections.items[i].Balance;
-                    }
-
-                    document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
-            });
-
-            receivingReceiptBookCollections.filter = function (item) {
-                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualDocumentCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            receivingReceiptBookCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            receivingReceiptBookGrid.itemsSource = receivingReceiptBookCollections;
-            receivingReceiptBookGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // =======================================
+        // Create Receiving Receipt Book Flex Grid
+        // =======================================
         function createReceivingReceiptBookFlexGrid() {
-            receivingReceiptBookCollections = new wijmo.collections.CollectionView(getReceivingReceiptBook());
-            receivingReceiptBookCollections.canFilter = true;
-            receivingReceiptBookCollections.pageSize = cboARReceivingReceiptBookShowNumberOfRows.selectedValue;
+            receivingReceiptBookCollectionView = new wijmo.collections.CollectionView(getCollecitonBookData());
+            receivingReceiptBookCollectionView.canFilter = true;
+            receivingReceiptBookCollectionView.pageSize = cboReceivingReceiptBookDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpReceivingReceiptBookSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                receivingReceiptBookCollections.refresh();
+                receivingReceiptBookCollectionView.refresh();
 
-                if (receivingReceiptBookCollections.items.length > 0) {
+                if (receivingReceiptBookCollectionView.items.length > 0) {
                     var totalDebit = 0;
                     var totalCredit = 0;
                     var totalBalance = 0;
-                    for (var i = 0; i < receivingReceiptBookCollections.items.length; i++) {
-                        totalDebit += receivingReceiptBookCollections.items[i].DebitAmount;
-                        totalCredit += receivingReceiptBookCollections.items[i].CreditAmount;
-                        totalBalance += receivingReceiptBookCollections.items[i].Balance;
+                    for (var i = 0; i < receivingReceiptBookCollectionView.items.length; i++) {
+                        totalDebit += receivingReceiptBookCollectionView.items[i].DebitAmount;
+                        totalCredit += receivingReceiptBookCollectionView.items[i].CreditAmount;
+                        totalBalance += receivingReceiptBookCollectionView.items[i].Balance;
                     }
 
-                    document.getElementById("totalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 } else {
-                    document.getElementById("totalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
             });
 
-            receivingReceiptBookCollections.filter = function (item) {
+            receivingReceiptBookCollectionView.filter = function (item) {
                 return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualDocumentCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
@@ -570,12 +536,12 @@
                     || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
             }
 
-            receivingReceiptBookCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            receivingReceiptBookCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateReceivingReceiptBookNavigationButtons();
             });
 
-            receivingReceiptBookGrid = new wijmo.grid.FlexGrid('#receivingReceiptBookGrid');
-            receivingReceiptBookGrid.initialize({
+            receivingReceiptBookFlexGrid = new wijmo.grid.FlexGrid('#receivingReceiptBookFlexGrid');
+            receivingReceiptBookFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Doc Reference",
@@ -631,75 +597,152 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: receivingReceiptBookCollections,
+                itemsSource: receivingReceiptBookCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            receivingReceiptBookGrid.trackChanges = true;
+            receivingReceiptBookFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateReceivingReceiptBookNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                receivingReceiptBookCollections.moveToFirstPage();
-                currentPageIndex = receivingReceiptBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnReceivingReceiptBookMoveToFirstPageGrid.addEventListener('click', function () {
+                receivingReceiptBookCollectionView.moveToFirstPage();
+                receivingReceiptBookCurrentPageIndex = receivingReceiptBookCollectionView.pageIndex + 1;
+                updateReceivingReceiptBookNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                receivingReceiptBookCollections.moveToPreviousPage();
-                currentPageIndex = receivingReceiptBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnReceivingReceiptBookMoveToPreviousPageGrid.addEventListener('click', function () {
+                receivingReceiptBookCollectionView.moveToPreviousPage();
+                receivingReceiptBookCurrentPageIndex = receivingReceiptBookCollectionView.pageIndex + 1;
+                updateReceivingReceiptBookNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                receivingReceiptBookCollections.moveToNextPage();
-                currentPageIndex = receivingReceiptBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnReceivingReceiptBookMoveToNextPageGrid.addEventListener('click', function () {
+                receivingReceiptBookCollectionView.moveToNextPage();
+                receivingReceiptBookCurrentPageIndex = receivingReceiptBookCollectionView.pageIndex + 1;
+                updateReceivingReceiptBookNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                receivingReceiptBookCollections.moveToLastPage();
-                currentPageIndex = receivingReceiptBookCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnReceivingReceiptBookMoveToLastPageGrid.addEventListener('click', function () {
+                receivingReceiptBookCollectionView.moveToLastPage();
+                receivingReceiptBookCurrentPageIndex = receivingReceiptBookCollectionView.pageIndex + 1;
+                updateReceivingReceiptBookNavigationButtons();
             });
         }
 
-        // ============
-        // Download CSV
-        // ============
-        function btnReceivingReceiptBookCSVOnclick() {
+        // ========================================
+        // Refresh Receiving Receipt Book Flex Grid
+        // ========================================
+        function refreshReceivingReceiptBookFlexGrid() {
+            receivingReceiptBookCollectionView = new wijmo.collections.CollectionView(getCollecitonBookData());
+            receivingReceiptBookCollectionView.canFilter = true;
+            receivingReceiptBookCollectionView.pageSize = cboReceivingReceiptBookDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpReceivingReceiptBookSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                receivingReceiptBookCollectionView.refresh();
+
+                if (receivingReceiptBookCollectionView.items.length > 0) {
+                    var totalDebit = 0;
+                    var totalCredit = 0;
+                    var totalBalance = 0;
+                    for (var i = 0; i < receivingReceiptBookCollectionView.items.length; i++) {
+                        totalDebit += receivingReceiptBookCollectionView.items[i].DebitAmount;
+                        totalCredit += receivingReceiptBookCollectionView.items[i].CreditAmount;
+                        totalBalance += receivingReceiptBookCollectionView.items[i].Balance;
+                    }
+
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(totalDebit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(totalCredit).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                } else {
+                    document.getElementById("inpTotalDebitAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCreditAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalanceAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+            });
+
+            receivingReceiptBookCollectionView.filter = function (item) {
+                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualDocumentCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.AccountCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            receivingReceiptBookCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateReceivingReceiptBookNavigationButtons();
+            });
+
+            receivingReceiptBookFlexGrid.itemsSource = receivingReceiptBookCollectionView;
+            receivingReceiptBookFlexGrid.trackChanges = true;
+        }
+
+        // ================================================
+        // Update Receiving Receipt Book Navigation Buttons
+        // ================================================
+        function updateReceivingReceiptBookNavigationButtons() {
+            if (receivingReceiptBookCollectionView.pageSize <= 0) {
+                document.getElementById('receivingReceiptBookNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('receivingReceiptBookNavigationPageGrid').style.display = 'block';
+            if (receivingReceiptBookCollectionView.pageIndex === 0) {
+                btnReceivingReceiptBookMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptBookMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptBookMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (receivingReceiptBookCollectionView.pageIndex === (receivingReceiptBookCollectionView.pageCount - 1)) {
+                btnReceivingReceiptBookMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptBookMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnReceivingReceiptBookMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptBookMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnReceivingReceiptBookCurrentPageGrid.innerHTML = (receivingReceiptBookCollectionView.pageIndex + 1) + ' / ' + receivingReceiptBookCollectionView.pageCount;
+        }
+
+        // ==========================================
+        // Download Receiving Receipt Book Report CSV
+        // ==========================================
+        function btnReceivingReceiptBookDownloadCSVOnclick() {
             var CSV = '';
             var receivingReceiptBook = [];
             var fileName = 'ReceivingReceiptBook.CSV';
 
-            receivingReceiptBookCollections.moveToFirstPage();
+            receivingReceiptBookCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= receivingReceiptBookCollections.pageCount; p++) {
-                for (i = 0; i < receivingReceiptBookCollections.items.length; i++) {
-                    var IsClose = receivingReceiptBookCollections.items[i].IsClose;
+            for (var p = 1; p <= receivingReceiptBookCollectionView.pageCount; p++) {
+                for (i = 0; i < receivingReceiptBookCollectionView.items.length; i++) {
+                    var IsClose = receivingReceiptBookCollectionView.items[i].IsClose;
                     var isPOClose = "Not Closed";
                     if (IsClose) {
                         isPOClose = "Closed"
                     }
 
                     receivingReceiptBook.push({
-                        DocumentReference: receivingReceiptBookCollections.items[i].DocumentReference,
-                        ManualDocumentCode: receivingReceiptBookCollections.items[i].ManualDocumentCode,
-                        AccountCode: receivingReceiptBookCollections.items[i].AccountCode,
-                        Account: receivingReceiptBookCollections.items[i].Account,
-                        Article: receivingReceiptBookCollections.items[i].Article,
-                        DebitAmount: receivingReceiptBookCollections.items[i].DebitAmount,
-                        CreditAmount: receivingReceiptBookCollections.items[i].CreditAmount,
-                        Balance: receivingReceiptBookCollections.items[i].Balance,
+                        DocumentReference: receivingReceiptBookCollectionView.items[i].DocumentReference,
+                        ManualDocumentCode: receivingReceiptBookCollectionView.items[i].ManualDocumentCode,
+                        AccountCode: receivingReceiptBookCollectionView.items[i].AccountCode,
+                        Account: receivingReceiptBookCollectionView.items[i].Account,
+                        Article: receivingReceiptBookCollectionView.items[i].Article,
+                        DebitAmount: receivingReceiptBookCollectionView.items[i].DebitAmount,
+                        CreditAmount: receivingReceiptBookCollectionView.items[i].CreditAmount,
+                        Balance: receivingReceiptBookCollectionView.items[i].Balance,
                     });
                 }
 
-                receivingReceiptBookCollections.moveToNextPage();
-                if (p == receivingReceiptBookCollections.pageCount) {
-                    receivingReceiptBookCollections.moveToPage(currentPageIndex - 1);
+                receivingReceiptBookCollectionView.moveToNextPage();
+                if (p == receivingReceiptBookCollectionView.pageCount) {
+                    receivingReceiptBookCollectionView.moveToPage(receivingReceiptBookCurrentPageIndex - 1);
                 }
             }
 
@@ -760,16 +803,16 @@
             }
         }
 
-        // =====================
-        // Preview and Print PDF
-        // =====================
+        // ============================
+        // Print Receiving Receipt Book
+        // ============================
         function btnReceivingReceiptBookPrintPDFOnclick() {
-            if (cboARReceivingReceiptBookCompany.selectedValue != null) {
-                if (cboARReceivingReceiptBookBranch.selectedValue != null) {
-                    var startDate = cboARReceivingReceiptBookStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboARReceivingReceiptBookEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboARReceivingReceiptBookCompany.selectedValue;
-                    var branchId = cboARReceivingReceiptBookBranch.selectedValue;
+            if (cboReceivingReceiptBookCompanyFilter.selectedValue != null) {
+                if (cboReceivingReceiptBookBranchFilter.selectedValue != null) {
+                    var startDate = cboReceivingReceiptBookStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboReceivingReceiptBookEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboReceivingReceiptBookCompanyFilter.selectedValue;
+                    var branchId = cboReceivingReceiptBookBranchFilter.selectedValue;
 
                     window.location.href = '/RepReceivingReceiptBook/ReceivingReceiptBook?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -780,15 +823,22 @@
             }
         }
 
-        // ============
-        // On Load Page
-        // ============
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            receivingReceiptBookDateFilters();
+            createCboReceivingReceiptBookDateFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -835,6 +885,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -874,6 +927,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
