@@ -393,9 +393,141 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // =================
+        // ==========================
+        // Update Price Article Price
+        // ==========================
+        [Authorize, HttpPut, Route("api/articlePrice/updatePrice/{id}")]
+        public HttpResponseMessage UpdatePriceArticlePrice(Entities.TrnArticlePrice objArticlePrice, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms
+                                    where d.UserId == currentUserId
+                                    && d.SysForm.FormName.Equals("ItemPriceDetail")
+                                    select d;
+
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanEdit)
+                        {
+                            var articlePrice = from d in db.TrnArticlePrices
+                                               where d.Id == Convert.ToInt32(id)
+                                               select d;
+
+                            if (articlePrice.Any())
+                            {
+                                if (articlePrice.FirstOrDefault().IsLocked)
+                                {
+                                    var articlePriceItems = from d in db.TrnArticlePriceItems
+                                                            where d.ArticlePriceId == articlePrice.FirstOrDefault().Id
+                                                            select d;
+
+                                    if (articlePriceItems.Any())
+                                    {
+                                        foreach (var articlePriceItem in articlePriceItems)
+                                        {
+                                            var item = from d in db.MstArticles
+                                                       where d.Id == articlePriceItem.ItemId
+                                                       select d;
+
+                                            if (item.Any())
+                                            {
+                                                var mstArticlePrice = from d in db.MstArticlePrices
+                                                                      where d.PriceDescription.Equals("IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber)
+                                                                      select d;
+
+                                                if (mstArticlePrice.Any())
+                                                {
+                                                    db.MstArticlePrices.DeleteOnSubmit(mstArticlePrice.FirstOrDefault());
+                                                    db.SubmitChanges();
+
+                                                    var updateItem = item.FirstOrDefault();
+                                                    updateItem.Price = articlePriceItem.Price;
+                                                    db.SubmitChanges();
+
+                                                    Data.MstArticlePrice newArticlePrice = new Data.MstArticlePrice
+                                                    {
+                                                        ArticleId = articlePriceItem.ItemId,
+                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber,
+                                                        Price = articlePriceItem.Price,
+                                                        Remarks = "Branch: " + articlePrice.FirstOrDefault().MstBranch.Branch +
+                                                                  "\nIP Date: " + articlePrice.FirstOrDefault().IPDate.ToShortDateString() +
+                                                                  "\nIP Number: " + articlePrice.FirstOrDefault().IPNumber +
+                                                                  "\nManual IP Number: " + articlePrice.FirstOrDefault().ManualIPNumber
+                                                    };
+
+                                                    db.MstArticlePrices.InsertOnSubmit(newArticlePrice);
+                                                    db.SubmitChanges();
+                                                }
+                                                else
+                                                {
+                                                    var updateItem = item.FirstOrDefault();
+                                                    updateItem.Price = articlePriceItem.Price;
+                                                    db.SubmitChanges();
+
+                                                    Data.MstArticlePrice newArticlePrice = new Data.MstArticlePrice
+                                                    {
+                                                        ArticleId = articlePriceItem.ItemId,
+                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber,
+                                                        Price = articlePriceItem.Price,
+                                                        Remarks = "Branch: " + articlePrice.FirstOrDefault().MstBranch.Branch +
+                                                                  "\nIP Date: " + articlePrice.FirstOrDefault().IPDate.ToShortDateString() +
+                                                                  "\nIP Number: " + articlePrice.FirstOrDefault().IPNumber +
+                                                                  "\nManual IP Number: " + articlePrice.FirstOrDefault().ManualIPNumber
+                                                    };
+
+                                                    db.MstArticlePrices.InsertOnSubmit(newArticlePrice);
+                                                    db.SubmitChanges();
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Update Error. Please lock the item price before proceeding.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These item price details are not found in the server.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to update price.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this item price page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ====================
         // Delete Article Price
-        // =================
+        // ====================
         [Authorize, HttpDelete, Route("api/articlePrice/delete/{id}")]
         public HttpResponseMessage DeleteArticlePrice(String id)
         {

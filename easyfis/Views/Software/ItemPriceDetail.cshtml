@@ -56,6 +56,10 @@
                                     {
                                         <button class="btn btn-primary" id="btnItemPriceDetailUnlock" onclick="btnItemPriceDetailUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
+                                    if (canEdit)
+                                    {
+                                        <button class="btn btn-primary" id="btnItemPriceUpdatePrice" onclick="btnItemPriceUpdatePriceOnclick()"><i class="fa fa-check"></i> Update Price</button>
+                                    }
                                     if (canPrint)
                                     {
                                         <button class="btn btn-primary" id="btnItemPricePrint" onclick="btnItemPricePrintOnclick()"><i class="fa fa-print"></i> Print</button>
@@ -577,6 +581,7 @@
                             } else {
                                 $("#btnItemPriceDetailUnlock").prop("disabled", true);
                                 $("#btnItemPricePrint").prop("disabled", true);
+                                $("#btnItemPriceUpdatePrice").prop("disabled", true);
                             }
 
                             createCboDisplayNumberOfRows();
@@ -600,6 +605,8 @@
             document.getElementById('btnItemPriceDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
             $("#btnItemPriceDetailLock").prop("disabled", true);
             $("#btnItemPriceDetailUnlock").prop("disabled", true);
+            $("#btnItemPriceUpdatePrice").prop("disabled", true);
+            $("#btnItemPricePrint").prop("disabled", true);
             $("#btnItemPriceDetailClose").prop("disabled", true);
 
             var itemPriceObject = new Object();
@@ -643,19 +650,43 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnItemPriceDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnItemPriceDetailLock").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                                $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                                $("#btnItemPricePrint").prop("disabled", false);
+                            } else {
+                                $("#btnItemPriceDetailLock").prop("disabled", false);
+                            }
+
                             $("#btnItemPriceDetailClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnItemPriceDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnItemPriceDetailLock").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                                $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                                $("#btnItemPricePrint").prop("disabled", false);
+                            } else {
+                                $("#btnItemPriceDetailLock").prop("disabled", false);
+                            }
+
                             $("#btnItemPriceDetailClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnItemPriceDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#btnItemPriceDetailLock").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                                $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                                $("#btnItemPricePrint").prop("disabled", false);
+                            } else {
+                                $("#btnItemPriceDetailLock").prop("disabled", false);
+                            }
+
                             $("#btnItemPriceDetailClose").prop("disabled", false);
                         }
                     }
@@ -672,6 +703,8 @@
             document.getElementById('btnItemPriceDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
             $("#btnItemPriceDetailLock").prop("disabled", true);
             $("#btnItemPriceDetailUnlock").prop("disabled", true);
+            $("#btnItemPriceUpdatePrice").prop("disabled", true);
+            $("#btnItemPricePrint").prop("disabled", true);
             $("#btnItemPriceDetailClose").prop("disabled", true);
 
             var itemPriceId = getURLParameterValue("id");
@@ -691,20 +724,125 @@
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('btnItemPriceDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnItemPriceDetailUnlock").prop("disabled", false);
-                        $("#btnItemPriceDetailClose").prop("disabled", true);
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                         document.getElementById('btnItemPriceDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnItemPriceDetailUnlock").prop("disabled", false);
-                        $("#btnItemPriceDetailClose").prop("disabled", true);
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnItemPriceDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#btnItemPriceDetailUnlock").prop("disabled", false);
-                        $("#btnItemPriceDetailClose").prop("disabled", true);
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ================
+        // Print Item Price
+        // ================
+        function btnItemPricePrintOnclick() {
+            var articlePriceId = getURLParameterValue("id");
+            var pirntLink = "/RepArticlePrice/ArticlePrice?articlePriceId=" + articlePriceId;
+            window.open(pirntLink, '_blank');
+        }
+
+        // =======================
+        // Update Price Item Price
+        // =======================
+        function btnItemPriceUpdatePriceOnclick() {
+            document.getElementById('btnItemPriceUpdatePrice').innerHTML = "<i class='fa fa-check'></i> Updating Price...";
+            $("#btnItemPriceDetailLock").prop("disabled", true);
+            $("#btnItemPriceDetailUnlock").prop("disabled", true);
+            $("#btnItemPricePrint").prop("disabled", true);
+            $("#btnItemPriceUpdatePrice").prop("disabled", true);
+            $("#btnItemPriceDetailClose").prop("disabled", true);
+
+            var itemPriceId = getURLParameterValue("id");
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/articlePrice/updatePrice/' + itemPriceId,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: "",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Update Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnItemPriceUpdatePrice').innerHTML = "<i class='fa fa-check'></i> Update Price";
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnItemPriceUpdatePrice').innerHTML = "<i class='fa fa-check'></i> Update Price";
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnItemPriceUpdatePrice').innerHTML = "<i class='fa fa-check'></i> Update Price";
+
+                        if (isLocked) {
+                            $("#btnItemPriceDetailUnlock").prop("disabled", false);
+                            $("#btnItemPriceUpdatePrice").prop("disabled", false);
+                            $("#btnItemPricePrint").prop("disabled", false);
+                        } else {
+                            $("#btnItemPriceDetailLock").prop("disabled", false);
+                        }
+
+                        $("#btnItemPriceDetailClose").prop("disabled", false);
                     }
                 }
             });
@@ -839,13 +977,15 @@
                         "header": "Price",
                         "binding": "PriceDisplay",
                         "allowSorting": true,
-                        "width": "1*"
+                        "width": "1*",
+                        "align": "right"
                     },
                     {
                         "header": "Trigger Qty.",
                         "binding": "TriggerQuantityDisplay",
                         "allowSorting": true,
-                        "width": "1*"
+                        "width": "1*",
+                        "align": "right"
                     }
                 ],
                 autoGenerateColumns: false,
@@ -1506,15 +1646,6 @@
                     }, 300);
                 }
             });
-        }
-
-        // ================
-        // Print Item Price
-        // ================
-        function btnItemPricePrintOnclick() {
-            var articlePriceId = getURLParameterValue("id");
-            var pirntLink = "/RepArticlePrice/ArticlePrice?articlePriceId=" + articlePriceId;
-            window.open(pirntLink, '_blank');
         }
 
         // =============================
