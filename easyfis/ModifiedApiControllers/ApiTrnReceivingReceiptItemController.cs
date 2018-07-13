@@ -158,14 +158,14 @@ namespace easyfis.ModifiedApiControllers
                               where d.UserId == User.Identity.GetUserId()
                               select d;
 
-            var companyId = currentUser.FirstOrDefault().CompanyId;
+            var currentUserId = currentUser.FirstOrDefault().Id;
 
-            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
-                           where d.CompanyId == companyId
+            var branches = from d in db.MstUserBranches.OrderBy(d => d.MstBranch.Branch)
+                           where d.UserId == currentUserId
                            select new Entities.MstBranch
                            {
-                               Id = d.Id,
-                               Branch = d.Branch
+                               Id = d.BranchId,
+                               Branch = d.MstBranch.Branch
                            };
 
             return branches.ToList();

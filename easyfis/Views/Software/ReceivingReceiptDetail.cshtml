@@ -1819,31 +1819,35 @@
                     data: {},
                     success: function (results) {
                         $('#cmdApplyPOStatusButton').prop("disabled", false);
-                        if (results.length > 0) {
-                            for (i = 0; i < results.length; i++) {
-                                purchaseOrderStatusObservableArray.push({
-                                    POId: results[i]["POId"],
-                                    ItemId: results[i]["ItemId"],
-                                    ManualArticleOldCode: results[i]["ItemManualOldCode"],
-                                    ItemCode: results[i]["ItemCode"],
-                                    ItemDescription: results[i]["ItemDescription"],
-                                    Particulars: results[i]["Particulars"],
-                                    Amount: results[i]["Amount"],
-                                    BaseUnitId: results[i]["BaseUnitId"],
-                                    BaseUnit: results[i]["BaseUnit"],
-                                    BaseQuantity: results[i]["BaseQuantity"],
-                                    BaseQuantityDisplay: parseFloat(results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    BaseCost: results[i]["BaseCost"],
-                                    BaseCostDisplay: parseFloat(results[i]["BaseCost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    ReceivedQuantity: results[i]["ReceivedQuantity"],
-                                    ReceivedQuantityDisplay: parseFloat(results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    BalanceQuantity: results[i]["BalanceQuantity"],
-                                    BalanceQuantityDisplay: parseFloat(results[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                    PickButton: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPOStatusPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
-                                    Pick: (results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]) == 0 ? "<button class='btn btn-primary btn-xs' onclick='pickQuantity_OnClick()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='pickReverseQuantity_OnClick()'><i class='fa fa-arrow-left'></i></button>",
-                                    Balance: results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"],
-                                    BalanceDisplay: parseFloat(results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                });
+                        if (results != null) {
+                            if (results.length > 0) {
+                                for (i = 0; i < results.length; i++) {
+                                    purchaseOrderStatusObservableArray.push({
+                                        POId: results[i]["POId"],
+                                        ItemId: results[i]["ItemId"],
+                                        ManualArticleOldCode: results[i]["ItemManualOldCode"],
+                                        ItemCode: results[i]["ItemCode"],
+                                        ItemDescription: results[i]["ItemDescription"],
+                                        Particulars: results[i]["Particulars"],
+                                        Amount: results[i]["Amount"],
+                                        BaseUnitId: results[i]["BaseUnitId"],
+                                        BaseUnit: results[i]["BaseUnit"],
+                                        BaseQuantity: results[i]["BaseQuantity"],
+                                        BaseQuantityDisplay: parseFloat(results[i]["BaseQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        BaseCost: results[i]["BaseCost"],
+                                        BaseCostDisplay: parseFloat(results[i]["BaseCost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        ReceivedQuantity: results[i]["ReceivedQuantity"],
+                                        ReceivedQuantityDisplay: parseFloat(results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        BalanceQuantity: results[i]["BalanceQuantity"],
+                                        BalanceQuantityDisplay: parseFloat(results[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                        PickButton: "<button class='btn btn-primary btn-xs btn-block' onclick='btnPOStatusPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                        Pick: (results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]) == 0 ? "<button class='btn btn-primary btn-xs' onclick='pickQuantity_OnClick()'><i class='fa fa-arrow-right'></i></button>" : "<button class='btn btn-warning btn-xs' onclick='pickReverseQuantity_OnClick()'><i class='fa fa-arrow-left'></i></button>",
+                                        Balance: results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"],
+                                        BalanceDisplay: parseFloat(results[i]["BaseQuantity"] - results[i]["ReceivedQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    });
+                                }
+                            } else {
+                                $('#cmdApplyPOStatusButton').prop("disabled", true);
                             }
                         } else {
                             $('#cmdApplyPOStatusButton').prop("disabled", true);
