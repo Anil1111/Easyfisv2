@@ -3,18 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace easyfis.Quinta.Entities
+namespace easyfis.QuintaIntegration.QuintaIntegrationEntities
 {
-
-    // ===========
-    // Model: Root
-    // ===========
-    public class RootObject
+    public class ReturnedDocument
     {
-        public List<TrnSales> TRN { get; set; }
+        public String SINumber { get; set; }
+        public String ManualSINumber { get; set; }
     }
 
-    public class TrnSales
+    public class RootObject
+    {
+        public List<TrnSalesInvoice> TRN { get; set; }
+        public String DefaultTerm { get; set; }
+        public String DefaultVatOutput { get; set; }
+        public String DefaultVatInput { get; set; }
+        public String DefaultWTax { get; set; }
+        public String DefaultDiscount { get; set; }
+    }
+
+    public class TrnSalesInvoice
     {
         public String FTN { get; set; }     // Folio Transaction #
         public String TDT { get; set; }     // Transaction Date

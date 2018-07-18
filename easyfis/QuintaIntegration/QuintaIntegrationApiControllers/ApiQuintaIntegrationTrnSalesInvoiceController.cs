@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
-namespace easyfis.Quinta.ApiControllers
+namespace easyfis.QuintaIntegration.QuintaIntegrationApiControllers
 {
-    public class ApiSalesIntegrationController : ApiController
+    public class ApiQuintaIntegrationTrnSalesInvoiceController : ApiController
     {
         // ============
         // Data Context
@@ -37,14 +37,30 @@ namespace easyfis.Quinta.ApiControllers
             return result;
         }
 
-        // =============
-        // Get Tax Types
-        // =============
-        [HttpGet, Route("api/quinta/sales/integration/list/taxType")]
-        public List<easyfis.Entities.MstTaxType> ListTaxType()
+        // ========================================
+        // Quinta Integration: Dropdown List (Term)
+        // ========================================
+        [HttpGet, Route("api/quinta/integration/salesInvoice/dropdown/term/list")]
+        public List<QuintaIntegrationEntities.MstTerm> QuintaIntegrationListTerm()
+        {
+            var terms = from d in db.MstTerms
+                        select new QuintaIntegrationEntities.MstTerm
+                        {
+                            Id = d.Id,
+                            Term = d.Term
+                        };
+
+            return terms.OrderBy(t => t.Term).ToList();
+        }
+
+        // ============================================
+        // Quinta Integration: Dropdown List (Tax Type)
+        // ============================================
+        [HttpGet, Route("api/quinta/integration/salesInvoice/dropdown/taxType/list")]
+        public List<QuintaIntegrationEntities.MstTaxType> QuintaIntegrationListTaxType()
         {
             var taxTypes = from d in db.MstTaxTypes
-                           select new easyfis.Entities.MstTaxType
+                           select new QuintaIntegrationEntities.MstTaxType
                            {
                                Id = d.Id,
                                TaxType = d.TaxType
@@ -53,15 +69,32 @@ namespace easyfis.Quinta.ApiControllers
             return taxTypes.OrderBy(t => t.TaxType).ToList();
         }
 
-        // ==========================
-        // Add Sales Invoice (Quinta)
-        // ==========================
-        [HttpPost]
-        [Route("api/quinta/sales/integration/add")]
-        public HttpResponseMessage AddQuintaSalesIntegration(Entities.RootObject objRoot)
+        // ============================================
+        // Quinta Integration: Dropdown List (Discount)
+        // ============================================
+        [HttpGet, Route("api/quinta/integration/salesInvoice/dropdown/discount/list")]
+        public List<QuintaIntegrationEntities.MstDiscount> QuintaIntegrationListDiscount()
+        {
+            var discounts = from d in db.MstDiscounts
+                            select new QuintaIntegrationEntities.MstDiscount
+                            {
+                                Id = d.Id,
+                                Discount = d.Discount
+                            };
+
+            return discounts.OrderBy(t => t.Discount).ToList();
+        }
+
+        // =====================================
+        // Quinta Integration: Add Sales Invoice 
+        // =====================================
+        [HttpPost, Route("api/quinta/integration/salesInvoice/add")]
+        public List<QuintaIntegrationEntities.ReturnedDocument> QuintaIntegrationAddSalesInvoice(QuintaIntegrationEntities.RootObject objRoot)
         {
             try
             {
+                List<QuintaIntegrationEntities.ReturnedDocument> listSINumber = new List<QuintaIntegrationEntities.ReturnedDocument>();
+
                 var branch = from d in db.MstBranches
                              select d;
 
@@ -71,8 +104,6 @@ namespace easyfis.Quinta.ApiControllers
 
                     if (objRoot.TRN.Any())
                     {
-                        Debug.WriteLine(objRoot);
-
                         foreach (var objSales in objRoot.TRN)
                         {
                             if (objSales != null)
@@ -88,6 +119,7 @@ namespace easyfis.Quinta.ApiControllers
 
                                 Boolean termExist = false;
                                 var terms = from d in db.MstTerms
+                                            where d.Term.Equals(objRoot.DefaultTerm)
                                             select d;
 
                                 if (terms.Any())
@@ -181,8 +213,18 @@ namespace easyfis.Quinta.ApiControllers
                                     }
                                 }
 
+                                Boolean taxTypeExist = false;
+                                var taxTypes = from d in db.MstTaxTypes
+                                               select d;
+
+                                if (taxTypes.Any())
+                                {
+                                    taxTypeExist = true;
+                                }
+
                                 Boolean discountExist = false;
                                 var discounts = from d in db.MstDiscounts
+                                                where d.Discount.Equals(objRoot.DefaultDiscount)
                                                 select d;
 
                                 if (discounts.Any())
@@ -210,6 +252,12 @@ namespace easyfis.Quinta.ApiControllers
 
                                                 Business.Journal journal = new Business.Journal();
                                                 journal.DeleteSalesInvoiceJournal(Convert.ToInt32(salesInvoiceId));
+
+                                                listSINumber.Add(new QuintaIntegrationEntities.ReturnedDocument()
+                                                {
+                                                    SINumber = salesInvoice.FirstOrDefault().SINumber,
+                                                    ManualSINumber = salesInvoice.FirstOrDefault().ManualSINumber
+                                                });
                                             }
                                             else
                                             {
@@ -256,6 +304,12 @@ namespace easyfis.Quinta.ApiControllers
                                                 db.SubmitChanges();
 
                                                 salesInvoiceId = addSalesInvoice.Id;
+
+                                                listSINumber.Add(new QuintaIntegrationEntities.ReturnedDocument()
+                                                {
+                                                    SINumber = addSalesInvoice.SINumber,
+                                                    ManualSINumber = addSalesInvoice.ManualSINumber
+                                                });
                                             }
 
                                             if (salesInvoiceId != 0)
@@ -303,9 +357,9 @@ namespace easyfis.Quinta.ApiControllers
                                                             AssetAccountId = articleGroups.FirstOrDefault().AssetAccountId,
                                                             ExpenseAccountId = articleGroups.FirstOrDefault().ExpenseAccountId,
                                                             UnitId = units.FirstOrDefault().Id,
-                                                            OutputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                            InputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                            WTaxTypeId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                            OutputTaxId = taxTypes.Where(d => d.TaxType.Equals(objRoot.DefaultVatOutput)).FirstOrDefault().Id,
+                                                            InputTaxId = taxTypes.Where(d => d.TaxType.Equals(objRoot.DefaultVatInput)).FirstOrDefault().Id,
+                                                            WTaxTypeId = taxTypes.Where(d => d.TaxType.Equals(objRoot.DefaultWTax)).FirstOrDefault().Id,
                                                             Price = objSales.NAM,
                                                             Cost = 0,
                                                             IsInventory = false,
@@ -363,64 +417,67 @@ namespace easyfis.Quinta.ApiControllers
                                                 {
                                                     if (unitExist)
                                                     {
-                                                        if (discountExist)
+                                                        if (taxTypeExist)
                                                         {
-                                                            Int32? itemInventoryId = null;
-                                                            var articleInventory = from d in db.MstArticleInventories
-                                                                                   where d.BranchId == currentBranchId
-                                                                                   && d.ArticleId == itemId
-                                                                                   select d;
-
-                                                            if (articleInventory.Any())
+                                                            if (discountExist)
                                                             {
-                                                                itemInventoryId = articleInventory.FirstOrDefault().Id;
-                                                            }
+                                                                Int32? itemInventoryId = null;
+                                                                var articleInventory = from d in db.MstArticleInventories
+                                                                                       where d.BranchId == currentBranchId
+                                                                                       && d.ArticleId == itemId
+                                                                                       select d;
 
-                                                            var conversionUnit = from d in db.MstArticleUnits
-                                                                                 where d.ArticleId == itemId
-                                                                                 && d.UnitId == items.FirstOrDefault().UnitId
-                                                                                 select d;
-
-                                                            if (conversionUnit.Any())
-                                                            {
-                                                                Decimal baseQuantity = 1;
-                                                                Decimal basePrice = objSales.NAM;
-
-                                                                if (conversionUnit.FirstOrDefault().Multiplier > 0)
+                                                                if (articleInventory.Any())
                                                                 {
-                                                                    baseQuantity = 1 * (1 / conversionUnit.FirstOrDefault().Multiplier);
+                                                                    itemInventoryId = articleInventory.FirstOrDefault().Id;
                                                                 }
 
-                                                                if (baseQuantity > 0)
+                                                                var conversionUnit = from d in db.MstArticleUnits
+                                                                                     where d.ArticleId == itemId
+                                                                                     && d.UnitId == items.FirstOrDefault().UnitId
+                                                                                     select d;
+
+                                                                if (conversionUnit.Any())
                                                                 {
-                                                                    basePrice = objSales.NAM / baseQuantity;
+                                                                    Decimal baseQuantity = 1;
+                                                                    Decimal basePrice = objSales.NAM;
+
+                                                                    if (conversionUnit.FirstOrDefault().Multiplier > 0)
+                                                                    {
+                                                                        baseQuantity = 1 * (1 / conversionUnit.FirstOrDefault().Multiplier);
+                                                                    }
+
+                                                                    if (baseQuantity > 0)
+                                                                    {
+                                                                        basePrice = objSales.NAM / baseQuantity;
+                                                                    }
+
+                                                                    Data.TrnSalesInvoiceItem newSalesInvoiceItem = new Data.TrnSalesInvoiceItem
+                                                                    {
+                                                                        SIId = salesInvoiceId,
+                                                                        ItemId = itemId,
+                                                                        ItemInventoryId = itemInventoryId,
+                                                                        Particulars = "NA",
+                                                                        UnitId = units.FirstOrDefault().Id,
+                                                                        Quantity = 1,
+                                                                        Price = objSales.NAM,
+                                                                        DiscountId = discounts.FirstOrDefault().Id,
+                                                                        DiscountRate = discounts.FirstOrDefault().DiscountRate,
+                                                                        DiscountAmount = 0,
+                                                                        NetPrice = objSales.NAM,
+                                                                        Amount = objSales.NAM,
+                                                                        VATId = items.FirstOrDefault().OutputTaxId,
+                                                                        VATPercentage = items.FirstOrDefault().MstTaxType.TaxRate,
+                                                                        VATAmount = (objSales.NAM / (1 + (items.FirstOrDefault().MstTaxType.TaxRate / 100))) * (items.FirstOrDefault().MstTaxType.TaxRate / 100),
+                                                                        BaseUnitId = items.FirstOrDefault().UnitId,
+                                                                        BaseQuantity = baseQuantity,
+                                                                        BasePrice = basePrice,
+                                                                        SalesItemTimeStamp = DateTime.Now
+                                                                    };
+
+                                                                    db.TrnSalesInvoiceItems.InsertOnSubmit(newSalesInvoiceItem);
+                                                                    db.SubmitChanges();
                                                                 }
-
-                                                                Data.TrnSalesInvoiceItem newSalesInvoiceItem = new Data.TrnSalesInvoiceItem
-                                                                {
-                                                                    SIId = salesInvoiceId,
-                                                                    ItemId = itemId,
-                                                                    ItemInventoryId = itemInventoryId,
-                                                                    Particulars = "NA",
-                                                                    UnitId = units.FirstOrDefault().Id,
-                                                                    Quantity = 1,
-                                                                    Price = objSales.NAM,
-                                                                    DiscountId = discounts.FirstOrDefault().Id,
-                                                                    DiscountRate = discounts.FirstOrDefault().DiscountRate,
-                                                                    DiscountAmount = 0,
-                                                                    NetPrice = objSales.NAM,
-                                                                    Amount = objSales.NAM,
-                                                                    VATId = items.FirstOrDefault().OutputTaxId,
-                                                                    VATPercentage = items.FirstOrDefault().MstTaxType.TaxRate,
-                                                                    VATAmount = (objSales.NAM / (1 + (items.FirstOrDefault().MstTaxType.TaxRate / 100))) * (items.FirstOrDefault().MstTaxType.TaxRate / 100),
-                                                                    BaseUnitId = items.FirstOrDefault().UnitId,
-                                                                    BaseQuantity = baseQuantity,
-                                                                    BasePrice = basePrice,
-                                                                    SalesItemTimeStamp = DateTime.Now
-                                                                };
-
-                                                                db.TrnSalesInvoiceItems.InsertOnSubmit(newSalesInvoiceItem);
-                                                                db.SubmitChanges();
                                                             }
                                                         }
                                                     }
@@ -462,17 +519,17 @@ namespace easyfis.Quinta.ApiControllers
                         }
                     }
 
-                    return Request.CreateResponse(HttpStatusCode.OK);
+                    return listSINumber.ToList();
                 }
                 else
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Easyfis: Branch Not Exist!");
+                    return new List<QuintaIntegrationEntities.ReturnedDocument>();
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+                return new List<QuintaIntegrationEntities.ReturnedDocument>();
             }
         }
     }
