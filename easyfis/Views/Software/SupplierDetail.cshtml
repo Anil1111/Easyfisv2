@@ -154,6 +154,7 @@
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
                     <li role="presentation" class="active"><a data-toggle="tab" href="#JournalLedger" id="journalLedgerTab">Journal Ledger</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#ContactInformation" id="contactInformationTab">More Contact Information</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#Consignment" id="consignmentTab">Consignment</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
@@ -258,6 +259,60 @@
                             </div>
                         </div>
                     </div>
+                    <div id="Consignment" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 49.5%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                                <input type="text" class="form-control " id="ConsignmentInputFilter" placeholder="Search...">
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24%">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                                <div class="comboBox-wide" id="cboConsignmentShowNumberOfRows"></div>
+                                            </div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 24.5%" align="right">
+                                            @{
+                                                if (canAdd)
+                                                {
+                                                    <button class="btn btn-primary" id="btnAddConsignment" onclick="cmdAddConsignment_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="panel-body">
+                                <div id="ConsignmentGrid" class="grid"></div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="btn-group col-md-7" id="naviagtionPageGridConsignment">
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridConsignment">
+                                            <span class="glyphicon glyphicon-fast-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridConsignment">
+                                            <span class="glyphicon glyphicon-step-backward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridConsignment"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridConsignment">
+                                            <span class="glyphicon glyphicon-step-forward"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridConsignment">
+                                            <span class="glyphicon glyphicon-fast-forward"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -340,6 +395,67 @@
         </div>
     </div>
 
+    <!-- Consignment Item Edit Detail -->
+    <div class="modal fade" id="consignmentModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="consignmentModalLabel">Consignment Item</h4>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <span id="consignmentLoading"></span>
+                    </center>
+                    <div id="consignmentContent">
+                        <dl class="dl-horizontal">
+                            <dt>Item</dt>
+                            <dd>
+                                <table style="width: 100%" border="0">
+                                    <tr>
+                                        <td style="width: 30%">
+                                            <div class="" id="cboConsignmentItemCode"></div>
+                                        </td>
+                                        <td style="width: 1%"></td>
+                                        <td style="width: 69%">
+                                            <div class="" id="cboConsignmentItemDescription"></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </dd>
+                            <dt>Cost Percentage</dt>
+                            <dd><input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostPercentage" placeholder="0.00" /></dd>
+                            <dt>Cost Value</dt>
+                            <dd><input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostValue" placeholder="0.00" /></dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnConsignmentItemSave" class="btn btn-primary" onclick="btnConsignmentItemSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="btnConsignmentItemCloseModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consignment Item Delete Modal Confirmation -->
+    <div class="modal fade" id="consignmentDeletModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete</h4>
+                </div>
+                <div class="modal-body">
+                    Delete Consignment Item?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnConsignmentItemConfirmDelete" class="btn btn-danger" onclick="btnConsignmentItemConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnConsignmentItemConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ================
@@ -369,6 +485,18 @@
         var btnMoveToNextPageGridContactInformation = document.getElementById('btnMoveToNextPageGridContactInformation');
         var btnMoveToLastPageGridContactInformation = document.getElementById('btnMoveToLastPageGridContactInformation');
         var btnCurrentPageGridContactInformation = document.getElementById('btnCurrentPageGridContactInformation');
+
+        var consignmentItemCollectionView;
+        var consignmentItemFlexGrid;
+        var cboConsignmentShowNumberOfRows = new wijmo.input.ComboBox('#cboConsignmentShowNumberOfRows');
+        var btnMoveToFirstPageGridConsignment = document.getElementById('btnMoveToFirstPageGridConsignment');
+        var btnMoveToPreviousPageGridConsignment = document.getElementById('btnMoveToPreviousPageGridConsignment');
+        var btnMoveToNextPageGridConsignment = document.getElementById('btnMoveToNextPageGridConsignment');
+        var btnMoveToLastPageGridConsignment = document.getElementById('btnMoveToLastPageGridConsignment');
+        var btnCurrentPageGridConsignment = document.getElementById('btnCurrentPageGridConsignment');
+
+        var cboConsignmentItemCode = new wijmo.input.ComboBox('#cboConsignmentItemCode');
+        var cboConsignmentItemDescription = new wijmo.input.ComboBox('#cboConsignmentItemDescription');
 
         // =======================
         // Get URL Parameter Value
@@ -597,6 +725,7 @@
 
                                 $('#btnLockSupplier').prop('disabled', true);
                                 $('#btnAddMoreContactInformation').prop('disabled', true);
+                                $('#btnAddConsignment').prop('disabled', true);
 
                                 Islocked = true;
                             } else {
@@ -609,6 +738,7 @@
 
                         createJournalLedgerFlexGrid();
                         createContactInformationFlexGrid();
+                        createConsignmentItemFlexGrid();
                     }
                 });
             } else {
@@ -1545,6 +1675,547 @@
             });
         }
 
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRowsCosignmentItem() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboConsignmentShowNumberOfRows.dispose();
+            cboConsignmentShowNumberOfRows = new wijmo.input.ComboBox('#cboConsignmentShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboConsignmentShowNumberOfRows.selectedValue;
+                        consignmentItemCollectionView.pageSize = parseInt(numberOfRows);
+                        consignmentItemCollectionView.refresh();
+                        consignmentItemFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // ============================
+        // Consignment Entry Validation
+        // ============================
+        function consignmentEntryValidation() {
+            var isValid = true;
+            $('.requiredConsignmentItem').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": ""
+                    });
+                }
+            });
+
+            return isValid;
+        }
+
+        // =========================
+        // Get Consignment Item Data
+        // =========================
+        function getConsignmentItemData() {
+            var consignmentItemObservableArray = new wijmo.collections.ObservableArray;
+            if (document.location.search.length > 0) {
+                $.ajax({
+                    url: '/api/consignment/item/list/' + supplierId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+
+                                var btnConsignmentItemEdit = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditConsignmentItemOnclick()'><i class='fa fa-edit'></i> Edit</button>";
+                                var btnConsignmentItemDelete = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteConsignmentItemOnclick()'><i class='fa fa-trash'></i> Delete</button>";
+                                if (Islocked) {
+                                    btnConsignmentItemEdit = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditConsignmentItemOnclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                    btnConsignmentItemDelete = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteConsignmentItemOnclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                                }
+
+                                consignmentItemObservableArray.push({
+                                    EditId: btnConsignmentItemEdit,
+                                    DeleteId: btnConsignmentItemDelete,
+                                    Id: results[i]["Id"],
+                                    ArticleCode: results[i]["ArticleCode"],
+                                    ManualArticleCode: results[i]["ManualArticleCode"],
+                                    Article: results[i]["Article"],
+                                    ManualArticleOldCode: results[i]["ManualArticleOldCode"],
+                                    ConsignmentCostPercentage: results[i]["ConsignmentCostPercentage"],
+                                    ConsignmentCostPercentageDsiplay: parseFloat(results[i]["ConsignmentCostPercentage"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                    ConsignmentCostValue: results[i]["ConsignmentCostValue"],
+                                    ConsignmentCostValueDisplay: parseFloat(results[i]["ConsignmentCostValue"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                });
+                            }
+                        }
+
+                        NProgress.done();
+                    }
+                });
+            }
+
+            return consignmentItemObservableArray;
+        }
+
+        // =================================
+        // Create Consignment Item Flex Grid
+        // =================================
+        function createConsignmentItemFlexGrid() {
+            createCboShowRowsCosignmentItem();
+
+            consignmentItemCollectionView = new wijmo.collections.CollectionView(getConsignmentItemData());
+            consignmentItemCollectionView.canFilter = true;
+            consignmentItemCollectionView.pageSize = cboConsignmentShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#ConsignmentInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                consignmentItemCollectionView.refresh();
+            });
+
+            consignmentItemCollectionView.filter = function (item) {
+                return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            consignmentItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItemsConsignment();
+            });
+
+            consignmentItemFlexGrid = new wijmo.grid.FlexGrid('#ConsignmentGrid');
+            consignmentItemFlexGrid.initialize({
+                columns: [
+                    @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Bar Code",
+                        "binding": "ManualArticleCode",
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Item Description",
+                        "binding": "Article",
+                        "width": "4*"
+                    },
+                    {
+                        "header": "Cost Percentage",
+                        "binding": "ConsignmentCostPercentageDsiplay",
+                        "width": "2*",
+                        "align": "right"
+                    },
+                    {
+                        "header": "Cost Value",
+                        "binding": "ConsignmentCostValueDisplay",
+                        "width": "2*",
+                        "align": "right"
+                    },
+                ],
+                autoGenerateColumns: false,
+                itemsSource: consignmentItemCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            consignmentItemFlexGrid.trackChanges = true;
+
+            updateNavigateButtonsItemsConsignment();
+
+            btnMoveToFirstPageGridConsignment.addEventListener('click', function () {
+                consignmentItemCollectionView.moveToFirstPage();
+                updateNavigateButtonsItemsConsignment();
+            });
+
+            btnMoveToPreviousPageGridConsignment.addEventListener('click', function () {
+                consignmentItemCollectionView.moveToPreviousPage();
+                updateNavigateButtonsItemsConsignment();
+            });
+
+            btnMoveToNextPageGridConsignment.addEventListener('click', function () {
+                consignmentItemCollectionView.moveToNextPage();
+                updateNavigateButtonsItemsConsignment();
+            });
+
+            btnMoveToLastPageGridConsignment.addEventListener('click', function () {
+                consignmentItemCollectionView.moveToLastPage();
+                updateNavigateButtonsItemsConsignment();
+            });
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateNavigateButtonsItemsConsignment() {
+            if (consignmentItemCollectionView.pageSize <= 0) {
+                document.getElementById('naviagtionPageGridConsignment').style.display = 'none';
+                return;
+            }
+            document.getElementById('naviagtionPageGridConsignment').style.display = 'block';
+            if (consignmentItemCollectionView.pageIndex === 0) {
+                btnMoveToFirstPageGridConsignment.setAttribute('disabled', 'disabled');
+                btnMoveToPreviousPageGridConsignment.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridConsignment.removeAttribute('disabled');
+                btnMoveToLastPageGridConsignment.removeAttribute('disabled');
+            } else if (consignmentItemCollectionView.pageIndex === (consignmentItemCollectionView.pageCount - 1)) {
+                btnMoveToFirstPageGridConsignment.removeAttribute('disabled');
+                btnMoveToPreviousPageGridConsignment.removeAttribute('disabled');
+                btnMoveToLastPageGridConsignment.setAttribute('disabled', 'disabled');
+                btnMoveToNextPageGridConsignment.setAttribute('disabled', 'disabled');
+            } else {
+                btnMoveToFirstPageGridConsignment.removeAttribute('disabled');
+                btnMoveToPreviousPageGridConsignment.removeAttribute('disabled');
+                btnMoveToNextPageGridConsignment.removeAttribute('disabled');
+                btnMoveToLastPageGridConsignment.removeAttribute('disabled');
+            }
+            btnCurrentPageGridConsignment.innerHTML = (consignmentItemCollectionView.pageIndex + 1) + ' / ' + consignmentItemCollectionView.pageCount;
+        }
+
+        // ==================================
+        // Refresh Consignment Item Flex Grid
+        // ==================================
+        function refreshConsignmentItemFlexGrid() {
+            consignmentItemCollectionView = new wijmo.collections.CollectionView(getConsignmentItemData());
+            consignmentItemCollectionView.canFilter = true;
+            consignmentItemCollectionView.pageSize = cboConsignmentShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#ConsignmentInputFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                consignmentItemCollectionView.refresh();
+            });
+
+            consignmentItemCollectionView.filter = function (item) {
+                return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            consignmentItemCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsItemsConsignment();
+            });
+
+            consignmentItemFlexGrid.itemsSource = consignmentItemCollectionView;
+            consignmentItemFlexGrid.trackChanges = true;
+        }
+
+        // ==================================
+        // Create Consignment Item Combo Box
+        // =================================
+        function createCboItem(ItemIdSelectedValue) {
+            var consignmentItemObservableArray = new wijmo.collections.ObservableArray();
+
+            $.ajax({
+                url: '/api/consignment/item/list/item',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            consignmentItemObservableArray.push({
+                                Id: results[i]["Id"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
+                                Article: results[i]["Article"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    $("#btnConsignmentItemSave").prop("disabled", true);
+
+                    if (results.length > 0) {
+                        if (ItemIdSelectedValue != null) {
+                            var disabled = true;
+                        } else {
+                            disabled = false;
+                            $("#btnConsignmentItemSave").prop("disabled", false);
+                        }
+                    }
+
+                    cboConsignmentItemCode.dispose();
+                    cboConsignmentItemCode = new wijmo.input.ComboBox('#cboConsignmentItemCode', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: consignmentItemObservableArray,
+                        displayMemberPath: "ManualArticleCode",
+                        selectedValuePath: "Id",
+                        selectedValue: ItemIdSelectedValue,
+                        onSelectedIndexChanged: function () {
+                            cboConsignmentItemDescription.selectedValue = this.selectedValue;
+                        }
+                    });
+
+                    cboConsignmentItemDescription.dispose();
+                    cboConsignmentItemDescription = new wijmo.input.ComboBox('#cboConsignmentItemDescription', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: consignmentItemObservableArray,
+                        displayMemberPath: "Article",
+                        selectedValuePath: "Id",
+                        selectedValue: ItemIdSelectedValue,
+                        onSelectedIndexChanged: function () {
+                            cboConsignmentItemCode.selectedValue = this.selectedValue;
+                        }
+                    });
+
+                    setTimeout(function () {
+                        $("#consignmentLoading").hide();
+                        $("#consignmentContent").show();
+                        $('#btnConsignmentItemSave').prop('disabled', false);
+                    }, 500);
+                }
+            });
+        }
+
+        // ===============
+        // Add Consignment
+        // ===============
+        function cmdAddConsignment_OnClick() {
+            $('#consignmentModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredConsignmentItem').each(function () {
+                $(this).css({
+                    "border": ""
+                });
+            });
+
+            $("#consignmentLoading").show();
+            document.getElementById("consignmentLoading").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#consignmentContent").hide();
+
+            document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $('#btnConsignmentItemSave').prop('disabled', true);
+            $('#btnConsignmentItemCloseModal').prop('disabled', false);
+
+            createCboItem(null);
+            document.getElementById('inpConsignmentItemCostPercentage').value = formatDecimalValues(0);
+            document.getElementById('inpConsignmentItemCostValue').value = formatDecimalValues(0);
+        }
+
+        // ================
+        // Edit Consignment
+        // ================
+        function btnEditConsignmentItemOnclick() {
+            $('#consignmentModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredConsignmentItem').each(function () {
+                $(this).css({
+                    "border": ""
+                });
+            });
+
+            $("#consignmentLoading").show();
+            document.getElementById("consignmentLoading").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#consignmentContent").hide();
+
+            document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $('#btnConsignmentItemSave').prop('disabled', true);
+            $('#btnConsignmentItemCloseModal').prop('disabled', false);
+
+            consignmentItemCollectionView.editItem(consignmentItemCollectionView.currentItem);
+            var currentItem = consignmentItemCollectionView.currentEditItem;
+            createCboItem(currentItem.Id);
+            document.getElementById('inpConsignmentItemCostPercentage').value = formatDecimalValues(currentItem.ConsignmentCostPercentage);
+            document.getElementById('inpConsignmentItemCostValue').value = formatDecimalValues(currentItem.ConsignmentCostValue);
+        }
+
+        // ==================
+        // Delete Consignment
+        // ==================
+        function btnDeleteConsignmentItemOnclick() {
+            $('#consignmentDeletModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $('#btnConsignmentItemConfirmDelete').prop('disabled', false);
+            $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', false);
+        }
+
+        // ==========================
+        // Consignment Confirm Delete
+        // ==========================
+        function btnConsignmentItemConfirmDeleteOnclick() {
+            document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+            $('#btnConsignmentItemConfirmDelete').prop('disabled', true);
+            $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', true);
+
+            consignmentItemCollectionView.editItem(consignmentItemCollectionView.currentItem);
+            var itemId = consignmentItemCollectionView.currentEditItem.Id;
+
+            $.ajax({
+                url: '/api/consignment/item/' + itemId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#consignmentDeletModal').modal('hide');
+                        refreshConsignmentItemFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#consignmentDeletModal').modal('hide');
+                        document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnConsignmentItemConfirmDelete').prop('disabled', false);
+                        $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#consignmentDeletModal').modal('hide');
+                        document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnConsignmentItemConfirmDelete').prop('disabled', false);
+                        $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#consignmentDeletModal').modal('hide');
+                        document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnConsignmentItemConfirmDelete').prop('disabled', false);
+                        $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // ================
+        // Save Consignment
+        // ================
+        function btnConsignmentItemSaveOnclick() {
+            var objConsignment = new Object();
+            objConsignment.Id = cboConsignmentItemDescription.selectedValue;
+            objConsignment.ConsignmentCostPercentage = document.getElementById('inpConsignmentItemCostPercentage').value;
+            objConsignment.ConsignmentCostValue = document.getElementById('inpConsignmentItemCostValue').value;
+            var objConsignmentData = JSON.stringify(objConsignment);
+
+            if (consignmentEntryValidation()) {
+                document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                $('#btnConsignmentItemSave').prop('disabled', true);
+                $('#btnConsignmentItemCloseModal').prop('disabled', true);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/consignment/item/add/update/' + supplierId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: objConsignmentData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            $('#consignmentModal').modal('hide');
+                            refreshConsignmentItemFlexGrid();
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            $('#consignmentModal').modal('hide');
+                            document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnConsignmentItemSave').prop('disabled', true);
+                            $('#btnConsignmentItemCloseModal').prop('disabled', false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            $('#consignmentModal').modal('hide');
+                            document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnConsignmentItemSave').prop('disabled', true);
+                            $('#btnConsignmentItemCloseModal').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            $('#consignmentModal').modal('hide');
+                            document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnConsignmentItemSave').prop('disabled', true);
+                            $('#btnConsignmentItemCloseModal').prop('disabled', false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
         // ============
         // On Page Load
         // ============
@@ -1558,6 +2229,7 @@
         $('#journalLedgerTab').click(function () {
             $('#JournalLedger').show();
             $('#ContactInformation').hide();
+            $('#Consignment').hide();
             NProgress.start();
             refreshJournalLedgerFlexGrid();
         });
@@ -1565,8 +2237,17 @@
         $('#contactInformationTab').click(function () {
             $('#JournalLedger').hide();
             $('#ContactInformation').show();
+            $('#Consignment').hide();
             NProgress.start();
             refreshContactInformationFlexGrid();
+        });
+
+        $('#consignmentTab').click(function () {
+            $('#JournalLedger').hide();
+            $('#ContactInformation').hide();
+            $('#Consignment').show();
+            NProgress.start();
+            refreshConsignmentItemFlexGrid();
         });
     </script>
     <script type="text/javascript">

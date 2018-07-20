@@ -28,6 +28,9 @@ namespace easyfis.Entities
         public Decimal Price { get; set; }
         public Decimal? Cost { get; set; }
         public Boolean IsInventory { get; set; }
+        public Boolean IsConsignment { get; set; }
+        public Decimal ConsignmentCostPercentage { get; set; }
+        public Decimal ConsignmentCostValue { get; set; }
         public String Particulars { get; set; }
         public String Address { get; set; }
         public Int32 TermId { get; set; }
