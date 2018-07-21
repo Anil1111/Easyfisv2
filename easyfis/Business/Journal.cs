@@ -242,9 +242,9 @@ namespace easyfis.Business
 
                 if (salesInvoices.Any())
                 {
-                    // ============================================
-                    // Debit: Header (Customer Accounts Receivable)
-                    // ============================================
+                    // ====================================
+                    // Debit: Account Receivable (Customer)
+                    // ====================================
                     Data.TrnJournal newSalesJournal = new Data.TrnJournal
                     {
                         JournalDate = salesInvoices.FirstOrDefault().SIDate,
@@ -260,9 +260,9 @@ namespace easyfis.Business
 
                     db.TrnJournals.InsertOnSubmit(newSalesJournal);
 
-                    // ===================
-                    // Credit: Sales Lines
-                    // ===================
+                    // =======================================
+                    // Credit: Sales Line Amount Excluding VAT
+                    // =======================================
                     var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                             where d.SIId == SIId
                                             group d by new
@@ -297,9 +297,9 @@ namespace easyfis.Business
                         }
                     }
 
-                    // =================
-                    // Credit: Sales VAT
-                    // =================
+                    // ======================
+                    // Credit: Sales Line VAT
+                    // ======================
                     var salesInvoiceVATItems = from d in db.TrnSalesInvoiceItems
                                                where d.SIId == SIId
                                                group d by new
@@ -310,7 +310,7 @@ namespace easyfis.Business
                                                select new
                                                {
                                                    AccountId = g.Key.AccountId,
-                                                   Amount = g.Sum(d => d.VATAmount)
+                                                   VATAmount = g.Sum(d => d.VATAmount)
                                                };
 
                     if (salesInvoiceVATItems.Any())
@@ -325,7 +325,7 @@ namespace easyfis.Business
                                 ArticleId = salesInvoices.FirstOrDefault().CustomerId,
                                 Particulars = salesInvoices.FirstOrDefault().Remarks,
                                 DebitAmount = 0,
-                                CreditAmount = salesInvoiceVATItem.Amount,
+                                CreditAmount = salesInvoiceVATItem.VATAmount,
                                 SIId = SIId,
                                 DocumentReference = "SI-" + salesInvoices.FirstOrDefault().MstBranch.BranchCode + "-" + salesInvoices.FirstOrDefault().SINumber
                             };
@@ -334,9 +334,9 @@ namespace easyfis.Business
                         }
                     }
 
-                    // ==================================
-                    // Debit: Cost of Sales (Sales Lines)
-                    // ==================================
+                    // ====================
+                    // Debit: Cost of Sales
+                    // ====================
                     var salesInvoiceCostItems = from d in db.TrnSalesInvoiceItems
                                                 where d.SIId == SIId && d.MstArticle.IsInventory == true && d.ItemInventoryId > 0
                                                 group d by new
@@ -347,7 +347,7 @@ namespace easyfis.Business
                                                 select new
                                                 {
                                                     ArticleGroupId = g.Key.ArticleGroupId,
-                                                    Amount = g.Sum(d => d.MstArticleInventory.Cost * d.Quantity)
+                                                    Amount = g.Sum(d => d.MstArticle.IsConsignment == true ? ((d.NetPrice * (d.MstArticle.ConsignmentCostPercentage / 100)) + d.MstArticle.ConsignmentCostValue) * d.Quantity : d.MstArticleInventory.Cost * d.Quantity)
                                                 };
 
                     if (salesInvoiceCostItems.Any())
@@ -384,7 +384,7 @@ namespace easyfis.Business
                                                      select new
                                                      {
                                                          ArticleGroupId = g.Key.ArticleGroupId,
-                                                         Amount = g.Sum(d => d.MstArticleInventory.Cost * d.Quantity)
+                                                         Amount = g.Sum(d => d.MstArticle.IsConsignment == true ? ((d.NetPrice * (d.MstArticle.ConsignmentCostPercentage / 100)) + d.MstArticle.ConsignmentCostValue) * d.Quantity : d.MstArticleInventory.Cost * d.Quantity)
                                                      };
 
                     if (salesInvoiceInventoryItems.Any())

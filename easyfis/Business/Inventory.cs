@@ -379,7 +379,8 @@ namespace easyfis.Business
                                             Particulars = d.Particulars,
                                             Quantity = d.Quantity,
                                             BaseQuantity = d.BaseQuantity,
-                                            Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0
+                                            Cost = d.MstArticleInventory != null ? d.MstArticleInventory.Cost : 0,
+                                            IsConsignment = d.MstArticle.IsConsignment
                                         };
 
                 if (salesInvoiceItems.Any())
@@ -392,6 +393,12 @@ namespace easyfis.Business
                             {
                                 if (salesInvoiceItem.BaseQuantity > 0)
                                 {
+                                    decimal cost = salesInvoiceItem.Cost;
+                                    if (salesInvoiceItem.IsConsignment)
+                                    {
+                                        cost = 0;
+                                    }
+
                                     // ==========================
                                     // Insert New Inventory (Out)
                                     // ==========================
@@ -405,7 +412,7 @@ namespace easyfis.Business
                                         QuantityIn = 0,
                                         QuantityOut = salesInvoiceItem.BaseQuantity,
                                         Quantity = salesInvoiceItem.BaseQuantity * -1,
-                                        Amount = (salesInvoiceItem.Cost * salesInvoiceItem.BaseQuantity) * -1,
+                                        Amount = (cost * salesInvoiceItem.BaseQuantity) * -1,
                                         Particulars = salesInvoiceItem.Particulars
                                     };
 
@@ -426,6 +433,12 @@ namespace easyfis.Business
                                     {
                                         if (componentItem.Quantity > 0)
                                         {
+                                            decimal cost = salesInvoiceItem.Cost;
+                                            if (componentItem.MstArticle1.IsConsignment)
+                                            {
+                                                cost = 0;
+                                            }
+
                                             var articleInventories = from d in db.MstArticleInventories
                                                                      where d.BranchId == salesInvoiceItem.BranchId
                                                                      && d.ArticleId == componentItem.ComponentArticleId
@@ -452,7 +465,7 @@ namespace easyfis.Business
                                                     QuantityIn = 0,
                                                     QuantityOut = salesInvoiceItem.BaseQuantity * componentItem.Quantity,
                                                     Quantity = (salesInvoiceItem.BaseQuantity * componentItem.Quantity) * -1,
-                                                    Amount = (salesInvoiceItem.Cost * (salesInvoiceItem.BaseQuantity * componentItem.Quantity)) * -1,
+                                                    Amount = (cost * (salesInvoiceItem.BaseQuantity * componentItem.Quantity)) * -1,
                                                     Particulars = salesInvoiceItem.Particulars
                                                 };
 

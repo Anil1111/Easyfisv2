@@ -20,6 +20,7 @@ namespace easyfis.Entities
         public String Unit { get; set; }
         public Decimal Quantity { get; set; }
         public Decimal Price { get; set; }
+        public Decimal Cost { get; set; }
         public Int32 DiscountId { get; set; }
         public String Discount { get; set; }
         public Decimal DiscountRate { get; set; }

@@ -26,6 +26,7 @@ namespace easyfis.ModifiedApiControllers
                                    where d.DefaultSupplierId == Convert.ToInt32(supplierId)
                                    && d.ArticleTypeId == 1
                                    && d.IsLocked == true
+                                   && d.IsInventory == true
                                    select new Entities.MstArticle
                                    {
                                        Id = d.Id,

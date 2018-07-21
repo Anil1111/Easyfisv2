@@ -761,5 +761,184 @@ namespace easyfis.ModifiedApiControllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
             }
         }
+
+        // ===============================
+        // List Purchase Order Consignment
+        // ===============================
+        [Authorize, HttpGet, Route("api/purchaseOrder/consignment/salesInvoiceItem/list/{startDate}/{endDate}/{supplierId}")]
+        public List<Entities.TrnSalesInvoiceItem> ListPurchaseOrderConsignmentSalesInvoiceItem(String startDate, String endDate, String supplierId)
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var currentBranchId = currentUser.FirstOrDefault().BranchId;
+
+            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                    where d.MstArticle.DefaultSupplierId == Convert.ToInt32(supplierId)
+                                    && d.TrnSalesInvoice.SIDate >= Convert.ToDateTime(startDate)
+                                    && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
+                                    && d.TrnSalesInvoice.BranchId == currentBranchId
+                                    select new
+                                    {
+                                        ItemId = d.ItemId,
+                                        ItemManualArticleOldCode = d.MstArticle.ManualArticleOldCode,
+                                        ItemCode = d.MstArticle.ManualArticleCode,
+                                        ItemDescription = d.MstArticle.Article,
+                                        UnitId = d.MstArticle.UnitId,
+                                        Unit = d.MstArticle.MstUnit.Unit,
+                                        Quantity = d.Quantity,
+                                        Amount = ((d.NetPrice * (d.MstArticle.ConsignmentCostPercentage / 100)) + d.MstArticle.ConsignmentCostValue) * d.Quantity
+                                    };
+
+            if (salesInvoiceItems.Any())
+            {
+                var consignmentItems = from d in salesInvoiceItems
+                                       group d by new
+                                       {
+                                           ItemId = d.ItemId,
+                                           ItemManualArticleOldCode = d.ItemManualArticleOldCode,
+                                           ItemCode = d.ItemCode,
+                                           ItemDescription = d.ItemDescription,
+                                           UnitId = d.UnitId,
+                                           Unit = d.Unit
+                                       } into g
+                                       select new Entities.TrnSalesInvoiceItem
+                                       {
+                                           ItemId = g.Key.ItemId,
+                                           ItemManualArticleOldCode = g.Key.ItemManualArticleOldCode,
+                                           ItemCode = g.Key.ItemCode,
+                                           ItemDescription = g.Key.ItemDescription,
+                                           UnitId = g.Key.UnitId,
+                                           Unit = g.Key.Unit,
+                                           Quantity = g.Sum(d => d.Quantity),
+                                           Cost = g.Sum(d => d.Amount) / g.Sum(d => d.Quantity),
+                                           Amount = g.Sum(d => d.Amount)
+                                       };
+
+                return consignmentItems.ToList();
+            }
+            else
+            {
+                return new List<Entities.TrnSalesInvoiceItem>();
+            }
+        }
+
+        // ================================
+        // Apply Purchase Order Consignment
+        // ================================
+        [Authorize, HttpPost, Route("api/purchaseOrder/apply/consignment/{POId}")]
+        public HttpResponseMessage ApplyPurchaseOrderConsignment(List<Entities.TrnSalesInvoiceItem> objItems, String POId)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+                    var currentBranchId = currentUser.FirstOrDefault().BranchId;
+
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("PurchaseOrderDetail") select d;
+                    IQueryable<Data.TrnPurchaseOrder> purchaseOrder = from d in db.TrnPurchaseOrders where d.Id == Convert.ToInt32(POId) select d;
+
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!userForms.Any())
+                    {
+                        returnMessage = "Sorry. You have no access in this purchase order detail page.";
+                    }
+                    else if (!userForms.FirstOrDefault().CanAdd)
+                    {
+                        returnMessage = "Sorry. You have no rights to add new purchase order item in this purchase order detail page.";
+                    }
+                    else if (!purchaseOrder.Any())
+                    {
+                        returnMessage = "These current purchase order details are not found in the server. Please add new purchase order first before proceeding.";
+                    }
+                    else if (purchaseOrder.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "You cannot apply consignment items to purchase order item if the current purchase order detail is locked.";
+                    }
+                    else if (!objItems.Any())
+                    {
+                        returnMessage = "There are no consignment items.";
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        foreach (var objItem in objItems)
+                        {
+                            var item = from d in db.MstArticles
+                                       where d.Id == objItem.ItemId
+                                       && d.ArticleTypeId == 1
+                                       && d.IsLocked == true
+                                       select d;
+
+                            if (item.Any())
+                            {
+                                var conversionUnit = from d in db.MstArticleUnits
+                                                     where d.ArticleId == objItem.ItemId
+                                                     && d.UnitId == objItem.UnitId
+                                                     && d.MstArticle.IsLocked == true
+                                                     select d;
+
+                                if (conversionUnit.Any())
+                                {
+                                    Decimal baseQuantity = objItem.Quantity * 1;
+                                    if (conversionUnit.FirstOrDefault().Multiplier > 0)
+                                    {
+                                        baseQuantity = objItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
+                                    }
+
+                                    Decimal baseCost = objItem.Amount;
+                                    if (baseQuantity > 0)
+                                    {
+                                        baseCost = objItem.Amount / baseQuantity;
+                                    }
+
+                                    Data.TrnPurchaseOrderItem newPurchaseOrderItem = new Data.TrnPurchaseOrderItem
+                                    {
+                                        POId = Convert.ToInt32(POId),
+                                        ItemId = objItem.ItemId,
+                                        Particulars = "Consignment Item",
+                                        UnitId = objItem.UnitId,
+                                        Quantity = objItem.Quantity,
+                                        Cost = objItem.Cost,
+                                        Amount = objItem.Amount,
+                                        BaseUnitId = item.FirstOrDefault().UnitId,
+                                        BaseQuantity = baseQuantity,
+                                        BaseCost = baseCost
+                                    };
+
+                                    db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
+                                }
+                            }
+                        }
+
+                        db.SubmitChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, returnMessage);
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
     }
 }
