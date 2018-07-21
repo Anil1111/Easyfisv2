@@ -103,6 +103,8 @@ namespace easyfis.ModifiedApiControllers
                                         updateItem.DefaultSupplierId = Convert.ToInt32(supplierId);
                                         updateItem.ConsignmentCostPercentage = objItem.ConsignmentCostPercentage;
                                         updateItem.ConsignmentCostValue = objItem.ConsignmentCostValue;
+                                        updateItem.IsConsignment = true;
+                                        updateItem.IsInventory = true;
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
@@ -181,6 +183,7 @@ namespace easyfis.ModifiedApiControllers
                                 updateItem.DefaultSupplierId = null;
                                 updateItem.ConsignmentCostPercentage = 0;
                                 updateItem.ConsignmentCostValue = 0;
+                                updateItem.IsConsignment = false;
 
                                 db.SubmitChanges();
 
