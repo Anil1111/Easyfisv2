@@ -170,6 +170,8 @@ namespace easyfis.ModifiedApiControllers
                            WTaxTypeId = d.WTaxTypeId,
                            IsInventory = d.IsInventory,
                            IsConsignment = d.IsConsignment,
+                           ConsignmentCostPercentage = d.ConsignmentCostPercentage,
+                           ConsignmentCostValue = d.ConsignmentCostValue,
                            ManualArticleOldCode = d.ManualArticleOldCode,
                            Cost = d.Cost,
                            Kitting = d.Kitting,
@@ -417,6 +419,8 @@ namespace easyfis.ModifiedApiControllers
                                                 lockItem.WTaxTypeId = objItem.WTaxTypeId;
                                                 lockItem.IsInventory = objItem.IsInventory;
                                                 lockItem.IsConsignment = objItem.IsConsignment;
+                                                lockItem.ConsignmentCostPercentage = objItem.ConsignmentCostPercentage;
+                                                lockItem.ConsignmentCostValue = objItem.ConsignmentCostValue;
                                                 lockItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
                                                 lockItem.Cost = objItem.Cost;
                                                 lockItem.Kitting = objItem.Kitting;

@@ -163,18 +163,6 @@
                                             <div class="comboBox-wide" id="cboItemDetailKitting"></div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-4">Default Supplier</label>
-                                        <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboItemDetailDefaultSupplier"></div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-4">Is Consignment</label>
-                                        <div class="col-sm-8">
-                                            <input type="checkbox" id="inpItemDetailIsConsignment" onchange="isConsignmentOnchange(this)" />
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -193,6 +181,7 @@
                     <li role="presentation"><a data-toggle="tab" href="#Inventory" id="inventoryTab">Inventory</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#GLAccount" id="GLAccountTab">GL Account</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#FixedAsset" id="fixedAssetTab">Fixed Asset</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#Consignment" id="consignmentTab">Consignment</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
@@ -651,6 +640,49 @@
                                                 <label class="control-label col-sm-4">Salvage Value</label>
                                                 <div class="col-sm-8">
                                                     <input type="text" class="form-control numberField" id="inpItemDetailsalvageValue" placeholder="0.00" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6"></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--
+                        ========================
+                        Tab Content: Consignment
+                        ========================
+                    -->
+                    <div id="Consignment" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Default Supplier</label>
+                                                <div class="col-sm-8">
+                                                    <div class="comboBox-wide" id="cboItemDetailDefaultSupplier"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Is Consignment</label>
+                                                <div class="col-sm-8">
+                                                    <input type="checkbox" id="inpItemDetailIsConsignment" onchange="isConsignmentOnchange(this)" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Cost Percentage (%)</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control requiredItem numberField" id="inpItemDetailConsignmentCostPercentage" placeholder="0.00" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Cost Value</label>
+                                                <div class="col-sm-8">
+                                                    <input type="text" class="form-control requiredItem numberField" id="inpItemDetailConsignmentCostValue" placeholder="0.00" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1388,6 +1420,8 @@
                             cboItemDetailWitholdingTax.selectedValue = results.WTaxTypeId;
                             document.getElementById('inpItemDetailIsInventory').checked = results.IsInventory;
                             document.getElementById('inpItemDetailIsConsignment').checked = results.IsConsignment;
+                            document.getElementById('inpItemDetailConsignmentCostPercentage').value = formatDecimalValues(results.ConsignmentCostPercentage);
+                            document.getElementById('inpItemDetailConsignmentCostValue').value = formatDecimalValues(results.ConsignmentCostValue);
 
                             if (results.Kitting == 0) {
                                 cboItemDetailKitting.selectedValue = "None";
@@ -1439,6 +1473,8 @@
                                 document.getElementById('inpItemDetailsalvageValue').disabled = true;
                                 cboItemDetailDefaultSupplier.disabled = true;
                                 document.getElementById('inpItemDetailIsConsignment').disabled = true;
+                                document.getElementById('inpItemDetailConsignmentCostPercentage').disabled = true;
+                                document.getElementById('inpItemDetailConsignmentCostValue').disabled = true;
 
                                 $('#btnItemDetailLock').prop('disabled', true);
                                 $('#btnUnitConversionAdd').prop('disabled', true);
@@ -1495,6 +1531,8 @@
             itemObject.SalvageValue = document.getElementById('inpItemDetailsalvageValue').value;
             itemObject.ManualArticleOldCode = document.getElementById('inpItemDetailSKUCode').value;
             itemObject.IsConsignment = document.getElementById('inpItemDetailIsConsignment').checked;
+            itemObject.ConsignmentCostPercentage = document.getElementById('inpItemDetailConsignmentCostPercentage').value;
+            itemObject.ConsignmentCostValue = document.getElementById('inpItemDetailConsignmentCostValue').value;
 
             if (cboItemDetailKitting.selectedValue == "None") {
                 itemObject.Kitting = 0;
@@ -3531,6 +3569,7 @@
             $('#Inventory').hide();
             $('#GLAccount').hide();
             $('#FixedAsset').hide();
+            $('#Consignment').hide();
             NProgress.start();
             refresUnitConversionFlexGrid();
         });
@@ -3541,6 +3580,7 @@
             $('#Inventory').hide();
             $('#GLAccount').hide();
             $('#FixedAsset').hide();
+            $('#Consignment').hide();
             NProgress.start();
             refreshComponentFlexGrid();
         });
@@ -3551,6 +3591,7 @@
             $('#Inventory').hide();
             $('#GLAccount').hide();
             $('#FixedAsset').hide();
+            $('#Consignment').hide();
             NProgress.start();
             refreshPriceFlexGrid();
         });
@@ -3561,6 +3602,7 @@
             $('#Inventory').show();
             $('#GLAccount').hide();
             $('#FixedAsset').hide();
+            $('#Consignment').hide();
             refreshInventoryFlexGrid();
         });
         $('#GLAccountTab').click(function () {
@@ -3570,6 +3612,7 @@
             $('#Inventory').hide();
             $('#GLAccount').show();
             $('#FixedAsset').hide();
+            $('#Consignment').hide();
         });
         $('#fixedAssetTab').click(function () {
             $('#UnitConversion').hide();
@@ -3578,6 +3621,16 @@
             $('#Inventory').hide();
             $('#GLAccount').hide();
             $('#FixedAsset').show();
+            $('#Consignment').hide();
+        });
+        $('#consignmentTab').click(function () {
+            $('#UnitConversion').hide();
+            $('#Component').hide();
+            $('#Price').hide();
+            $('#Inventory').hide();
+            $('#GLAccount').hide();
+            $('#FixedAsset').hide();
+            $('#Consignment').show();
         });
 
         // ============
