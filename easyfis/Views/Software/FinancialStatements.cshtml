@@ -36,6 +36,7 @@
                         -->
                         <ul class="nav nav-pills nav-stacked pill-custom pill-report-custom" role="tablist" id="myTab">
                             <li class="active"><a data-toggle="pill" href="#tabPillBalanceSheet">Balance Sheet</a></li>
+                            <li><a data-toggle="pill" href="#tabPillBalanceSheetPerBranch">Balance Sheet Per Branch</a></li>
                             <li><a data-toggle="pill" href="#tabPillIncomeStatement">Income Statement</a></li>
                             <li><a data-toggle="pill" href="#tabPillCashFlow">Cash Flow</a></li>
                             <li class="reportDivider"></li>
@@ -86,6 +87,51 @@
                                                             <label class="control-label col-sm-4">Company</label>
                                                             <div class="col-sm-8">
                                                                 <div class="comboBox-wide" id="cboBalanceSheetCompany"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--
+                                ======================================
+                                Tab Content - Balance Sheet Per Branch
+                                ======================================
+                            -->
+                            <div id="tabPillBalanceSheetPerBranch" class="tab-pane">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div align="right">
+                                            <button onclick="btnBalanceSheetPerBranchViewOnclick()" class="btn btn-primary "><i class="fa fa-table"></i> View</button>
+                                            <button onclick="btnBalanceSheetPerBranchPrintPDFOnclick()" class="btn btn-primary "><i class="fa fa-print"></i> Print</button>
+                                            <a href="/Software" class="btn btn-danger" id=""><i class="fa fa-times"></i> Close</a>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="">
+                                            <form class="form-horizontal" role="form">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Date as of</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="comboBox-wide" id="cboBalanceSheetPerBranchDateAsOf"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Company</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="comboBox-wide" id="cboBalanceSheetPerBranchCompany"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-4">Branch</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="comboBox-wide" id="cboBalanceSheetPerBranchBranch"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -741,6 +787,13 @@
         var cboBalanceSheetDateAsOf = new wijmo.input.InputDate('#cboBalanceSheetDateAsOf');
         var cboBalanceSheetCompany = new wijmo.input.ComboBox('#cboBalanceSheetCompany');
 
+        // ================================
+        // Balance Sheet Per Branch Filters
+        // ================================
+        var cboBalanceSheetPerBranchDateAsOf = new wijmo.input.InputDate('#cboBalanceSheetPerBranchDateAsOf');
+        var cboBalanceSheetPerBranchCompany = new wijmo.input.ComboBox('#cboBalanceSheetPerBranchCompany');
+        var cboBalanceSheetPerBranchBranch = new wijmo.input.ComboBox('#cboBalanceSheetPerBranchBranch');
+
         // ========================
         // Income Statement Filters
         // ========================
@@ -841,6 +894,7 @@
         // All Company Dropdown Selection
         // ==============================
         var isCboBalanceSheetCompanySelected = true;
+        var isCboBalanceSheetPerBranchCompanySelected = true;
         var isCboIncomeStatementCompanySelected = true;
         var isCboCashFlowCompanySelected = true;
         var isCboTrialBalanceCompanySelected = true;
@@ -865,6 +919,15 @@
             NProgress.start();
             cboBalanceSheetDateAsOf.dispose();
             cboBalanceSheetDateAsOf = new wijmo.input.InputDate('#cboBalanceSheetDateAsOf', {
+                format: 'MM-dd-yyyy',
+                value: new Date()
+            });
+
+            // =============
+            // Balance Sheet
+            // =============
+            cboBalanceSheetPerBranchDateAsOf.dispose();
+            cboBalanceSheetPerBranchDateAsOf = new wijmo.input.InputDate('#cboBalanceSheetPerBranchDateAsOf', {
                 format: 'MM-dd-yyyy',
                 value: new Date()
             });
@@ -1092,6 +1155,24 @@
                         selectedValue: @ViewData["CompanyId"],
                         onSelectedIndexChanged: function () {
                             isCboBalanceSheetCompanySelected = true;
+                            if (this.selectedValue != null) {
+                                createAllCboFinancialStatementBranchFilters(this.selectedValue);
+                            } else {
+                                createAllCboFinancialStatementBranchFilters(0);
+                            }
+                        }
+                    });
+
+                    cboBalanceSheetPerBranchCompany.dispose();
+                    cboBalanceSheetPerBranchCompany = new wijmo.input.ComboBox('#cboBalanceSheetPerBranchCompany', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: companyObservableArray,
+                        displayMemberPath: "Company",
+                        selectedValuePath: "Id",
+                        selectedValue: @ViewData["CompanyId"],
+                        onSelectedIndexChanged: function () {
+                            isCboBalanceSheetPerBranchCompanySelected = true;
                             if (this.selectedValue != null) {
                                 createAllCboFinancialStatementBranchFilters(this.selectedValue);
                             } else {
@@ -1357,6 +1438,18 @@
 
                         }
 
+                        if (isCboBalanceSheetPerBranchCompanySelected) {
+                            cboBalanceSheetPerBranchBranch.dispose();
+                            cboBalanceSheetPerBranchBranch = new wijmo.input.ComboBox('#cboBalanceSheetPerBranchBranch', {
+                                disabled: disabled,
+                                isEditable: false,
+                                itemsSource: branchObservableArray,
+                                displayMemberPath: "Branch",
+                                selectedValuePath: "Id",
+                                selectedValue: @ViewData["BranchId"]
+                            });
+                        }
+
                         if (isCboIncomeStatementCompanySelected) {
                             cboIncomeStatementBranch.dispose();
                             cboIncomeStatementBranch = new wijmo.input.ComboBox('#cboIncomeStatementBranch', {
@@ -1495,6 +1588,7 @@
                         }
 
                         isCboBalanceSheetCompanySelected = false;
+                        isCboBalanceSheetPerBranchCompanySelected = false;
                         isCboIncomeStatementCompanySelected = false;
                         isCboCashFlowCompanySelected = false;
                         isCboTrialBalanceCompanySelected = false;
@@ -1593,6 +1687,7 @@
                 }
 
                 isCboBalanceSheetCompanySelected = false;
+                isCboBalanceSheetPerBranchCompanySelected = false;
                 isCboIncomeStatementCompanySelected = false;
                 isCboCashFlowCompanySelected = false;
                 isCboTrialBalanceCompanySelected = false;
@@ -1673,6 +1768,44 @@
                 var companyId = cboBalanceSheetCompany.selectedValue;
 
                 window.location.href = '/RepBalanceSheet/BalanceSheet?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId;
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // =============================
+        // Balance Sheet Per Branch View
+        // =============================
+        function btnBalanceSheetPerBranchViewOnclick() {
+            if (cboBalanceSheetPerBranchCompany.selectedValue != null) {
+                if (cboBalanceSheetPerBranchBranch.selectedValue != null) {
+                    var dateAsOf = cboBalanceSheetPerBranchDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboBalanceSheetPerBranchCompany.selectedValue;
+                    var branchId = cboBalanceSheetPerBranchBranch.selectedValue;
+
+                    window.location.href = '/Software/BalanceSheetPerBranch?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId;
+                } else {
+                    toastr.error("Lacking Information");
+                }
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // ==================================
+        // Balance Sheet Per Branch Print PDF
+        // ==================================
+        function btnBalanceSheetPerBranchPrintPDFOnclick() {
+            if (cboBalanceSheetPerBranchCompany.selectedValue != null) {
+                if (cboBalanceSheetPerBranchBranch.selectedValue != null) {
+                    var dateAsOf = cboBalanceSheetPerBranchDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboBalanceSheetPerBranchCompany.selectedValue;
+                    var branchId = cboBalanceSheetPerBranchBranch.selectedValue;
+
+                    window.location.href = '/RepBalanceSheetPerBranch/BalanceSheetPerBranch?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId ;
+                } else {
+                    toastr.error("Lacking Information");
+                }
             } else {
                 toastr.error("Lacking Information");
             }

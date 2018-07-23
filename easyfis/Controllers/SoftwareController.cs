@@ -1100,6 +1100,22 @@ namespace easyfis.Controllers
             }
         }
 
+        // =============================
+        // View Balance Sheet Per Branch
+        // =============================
+        [Authorize]
+        public ActionResult BalanceSheetPerBranch()
+        {
+            if (PageAccess("ViewBalanceSheetPerBranch").Equals("ViewBalanceSheetPerBranch"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
+        }
+
         // =====================
         // View Income Statement
         // =====================
