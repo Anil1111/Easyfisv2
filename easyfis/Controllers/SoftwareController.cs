@@ -727,6 +727,22 @@ namespace easyfis.Controllers
             }
         }
 
+        // =======================
+        // View Consignment Report
+        // =======================
+        [Authorize]
+        public ActionResult ConsignmentReport()
+        {
+            if (PageAccess("ViewConsignmentReport").Equals("ViewConsignmentReport"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
+        }
+
         // =========
         // Inventory
         // =========
