@@ -78,7 +78,7 @@ namespace easyfis.Controllers
                                 && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                 && d.BranchId == Convert.ToInt32(BranchId)
                                 && d.IsLocked == true
-                                select new Models.TrnDisbursement
+                                select new
                                 {
                                     Id = d.Id,
                                     Branch = d.MstBranch.Branch,

@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Stock Out Book List Report
         // ==========================
         [Authorize, HttpGet, Route("api/stockOutBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListStockOutBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepStockOutBook> ListStockOutBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.OTId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepStockOutBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.OTId != null ? d.TrnStockOut.ManualOTNumber : "",

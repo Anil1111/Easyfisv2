@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Sales Summary Report By Sales No. List
         // ======================================
         [Authorize, HttpGet, Route("api/salesSummaryReportSalesNo/list/{startSalesNo}/{endSalesNo}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoice> ListSalesSummaryBySalesNoReport(String startSalesNo, String endSalesNo, String companyId, String branchId)
+        public List<Entities.RepSalesSummaryReportBySalesNo> ListSalesSummaryBySalesNoReport(String startSalesNo, String endSalesNo, String companyId, String branchId)
         {
             var salesInvoices = from d in db.TrnSalesInvoices
                                 where d.BranchId == Convert.ToInt32(branchId)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                 && Convert.ToInt32(d.SINumber) >= Convert.ToInt32(startSalesNo)
                                 && Convert.ToInt32(d.SINumber) <= Convert.ToInt32(endSalesNo)
                                 && d.IsLocked == true
-                                select new Models.TrnSalesInvoice
+                                select new Entities.RepSalesSummaryReportBySalesNo
                                 {
                                     Id = d.Id,
                                     Branch = d.MstBranch.Branch,

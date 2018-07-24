@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Sales Summary Report All Fields List
         // ====================================
         [Authorize, HttpGet, Route("api/salesSummaryReportAllFields/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepSalesSummaryReportAllFields> ListSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                     && d.TrnSalesInvoice.SIDate >= Convert.ToDateTime(startDate)
                                     && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
                                     && d.TrnSalesInvoice.IsLocked == true
-                                    select new Models.TrnSalesInvoiceItem
+                                    select new Entities.RepSalesSummaryReportAllFields
                                     {
                                         Id = d.Id,
                                         Branch = d.TrnSalesInvoice.MstBranch.Branch,

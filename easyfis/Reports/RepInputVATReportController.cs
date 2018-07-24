@@ -81,7 +81,7 @@ namespace easyfis.Controllers
                                         && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(BranchId)
                                         && d.TrnReceivingReceipt.IsLocked == true
                                         && d.VATAmount > 0
-                                        select new Models.TrnReceivingReceiptItem
+                                        select new
                                         {
                                             Id = d.Id,
                                             RR = d.TrnReceivingReceipt.RRNumber,

@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Receiving Receipt Book List Report
         // ==================================
         [Authorize, HttpGet, Route("api/receivingReceiptBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListReceivingReceiptBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepReceivingReceiptBook> ListReceivingReceiptBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.RRId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepReceivingReceiptBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.RRId != null ? d.TrnReceivingReceipt.ManualRRNumber : "",

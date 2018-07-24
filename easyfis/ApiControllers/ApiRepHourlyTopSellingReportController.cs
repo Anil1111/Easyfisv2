@@ -37,7 +37,7 @@ namespace easyfis.ApiControllers
         // Hourly Top Selling Items Report List
         // ====================================
         [Authorize, HttpGet, Route("api/hourlyTopItemsSellingReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListHourlyTopItemsSellingReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepHourlyTopSellingItemsReport> ListHourlyTopItemsSellingReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -54,7 +54,7 @@ namespace easyfis.ApiControllers
                                         BaseUnit = d.MstArticle.MstUnit.Unit,
                                         SalesItemTimeStamp = d.SalesItemTimeStamp.Hour,
                                     } into g
-                                    select new Models.TrnSalesInvoiceItem
+                                    select new Entities.RepHourlyTopSellingItemsReport
                                     {
                                         Branch = g.Key.Branch,
                                         ItemId = g.Key.ItemId,

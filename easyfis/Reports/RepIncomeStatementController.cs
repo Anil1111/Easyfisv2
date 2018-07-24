@@ -81,7 +81,7 @@ namespace easyfis.Reports
                           && d.MstBranch.CompanyId == CompanyId
                           && d.BranchId == BranchId
                           group d by d.MstAccount into g
-                          select new Models.TrnJournal
+                          select new
                           {
                               DocumentReference = "5 - incomes",
                               AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
@@ -250,7 +250,7 @@ namespace easyfis.Reports
                            && d.MstBranch.CompanyId == CompanyId
                            && d.BranchId == BranchId
                            group d by d.MstAccount into g
-                           select new Models.TrnJournal
+                           select new
                            {
                                DocumentReference = "6 - Expenses",
                                AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,

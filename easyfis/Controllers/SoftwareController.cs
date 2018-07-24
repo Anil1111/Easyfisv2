@@ -26,7 +26,7 @@ namespace easyfis.Controllers
             {
                 var userForms = from d in db.MstUserForms
                                 where d.UserId == currentUser.FirstOrDefault().Id
-                                select new Models.MstUserForm
+                                select new Entities.MstUserForm
                                 {
                                     Id = d.Id,
                                     UserId = d.UserId,
@@ -74,7 +74,7 @@ namespace easyfis.Controllers
             {
                 var userForms = from d in db.MstUserForms
                                 where d.UserId == currentUser.FirstOrDefault().Id
-                                select new Models.MstUserForm
+                                select new Entities.MstUserForm
                                 {
                                     Id = d.Id,
                                     UserId = d.UserId,

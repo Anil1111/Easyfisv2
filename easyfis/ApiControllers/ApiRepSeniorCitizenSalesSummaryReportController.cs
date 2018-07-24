@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Senior Citizen Sales Summary Report List
         // ========================================
         [Authorize, HttpGet, Route("api/seniorCitizenSalesSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListSeniorCitizenSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepSeniorCitizenSalesSummaryReport> ListSeniorCitizenSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -28,7 +28,7 @@ namespace easyfis.ApiControllers
                                     && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
                                     && d.MstDiscount.Discount.Equals("Senior Citizen Discount")
                                     && d.DiscountAmount > 0
-                                    select new Models.TrnSalesInvoiceItem
+                                    select new Entities.RepSeniorCitizenSalesSummaryReport
                                     {
                                         Id = d.Id,
                                         Branch = d.TrnSalesInvoice.MstBranch.Branch,

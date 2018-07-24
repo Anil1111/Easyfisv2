@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Disbrusement Book List Report
         // =============================
         [Authorize, HttpGet, Route("api/disbursementBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListDisbursementBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepDisbursementBook> ListDisbursementBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.CVId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepDisbursementBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.CVId != null ? d.TrnDisbursement.ManualCVNumber : "",

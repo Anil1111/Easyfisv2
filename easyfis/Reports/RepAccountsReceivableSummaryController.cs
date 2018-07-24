@@ -244,7 +244,7 @@ namespace easyfis.Controllers
                                                               && d.MstArticle.AccountId == AccountId
                                                               && d.BalanceAmount > 0
                                                               && d.IsLocked == true
-                                                              select new Models.TrnSalesInvoice
+                                                              select new
                                                               {
                                                                   Id = d.Id,
                                                                   Customer = d.MstArticle.Article,

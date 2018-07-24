@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Collection Book List Report
         // ===========================
         [Authorize, HttpGet, Route("api/collectionBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListCollectionBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepCollectionBook> ListCollectionBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.ORId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepCollectionBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.ORId != null ? d.TrnCollection.ManualORNumber : "",

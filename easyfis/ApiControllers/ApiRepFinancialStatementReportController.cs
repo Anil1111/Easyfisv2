@@ -52,10 +52,10 @@ namespace easyfis.ApiControllers
         // Dropdown List - Account (Filter)
         // ================================
         [Authorize, HttpGet, Route("api/financialStatementReport/dropdown/list/account")]
-        public List<Models.MstAccount> DropdownListFinancialStatementListAccount()
+        public List<Entities.MstAccount> DropdownListFinancialStatementListAccount()
         {
             var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
-                           select new Models.MstAccount
+                           select new Entities.MstAccount
                            {
                                Id = d.Id,
                                AccountCode = d.AccountCode,

@@ -67,10 +67,8 @@ namespace easyfis.ModifiedApiControllers
         // =========================
         // Statement of Account list
         // =========================
-        [Authorize]
-        [HttpGet]
-        [Route("api/statementOfAccount/list/{dateAsOf}/{companyId}/{branchId}/{customerId}")]
-        public List<Models.TrnSalesInvoice> ListStatementOfAccount(String dateAsOf, String companyId, String branchId, String customerId)
+        [Authorize, HttpGet, Route("api/statementOfAccount/list/{dateAsOf}/{companyId}/{branchId}/{customerId}")]
+        public List<Entities.RepStatementOfAccount> ListStatementOfAccount(String dateAsOf, String companyId, String branchId, String customerId)
         {
             try
             {
@@ -81,7 +79,7 @@ namespace easyfis.ModifiedApiControllers
                                    && d.CustomerId == Convert.ToInt32(customerId)
                                    && d.BalanceAmount > 0
                                    && d.IsLocked == true
-                                   select new Models.TrnSalesInvoice
+                                   select new Entities.RepStatementOfAccount
                                    {
                                        Id = d.Id,
                                        Branch = d.MstBranch.Branch,

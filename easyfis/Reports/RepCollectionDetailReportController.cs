@@ -78,7 +78,7 @@ namespace easyfis.Reports
                                   && d.TrnCollection.ORDate >= Convert.ToDateTime(StartDate)
                                   && d.TrnCollection.ORDate <= Convert.ToDateTime(EndDate)
                                   && d.TrnCollection.IsLocked == true
-                                  select new Models.TrnCollectionLine
+                                  select new
                                   {
                                       Id = d.Id,
                                       Branch = d.TrnCollection.MstBranch.Branch,

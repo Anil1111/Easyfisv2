@@ -81,7 +81,7 @@ namespace easyfis.Controllers
                                         && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(BranchId)
                                         && d.WTAXAmount > 0
                                         && d.TrnReceivingReceipt.IsLocked == true
-                                        select new Models.TrnReceivingReceiptItem
+                                        select new
                                         {
                                             Id = d.Id,
                                             Supplier = d.TrnReceivingReceipt.MstArticle.Article,

@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // Stock Out Detail Report List
         // ============================
         [Authorize, HttpGet, Route("api/stockOutDetailReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnStockOutItem> ListStockOutDetailReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepStockOutDetailReport> ListStockOutDetailReport(String startDate, String endDate, String companyId, String branchId)
         {
             var stockOutItems = from d in db.TrnStockOutItems
                                 where d.TrnStockOut.MstBranch.CompanyId == Convert.ToInt32(companyId)
@@ -26,7 +26,7 @@ namespace easyfis.ApiControllers
                                 && d.TrnStockOut.OTDate >= Convert.ToDateTime(startDate)
                                 && d.TrnStockOut.OTDate <= Convert.ToDateTime(endDate)
                                 && d.TrnStockOut.IsLocked == true
-                                select new Models.TrnStockOutItem
+                                select new Entities.RepStockOutDetailReport
                                 {
                                     Id = d.Id,
                                     OTId = d.OTId,

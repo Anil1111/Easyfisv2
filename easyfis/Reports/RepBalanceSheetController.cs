@@ -246,7 +246,7 @@ namespace easyfis.Reports
                               d.MstAccount.MstAccountType.MstAccountCategory.Id == 2 &&
                               d.MstBranch.CompanyId == CompanyId
                               group d by d.MstAccount into g
-                              select new Models.TrnJournal
+                              select new
                               {
                                   DocumentReference = "2 - Liability",
                                   AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
@@ -402,7 +402,7 @@ namespace easyfis.Reports
                                 && (d.MstAccount.MstAccountType.MstAccountCategory.Id == 5 || d.MstAccount.MstAccountType.MstAccountCategory.Id == 6)
                                 && d.MstBranch.CompanyId == CompanyId
                                 group d by d.MstAccount into g
-                                select new Models.TrnJournal
+                                select new
                                 {
                                     DocumentReference = "ProfitAndLoss",
                                     AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
@@ -426,7 +426,7 @@ namespace easyfis.Reports
                            && d.MstAccount.MstAccountType.MstAccountCategory.Id == 4
                            && d.MstBranch.CompanyId == CompanyId
                            group d by d.MstAccount into g
-                           select new Models.TrnJournal
+                           select new
                            {
                                DocumentReference = "3 - Equity",
                                AccountCategoryCode = g.Key.MstAccountType.MstAccountCategory.AccountCategoryCode,
@@ -446,7 +446,7 @@ namespace easyfis.Reports
 
             var retainedEarnings = from d in profitAndLoss
                                    group d by d.DocumentReference into g
-                                   select new Models.TrnJournal
+                                   select new
                                    {
                                        DocumentReference = "3 - Equity",
                                        AccountCategoryCode = incomeAccount.FirstOrDefault().MstAccountType.MstAccountCategory.AccountCategoryCode,

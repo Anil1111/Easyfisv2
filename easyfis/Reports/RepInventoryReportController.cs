@@ -78,7 +78,7 @@ namespace easyfis.Reports
                                     && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                     && d.MstArticleInventory.BranchId == Convert.ToInt32(BranchId)
                                     && d.MstArticleInventory.MstArticle.IsInventory == true
-                                    select new Models.MstArticleInventory
+                                    select new
                                     {
                                         Id = d.Id,
                                         Document = "Beginning Balance",
@@ -103,7 +103,7 @@ namespace easyfis.Reports
                                              && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                              && d.MstArticleInventory.BranchId == Convert.ToInt32(BranchId)
                                              && d.MstArticleInventory.MstArticle.IsInventory == true
-                                             select new Models.MstArticleInventory
+                                             select new
                                              {
                                                  Id = d.Id,
                                                  Document = "Current",

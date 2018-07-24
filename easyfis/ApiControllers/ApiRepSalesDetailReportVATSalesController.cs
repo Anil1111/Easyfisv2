@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Sales Detail Report VAT Sales List
         // ==================================
         [Authorize, HttpGet, Route("api/salesDetailReport/VATSales/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListSalesDetailReportVATSales(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepSalesDetailReportVATSales> ListSalesDetailReportVATSales(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -28,7 +28,7 @@ namespace easyfis.ApiControllers
                                     && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
                                     && d.TrnSalesInvoice.IsLocked == true
                                     && d.VATAmount > 0
-                                    select new Models.TrnSalesInvoiceItem
+                                    select new Entities.RepSalesDetailReportVATSales
                                     {
                                         Id = d.Id,
                                         Branch = d.TrnSalesInvoice.MstBranch.Branch,

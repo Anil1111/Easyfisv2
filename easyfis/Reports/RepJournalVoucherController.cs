@@ -123,7 +123,7 @@ namespace easyfis.Reports
                 // ============
                 var journals = from d in db.TrnJournals
                                where d.JVId == JVId
-                               select new Models.TrnJournal
+                               select new
                                {
                                    Id = d.Id,
                                    JournalDate = d.JournalDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture),

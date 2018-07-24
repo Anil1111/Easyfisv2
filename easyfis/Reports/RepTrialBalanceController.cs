@@ -84,7 +84,7 @@ namespace easyfis.Reports
                                AccountCategoryId = d.MstAccount.MstAccountType.MstAccountCategory.Id,
                                AccountCategory = d.MstAccount.MstAccountType.MstAccountCategory.AccountCategory,
                            } into g
-                           select new Models.TrnJournal
+                           select new
                            {
                                AccountCode = g.Key.AccountCode,
                                Account = g.Key.Account,

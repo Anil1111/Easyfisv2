@@ -14,37 +14,8 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        [HttpGet, Route("api/inventoryReportItem/dropdown/item")]
-        public List<Entities.MstArticle> DropdownListInventoryReportItem()
-        {
-            var items = from d in db.MstArticles.OrderBy(d => d.Article)
-                        where d.ArticleTypeId == 1
-                        && d.IsLocked == true
-                        select new Entities.MstArticle
-                        {
-                            Id = d.Id,
-                            ManualArticleCode = d.ManualArticleCode,
-                            Article = d.Article
-                        };
-
-            return items.ToList();
-        }
-
-        [HttpGet, Route("api/inventoryReportItem/dropdown/company")]
-        public List<Entities.MstCompany> DropdownListInventoryReportItemCompany()
-        {
-            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
-                            select new Entities.MstCompany
-                            {
-                                Id = d.Id,
-                                Company = d.Company
-                            };
-
-            return companies.ToList();
-        }
-
         [HttpGet, Route("api/inventoryReportItem/list/{itemId}/{companyId}")]
-        public List<Models.MstArticleInventory> ListInventoryReportItem(String itemId, String companyId)
+        public List<Entities.RepInventoryPerItemReport> ListInventoryReportItem(String itemId, String companyId)
         {
             try
             {
@@ -52,7 +23,7 @@ namespace easyfis.ModifiedApiControllers
                                        where d.MstArticleInventory.ArticleId == Convert.ToInt32(itemId)
                                        && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                        && d.MstArticleInventory.MstArticle.IsInventory == true
-                                       select new Models.MstArticleInventory
+                                       select new Entities.RepInventoryPerItemReport
                                        {
                                            Id = d.Id,
                                            BranchId = d.BranchId,
@@ -85,7 +56,7 @@ namespace easyfis.ModifiedApiControllers
                                           d.Category,
                                           d.Price
                                       } into g
-                                      select new Models.MstArticleInventory
+                                      select new Entities.RepInventoryPerItemReport
                                       {
                                           BranchId = g.Key.BranchId,
                                           Branch = g.Key.Branch,
@@ -113,6 +84,41 @@ namespace easyfis.ModifiedApiControllers
             {
                 return null;
             }
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [HttpGet, Route("api/inventoryReportItem/dropdown/company")]
+        public List<Entities.MstCompany> DropdownListInventoryReportItemCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // =============================
+        // Dropdown List - Item (Filter)
+        // =============================
+        [HttpGet, Route("api/inventoryReportItem/dropdown/item")]
+        public List<Entities.MstArticle> DropdownListInventoryReportItem()
+        {
+            var items = from d in db.MstArticles.OrderBy(d => d.Article)
+                        where d.ArticleTypeId == 1
+                        && d.IsLocked == true
+                        select new Entities.MstArticle
+                        {
+                            Id = d.Id,
+                            ManualArticleCode = d.ManualArticleCode,
+                            Article = d.Article
+                        };
+
+            return items.ToList();
         }
     }
 }

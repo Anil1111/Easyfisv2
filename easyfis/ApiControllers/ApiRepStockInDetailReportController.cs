@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // Stock In Detail Report List
         // ===========================
         [Authorize, HttpGet, Route("api/stockInDetailReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnStockInItem> ListStockInDetailReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepStockInDetailReport> ListStockInDetailReport(String startDate, String endDate, String companyId, String branchId)
         {
             var stockInItems = from d in db.TrnStockInItems
                                where d.TrnStockIn.MstBranch.CompanyId == Convert.ToInt32(companyId)
@@ -26,7 +26,7 @@ namespace easyfis.ApiControllers
                                && d.TrnStockIn.INDate >= Convert.ToDateTime(startDate)
                                && d.TrnStockIn.INDate <= Convert.ToDateTime(endDate)
                                && d.TrnStockIn.IsLocked == true
-                               select new Models.TrnStockInItem
+                               select new Entities.RepStockInDetailReport
                                {
                                    Id = d.Id,
                                    INId = d.INId,

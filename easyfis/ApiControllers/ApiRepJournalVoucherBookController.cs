@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Journal Voucher Book List Report
         // ================================
         [Authorize, HttpGet, Route("api/journalVoucherBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListJournalVoucherBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepJournalVoucherBook> ListJournalVoucherBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.JVId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepJournalVoucherBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.JVId != null ? d.TrnJournalVoucher.ManualJVNumber : "",

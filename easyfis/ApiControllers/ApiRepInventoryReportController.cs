@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Inventory Report List
         // =====================
         [Authorize, HttpGet, Route("api/inventoryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.MstArticleInventory> ListInventoryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepInventoryReport> ListInventoryReport(String startDate, String endDate, String companyId, String branchId)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace easyfis.ApiControllers
                                         && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                         && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
                                         && d.MstArticleInventory.MstArticle.IsInventory == true
-                                        select new Models.MstArticleInventory
+                                        select new Entities.RepInventoryReport
                                         {
                                             Id = d.Id,
                                             Document = "Beginning Balance",
@@ -56,7 +56,7 @@ namespace easyfis.ApiControllers
                                                  && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                                  && d.MstArticleInventory.BranchId == Convert.ToInt32(branchId)
                                                  && d.MstArticleInventory.MstArticle.IsInventory == true
-                                                 select new Models.MstArticleInventory
+                                                 select new Entities.RepInventoryReport
                                                  {
                                                      Id = d.Id,
                                                      Document = "Current",
@@ -98,7 +98,7 @@ namespace easyfis.ApiControllers
                                           d.Category,
                                           d.Price
                                       } into g
-                                      select new Models.MstArticleInventory
+                                      select new Entities.RepInventoryReport
                                       {
                                           BranchId = g.Key.BranchId,
                                           Branch = g.Key.Branch,

@@ -68,7 +68,7 @@ namespace easyfis.Controllers
             var receivingReceipts = from d in db.TrnReceivingReceipts
                                     where d.Id == ReceivingReceiptId
                                     && d.IsLocked == true
-                                    select new Models.TrnReceivingReceipt
+                                    select new
                                     {
                                         Id = d.Id,
                                         RRDate = d.RRDate.ToShortDateString(),
@@ -117,7 +117,7 @@ namespace easyfis.Controllers
                 // journals 
                 var journals = from d in db.TrnJournals
                                where d.RRId == ReceivingReceiptId
-                               select new Models.TrnJournal
+                               select new
                                {
                                    Branch = d.MstBranch.Branch,
                                    Account = d.MstAccount.Account,

@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // Stock Transfer Detail Report List
         // =================================
         [Authorize, HttpGet, Route("api/stockTransferDetailReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnStockTransferItem> ListStockTransferDetailReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepStockTransferDetailReport> ListStockTransferDetailReport(String startDate, String endDate, String companyId, String branchId)
         {
             var stockTransferItems = from d in db.TrnStockTransferItems
                                      where d.TrnStockTransfer.MstBranch.CompanyId == Convert.ToInt32(companyId)
@@ -26,7 +26,7 @@ namespace easyfis.ApiControllers
                                      && d.TrnStockTransfer.STDate >= Convert.ToDateTime(startDate)
                                      && d.TrnStockTransfer.STDate <= Convert.ToDateTime(endDate)
                                      && d.TrnStockTransfer.IsLocked == true
-                                     select new Models.TrnStockTransferItem
+                                     select new Entities.RepStockTransferDetailReport
                                      {
                                          Id = d.Id,
                                          STId = d.STId,

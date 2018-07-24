@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Top Selling Items Report List
         // =============================
         [Authorize, HttpGet, Route("api/topSellingItemsReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListTopSellingItemsReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepTopSellingItemsReport> ListTopSellingItemsReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItem = from d in db.TrnSalesInvoiceItems
                                    where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -35,7 +35,7 @@ namespace easyfis.ApiControllers
                                        Unit = d.MstUnit.Unit,
                                        Price = d.Price
                                    } into g
-                                   select new Models.TrnSalesInvoiceItem
+                                   select new Entities.RepTopSellingItemsReport
                                    {
                                        Branch = g.Key.Branch,
                                        ItemId = g.Key.ItemId,

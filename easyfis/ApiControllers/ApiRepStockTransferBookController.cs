@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Stock Transfer Book List Report
         // ===============================
         [Authorize, HttpGet, Route("api/stockTransferBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> ListStockTransferBook(String startDate, String endDate, String companyId, String branchId)
+        public List<Entities.RepStockTransferBook> ListStockTransferBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -27,7 +27,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.STId != null
-                                             select new Models.TrnJournal
+                                             select new Entities.RepStockTransferBook
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.STId != null ? d.TrnStockTransfer.ManualSTNumber : "",

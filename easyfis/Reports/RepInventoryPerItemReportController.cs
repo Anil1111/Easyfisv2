@@ -73,12 +73,11 @@ namespace easyfis.Reports
             // ====
             // Data
             // ====
-
             var unionInventories = from d in db.TrnInventories
                                    where d.MstArticleInventory.ArticleId == Convert.ToInt32(ItemId)
                                    && d.MstArticleInventory.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                                    && d.MstArticleInventory.MstArticle.IsInventory == true
-                                   select new Models.MstArticleInventory
+                                   select new
                                    {
                                        Id = d.Id,
                                        BranchId = d.BranchId,

@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // Trial Balance Report List
         // =========================
         [Authorize, HttpGet, Route("api/trialBalance/list/{StartDate}/{EndDate}/{CompanyId}/{BranchId}")]
-        public List<Models.TrnJournal> ListTrialBalance(String StartDate, String EndDate, String CompanyId, String BranchId)
+        public List<Entities.RepTrialBalance> ListTrialBalance(String StartDate, String EndDate, String CompanyId, String BranchId)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace easyfis.ApiControllers
                                    AccountCode = d.MstAccount.AccountCode,
                                    Account = d.MstAccount.Account
                                } into g
-                               select new Models.TrnJournal
+                               select new Entities.RepTrialBalance
                                {
                                    AccountId = g.Key.AccountId,
                                    AccountCode = g.Key.AccountCode,
