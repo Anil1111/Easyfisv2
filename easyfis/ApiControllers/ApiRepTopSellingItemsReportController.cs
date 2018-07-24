@@ -48,5 +48,38 @@ namespace easyfis.ApiControllers
 
             return salesInvoiceItem.OrderByDescending(q => q.Quantity).ToList();
         }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/topSellingItemsReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListTopSellingItemsReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/topSellingItemsReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListTopSellingItemsReportListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
     }
 }

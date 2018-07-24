@@ -19,7 +19,7 @@ namespace easyfis.ApiControllers
         // Senior Citizen Sales Summary Report List
         // ========================================
         [Authorize, HttpGet, Route("api/seniorCitizenSalesSummaryReport/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnSalesInvoiceItem> ListSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
+        public List<Models.TrnSalesInvoiceItem> ListSeniorCitizenSalesSummaryReport(String startDate, String endDate, String companyId, String branchId)
         {
             var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
                                     where d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
@@ -48,6 +48,39 @@ namespace easyfis.ApiControllers
                                     };
 
             return salesInvoiceItems.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/seniorCitizenSalesSummaryReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListSeniorCitizenSalesSummaryReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/seniorCitizenSalesSummaryReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListSeniorCitizenSalesSummaryReportListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }

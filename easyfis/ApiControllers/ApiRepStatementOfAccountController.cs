@@ -110,5 +110,56 @@ namespace easyfis.ModifiedApiControllers
                 return null;
             }
         }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/statementOfAccount/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListStatementOfAccountListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/statementOfAccount/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListStatementOfAccountListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // =================================
+        // Dropdown List - Customer (Filter)
+        // =================================
+        [Authorize, HttpGet, Route("api/statementOfAccount/dropdown/list/customer")]
+        public List<Entities.MstArticle> DropdownListStatementOfAccountListCustomer()
+        {
+            var customers = from d in db.MstArticles.OrderBy(d => d.Article)
+                            where d.ArticleTypeId == 2
+                            && d.IsLocked == true
+                            select new Entities.MstArticle
+                            {
+                                Id = d.Id,
+                                Article = d.Article
+                            };
+
+            return customers.ToList();
+        }
     }
 }

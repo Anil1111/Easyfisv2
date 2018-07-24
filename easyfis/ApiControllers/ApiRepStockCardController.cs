@@ -185,5 +185,57 @@ namespace easyfis.ApiControllers
                 return null;
             }
         }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/stockCard/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListStockCardListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/stockCard/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListStockCardListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // =============================
+        // Dropdown List - Item (Filter)
+        // =============================
+        [Authorize, HttpGet, Route("api/stockCard/dropdown/list/item")]
+        public List<Entities.MstArticle> DropdownListStockCardListItem()
+        {
+            var items = from d in db.MstArticles.OrderBy(d => d.Article)
+                        where d.ArticleTypeId == 1
+                        && d.IsLocked == true
+                        select new Entities.MstArticle
+                        {
+                            Id = d.Id,
+                            ManualArticleCode = d.ManualArticleCode,
+                            Article = d.Article
+                        };
+
+            return items.ToList();
+        }
     }
 }
