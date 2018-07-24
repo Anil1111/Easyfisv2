@@ -5,20 +5,20 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
-namespace easyfis.ApiControllers
+namespace easyfis.ModifiedApiControllers
 {
-    public class ApiRepPhysicalCountSheetController : ApiController
+    public class ApiRepItemListController : ApiController
     {
         // ============
         // Data Context 
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // =========================
-        // List Physical Count Sheet
-        // =========================
-        [Authorize, HttpGet, Route("api/physicalCountSheet/list/{itemGroupId}")]
-        public List<Entities.MstArticle> ListPhysicalCountSheetItems(String itemGroupId)
+        // =========
+        // Item List
+        // =========
+        [Authorize, HttpGet, Route("api/itemList/list/{itemGroupId}")]
+        public List<Entities.MstArticle> ListItemList(String itemGroupId)
         {
             var items = from d in db.MstArticles
                         where d.ArticleGroupId == Convert.ToInt32(itemGroupId)
@@ -65,7 +65,7 @@ namespace easyfis.ApiControllers
         // ===================================
         // Dropdown List - Item Group (Filter)
         // ===================================
-        [Authorize, HttpGet, Route("api/physicalCountSheet/dropdown/list/itemGroup")]
+        [Authorize, HttpGet, Route("api/itemList/dropdown/list/itemGroup")]
         public List<Entities.MstArticleGroup> DropdownListItemListItemGroup()
         {
             var itemGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)

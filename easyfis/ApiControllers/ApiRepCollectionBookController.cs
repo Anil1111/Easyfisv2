@@ -18,8 +18,8 @@ namespace easyfis.ApiControllers
         // ===========================
         // Collection Book List Report
         // ===========================
-        [Authorize, HttpGet, Route("api/CollectionBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
-        public List<Models.TrnJournal> listCollectionBook(String startDate, String endDate, String companyId, String branchId)
+        [Authorize, HttpGet, Route("api/collectionBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Models.TrnJournal> ListCollectionBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
                                              where d.JournalDate >= Convert.ToDateTime(startDate)
@@ -41,6 +41,39 @@ namespace easyfis.ApiControllers
                                              };
 
             return journalsDocumentReferences.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/collectionBook/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListCollectionBookListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/collectionBook/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListCollectionBookListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }

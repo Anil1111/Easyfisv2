@@ -138,26 +138,64 @@ namespace easyfis.ApiControllers
             return branches.ToList();
         }
 
-        // ================================
-        // Dropdown List - Account (Filter)
-        // ================================
-        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/articleGroupAccount")]
-        public List<Entities.MstArticleGroup> DropdownListAccountsReceivableArticleGroupAccount()
+        // ===============================================
+        // Dropdown List - Customer Group Account (Filter)
+        // ===============================================
+        [Authorize, HttpGet, Route("api/accountsPayable/dropdown/list/customerGroup/account")]
+        public List<Entities.MstArticleGroup> DropdownListAccountsReceivableCustomerGroupAccount()
         {
-            var articleGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
-                                where d.ArticleTypeId == 2
-                                group d by new
-                                {
-                                    AccountId = d.AccountId,
-                                    Account = d.MstAccount.Account
-                                } into g
-                                select new Entities.MstArticleGroup
-                                {
-                                    AccountId = g.Key.AccountId,
-                                    Account = g.Key.Account
-                                };
+            var customerGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
+                                 where d.ArticleTypeId == 2
+                                 group d by new
+                                 {
+                                     d.AccountId,
+                                     d.MstAccount.AccountCode,
+                                     d.MstAccount.Account
+                                 } into g
+                                 select new Entities.MstArticleGroup
+                                 {
+                                     AccountId = g.Key.AccountId,
+                                     AccountCode = g.Key.AccountCode,
+                                     Account = g.Key.Account
+                                 };
 
-            return articleGroups.ToList();
+            return customerGroups.ToList();
+        }
+
+        // =================================
+        // Dropdown List - Customer (Filter)
+        // =================================
+        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/customer")]
+        public List<Entities.MstArticle> DropdownListAccountsReceivableCustomer()
+        {
+            var customers = from d in db.MstArticles.OrderBy(d => d.Article)
+                            where d.ArticleTypeId == 2
+                            && d.IsLocked == true
+                            select new Entities.MstArticle
+                            {
+                                Id = d.Id,
+                                Article = d.Article
+                            };
+
+            return customers.ToList();
+        }
+
+        // =================================
+        // Dropdown List - Supplier (Filter)
+        // =================================
+        [Authorize, HttpGet, Route("api/accountsReceivable/dropdown/list/supplier")]
+        public List<Entities.MstArticle> DropdownListAccountsReceivableSupplier()
+        {
+            var suppliers = from d in db.MstArticles.OrderBy(d => d.Article)
+                            where d.ArticleTypeId == 3
+                            && d.IsLocked == true
+                            select new Entities.MstArticle
+                            {
+                                Id = d.Id,
+                                Article = d.Article
+                            };
+
+            return suppliers.ToList();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace easyfis.ApiControllers
         // =============================
         // Disbrusement Book List Report
         // =============================
-        [Authorize, HttpGet, Route("api/DisbursementBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        [Authorize, HttpGet, Route("api/disbursementBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
         public List<Models.TrnJournal> ListDisbursementBook(String startDate, String endDate, String companyId, String branchId)
         {
             var journalsDocumentReferences = from d in db.TrnJournals
@@ -41,6 +41,39 @@ namespace easyfis.ApiControllers
                                              };
 
             return journalsDocumentReferences.ToList();
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/disbursementBook/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListDisbrusementBookListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/disbursementBook/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListDisbrusementBookListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
         }
     }
 }

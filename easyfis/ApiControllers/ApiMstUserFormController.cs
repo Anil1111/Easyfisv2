@@ -16,6 +16,33 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ========================
+        // List User Form (OLD API)
+        // ========================
+        [Authorize, HttpGet, Route("api/listUserFormByUserId/{UserId}")]
+        public List<Models.MstUserForm> listUserFormByUserId(String UserId)
+        {
+            var userForms = from d in db.MstUserForms
+                            where d.UserId == Convert.ToInt32(UserId)
+                            select new Models.MstUserForm
+                            {
+                                Id = d.Id,
+                                UserId = d.UserId,
+                                User = d.MstUser.FullName,
+                                FormId = d.FormId,
+                                Form = d.SysForm.FormName,
+                                Particulars = d.SysForm.Particulars,
+                                CanAdd = d.CanAdd,
+                                CanEdit = d.CanEdit,
+                                CanDelete = d.CanDelete,
+                                CanLock = d.CanLock,
+                                CanUnlock = d.CanUnlock,
+                                CanPrint = d.CanPrint
+                            };
+
+            return userForms.ToList();
+        }
+
         // ==============
         // List User Form
         // ==============

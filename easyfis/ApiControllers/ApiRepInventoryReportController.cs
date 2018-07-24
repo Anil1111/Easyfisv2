@@ -15,29 +15,6 @@ namespace easyfis.ApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===================================
-        // Dropdown List - Bank Group (Filter)
-        // ===================================
-        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/stockCount/{branchId}")]
-        public List<Entities.TrnStockCount> DropdownListStockCount(String branchId)
-        {
-            var stockCounts = from d in db.TrnStockCounts.OrderByDescending(d => d.Id)
-                              where d.BranchId == Convert.ToInt32(branchId)
-                              && d.IsLocked == true
-                              select new Entities.TrnStockCount
-                              {
-                                  Id = d.Id,
-                                  SCNumber = d.SCNumber,
-                                  StockCountItem = d.TrnStockCountItems.Select(i => new Entities.TrnStockCountItem
-                                  {
-                                      ItemId = i.ItemId,
-                                      Quantity = i.Quantity
-                                  }).ToList(),
-                              };
-
-            return stockCounts.ToList();
-        }
-
         // =====================
         // Inventory Report List
         // =====================
@@ -153,6 +130,116 @@ namespace easyfis.ApiControllers
             {
                 return null;
             }
+        }
+
+        // ================================
+        // Dropdown List - Company (Filter)
+        // ================================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownLisInventoryReportListCompany()
+        {
+            var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
+                            select new Entities.MstCompany
+                            {
+                                Id = d.Id,
+                                Company = d.Company
+                            };
+
+            return companies.ToList();
+        }
+
+        // ===============================
+        // Dropdown List - Branch (Filter)
+        // ===============================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListInventoryReportListBranch(String companyId)
+        {
+            var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
+                           where d.CompanyId == Convert.ToInt32(companyId)
+                           select new Entities.MstBranch
+                           {
+                               Id = d.Id,
+                               Branch = d.Branch
+                           };
+
+            return branches.ToList();
+        }
+
+        // =============================
+        // Dropdown List - Item (Filter)
+        // =============================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/item")]
+        public List<Entities.MstArticle> DropdownListInventoryReportListItem()
+        {
+            var items = from d in db.MstArticles.OrderBy(d => d.Article)
+                        where d.ArticleTypeId == 1
+                        && d.IsLocked == true
+                        select new Entities.MstArticle
+                        {
+                            Id = d.Id,
+                            ManualArticleCode = d.ManualArticleCode,
+                            Article = d.Article
+                        };
+
+            return items.ToList();
+        }
+
+        // ===================================
+        // Dropdown List - Item Group (Filter)
+        // ===================================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/itemGroup")]
+        public List<Entities.MstArticleGroup> DropdownListInventoryReportListItemGroup()
+        {
+            var itemGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
+                             where d.ArticleTypeId == 1
+                             select new Entities.MstArticleGroup
+                             {
+                                 Id = d.Id,
+                                 ArticleGroup = d.ArticleGroup,
+                             };
+
+            return itemGroups.ToList();
+        }
+
+        // =================================
+        // Dropdown List - Supplier (Filter)
+        // =================================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/supplier")]
+        public List<Entities.MstArticle> DropdownListInventoryReportListSupplier()
+        {
+            var suppliers = from d in db.MstArticles.OrderBy(d => d.Article)
+                            where d.ArticleTypeId == 3
+                            && d.IsLocked == true
+                            select new Entities.MstArticle
+                            {
+                                Id = d.Id,
+                                Article = d.Article
+                            };
+
+            return suppliers.ToList();
+        }
+
+        // ====================================
+        // Dropdown List - Stock Count (Filter)
+        // ====================================
+        [Authorize, HttpGet, Route("api/inventoryReport/dropdown/list/stockCount/{branchId}")]
+        public List<Entities.TrnStockCount> DropdownListInventoryReportListStockCount(String branchId)
+        {
+            var stockCounts = from d in db.TrnStockCounts.OrderByDescending(d => d.Id)
+                              where d.BranchId == Convert.ToInt32(branchId)
+                              && d.IsLocked == true
+                              select new Entities.TrnStockCount
+                              {
+                                  Id = d.Id,
+                                  SCNumber = d.SCNumber,
+                                  StockCountItem = d.TrnStockCountItems.Select(i => new Entities.TrnStockCountItem
+                                  {
+                                      ItemId = i.ItemId,
+                                      Quantity = i.Quantity
+                                  }).ToList(),
+                              };
+
+            return stockCounts.ToList();
         }
     }
 }

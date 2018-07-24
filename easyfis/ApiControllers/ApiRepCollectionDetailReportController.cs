@@ -69,7 +69,7 @@ namespace easyfis.ApiControllers
         // Dropdown List - Branch (Filter)
         // ===============================
         [Authorize, HttpGet, Route("api/collectionDetailReport/dropdown/list/branch/{companyId}")]
-        public List<Entities.MstBranch> DropdownListCollectionDetailReportBranch(String companyId)
+        public List<Entities.MstBranch> DropdownListCollectionDetailReportListBranch(String companyId)
         {
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
                            where d.CompanyId == Convert.ToInt32(companyId)

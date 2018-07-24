@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Microsoft.AspNet.Identity;
 
 namespace easyfis.ApiControllers
 {
@@ -138,26 +139,52 @@ namespace easyfis.ApiControllers
             return branches.ToList();
         }
 
-        // ================================
-        // Dropdown List - Account (Filter)
-        // ================================
-        [Authorize, HttpGet, Route("api/accountsPayable/dropdown/list/articleGroupAccount")]
-        public List<Entities.MstArticleGroup> DropdownListAccountsPayableArticleGroupAccount()
+        // ==========================================
+        // Dropdown List - Receiving Receipt (Filter)
+        // ==========================================
+        [Authorize, HttpGet, Route("api/accountsPayable/dropdown/list/receivingReceipt")]
+        public List<Entities.TrnReceivingReceipt> DropdownListAccountsPayableReceivingReceipt()
         {
-            var articleGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
-                                where d.ArticleTypeId == 3
-                                group d by new
-                                {
-                                    AccountId = d.AccountId,
-                                    Account = d.MstAccount.Account
-                                } into g
-                                select new Entities.MstArticleGroup
-                                {
-                                    AccountId = g.Key.AccountId,
-                                    Account = g.Key.Account
-                                };
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
 
-            return articleGroups.ToList();
+            var branchId = currentUser.FirstOrDefault().BranchId;
+
+            var receivingReceipts = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id)
+                                    where d.BranchId == branchId
+                                    select new Entities.TrnReceivingReceipt
+                                    {
+                                        Id = d.Id,
+                                        RRDate = d.RRDate.ToShortDateString(),
+                                        RRNumber = d.RRNumber
+                                    };
+
+            return receivingReceipts.ToList();
+        }
+
+        // ===============================================
+        // Dropdown List - Supplier Group Account (Filter)
+        // ===============================================
+        [Authorize, HttpGet, Route("api/accountsPayable/dropdown/list/supplierGroup/account")]
+        public List<Entities.MstArticleGroup> DropdownListAccountsPayableSupplierGroupAccount()
+        {
+            var supplierGroups = from d in db.MstArticleGroups.OrderBy(d => d.ArticleGroup)
+                                 where d.ArticleTypeId == 3
+                                 group d by new
+                                 {
+                                     d.AccountId,
+                                     d.MstAccount.AccountCode,
+                                     d.MstAccount.Account
+                                 } into g
+                                 select new Entities.MstArticleGroup
+                                 {
+                                     AccountId = g.Key.AccountId,
+                                     AccountCode = g.Key.AccountCode,
+                                     Account = g.Key.Account
+                                 };
+
+            return supplierGroups.ToList();
         }
     }
 }

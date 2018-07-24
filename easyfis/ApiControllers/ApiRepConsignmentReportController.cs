@@ -85,7 +85,7 @@ namespace easyfis.ModifiedApiControllers
         // Dropdown List - Branch (Filter)
         // ===============================
         [Authorize, HttpGet, Route("api/consignmentReport/dropdown/list/branch/{companyId}")]
-        public List<Entities.MstBranch> DropdownListConsignmentReportBranch(String companyId)
+        public List<Entities.MstBranch> DropdownListConsignmentReportListBranch(String companyId)
         {
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
                            where d.CompanyId == Convert.ToInt32(companyId)
@@ -102,7 +102,7 @@ namespace easyfis.ModifiedApiControllers
         // Dropdown List - Supplier (Filter)
         // =================================
         [Authorize, HttpGet, Route("api/consignmentReport/dropdown/list/supplier")]
-        public List<Entities.MstArticle> DropdownListConsignmentReportSupplier()
+        public List<Entities.MstArticle> DropdownListConsignmentReportListSupplier()
         {
             var suppliers = from d in db.MstArticles.OrderBy(d => d.Article)
                             where d.ArticleTypeId == 3
