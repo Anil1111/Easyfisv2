@@ -16,6 +16,83 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ===============================
+        // List User Branch (Current User)
+        // ===============================
+        [Authorize, HttpGet, Route("api/userBranch/list")]
+        public List<Entities.MstUserBranch> ListCurrentUserBranch()
+        {
+            var currentUser = from d in db.MstUsers
+                              where d.UserId == User.Identity.GetUserId()
+                              select d;
+
+            var currentUserId = currentUser.FirstOrDefault().Id;
+
+            var userBranches = from d in db.MstUserBranches
+                               where d.UserId == currentUserId
+                               select new Entities.MstUserBranch
+                               {
+                                   Id = d.Id,
+                                   UserId = d.UserId,
+                                   CompanyId = d.MstBranch.CompanyId,
+                                   Company = d.MstBranch.MstCompany.Company,
+                                   BranchId = d.BranchId,
+                                   Branch = d.MstBranch.Branch
+                               };
+
+            return userBranches.ToList();
+        }
+
+        // =================================
+        // Update User Branch (Current User)
+        // =================================
+        [Authorize, HttpPut, Route("api/userBranch/update")]
+        public HttpResponseMessage UpdateCurrentUserBranch(Entities.MstUserBranch objUserBranch)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userBranch = from d in db.MstUserBranches
+                                     where d.BranchId == objUserBranch.BranchId
+                                     && d.UserId == currentUserId
+                                     select d;
+
+                    if (userBranch.Any())
+                    {
+                        var updateCurrentBranch = currentUser.FirstOrDefault();
+                        updateCurrentBranch.CompanyId = userBranch.FirstOrDefault().MstBranch.CompanyId;
+                        updateCurrentBranch.BranchId = userBranch.FirstOrDefault().BranchId;
+                        updateCurrentBranch.UpdatedById = currentUserId;
+                        updateCurrentBranch.UpdatedDateTime = DateTime.Now;
+
+                        db.SubmitChanges();
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. Branch you selected was not found.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
         // ================
         // List User Branch
         // ================

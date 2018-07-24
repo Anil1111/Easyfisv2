@@ -2,7 +2,6 @@
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.AspNet.Identity;
-using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
