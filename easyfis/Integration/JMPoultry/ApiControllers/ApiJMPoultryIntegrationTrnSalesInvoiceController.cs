@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace easyfis.Integration.JMPoultry.ApiControllers
 {
-    public class JMPoultryIntegrationTrnSalesInvoiceController : ApiController
+    public class ApiJMPoultryIntegrationTrnSalesInvoiceController : ApiController
     {
         // ============
         // Data Context

@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace easyfis.Integration.JMPoultry.ApiControllers
 {
-    public class JMPoultryIntegrationTrnStockInController : ApiController
+    public class ApiJMPoultryIntegrationTrnStockInController : ApiController
     {
         // ============
         // Data Context

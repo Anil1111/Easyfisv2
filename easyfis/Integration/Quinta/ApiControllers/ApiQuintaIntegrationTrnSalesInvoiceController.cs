@@ -272,9 +272,6 @@ namespace easyfis.Integration.Quinta.ApiControllers
                                                     SINumberResult = ZeroFill(SINumber, 10);
                                                 }
 
-                                                // ====================
-                                                // Insert Sales Invoice
-                                                // ====================
                                                 Data.TrnSalesInvoice addSalesInvoice = new Data.TrnSalesInvoice
                                                 {
                                                     BranchId = currentBranchId,
