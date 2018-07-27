@@ -508,6 +508,89 @@ namespace easyfis.Integration.Quinta.ApiControllers
 
                                                 inventory.InsertSalesInvoiceInventory(Convert.ToInt32(salesInvoiceId));
                                                 journal.InsertSalesInvoiceJournal(Convert.ToInt32(salesInvoiceId));
+
+                                                if (currentSalesInvoice.Any())
+                                                {
+                                                    // ==================
+                                                    // Process Collection
+                                                    // ==================
+                                                    var defaultORNumber = "0000000001";
+                                                    var lastCollection = from d in db.TrnCollections.OrderByDescending(d => d.Id)
+                                                                         where d.BranchId == currentBranchId
+                                                                         select d;
+
+                                                    if (lastCollection.Any())
+                                                    {
+                                                        var ORNumber = Convert.ToInt32(lastCollection.FirstOrDefault().ORNumber) + 0000000001;
+                                                        defaultORNumber = ZeroFill(ORNumber, 10);
+                                                    }
+
+                                                    Data.TrnCollection newCollection = new Data.TrnCollection
+                                                    {
+                                                        BranchId = currentBranchId,
+                                                        ORNumber = defaultORNumber,
+                                                        ORDate = DateTime.Today,
+                                                        ManualORNumber = "NA",
+                                                        CustomerId = customers.FirstOrDefault().Id,
+                                                        Particulars = "NA",
+                                                        PreparedById = users.FirstOrDefault().Id,
+                                                        CheckedById = users.FirstOrDefault().Id,
+                                                        ApprovedById = users.FirstOrDefault().Id,
+                                                        IsLocked = false,
+                                                        CreatedById = users.FirstOrDefault().Id,
+                                                        CreatedDateTime = DateTime.Now,
+                                                        UpdatedById = users.FirstOrDefault().Id,
+                                                        UpdatedDateTime = DateTime.Now
+                                                    };
+
+                                                    db.TrnCollections.InsertOnSubmit(newCollection);
+                                                    db.SubmitChanges();
+
+                                                    Boolean payTypeExist = false;
+                                                    var payTypes = from d in db.MstPayTypes
+                                                                   select d;
+
+                                                    if (payTypes.Any())
+                                                    {
+                                                        payTypeExist = true;
+                                                    }
+
+                                                    Boolean bankExist = false;
+                                                    var banks = from d in db.MstArticles
+                                                                where d.ArticleTypeId == 5
+                                                                select d;
+
+                                                    if (banks.Any())
+                                                    {
+                                                        bankExist = true;
+                                                    }
+
+                                                    if (payTypeExist)
+                                                    {
+                                                        if (bankExist)
+                                                        {
+                                                            Data.TrnCollectionLine newCollectionLine = new Data.TrnCollectionLine
+                                                            {
+                                                                ORId = newCollection.Id,
+                                                                BranchId = currentBranchId,
+                                                                AccountId = currentSalesInvoice.FirstOrDefault().MstArticle.AccountId,
+                                                                ArticleId = currentSalesInvoice.FirstOrDefault().CustomerId,
+                                                                SIId = currentSalesInvoice.FirstOrDefault().Id,
+                                                                Particulars = currentSalesInvoice.FirstOrDefault().Remarks,
+                                                                Amount = objSales.NAM,
+                                                                PayTypeId = payTypes.FirstOrDefault().Id,
+                                                                CheckNumber = "NA",
+                                                                CheckDate = DateTime.Today,
+                                                                CheckBank = "NA",
+                                                                DepositoryBankId = banks.FirstOrDefault().Id,
+                                                                IsClear = false
+                                                            };
+
+                                                            db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
+                                                            db.SubmitChanges();
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }

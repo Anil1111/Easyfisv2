@@ -12,10 +12,11 @@ namespace easyfis.Entities
         public String SWNumber { get; set; }
         public String SWDate { get; set; }
         public Int32 CustomerId { get; set; }
-        public Int32 SIBranchId { get; set; }
         public Int32 SIId { get; set; }
+        public Int32 SIBranchId { get; set; }
         public String SIBranch { get; set; }
         public String SINumber { get; set; }
+        public String SIDate { get; set; }
         public String Remarks { get; set; }
         public String DocumentReference { get; set; }
         public String ContactPerson { get; set; }

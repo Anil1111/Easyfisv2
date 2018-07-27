@@ -75,17 +75,11 @@ namespace easyfis.ModifiedApiControllers
         // ===========================================
         // Dropdown List - Item Inventory Code (Field)
         // ===========================================
-        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/itemInventoryCode/{itemId}")]
-        public List<Entities.MstArticleInventory> DropdownListStockWithdrawalItemListItemInventoryCode(String itemId)
+        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/itemInventoryCode/{itemId}/{branchId}")]
+        public List<Entities.MstArticleInventory> DropdownListStockWithdrawalItemListItemInventoryCode(String itemId, String branchId)
         {
-            var currentUser = from d in db.MstUsers
-                              where d.UserId == User.Identity.GetUserId()
-                              select d;
-
-            var branchId = currentUser.FirstOrDefault().BranchId;
-
             var itemInventories = from d in db.MstArticleInventories
-                                  where d.BranchId == branchId
+                                  where d.BranchId == Convert.ToInt32(branchId)
                                   && d.ArticleId == Convert.ToInt32(itemId)
                                   && d.Quantity > 0
                                   && d.MstArticle.IsInventory == true
@@ -211,7 +205,7 @@ namespace easyfis.ModifiedApiControllers
                     var currentUserId = currentUser.FirstOrDefault().Id;
                     var currentBranchId = currentUser.FirstOrDefault().BranchId;
 
-                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("ReceivingReceiptDetail") select d;
+                    IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
                     IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(SWId) select d;
 
                     Boolean isValid = false;
@@ -256,7 +250,7 @@ namespace easyfis.ModifiedApiControllers
                             if (item.Any())
                             {
                                 var itemInventories = from d in db.MstArticleInventories
-                                                      where d.ArticleId == objSalesInvoiceItem.ItemId && d.BranchId == currentBranchId
+                                                      where d.ArticleId == objSalesInvoiceItem.ItemId && d.BranchId == stockWithdrawal.FirstOrDefault().TrnSalesInvoice.BranchId
                                                       && d.Quantity > 0 && d.MstArticle.IsInventory == true && d.MstArticle.IsLocked == true
                                                       select d;
 
