@@ -441,7 +441,7 @@ namespace easyfis.ModifiedApiControllers
                                             if (item.Any())
                                             {
                                                 var mstArticlePrice = from d in db.MstArticlePrices
-                                                                      where d.PriceDescription.Equals("IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber)
+                                                                      where d.PriceDescription.Equals("IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber + " (" + articlePrice.FirstOrDefault().IPDate.ToShortDateString() + ")")
                                                                       select d;
 
                                                 if (mstArticlePrice.Any())
@@ -456,7 +456,7 @@ namespace easyfis.ModifiedApiControllers
                                                     Data.MstArticlePrice newArticlePrice = new Data.MstArticlePrice
                                                     {
                                                         ArticleId = articlePriceItem.ItemId,
-                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber,
+                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber + " (" + articlePrice.FirstOrDefault().IPDate.ToShortDateString() + ")",
                                                         Price = articlePriceItem.Price,
                                                         Remarks = "Branch: " + articlePrice.FirstOrDefault().MstBranch.Branch +
                                                                   "\nIP Date: " + articlePrice.FirstOrDefault().IPDate.ToShortDateString() +
@@ -476,7 +476,7 @@ namespace easyfis.ModifiedApiControllers
                                                     Data.MstArticlePrice newArticlePrice = new Data.MstArticlePrice
                                                     {
                                                         ArticleId = articlePriceItem.ItemId,
-                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber,
+                                                        PriceDescription = "IP-" + articlePrice.FirstOrDefault().MstBranch.BranchCode + "-" + articlePrice.FirstOrDefault().IPNumber + " (" + articlePrice.FirstOrDefault().IPDate.ToShortDateString() + ")",
                                                         Price = articlePriceItem.Price,
                                                         Remarks = "Branch: " + articlePrice.FirstOrDefault().MstBranch.Branch +
                                                                   "\nIP Date: " + articlePrice.FirstOrDefault().IPDate.ToShortDateString() +

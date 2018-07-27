@@ -34,7 +34,14 @@ namespace easyfis.Integration.POSIntegration.ApiControllers
                             Cost = d.Cost,
                             IsInventory = d.IsInventory,
                             Particulars = d.Particulars,
-                            OutputTax = d.MstTaxType.TaxType
+                            OutputTax = d.MstTaxType.TaxType,
+                            ListItemPrice = db.MstArticlePrices.Select(i => new Entities.POSIntegrationMstItemPrice
+                            {
+                                ArticleId = i.ArticleId,
+                                PriceDescription = i.PriceDescription,
+                                Price = i.Price,
+                                Remarks = i.Remarks
+                            }).Where(i => i.ArticleId == d.Id).ToList(),
                         };
 
             return items.ToList();
