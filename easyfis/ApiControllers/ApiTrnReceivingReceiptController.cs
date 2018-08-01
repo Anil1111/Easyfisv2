@@ -187,6 +187,77 @@ namespace easyfis.ModifiedApiControllers
             return result;
         }
 
+        // ============================
+        // Update Purchase Order Status
+        // ============================
+        public void UpdatePurchaseOrderStatus(Int32 RRId)
+        {
+            var groupedReceivingReceiptItemPOIds = from d in db.TrnReceivingReceiptItems
+                                                   where d.RRId == RRId
+                                                   group d by d.POId into g
+                                                   select g;
+
+            if (groupedReceivingReceiptItemPOIds.Any())
+            {
+                foreach (var groupedReceivingReceiptItemPOId in groupedReceivingReceiptItemPOIds)
+                {
+                    Decimal balanceQuantity = 0;
+
+                    var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems
+                                                    where d.POId == groupedReceivingReceiptItemPOId.Key
+                                                    group d by new
+                                                    {
+                                                        d.ItemId
+                                                    } into g
+                                                    select g;
+
+                    if (groupedPurchaseOrderItems.Any())
+                    {
+                        Decimal totalPurchaseOrderItemQuantity = 0;
+                        Decimal totalReceivingReceiptItemQuantity = 0;
+
+                        foreach (var groupedPurchaseOrderItem in groupedPurchaseOrderItems)
+                        {
+                            totalPurchaseOrderItemQuantity = groupedPurchaseOrderItem.Sum(d => d.Quantity);
+
+                            var groupedReceivingReceiptItem = from d in db.TrnReceivingReceiptItems
+                                                              where d.POId == groupedReceivingReceiptItemPOId.Key
+                                                              && d.ItemId == groupedPurchaseOrderItem.Key.ItemId
+                                                              && d.TrnReceivingReceipt.IsLocked == true
+                                                              group d by d.ItemId into g
+                                                              select g;
+
+                            if (groupedReceivingReceiptItem.Any())
+                            {
+                                totalReceivingReceiptItemQuantity = groupedReceivingReceiptItem.FirstOrDefault().Sum(d => d.Quantity);
+                            }
+
+                            balanceQuantity += totalPurchaseOrderItemQuantity - totalReceivingReceiptItemQuantity;
+                        }
+                    }
+
+                    var currentPurchaseOrder = from d in db.TrnPurchaseOrders
+                                               where d.Id == groupedReceivingReceiptItemPOId.Key
+                                               select d;
+
+                    if (currentPurchaseOrder.Any())
+                    {
+                        Boolean isClose = false;
+                        if (balanceQuantity <= 0)
+                        {
+                            isClose = true;
+                        }
+
+                        var updatePurchaseOrder = currentPurchaseOrder.FirstOrDefault();
+                        updatePurchaseOrder.IsClose = isClose;
+                        db.SubmitChanges();
+
+                        balanceQuantity = 0;
+                    }
+                }
+            }
+        }
+
         // =====================
         // Add Receiving Receipt
         // =====================
@@ -410,6 +481,11 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
+                                    // ============================
+                                    // Update Purchase Order Status
+                                    // ============================
+                                    UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+
                                     // =====================
                                     // Inventory and Journal
                                     // =====================
@@ -495,6 +571,11 @@ namespace easyfis.ModifiedApiControllers
                                     unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    // ============================
+                                    // Update Purchase Order Status
+                                    // ============================
+                                    UpdatePurchaseOrderStatus(Convert.ToInt32(id));
 
                                     // =====================
                                     // Inventory and Journal
