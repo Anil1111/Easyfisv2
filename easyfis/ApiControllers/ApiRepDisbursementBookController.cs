@@ -5,6 +5,7 @@ using System.Net;
 using Microsoft.AspNet.Identity;
 using System.Net.Http;
 using System.Web.Http;
+using System.Diagnostics;
 
 namespace easyfis.ApiControllers
 {
@@ -27,7 +28,7 @@ namespace easyfis.ApiControllers
                                              && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                              && d.BranchId == Convert.ToInt32(branchId)
                                              && d.CVId != null
-                                             select new Entities.RepDisbursementBook
+                                             select new
                                              {
                                                  DocumentReference = d.DocumentReference,
                                                  ManualDocumentCode = d.CVId != null ? d.TrnDisbursement.ManualCVNumber : "",
@@ -35,12 +36,39 @@ namespace easyfis.ApiControllers
                                                  Account = d.MstAccount.Account,
                                                  Article = d.MstArticle.Article,
                                                  Particulars = d.Particulars,
+                                                 CheckNumber = d.CVId != null ? d.TrnDisbursement.CheckNumber : "",
+                                                 CheckDate = d.CVId != null ? d.TrnDisbursement.CheckDate : DateTime.Now,
+                                                 Amount = d.CVId != null ? d.TrnDisbursement.Amount : 0,
                                                  DebitAmount = d.DebitAmount,
                                                  CreditAmount = d.CreditAmount,
                                                  Balance = d.DebitAmount - d.CreditAmount
                                              };
 
-            return journalsDocumentReferences.ToList();
+            if (journalsDocumentReferences.Any())
+            {
+                var disbursmentBooks = from d in journalsDocumentReferences
+                                       select new Entities.RepDisbursementBook
+                                       {
+                                           DocumentReference = d.DocumentReference,
+                                           ManualDocumentCode =  d.ManualDocumentCode,
+                                           AccountCode = d.AccountCode,
+                                           Account = d.Account,
+                                           Article = d.Article,
+                                           Particulars = d.Particulars,
+                                           CheckNumber = d.CheckNumber,
+                                           CheckDate = d.CheckDate.ToShortDateString(),
+                                           Amount = d.Amount,
+                                           DebitAmount = d.DebitAmount,
+                                           CreditAmount = d.CreditAmount,
+                                           Balance = d.DebitAmount - d.CreditAmount
+                                       };
+
+                return disbursmentBooks.ToList();
+            }
+            else
+            {
+                return new List<Entities.RepDisbursementBook>();
+            }
         }
 
         // ================================
