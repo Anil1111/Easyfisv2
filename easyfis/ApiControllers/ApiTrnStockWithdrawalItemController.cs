@@ -75,11 +75,14 @@ namespace easyfis.ModifiedApiControllers
         // ===========================================
         // Dropdown List - Item Inventory Code (Field)
         // ===========================================
-        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/itemInventoryCode/{itemId}/{branchId}")]
-        public List<Entities.MstArticleInventory> DropdownListStockWithdrawalItemListItemInventoryCode(String itemId, String branchId)
+        [Authorize, HttpGet, Route("api/stockWithdrawalItem/dropdown/list/itemInventoryCode/{itemId}")]
+        public List<Entities.MstArticleInventory> DropdownListStockWithdrawalItemListItemInventoryCode(String itemId)
         {
+            var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+            var currentBranchId = currentUser.FirstOrDefault().BranchId;
+
             var itemInventories = from d in db.MstArticleInventories
-                                  where d.BranchId == Convert.ToInt32(branchId)
+                                  where d.BranchId == currentBranchId
                                   && d.ArticleId == Convert.ToInt32(itemId)
                                   && d.Quantity > 0
                                   && d.MstArticle.IsInventory == true
