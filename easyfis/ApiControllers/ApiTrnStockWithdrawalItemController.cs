@@ -253,7 +253,7 @@ namespace easyfis.ModifiedApiControllers
                             if (item.Any())
                             {
                                 var itemInventories = from d in db.MstArticleInventories
-                                                      where d.ArticleId == objSalesInvoiceItem.ItemId && d.BranchId == stockWithdrawal.FirstOrDefault().TrnSalesInvoice.BranchId
+                                                      where d.ArticleId == objSalesInvoiceItem.ItemId && d.BranchId == stockWithdrawal.FirstOrDefault().BranchId
                                                       && d.Quantity > 0 && d.MstArticle.IsInventory == true && d.MstArticle.IsLocked == true
                                                       select d;
 
