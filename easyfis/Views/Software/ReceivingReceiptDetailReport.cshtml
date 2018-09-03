@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Receiving Receipt Detail Report</title>
+
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
@@ -25,67 +26,91 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="receivingReceiptDetailReportFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpReceivingReceiptDetailReportFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="receivingReceiptDetailReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportShowNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnReceivingReceiptDetailReportCSVOnclick()" id="btnReceivingReceiptDetailReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnReceivingReceiptDetailReportDownloadCSVOnclick()" id="btnReceivingReceiptDetailReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnReceivingReceiptDetailReportPDFOnclick()" id="btnReceivingReceiptDetailReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsPayable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboReceivingReceiptDetailReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="receivingReceiptDetailReportGrid" style="font-size: 11.5px;"></div>
+                        <div id="receivingReceiptDetailReportFlexGrid" style="font-size: 11.5px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
                             <div class="btn-group col-md-7" id="receivingReceiptDetailReportNavigationPageGrid">
@@ -106,6 +131,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -116,19 +147,19 @@
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total VAT</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalVATAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalVATAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total WTAX</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalWTAXAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalWTAXAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -144,22 +175,31 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboReceivingReceiptDetailReportStartDate = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportStartDate');
-        var cboReceivingReceiptDetailReportEndDate = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportEndDate');
+        // ============
+        // Date Filters
+        // ============
+        var cboReceivingReceiptDetailReportStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportStartDateFilter');
+        var cboReceivingReceiptDetailReportEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportEndDateFilter');
         var isReceivingReceiptDetailReportStartDateSelected = false;
         var isReceivingReceiptDetailReportEndDateSelected = false;
 
-        var cboReceivingReceiptDetailReportCompany = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportCompany');
-        var cboReceivingReceiptDetailReportBranch = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportBranch');
-        var isReceivingReceiptDetailReportCompanySelected = false;
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboReceivingReceiptDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportCompanyFilter');
+        var cboReceivingReceiptDetailReportBranchFilter = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportBranchFilter');
+        var isCboReceivingReceiptDetailReportCompanySelected = false;
 
-        var receivingReceiptDetailReportCollections;
-        var receivingReceiptDetailReportGrid;
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var receivingReceiptDetailReportCollectionView;
+        var receivingReceiptDetailReportFlexGrid;
+        var cboReceivingReceiptDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportShowNumberOfRows');
 
-        var receivingReceiptDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#receivingReceiptDetailReportShowNumberOfRows');
+        // ==================
+        // Navigation Buttons
+        // ==================
         var btnReceivingReceiptDetailReportMoveToFirstPageGrid = document.getElementById('btnReceivingReceiptDetailReportMoveToFirstPageGrid');
         var btnReceivingReceiptDetailReportMoveToPreviousPageGrid = document.getElementById('btnReceivingReceiptDetailReportMoveToPreviousPageGrid');
         var btnReceivingReceiptDetailReportMoveToNextPageGrid = document.getElementById('btnReceivingReceiptDetailReportMoveToNextPageGrid');
@@ -167,10 +207,10 @@
         var btnReceivingReceiptDetailReportCurrentPageGrid = document.getElementById('btnReceivingReceiptDetailReportCurrentPageGrid');
         var currentPageIndex = 0;
 
-        // =================
-        // Get URL Parameter
-        // =================
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -184,16 +224,16 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function receivingReceiptDetailReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
 
-            cboReceivingReceiptDetailReportStartDate.dispose();
-            cboReceivingReceiptDetailReportStartDate = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportStartDate', {
+            cboReceivingReceiptDetailReportStartDateFilter.dispose();
+            cboReceivingReceiptDetailReportStartDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
                     if (!isReceivingReceiptDetailReportStartDateSelected) {
                         NProgress.start();
@@ -204,10 +244,10 @@
                 }
             });
 
-            cboReceivingReceiptDetailReportEndDate.dispose();
-            cboReceivingReceiptDetailReportEndDate = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportEndDate', {
+            cboReceivingReceiptDetailReportEndDateFilter.dispose();
+            cboReceivingReceiptDetailReportEndDateFilter = new wijmo.input.InputDate('#cboReceivingReceiptDetailReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
                     if (!isReceivingReceiptDetailReportEndDateSelected) {
                         NProgress.start();
@@ -218,13 +258,13 @@
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/receivingReceiptDetailReport/dropdown/list/company',
@@ -245,40 +285,40 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnReceivingReceiptDetailReportCSV").prop("disabled", true);
+                        $("#btnReceivingReceiptDetailReportDownloadCSV").prop("disabled", true);
                         $("#btnReceivingReceiptDetailReportPDF").prop("disabled", true);
                     }
 
-                    cboReceivingReceiptDetailReportCompany.dispose();
-                    cboReceivingReceiptDetailReportCompany = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportCompany', {
+                    cboReceivingReceiptDetailReportCompanyFilter.dispose();
+                    cboReceivingReceiptDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnReceivingReceiptDetailReportCSV").prop("disabled", false);
+                            $("#btnReceivingReceiptDetailReportDownloadCSV").prop("disabled", false);
                             $("#btnReceivingReceiptDetailReportPDF").prop("disabled", false);
-                            isReceivingReceiptDetailReportCompanySelected = true;
-                            createCboBranch();
+                            isCboReceivingReceiptDetailReportCompanySelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboReceivingReceiptDetailReportCompany.selectedValue != null) {
+            if (cboReceivingReceiptDetailReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/receivingReceiptDetailReport/dropdown/list/branch/' + cboReceivingReceiptDetailReportCompany.selectedValue,
+                    url: '/api/receivingReceiptDetailReport/dropdown/list/branch/' + cboReceivingReceiptDetailReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -296,18 +336,18 @@
                         if (branchResults.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnReceivingReceiptDetailReportCSV").prop("disabled", true);
+                            $("#btnReceivingReceiptDetailReportDownloadCSV").prop("disabled", true);
                             $("#btnReceivingReceiptDetailReportPDF").prop("disabled", true);
                         }
 
-                        cboReceivingReceiptDetailReportBranch.dispose();
-                        cboReceivingReceiptDetailReportBranch = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportBranch', {
+                        cboReceivingReceiptDetailReportBranchFilter.dispose();
+                        cboReceivingReceiptDetailReportBranchFilter = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshReceivingReceiptDetailReportFlexGrid();
@@ -320,9 +360,9 @@
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
         function createCboShowRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
@@ -353,8 +393,8 @@
                 });
             }
 
-            receivingReceiptDetailReportShowNumberOfRows.dispose();
-            receivingReceiptDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#receivingReceiptDetailReportShowNumberOfRows', {
+            cboReceivingReceiptDetailReportShowNumberOfRows.dispose();
+            cboReceivingReceiptDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboReceivingReceiptDetailReportShowNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -364,35 +404,35 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = receivingReceiptDetailReportShowNumberOfRows.selectedValue;
-                        receivingReceiptDetailReportCollections.pageSize = parseInt(numberOfRows);
-                        receivingReceiptDetailReportCollections.refresh();
-                        receivingReceiptDetailReportGrid.refresh();
+                        var numberOfRows = cboReceivingReceiptDetailReportShowNumberOfRows.selectedValue;
+                        receivingReceiptDetailReportCollectionView.pageSize = parseInt(numberOfRows);
+                        receivingReceiptDetailReportCollectionView.refresh();
+                        receivingReceiptDetailReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isReceivingReceiptDetailReportCompanySelected) {
+            if (!isCboReceivingReceiptDetailReportCompanySelected) {
                 createReceivingReceiptDetailReportFlexGrid();
             } else {
                 refreshReceivingReceiptDetailReportFlexGrid();
             }
         }
 
-        // ========================================
-        // Get Receiving Receipt Order Detail Data
-        // ========================================
-        function getReceivingReceiptDetailReport() {
+        // =================================
+        // Get Receiving Receipt Detail Data
+        // =================================
+        function getReceivingReceiptDetailReportData() {
             var receivingReceiptDetailReports = new wijmo.collections.ObservableArray;
-            if (cboReceivingReceiptDetailReportCompany.selectedValue != null) {
-                if (cboReceivingReceiptDetailReportBranch.selectedValue != null) {
+            if (cboReceivingReceiptDetailReportCompanyFilter.selectedValue != null) {
+                if (cboReceivingReceiptDetailReportBranchFilter.selectedValue != null) {
 
-                    var startDate = cboReceivingReceiptDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboReceivingReceiptDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboReceivingReceiptDetailReportCompany.selectedValue;
-                    var branchId = cboReceivingReceiptDetailReportBranch.selectedValue;
+                    var startDate = cboReceivingReceiptDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboReceivingReceiptDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboReceivingReceiptDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboReceivingReceiptDetailReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/receivingReceiptDetailReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -400,7 +440,7 @@
                         type: 'GET',
                         contentType: 'application/json; charset=utf-8',
                         success: function (results) {
-                            var totalAmount = 0, totalVAT = 0, totalWTAX = 0;
+                            var inpTotalAmount = 0, totalVAT = 0, totalWTAX = 0;
                             if (results.length > 0) {
                                 for (i = 0; i < results.length; i++) {
                                     var docLink = "/Software/ReceivingReceiptDetail?id=" + results[i]["RRId"];
@@ -433,109 +473,49 @@
                                         WTAXDisplay: parseFloat(results[i]["WTAX"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                     });
 
-                                    totalAmount += results[i]["Amount"];
+                                    inpTotalAmount += results[i]["Amount"];
                                     totalVAT += results[i]["VAT"];
                                     totalWTAX += results[i]["WTAX"];
                                 }
                             }
 
-                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalVATAmount").value = parseFloat(totalVAT).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            document.getElementById("totalWTAXAmount").value = parseFloat(totalWTAX).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalAmount").value = parseFloat(inpTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalVATAmount").value = parseFloat(totalVAT).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalWTAXAmount").value = parseFloat(totalWTAX).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalVATAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalWTAXAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalVATAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalWTAXAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalVATAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalWTAXAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalVATAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalWTAXAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return receivingReceiptDetailReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (receivingReceiptDetailReportCollections.pageSize <= 0) {
-                document.getElementById('receivingReceiptDetailReportNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('receivingReceiptDetailReportNavigationPageGrid').style.display = 'block';
-            if (receivingReceiptDetailReportCollections.pageIndex === 0) {
-                btnReceivingReceiptDetailReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnReceivingReceiptDetailReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (receivingReceiptDetailReportCollections.pageIndex === (receivingReceiptDetailReportCollections.pageCount - 1)) {
-                btnReceivingReceiptDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnReceivingReceiptDetailReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnReceivingReceiptDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnReceivingReceiptDetailReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-            btnReceivingReceiptDetailReportCurrentPageGrid.innerHTML = (receivingReceiptDetailReportCollections.pageIndex + 1) + ' / ' + receivingReceiptDetailReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshReceivingReceiptDetailReportFlexGrid() {
-            receivingReceiptDetailReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptDetailReport());
-            receivingReceiptDetailReportCollections.canFilter = true;
-            receivingReceiptDetailReportCollections.pageSize = receivingReceiptDetailReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#receivingReceiptDetailReportFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                receivingReceiptDetailReportCollections.refresh();
-            });
-
-            receivingReceiptDetailReportCollections.filter = function (item) {
-                return !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.PONumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            receivingReceiptDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            receivingReceiptDetailReportGrid.itemsSource = receivingReceiptDetailReportCollections;
-            receivingReceiptDetailReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ================================================
+        // Create Receiving Receipt Detail Report Flex Grid
+        // ================================================
         function createReceivingReceiptDetailReportFlexGrid() {
-            receivingReceiptDetailReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptDetailReport());
-            receivingReceiptDetailReportCollections.canFilter = true;
-            receivingReceiptDetailReportCollections.pageSize = receivingReceiptDetailReportShowNumberOfRows.selectedValue;
+            receivingReceiptDetailReportCollectionView = new wijmo.collections.CollectionView(getReceivingReceiptDetailReportData());
+            receivingReceiptDetailReportCollectionView.canFilter = true;
+            receivingReceiptDetailReportCollectionView.pageSize = cboReceivingReceiptDetailReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#receivingReceiptDetailReportFilter').keyup(function () {
+            $('#inpReceivingReceiptDetailReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                receivingReceiptDetailReportCollections.refresh();
+                receivingReceiptDetailReportCollectionView.refresh();
             });
 
-            receivingReceiptDetailReportCollections.filter = function (item) {
+            receivingReceiptDetailReportCollectionView.filter = function (item) {
                 return !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.PONumber.toLowerCase().indexOf(filterText) > -1)
@@ -545,12 +525,12 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            receivingReceiptDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            receivingReceiptDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateReceivingReceiptDetailReportNavigationButtons();
             });
 
-            receivingReceiptDetailReportGrid = new wijmo.grid.FlexGrid('#receivingReceiptDetailReportGrid');
-            receivingReceiptDetailReportGrid.initialize({
+            receivingReceiptDetailReportFlexGrid = new wijmo.grid.FlexGrid('#receivingReceiptDetailReportFlexGrid');
+            receivingReceiptDetailReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -651,76 +631,136 @@
                 ],
 
                 autoGenerateColumns: false,
-                itemsSource: receivingReceiptDetailReportCollections,
+                itemsSource: receivingReceiptDetailReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            receivingReceiptDetailReportGrid.trackChanges = true;
+            receivingReceiptDetailReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateReceivingReceiptDetailReportNavigationButtons();
 
             btnReceivingReceiptDetailReportMoveToFirstPageGrid.addEventListener('click', function () {
-                receivingReceiptDetailReportCollections.moveToFirstPage();
-                currentPageIndex = receivingReceiptDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                receivingReceiptDetailReportCollectionView.moveToFirstPage();
+                currentPageIndex = receivingReceiptDetailReportCollectionView.pageIndex + 1;
+                updateReceivingReceiptDetailReportNavigationButtons();
             });
 
             btnReceivingReceiptDetailReportMoveToPreviousPageGrid.addEventListener('click', function () {
-                receivingReceiptDetailReportCollections.moveToPreviousPage();
-                currentPageIndex = receivingReceiptDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                receivingReceiptDetailReportCollectionView.moveToPreviousPage();
+                currentPageIndex = receivingReceiptDetailReportCollectionView.pageIndex + 1;
+                updateReceivingReceiptDetailReportNavigationButtons();
             });
 
             btnReceivingReceiptDetailReportMoveToNextPageGrid.addEventListener('click', function () {
-                receivingReceiptDetailReportCollections.moveToNextPage();
-                currentPageIndex = receivingReceiptDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                receivingReceiptDetailReportCollectionView.moveToNextPage();
+                currentPageIndex = receivingReceiptDetailReportCollectionView.pageIndex + 1;
+                updateReceivingReceiptDetailReportNavigationButtons();
             });
 
             btnReceivingReceiptDetailReportMoveToLastPageGrid.addEventListener('click', function () {
-                receivingReceiptDetailReportCollections.moveToLastPage();
-                currentPageIndex = receivingReceiptDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+                receivingReceiptDetailReportCollectionView.moveToLastPage();
+                currentPageIndex = receivingReceiptDetailReportCollectionView.pageIndex + 1;
+                updateReceivingReceiptDetailReportNavigationButtons();
             });
+        }
+
+        // =========================================================
+        // Update Receiving Receipt Detail Report Navigation Buttons
+        // =========================================================
+        function updateReceivingReceiptDetailReportNavigationButtons() {
+            if (receivingReceiptDetailReportCollectionView.pageSize <= 0) {
+                document.getElementById('receivingReceiptDetailReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('receivingReceiptDetailReportNavigationPageGrid').style.display = 'block';
+            if (receivingReceiptDetailReportCollectionView.pageIndex === 0) {
+                btnReceivingReceiptDetailReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (receivingReceiptDetailReportCollectionView.pageIndex === (receivingReceiptDetailReportCollectionView.pageCount - 1)) {
+                btnReceivingReceiptDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnReceivingReceiptDetailReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnReceivingReceiptDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnReceivingReceiptDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnReceivingReceiptDetailReportCurrentPageGrid.innerHTML = (receivingReceiptDetailReportCollectionView.pageIndex + 1) + ' / ' + receivingReceiptDetailReportCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshReceivingReceiptDetailReportFlexGrid() {
+            receivingReceiptDetailReportCollectionView = new wijmo.collections.CollectionView(getReceivingReceiptDetailReportData());
+            receivingReceiptDetailReportCollectionView.canFilter = true;
+            receivingReceiptDetailReportCollectionView.pageSize = cboReceivingReceiptDetailReportShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpReceivingReceiptDetailReportFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                receivingReceiptDetailReportCollectionView.refresh();
+            });
+
+            receivingReceiptDetailReportCollectionView.filter = function (item) {
+                return !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.PONumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            receivingReceiptDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateReceivingReceiptDetailReportNavigationButtons();
+            });
+
+            receivingReceiptDetailReportFlexGrid.itemsSource = receivingReceiptDetailReportCollectionView;
+            receivingReceiptDetailReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnReceivingReceiptDetailReportCSVOnclick() {
+        function btnReceivingReceiptDetailReportDownloadCSVOnclick() {
             var CSV = '';
             var receivingReceiptDetailReport = [];
             var fileName = 'ReceivingReceiptDetailReport.CSV';
 
-            receivingReceiptDetailReportCollections.moveToFirstPage();
+            receivingReceiptDetailReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= receivingReceiptDetailReportCollections.pageCount; p++) {
-                for (i = 0; i < receivingReceiptDetailReportCollections.items.length; i++) {
+            for (var p = 1; p <= receivingReceiptDetailReportCollectionView.pageCount; p++) {
+                for (i = 0; i < receivingReceiptDetailReportCollectionView.items.length; i++) {
                     receivingReceiptDetailReport.push({
-                        Branch: receivingReceiptDetailReportCollections.items[i].Branch,
-                        RRNumber: receivingReceiptDetailReportCollections.items[i].RRNumber,
-                        RRDate: receivingReceiptDetailReportCollections.items[i].RRDate,
-                        Supplier: receivingReceiptDetailReportCollections.items[i].Supplier,
-                        Remarks: receivingReceiptDetailReportCollections.items[i].Remarks,
-                        PONumber: receivingReceiptDetailReportCollections.items[i].PONumber,
-                        Quantity: receivingReceiptDetailReportCollections.items[i].Quantity,
-                        Barcode: receivingReceiptDetailReportCollections.items[i].ItemCode,
-                        SKUCode: receivingReceiptDetailReportCollections.items[i].ItemManualArticleOldCode,
-                        ItemDescription: receivingReceiptDetailReportCollections.items[i].ItemDescription,
-                        Unit: receivingReceiptDetailReportCollections.items[i].Unit,
-                        Cost: receivingReceiptDetailReportCollections.items[i].Cost,
-                        Amount: receivingReceiptDetailReportCollections.items[i].Amount,
-                        VAT: receivingReceiptDetailReportCollections.items[i].VAT,
-                        WTAX: receivingReceiptDetailReportCollections.items[i].WTAX,
+                        Branch: receivingReceiptDetailReportCollectionView.items[i].Branch,
+                        RRNumber: receivingReceiptDetailReportCollectionView.items[i].RRNumber,
+                        RRDate: receivingReceiptDetailReportCollectionView.items[i].RRDate,
+                        Supplier: receivingReceiptDetailReportCollectionView.items[i].Supplier,
+                        Remarks: receivingReceiptDetailReportCollectionView.items[i].Remarks,
+                        PONumber: receivingReceiptDetailReportCollectionView.items[i].PONumber,
+                        Quantity: receivingReceiptDetailReportCollectionView.items[i].Quantity,
+                        Barcode: receivingReceiptDetailReportCollectionView.items[i].ItemCode,
+                        SKUCode: receivingReceiptDetailReportCollectionView.items[i].ItemManualArticleOldCode,
+                        ItemDescription: receivingReceiptDetailReportCollectionView.items[i].ItemDescription,
+                        Unit: receivingReceiptDetailReportCollectionView.items[i].Unit,
+                        Cost: receivingReceiptDetailReportCollectionView.items[i].Cost,
+                        Amount: receivingReceiptDetailReportCollectionView.items[i].Amount,
+                        VAT: receivingReceiptDetailReportCollectionView.items[i].VAT,
+                        WTAX: receivingReceiptDetailReportCollectionView.items[i].WTAX,
                     });
                 }
 
-                receivingReceiptDetailReportCollections.moveToNextPage();
-                if (p == receivingReceiptDetailReportCollections.pageCount) {
-                    receivingReceiptDetailReportCollections.moveToPage(currentPageIndex - 1);
+                receivingReceiptDetailReportCollectionView.moveToNextPage();
+                if (p == receivingReceiptDetailReportCollectionView.pageCount) {
+                    receivingReceiptDetailReportCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
@@ -788,16 +828,16 @@
             }
         }
 
-        // =====================
-        // Preview and Print PDF
-        // =====================
+        // =========
+        // Print PDF
+        // =========
         function btnReceivingReceiptDetailReportPDFOnclick() {
-            if (cboReceivingReceiptDetailReportCompany.selectedValue != null) {
-                if (cboReceivingReceiptDetailReportBranch.selectedValue != null) {
-                    var startDate = cboReceivingReceiptDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboReceivingReceiptDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboReceivingReceiptDetailReportCompany.selectedValue;
-                    var branchId = cboReceivingReceiptDetailReportBranch.selectedValue;
+            if (cboReceivingReceiptDetailReportCompanyFilter.selectedValue != null) {
+                if (cboReceivingReceiptDetailReportBranchFilter.selectedValue != null) {
+                    var startDate = cboReceivingReceiptDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboReceivingReceiptDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboReceivingReceiptDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboReceivingReceiptDetailReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepReceivingReceiptDetailReport/ReceivingReceiptDetailReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -812,11 +852,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            receivingReceiptDetailReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -863,6 +910,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -902,6 +952,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
