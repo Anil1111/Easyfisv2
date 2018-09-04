@@ -1173,6 +1173,15 @@ namespace easyfis.Controllers
             return View();
         }
 
+        // ===============
+        // BIR CAS Reports
+        // ===============
+        [Authorize]
+        public ActionResult BIRCASReports()
+        {
+            return View();
+        }
+
         // ==============================
         // View Inventory Report Per Item
         // ==============================
