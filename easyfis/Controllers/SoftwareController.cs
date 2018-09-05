@@ -1182,6 +1182,48 @@ namespace easyfis.Controllers
             return View();
         }
 
+        [Authorize]
+        public ActionResult BIRCASCashReceiptBook()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASSalesJournal()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASPurchaseJournal()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASDisbursementBook()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASGeneralLedger()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASInventoryJournal()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public ActionResult BIRCASAuditTrail()
+        {
+            return View();
+        }
+
         // ==============================
         // View Inventory Report Per Item
         // ==============================
