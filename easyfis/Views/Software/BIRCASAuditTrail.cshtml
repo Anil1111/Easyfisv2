@@ -1,7 +1,759 @@
-﻿
-@{
-    ViewBag.Title = "BIRCASAuditTrail";
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
+    <title>BIR CAS - Audit Trail</title>
 
-<h2>BIRCASAuditTrail</h2>
+    @Styles.Render("~/Content/Software-css")
+</head>
+<body>
+    <div id="o-wrapper" class="o-wrapper">
+        <main class="o-content">
+            @Html.Partial("_SoftwareHeader")
 
+            <section class="content-header">
+                <div class="container">
+                    <h3>
+                        BIR CAS - Audit Trail
+                    </h3>
+                    <p>
+                        <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
+                        <i class="fa fa-home fa-fw"></i> &nbsp; <a href="#" onclick="getUserBranches()" style="color: white;">@ViewData["Branch"]</a>
+                    </p>
+                </div>
+            </section>
+            <section class="container">
+                <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 49.5%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                        <input type="text" class="form-control" id="inpBIRCASAuditTrailSeacrhFilter" placeholder="Search...">
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboBIRCASAuditTrailDisplayNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right">
+                                    <button class="btn btn-success" onclick="btnBIRCASAuditTrailDownloadCSVOnclick()" id="btnBIRCASAuditTrailDownloadCSV"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button class="btn btn-primary" onclick="btnBIRCASAuditTrailPrintPDFOnclick()" id="btnBIRCASAuditTrailPrintPDF"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF</button>
+                                    <a href="/Software/BIRCASReports" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Start Date</b></span>
+                                        <div class="comboBox-wide" id="cboBIRCASAuditTrailStartDateFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%" align="right">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>End Date</b></span>
+                                        <div class="comboBox-wide" id="cboBIRCASAuditTrailEndDateFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Company</b></span>
+                                        <div class="comboBox-wide" id="cboBIRCASAuditTrailCompanyFilter"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b>Branch</b></span>
+                                        <div class="comboBox-wide" id="cboBIRCASAuditTrailBranchFilter"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
+                    <div class="panel-body">
+                        <div id="BIRCASAuditTrailFlexGrid" class="grid"></div>
+                    </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="BIRCASAuditTrailNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnBIRCASAuditTrailMoveToFirstPageGrid">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBIRCASAuditTrailMoveToPreviousPageGrid">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnBIRCASAuditTrailCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBIRCASAuditTrailMoveToNextPageGrid">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnBIRCASAuditTrailMoveToLastPageGrid">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            @Html.Partial("_SoftwareFooter")
+        </main>
+    </div>
+    <div id="c-mask" class="c-mask"></div>
+
+    @Scripts.Render("~/Scripts/Software-js")
+    <script type="text/javascript">
+        // ==================
+        // Data Range Filters
+        // ==================
+        var cboBIRCASAuditTrailStartDateFilter = new wijmo.input.InputDate('#cboBIRCASAuditTrailStartDateFilter');
+        var cboBIRCASAuditTrailEndDateFilter = new wijmo.input.InputDate('#cboBIRCASAuditTrailEndDateFilter');
+        var isCboBIRCASAuditTrailStartDateFilterSelected = false;
+        var isCboBIRCASAuditTrailEndDateFilterSelected = false;
+
+        // ==========================
+        // Company and Branch Filters
+        // ==========================
+        var cboBIRCASAuditTrailCompanyFilter = new wijmo.input.ComboBox('#cboBIRCASAuditTrailCompanyFilter');
+        var isCboBIRCASAuditTrailCompanyFilterSelected = false;
+        var cboBIRCASAuditTrailBranchFilter = new wijmo.input.ComboBox('#cboBIRCASAuditTrailBranchFilter');
+
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var BIRCASAuditTrailCollectionView;
+        var BIRCASAuditTrailFlexGrid;
+        var cboBIRCASAuditTrailDisplayNumberOfRows = new wijmo.input.ComboBox('#cboBIRCASAuditTrailDisplayNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnBIRCASAuditTrailMoveToFirstPageGrid = document.getElementById('btnBIRCASAuditTrailMoveToFirstPageGrid');
+        var btnBIRCASAuditTrailMoveToPreviousPageGrid = document.getElementById('btnBIRCASAuditTrailMoveToPreviousPageGrid');
+        var btnBIRCASAuditTrailMoveToNextPageGrid = document.getElementById('btnBIRCASAuditTrailMoveToNextPageGrid');
+        var btnBIRCASAuditTrailMoveToLastPageGrid = document.getElementById('btnBIRCASAuditTrailMoveToLastPageGrid');
+        var btnBIRCASAuditTrailCurrentPageGrid = document.getElementById('btnBIRCASAuditTrailCurrentPageGrid');
+        var BIRCASAuditTrailCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+            var regexS = "[\\?&]" + name + "=([^&#]*)";
+            var regex = new RegExp(regexS);
+
+            var results = regex.exec(window.location.href);
+            if (results == null) {
+                return "";
+            } else {
+                return results[1];
+            }
+        }
+
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangedFilter() {
+            NProgress.start();
+            cboBIRCASAuditTrailStartDateFilter.dispose();
+            cboBIRCASAuditTrailStartDateFilter = new wijmo.input.InputDate('#cboBIRCASAuditTrailStartDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(getURLParameterValue("StartDate")),
+                onValueChanged: function () {
+                    if (!isCboBIRCASAuditTrailStartDateFilterSelected) {
+                        NProgress.start();
+                        refreshBIRCASAuditTrailFlexGrid();
+                    } else {
+                        isCboBIRCASAuditTrailStartDateFilterSelected = false;
+                    }
+                }
+            });
+
+            cboBIRCASAuditTrailEndDateFilter.dispose();
+            cboBIRCASAuditTrailEndDateFilter = new wijmo.input.InputDate('#cboBIRCASAuditTrailEndDateFilter', {
+                format: 'MM-dd-yyyy',
+                value: new Date(getURLParameterValue("EndDate")),
+                onValueChanged: function () {
+                    if (!isCboBIRCASAuditTrailEndDateFilterSelected) {
+                        NProgress.start();
+                        refreshBIRCASAuditTrailFlexGrid();
+                    } else {
+                        isCboBIRCASAuditTrailEndDateFilterSelected = false;
+                    }
+                }
+            });
+
+            createCboCompanyFilter();
+        }
+
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
+            var companyObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/BIRCASAuditTrail/dropdown/list/company',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            companyObservableArray.push({
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
+                            });
+                        }
+                    }
+
+                    var disabled = true;
+                    if (results.length > 0) {
+                        disabled = false;
+                    } else {
+                        $("#btnBIRCASAuditTrailDownloadCSV").prop("disabled", true);
+                        $("#btnBIRCASAuditTrailPrintPDF").prop("disabled", true);
+                    }
+
+                    cboBIRCASAuditTrailCompanyFilter.dispose();
+                    cboBIRCASAuditTrailCompanyFilter = new wijmo.input.ComboBox('#cboBIRCASAuditTrailCompanyFilter', {
+                        disabled: disabled,
+                        isEditable: false,
+                        itemsSource: companyObservableArray,
+                        displayMemberPath: "Company",
+                        selectedValuePath: "Id",
+                        selectedValue: getURLParameterValue("CompanyId"),
+                        onSelectedIndexChanged: function () {
+                            NProgress.start();
+                            $("#btnBIRCASAuditTrailDownloadCSV").prop("disabled", false);
+                            $("#btnBIRCASAuditTrailPrintPDF").prop("disabled", false);
+                            isCboBIRCASAuditTrailCompanyFilterSelected = true;
+                            createCboBranchFilter();
+                        }
+                    });
+
+                    createCboBranchFilter();
+                }
+            });
+        }
+
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
+            var branchObservableArray = new wijmo.collections.ObservableArray();
+
+            if (cboBIRCASAuditTrailCompanyFilter.selectedValue != null) {
+                $.ajax({
+                    url: '/api/BIRCASAuditTrail/dropdown/list/branch/' + cboBIRCASAuditTrailCompanyFilter.selectedValue,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                branchObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    Branch: results[i]["Branch"]
+                                });
+                            }
+                        }
+
+                        var disabled = true;
+                        if (results.length > 0) {
+                            disabled = false;
+                        } else {
+                            $("#btnBIRCASAuditTrailDownloadCSV").prop("disabled", true);
+                            $("#btnBIRCASAuditTrailPrintPDF").prop("disabled", true);
+                        }
+
+                        cboBIRCASAuditTrailBranchFilter.dispose();
+                        cboBIRCASAuditTrailBranchFilter = new wijmo.input.ComboBox('#cboBIRCASAuditTrailBranchFilter', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: branchObservableArray,
+                            displayMemberPath: "Branch",
+                            selectedValuePath: "Id",
+                            selectedValue: getURLParameterValue("BranchId"),
+                            onSelectedIndexChanged: function () {
+                                NProgress.start();
+                                refreshBIRCASAuditTrailFlexGrid();
+                            }
+                        });
+
+                        createCboDisplayNumberOfRows();
+                    }
+                });
+            }
+        }
+
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
+        function createCboDisplayNumberOfRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboBIRCASAuditTrailDisplayNumberOfRows.dispose();
+            cboBIRCASAuditTrailDisplayNumberOfRows = new wijmo.input.ComboBox('#cboBIRCASAuditTrailDisplayNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboBIRCASAuditTrailDisplayNumberOfRows.selectedValue;
+                        BIRCASAuditTrailCollectionView.pageSize = parseInt(numberOfRows);
+                        BIRCASAuditTrailCollectionView.refresh();
+                        BIRCASAuditTrailFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            if (!isCboBIRCASAuditTrailCompanyFilterSelected) {
+                createBIRCASAuditTrailFlexGrid();
+            } else {
+                refreshBIRCASAuditTrailFlexGrid();
+            }
+        }
+
+        // ========
+        // Get Data
+        // ========
+        function getBIRCASAuditTrailData() {
+            var BIRCASAuditTrailObservableArray = new wijmo.collections.ObservableArray;
+            if (cboBIRCASAuditTrailCompanyFilter.selectedValue != null) {
+                if (cboBIRCASAuditTrailBranchFilter.selectedValue != null) {
+                    var startDate = cboBIRCASAuditTrailStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboBIRCASAuditTrailEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboBIRCASAuditTrailCompanyFilter.selectedValue;
+                    var branchId = cboBIRCASAuditTrailBranchFilter.selectedValue;
+
+                    //$.ajax({
+                    //    url: '/api/../' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
+                    //    cache: false,
+                    //    type: 'GET',
+                    //    contentType: 'application/json; charset=utf-8',
+                    //    success: function (BIRCASAuditTrailResult) {
+                    //        var inpBIRCASAuditTrailTotalAmount = 0;
+                    //        if (BIRCASAuditTrailResult.length > 0) {
+                    //            for (i = 0; i < BIRCASAuditTrailResult.length; i++) {
+
+                    //            }
+                    //        }
+                    //    }
+                    //});
+                } else {
+
+                }
+            } else {
+
+            }
+
+            NProgress.done();
+            return BIRCASAuditTrailObservableArray;
+        }
+
+        // ================
+        // Create Flex Grid
+        // ================
+        function createBIRCASAuditTrailFlexGrid() {
+            BIRCASAuditTrailCollectionView = new wijmo.collections.CollectionView(getBIRCASAuditTrailData());
+            BIRCASAuditTrailCollectionView.canFilter = true;
+            BIRCASAuditTrailCollectionView.pageSize = cboBIRCASAuditTrailDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpBIRCASAuditTrailSeacrhFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                BIRCASAuditTrailCollectionView.refresh();
+            });
+
+            BIRCASAuditTrailCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            BIRCASAuditTrailCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateBIRCASAuditTrailNavigationButton();
+            });
+
+            BIRCASAuditTrailFlexGrid = new wijmo.grid.FlexGrid('#BIRCASAuditTrailFlexGrid');
+            BIRCASAuditTrailFlexGrid.initialize({
+                columns: [
+
+                ],
+                autoGenerateColumns: false,
+                itemsSource: BIRCASAuditTrailCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            BIRCASAuditTrailFlexGrid.trackChanges = true;
+
+            updateBIRCASAuditTrailNavigationButton();
+
+            btnBIRCASAuditTrailMoveToFirstPageGrid.addEventListener('click', function () {
+                BIRCASAuditTrailCollectionView.moveToFirstPage();
+                BIRCASAuditTrailCurrentPageIndex = BIRCASAuditTrailCollectionView.pageIndex + 1;
+                updateBIRCASAuditTrailNavigationButton();
+            });
+
+            btnBIRCASAuditTrailMoveToPreviousPageGrid.addEventListener('click', function () {
+                BIRCASAuditTrailCollectionView.moveToPreviousPage();
+                BIRCASAuditTrailCurrentPageIndex = BIRCASAuditTrailCollectionView.pageIndex + 1;
+                updateBIRCASAuditTrailNavigationButton();
+            });
+
+            btnBIRCASAuditTrailMoveToNextPageGrid.addEventListener('click', function () {
+                BIRCASAuditTrailCollectionView.moveToNextPage();
+                BIRCASAuditTrailCurrentPageIndex = BIRCASAuditTrailCollectionView.pageIndex + 1;
+                updateBIRCASAuditTrailNavigationButton();
+            });
+
+            btnBIRCASAuditTrailMoveToLastPageGrid.addEventListener('click', function () {
+                BIRCASAuditTrailCollectionView.moveToLastPage();
+                BIRCASAuditTrailCurrentPageIndex = BIRCASAuditTrailCollectionView.pageIndex + 1;
+                updateBIRCASAuditTrailNavigationButton();
+            });
+        }
+
+        // =========================
+        // Update Navigation Buttons
+        // =========================
+        function updateBIRCASAuditTrailNavigationButton() {
+            if (BIRCASAuditTrailCollectionView.pageSize <= 0) {
+                document.getElementById('BIRCASAuditTrailNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('BIRCASAuditTrailNavigationPageGrid').style.display = 'block';
+            if (BIRCASAuditTrailCollectionView.pageIndex === 0) {
+                btnBIRCASAuditTrailMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnBIRCASAuditTrailMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnBIRCASAuditTrailMoveToNextPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (BIRCASAuditTrailCollectionView.pageIndex === (BIRCASAuditTrailCollectionView.pageCount - 1)) {
+                btnBIRCASAuditTrailMoveToFirstPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnBIRCASAuditTrailMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnBIRCASAuditTrailMoveToFirstPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToNextPageGrid.removeAttribute('disabled');
+                btnBIRCASAuditTrailMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnBIRCASAuditTrailCurrentPageGrid.innerHTML = (BIRCASAuditTrailCollectionView.pageIndex + 1) + ' / ' + BIRCASAuditTrailCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshBIRCASAuditTrailFlexGrid() {
+            BIRCASAuditTrailCollectionView = new wijmo.collections.CollectionView(getBIRCASAuditTrailData());
+            BIRCASAuditTrailCollectionView.canFilter = true;
+            BIRCASAuditTrailCollectionView.pageSize = cboBIRCASAuditTrailDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpBIRCASAuditTrailSeacrhFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                BIRCASAuditTrailCollectionView.refresh();
+            });
+
+            BIRCASAuditTrailCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            BIRCASAuditTrailCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateBIRCASAuditTrailNavigationButton();
+            });
+
+            BIRCASAuditTrailFlexGrid.itemsSource = BIRCASAuditTrailCollectionView;
+            BIRCASAuditTrailFlexGrid.trackChanges = true;
+        }
+
+        // ============
+        // Download CSV
+        // ============
+        function btnBIRCASAuditTrailDownloadCSVOnclick() {
+            var CSV = '';
+            var BIRCASAuditTrail = [];
+            var fileName = 'BIRCASAuditTrail.CSV';
+
+            BIRCASAuditTrailCollectionView.moveToFirstPage();
+
+            for (var p = 1; p <= BIRCASAuditTrailCollectionView.pageCount; p++) {
+                for (i = 0; i < BIRCASAuditTrailCollectionView.items.length; i++) {
+                    BIRCASAuditTrail.push({
+
+                    });
+                }
+
+                BIRCASAuditTrailCollectionView.moveToNextPage();
+                if (p == BIRCASAuditTrailCollectionView.pageCount) {
+                    BIRCASAuditTrailCollectionView.moveToPage(BIRCASAuditTrailCurrentPageIndex - 1);
+                }
+            }
+
+            var Headers = [];
+            Headers.push({
+
+            });
+
+            var header = '';
+            for (var b in Headers[0]) {
+                header += '"' + Headers[0][b] + '",';
+            }
+
+            CSV = header + '\r\n';
+            for (var i = 0; i < BIRCASAuditTrail.length; i++) {
+                var row = '';
+                for (var a in BIRCASAuditTrail[i]) {
+                    row += '"' + BIRCASAuditTrail[i][a] + '",';
+                }
+
+                row.slice(0, row.length - 1);
+                CSV += row + '\r\n';
+            }
+
+            if (CSV == '') {
+                toastr.error("No data.");
+            } else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) {
+                    var blob = new Blob([CSV], { type: 'text/csv;charset=utf-8;' });
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", fileName);
+                    link.style = "visibility:hidden";
+                }
+
+                if (navigator.msSaveBlob) {
+                    link.addEventListener("click", function (event) {
+                        var blob = new Blob([CSV], {
+                            "type": "text/csv;charset=utf-8;"
+                        });
+                        navigator.msSaveBlob(blob, fileName);
+                    }, false);
+                }
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                toastr.success("Dowload successful.");
+            }
+        }
+
+        // =====================
+        // Preview and Print PDF
+        // =====================
+        function btnBIRCASAuditTrailPrintPDFOnclick() {
+            if (cboBIRCASAuditTrailCompanyFilter.selectedValue != null) {
+                if (cboBIRCASAuditTrailBranchFilter.selectedValue != null) {
+                    var startDate = cboBIRCASAuditTrailStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboBIRCASAuditTrailEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboBIRCASAuditTrailCompanyFilter.selectedValue;
+                    var branchId = cboBIRCASAuditTrailBranchFilter.selectedValue;
+
+                    window.location.href = '/RepBIRCASAuditTrail/BIRCASAuditTrail?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
+                } else {
+                    toastr.error("Lacking Information");
+                }
+            } else {
+                toastr.error("Lacking Information");
+            }
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
+        $(document).ready(function () {
+            createCboDateRangedFilter();
+        });
+    </script>
+    <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
+        var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
+        function getUserBranches() {
+            $("#loadingUserBranches").show();
+            document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            $("#userBranchContent").hide();
+
+            $('#userBranchesModal').modal({ show: true, backdrop: 'static' });
+
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+            $("#updateUserBranch").prop("disabled", false);
+            $("#closeUserBranch").prop("disabled", false);
+
+            var userBranchesObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/userBranch/list',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
+                            userBranchesObservableArray.push({
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
+                            });
+                        }
+                    }
+
+                    var currentBranch = "@ViewData["BranchId"]";
+                    cboUserBranches.dispose();
+                    cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches', {
+                        isEditable: false,
+                        placeholder: "Select Branches",
+                        itemsSource: userBranchesObservableArray,
+                        displayMemberPath: "Branch",
+                        selectedValuePath: "BranchId",
+                        selectedValue: currentBranch
+                    });
+
+                    setTimeout(function () {
+                        $("#loadingUserBranches").hide();
+                        $("#userBranchContent").show();
+                    }, 500)
+                }
+            });
+        }
+
+        // ==========================
+        // Update Current User Branch
+        // ==========================
+        function updateUserBranchOnclick() {
+            document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
+            $("#updateUserBranch").prop("disabled", true);
+            $("#closeUserBranch").prop("disabled", true);
+
+            var userBranchObject = new Object();
+            userBranchObject.BranchId = cboUserBranches.selectedValue;
+            var userBranchData = JSON.stringify(userBranchObject);
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/userBranch/update',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: userBranchData,
+                statusCode: {
+                    200: function () {
+                        toastr.success("Update Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function () {
+                        toastr.error("Not Found");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    },
+                    500: function () {
+                        toastr.error("Bad Request");
+                        document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-save fa-fw'></i> Update";
+                        $("#updateUserBranch").prop("disabled", false);
+                        $("#closeUserBranch").prop("disabled", false);
+                    }
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
+        var slideLeft = new Menu({
+            wrapper: '#o-wrapper',
+            type: 'slide-left',
+            menuOpenerClass: '.c-button',
+            maskId: '#c-mask'
+        });
+
+        var slideLeftBtn = document.querySelector('#c-button--slide-left');
+
+        slideLeftBtn.addEventListener('click', function (e) {
+            e.preventDefault;
+            slideLeft.open();
+        });
+    </script>
+</body>
+</html>

@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace easyfis.ApiControllers
 {
-    public class ApiRepBIRCASInventoryJournalController : ApiController
+    public class ApiRepBIRCASReportController : ApiController
     {
         // ============
         // Data Context
@@ -17,8 +17,8 @@ namespace easyfis.ApiControllers
         // ================================
         // Dropdown List - Company (Filter)
         // ================================
-        [Authorize, HttpGet, Route("api/BIRCASInventoryJournal/dropdown/list/company")]
-        public List<Entities.MstCompany> DropdownListBIRCASInventoryJournalListCompany()
+        [Authorize, HttpGet, Route("api/BIRCASReport/dropdown/list/company")]
+        public List<Entities.MstCompany> DropdownListBIRCASReportListCompany()
         {
             var companies = from d in db.MstCompanies.OrderBy(d => d.Company)
                             select new Entities.MstCompany
@@ -33,8 +33,8 @@ namespace easyfis.ApiControllers
         // ===============================
         // Dropdown List - Branch (Filter)
         // ===============================
-        [Authorize, HttpGet, Route("api/BIRCASInventoryJournal/dropdown/list/branch/{companyId}")]
-        public List<Entities.MstBranch> DropdownListBIRCASInventoryJournalListBranch(String companyId)
+        [Authorize, HttpGet, Route("api/BIRCASReport/dropdown/list/branch/{companyId}")]
+        public List<Entities.MstBranch> DropdownListBIRCASReportListBranch(String companyId)
         {
             var branches = from d in db.MstBranches.OrderBy(d => d.Branch)
                            where d.CompanyId == Convert.ToInt32(companyId)

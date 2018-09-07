@@ -19,7 +19,7 @@ namespace easyfis.Reports
         // Preview and Print PDF
         // =====================
         [Authorize]
-        public ActionResult BIRCASAudtiTrail(String StartDate, String EndDate, String CompanyId, String BranchId)
+        public ActionResult BIRCASAuditTrail(String StartDate, String EndDate, String CompanyId, String BranchId)
         {
             // ==============================
             // PDF Settings and Customization
