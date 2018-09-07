@@ -40,12 +40,8 @@ namespace easyfis.Reports
             // Fonts Styles
             // ============
             Font fontArial17Bold = FontFactory.GetFont("Arial", 17, Font.BOLD);
-            Font fontArial12Bold = FontFactory.GetFont("Arial", 12, Font.BOLD);
-            Font fontArial12 = FontFactory.GetFont("Arial", 12);
             Font fontArial11Bold = FontFactory.GetFont("Arial", 11, Font.BOLD);
             Font fontArial11 = FontFactory.GetFont("Arial", 11);
-            Font fontArial10Bold = FontFactory.GetFont("Arial", 10, Font.BOLD);
-            Font fontArial10 = FontFactory.GetFont("Arial", 10);
 
             // ====
             // Line 
@@ -84,6 +80,60 @@ namespace easyfis.Reports
             dateRangeFilters.AddCell(new PdfPCell(new Phrase("Date Start:  " + Convert.ToDateTime(StartDate).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 8f });
             dateRangeFilters.AddCell(new PdfPCell(new Phrase("Date End:   " + Convert.ToDateTime(EndDate).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 5f });
             document.Add(dateRangeFilters);
+
+            // =====
+            // Space
+            // =====
+            PdfPTable space = new PdfPTable(1);
+            space.SetWidths(new float[] { 100f });
+            space.WidthPercentage = 100;
+            space.AddCell(new PdfPCell(new Phrase(" ", fontArial11)) { Border = 0, PaddingTop = 7f });
+            document.Add(space);
+
+            // ====
+            // Data
+            // ====
+            var journals = from d in db.TrnJournals
+                           where d.ORId != null
+                           && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                           && d.BranchId == Convert.ToInt32(BranchId)
+                           && d.JournalDate >= Convert.ToDateTime(StartDate)
+                           && d.JournalDate <= Convert.ToDateTime(EndDate)
+                           select d;
+
+            if (journals.Any())
+            {
+                PdfPTable data = new PdfPTable(6);
+                data.SetWidths(new float[] { 50f, 60f, 60f, 150f, 80f, 80f });
+                data.WidthPercentage = 100;
+                data.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+                data.AddCell(new PdfPCell(new Phrase("Reference No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+                data.AddCell(new PdfPCell(new Phrase("Account Code", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+                data.AddCell(new PdfPCell(new Phrase("Account", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+                data.AddCell(new PdfPCell(new Phrase("Debit Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+                data.AddCell(new PdfPCell(new Phrase("Credit Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f });
+
+                Decimal totalDebitAmount = 0;
+                Decimal totalCreditAmount = 0;
+                foreach (var journal in journals)
+                {
+                    totalDebitAmount += journal.DebitAmount;
+                    totalCreditAmount += journal.CreditAmount;
+
+                    data.AddCell(new PdfPCell(new Phrase(journal.JournalDate.ToShortDateString(), fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase("OR-" + journal.TrnCollection.ORNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(journal.MstAccount.AccountCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(journal.MstAccount.Account, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(journal.DebitAmount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(journal.CreditAmount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                }
+
+                data.AddCell(new PdfPCell(new Phrase("TOTAL", fontArial11Bold)) { Colspan = 4, HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalDebitAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalCreditAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+
+                document.Add(data);
+            }
 
             // ==============
             // Document Close

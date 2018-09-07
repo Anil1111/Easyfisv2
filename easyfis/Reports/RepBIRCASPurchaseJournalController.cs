@@ -84,6 +84,24 @@ namespace easyfis.Reports
             dateRangeFilters.AddCell(new PdfPCell(new Phrase("Date End:   " + Convert.ToDateTime(EndDate).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 5f });
             document.Add(dateRangeFilters);
 
+            // ====
+            // Data
+            // ====
+            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                        where d.TrnReceivingReceipt.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                                        && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(BranchId)
+                                        && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(StartDate)
+                                        && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(EndDate)
+                                        select d;
+
+            if (receivingReceiptItems.Any())
+            {
+                foreach (var receivingReceiptItem in receivingReceiptItems)
+                {
+
+                }
+            }
+
             // ==============
             // Document Close
             // ==============
