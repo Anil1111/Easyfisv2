@@ -39,12 +39,8 @@ namespace easyfis.Reports
             // Fonts Styles
             // ============
             Font fontArial17Bold = FontFactory.GetFont("Arial", 17, Font.BOLD);
-            Font fontArial12Bold = FontFactory.GetFont("Arial", 12, Font.BOLD);
-            Font fontArial12 = FontFactory.GetFont("Arial", 12);
             Font fontArial11Bold = FontFactory.GetFont("Arial", 11, Font.BOLD);
             Font fontArial11 = FontFactory.GetFont("Arial", 11);
-            Font fontArial10Bold = FontFactory.GetFont("Arial", 10, Font.BOLD);
-            Font fontArial10 = FontFactory.GetFont("Arial", 10);
 
             // ====
             // Line 
@@ -84,6 +80,15 @@ namespace easyfis.Reports
             dateRangeFilters.AddCell(new PdfPCell(new Phrase("Date End:   " + Convert.ToDateTime(EndDate).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 5f });
             document.Add(dateRangeFilters);
 
+            // =====
+            // Space
+            // =====
+            PdfPTable space = new PdfPTable(1);
+            space.SetWidths(new float[] { 100f });
+            space.WidthPercentage = 100;
+            space.AddCell(new PdfPCell(new Phrase(" ", fontArial11)) { Border = 0, PaddingTop = 7f });
+            document.Add(space);
+
             // ====
             // Data
             // ====
@@ -96,10 +101,82 @@ namespace easyfis.Reports
 
             if (inventories.Any())
             {
+                PdfPTable data = new PdfPTable(7);
+                data.SetWidths(new float[] { 50f, 70f, 70f, 100f, 130f, 70f, 70f });
+                data.WidthPercentage = 100;
+                data.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Reference No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Account Code", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Account", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Item", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Debit Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Credit Amount", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+
+                Decimal totalDebitAmount = 0;
+                Decimal totalCreditAmount = 0;
+
                 foreach (var inventory in inventories)
                 {
+                    String referenceNumber = "0000000000";
 
+                    if (inventory.RRId != null)
+                    {
+                        referenceNumber = "RR-" + inventory.TrnReceivingReceipt.RRNumber;
+                    }
+                    else if (inventory.SIId != null)
+                    {
+                        referenceNumber = "SI-" + inventory.TrnSalesInvoice.SINumber;
+                    }
+                    else if (inventory.INId != null)
+                    {
+                        referenceNumber = "IN-" + inventory.TrnStockIn.INNumber;
+                    }
+                    else if (inventory.OTId != null)
+                    {
+                        referenceNumber = "OT-" + inventory.TrnStockOut.OTNumber;
+                    }
+                    else if (inventory.STId != null)
+                    {
+                        referenceNumber = "ST-" + inventory.TrnStockTransfer.STNumber;
+                    }
+                    else if (inventory.SWId != null)
+                    {
+                        referenceNumber = "SW-" + inventory.TrnStockWithdrawal.SWNumber;
+                    }
+                    else
+                    {
+                        referenceNumber = "0000000000";
+                    }
+
+                    Decimal debitAmount = 0;
+                    Decimal creditAmount = 0;
+
+                    if (inventory.Quantity > 0)
+                    {
+                        debitAmount = inventory.Amount;
+                    }
+                    else
+                    {
+                        creditAmount = inventory.Amount;
+                    }
+
+                    totalDebitAmount += debitAmount;
+                    totalCreditAmount += creditAmount;
+
+                    data.AddCell(new PdfPCell(new Phrase(inventory.InventoryDate.ToShortDateString(), fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(referenceNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(inventory.MstArticle.MstAccount.AccountCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(inventory.MstArticle.MstAccount.Account, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(inventory.MstArticle.Article, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(debitAmount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(creditAmount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                 }
+
+                data.AddCell(new PdfPCell(new Phrase("TOTAL", fontArial11Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalDebitAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+                data.AddCell(new PdfPCell(new Phrase(totalCreditAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 4f, PaddingBottom = 8f, PaddingRight = 5f, PaddingLeft = 5f });
+
+                document.Add(data);
             }
 
             // ==============
