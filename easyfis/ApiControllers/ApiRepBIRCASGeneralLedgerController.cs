@@ -46,5 +46,38 @@ namespace easyfis.ApiControllers
 
             return branches.ToList();
         }
+
+        // ========================
+        // List General Ledger Data
+        // ========================
+        [Authorize, HttpGet, Route("api/BIRCASGeneralLedger/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Entities.RepBIRCASGeneralLedger> ListBIRCASGeneralLedger(String startDate, String endDate, String companyId, String branchId)
+        {
+            var journals = from d in db.TrnJournals
+                           where d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                           && d.BranchId == Convert.ToInt32(branchId)
+                           && d.JournalDate >= Convert.ToDateTime(startDate)
+                           && d.JournalDate <= Convert.ToDateTime(endDate)
+                           select new Entities.RepBIRCASGeneralLedger
+                           {
+                               Date = d.JournalDate.ToShortDateString(),
+                               ReferenceNumber = d.ORId != null ? "OR-" + d.TrnCollection.ORNumber :
+                                                 d.CVId != null ? "CV-" + d.TrnDisbursement.CVNumber :
+                                                 d.JVId != null ? "JV-" + d.TrnJournalVoucher.JVNumber :
+                                                 d.RRId != null ? "RR-" + d.TrnReceivingReceipt.RRNumber :
+                                                 d.SIId != null ? "SI-" + d.TrnSalesInvoice.SINumber :
+                                                 d.INId != null ? "IN-" + d.TrnStockIn.INNumber :
+                                                 d.OTId != null ? "OT-" + d.TrnStockOut.OTNumber :
+                                                 d.STId != null ? "ST-" + d.TrnStockTransfer.STNumber :
+                                                 d.SWId != null ? "SW-" + d.TrnStockWithdrawal.SWNumber :
+                                                 "0000000000",
+                               AccountCode = d.MstAccount.AccountCode,
+                               Account = d.MstAccount.Account,
+                               DebitAmount = d.DebitAmount,
+                               CreditAmount = d.CreditAmount
+                           };
+
+            return journals.ToList();
+        }
     }
 }
