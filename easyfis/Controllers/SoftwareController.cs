@@ -1164,62 +1164,139 @@ namespace easyfis.Controllers
             }
         }
 
-        // ==================================
-        // View Inventory Report Per Supplier
-        // ==================================
-        [Authorize]
-        public ActionResult ItemListSupplier()
-        {
-            return View();
-        }
-
         // ===============
         // BIR CAS Reports
         // ===============
         [Authorize]
         public ActionResult BIRCASReports()
         {
-            return View();
+            if (PageAccess("BIRCASReport").Equals("BIRCASReport"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ==============================
+        // View BIR CAS Cash Receipt Book 
+        // ==============================
         [Authorize]
         public ActionResult BIRCASCashReceiptBook()
         {
-            return View();
+            if (PageAccess("ViewBIRCASCashReceiptBook").Equals("ViewBIRCASCashReceiptBook"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ==========================
+        // View BIR CAS Sales Journal
+        // ==========================
         [Authorize]
         public ActionResult BIRCASSalesJournal()
         {
-            return View();
+            if (PageAccess("ViewBIRCASSalesJournal").Equals("ViewBIRCASSalesJournal"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // =============================
+        // View BIR CAS Purchase Journal
+        // =============================
         [Authorize]
         public ActionResult BIRCASPurchaseJournal()
         {
-            return View();
+            if (PageAccess("ViewBIRCASPurchaseJournal").Equals("ViewBIRCASPurchaseJournal"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ==============================
+        // View BIR CAS Disbursement Book
+        // ==============================
         [Authorize]
         public ActionResult BIRCASDisbursementBook()
         {
-            return View();
+            if (PageAccess("ViewBIRCASDisbursementBook").Equals("ViewBIRCASDisbursementBook"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ===========================
+        // View BIR CAS General Ledger
+        // ===========================
         [Authorize]
         public ActionResult BIRCASGeneralLedger()
         {
-            return View();
+            if (PageAccess("ViewBIRCASGeneralLedger").Equals("ViewBIRCASGeneralLedger"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ==============================
+        // View BIR CAS Inventory Journal
+        // ==============================
         [Authorize]
         public ActionResult BIRCASInventoryJournal()
         {
-            return View();
+            if (PageAccess("ViewBIRCASInventoryJournal").Equals("ViewBIRCASInventoryJournal"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
         }
 
+        // ========================
+        // View BIR CAS Audit Trail
+        // ========================
         [Authorize]
         public ActionResult BIRCASAuditTrail()
+        {
+            if (PageAccess("ViewBIRCASAuditTrail").Equals("ViewBIRCASAuditTrail"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Forbidden", "Software");
+            }
+        }
+
+        // ==================================
+        // View Inventory Report Per Supplier
+        // ==================================
+        [Authorize]
+        public ActionResult ItemListSupplier()
         {
             return View();
         }
