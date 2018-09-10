@@ -46,5 +46,36 @@ namespace easyfis.ApiControllers
 
             return branches.ToList();
         }
+
+        // ===========================
+        // List Inventory Journal Data
+        // ===========================
+        [Authorize, HttpGet, Route("api/BIRCASInventoryJournal/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Entities.RepBIRCASInventoryJournal> ListBIRCASInventoryJournal(String startDate, String endDate, String companyId, String branchId)
+        {
+            var inventories = from d in db.TrnInventories
+                              where d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                              && d.BranchId == Convert.ToInt32(branchId)
+                              && d.InventoryDate >= Convert.ToDateTime(startDate)
+                              && d.InventoryDate <= Convert.ToDateTime(endDate)
+                              select new Entities.RepBIRCASInventoryJournal
+                              {
+                                  Date = d.InventoryDate.ToShortDateString(),
+                                  ReferenceNumber = d.RRId != null ? "RR-" + d.TrnReceivingReceipt.RRNumber :
+                                                    d.SIId != null ? "SI-" + d.TrnSalesInvoice.SINumber :
+                                                    d.INId != null ? "IN-" + d.TrnStockIn.INNumber :
+                                                    d.OTId != null ? "OT-" + d.TrnStockOut.OTNumber :
+                                                    d.STId != null ? "ST-" + d.TrnStockTransfer.STNumber :
+                                                    d.SWId != null ? "SW-" + d.TrnStockWithdrawal.SWNumber :
+                                                    "0000000000",
+                                  AccountCode = d.MstArticle.MstAccount.AccountCode,
+                                  Account = d.MstArticle.MstAccount.Account,
+                                  Item = d.MstArticle.Article,
+                                  DebitAmount = d.Quantity > 0 ? d.Amount : 0,
+                                  CreditAmount = d.Quantity < 0 ? d.Amount : 0
+                              };
+
+            return inventories.ToList();
+        }
     }
 }

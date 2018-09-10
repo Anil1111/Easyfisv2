@@ -46,5 +46,33 @@ namespace easyfis.ApiControllers
 
             return branches.ToList();
         }
+
+        // =======================
+        // List Sales Journal Data
+        // =======================
+        [Authorize, HttpGet, Route("api/BIRCASSalesJournal/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Entities.RepBIRCASSalesJournal> ListBIRCASSalesJournal(String startDate, String endDate, String companyId, String branchId)
+        {
+            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                    where d.TrnSalesInvoice.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                    && d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
+                                    && d.TrnSalesInvoice.SIDate >= Convert.ToDateTime(startDate)
+                                    && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
+                                    select new Entities.RepBIRCASSalesJournal
+                                    {
+                                        Date = d.TrnSalesInvoice.SIDate.ToShortDateString(),
+                                        ReferenceNumber = "SI-" + d.TrnSalesInvoice.SINumber,
+                                        Customer = d.TrnSalesInvoice.MstArticle.Article,
+                                        CustomerTIN = d.TrnSalesInvoice.MstArticle.TaxNumber,
+                                        Address = d.TrnSalesInvoice.MstArticle.Address,
+                                        ManualReferenceNumber = d.TrnSalesInvoice.ManualSINumber,
+                                        TotalAmount = d.Price * d.Quantity,
+                                        Discount = d.DiscountAmount,
+                                        VAT = d.VATAmount,
+                                        NetSales = d.Amount
+                                    };
+
+            return salesInvoiceItems.ToList();
+        }
     }
 }

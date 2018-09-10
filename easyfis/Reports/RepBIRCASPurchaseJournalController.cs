@@ -102,7 +102,7 @@ namespace easyfis.Reports
             if (receivingReceiptItems.Any())
             {
                 PdfPTable data = new PdfPTable(10);
-                data.SetWidths(new float[] { 50f, 55f, 60f, 50f, 50f, 55f, 50f, 50f, 50f, 50f });
+                data.SetWidths(new float[] { 50f, 65f, 60f, 50f, 50f, 55f, 50f, 50f, 50f, 50f });
                 data.WidthPercentage = 100;
                 data.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
                 data.AddCell(new PdfPCell(new Phrase("Reference No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -128,7 +128,7 @@ namespace easyfis.Reports
                     totalNetPurchase += receivingReceiptItem.Amount;
 
                     data.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.TrnReceivingReceipt.RRDate.ToShortDateString(), fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
-                    data.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.TrnReceivingReceipt.RRNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase("RR-" + receivingReceiptItem.TrnReceivingReceipt.RRNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.TrnReceivingReceipt.MstArticle.Article, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.TrnReceivingReceipt.MstArticle.TaxNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(receivingReceiptItem.TrnReceivingReceipt.MstArticle.Address, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });

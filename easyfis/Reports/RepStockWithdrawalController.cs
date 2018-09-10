@@ -107,9 +107,9 @@ namespace easyfis.Reports
                 String contactAddress = stockWithdrawals.FirstOrDefault().Address;
                 String SWNumber = stockWithdrawals.FirstOrDefault().SWNumber;
                 String SWDate = stockWithdrawals.FirstOrDefault().SWDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture); ;
-                String preparedBy = stockWithdrawals.FirstOrDefault().MstUser3.FullName;
+                String preparedBy = stockWithdrawals.FirstOrDefault().MstUser.FullName;
                 String checkedBy = stockWithdrawals.FirstOrDefault().MstUser1.FullName;
-                String approvedBy = stockWithdrawals.FirstOrDefault().MstUser.FullName;
+                String approvedBy = stockWithdrawals.FirstOrDefault().MstUser2.FullName;
 
                 PdfPTable tableStockWithdrawals = new PdfPTable(4);
                 float[] widthscellsTablePurchaseOrder = new float[] { 40f, 150f, 70f, 50f };

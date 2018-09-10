@@ -46,5 +46,33 @@ namespace easyfis.ApiControllers
 
             return branches.ToList();
         }
+
+        // ==========================
+        // List Purchase Journal Data
+        // ==========================
+        [Authorize, HttpGet, Route("api/BIRCASPurchaseJournal/list/{startDate}/{endDate}/{companyId}/{branchId}")]
+        public List<Entities.RepBIRCASPurchaseJournal> ListBIRCASPurchaseJournal(String startDate, String endDate, String companyId, String branchId)
+        {
+            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                        where d.TrnReceivingReceipt.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                        && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(branchId)
+                                        && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(startDate)
+                                        && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(endDate)
+                                        select new Entities.RepBIRCASPurchaseJournal
+                                        {
+                                            Date = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
+                                            ReferenceNumber = "RR-" + d.TrnReceivingReceipt.RRNumber,
+                                            Supplier = d.TrnReceivingReceipt.MstArticle.Article,
+                                            SupplierTIN = d.TrnReceivingReceipt.MstArticle.TaxNumber,
+                                            Address = d.TrnReceivingReceipt.MstArticle.Address,
+                                            ManualReferenceNumber = d.TrnReceivingReceipt.ManualRRNumber,
+                                            TotalAmount = d.Amount,
+                                            Discount = 0,
+                                            VAT = d.VATAmount,
+                                            NetPurchase = d.Amount
+                                        };
+
+            return receivingReceiptItems.ToList();
+        }
     }
 }
