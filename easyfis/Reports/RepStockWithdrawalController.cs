@@ -110,6 +110,7 @@ namespace easyfis.Reports
                 String preparedBy = stockWithdrawals.FirstOrDefault().MstUser.FullName;
                 String checkedBy = stockWithdrawals.FirstOrDefault().MstUser1.FullName;
                 String approvedBy = stockWithdrawals.FirstOrDefault().MstUser2.FullName;
+                String receivedBy = stockWithdrawals.FirstOrDefault().MstUser5.FullName;
 
                 PdfPTable tableStockWithdrawals = new PdfPTable(4);
                 float[] widthscellsTablePurchaseOrder = new float[] { 40f, 150f, 70f, 50f };
@@ -141,9 +142,9 @@ namespace easyfis.Reports
 
                 document.Add(spaceTable);
 
-                // ========================
+                // ==========================
                 // Get Stock Withdrawal Items
-                // ========================
+                // ==========================
                 var stockWithdrawalItems = from d in db.TrnStockWithdrawalItems
                                            where d.SWId == StockWithdrawalId
                                            && d.TrnStockWithdrawal.IsLocked == true
@@ -233,19 +234,22 @@ namespace easyfis.Reports
                 // ==============
                 // User Signature
                 // ==============
-                PdfPTable tableUsers = new PdfPTable(3);
-                float[] widthsCellsTableUsers = new float[] { 100f, 100f, 100f };
+                PdfPTable tableUsers = new PdfPTable(4);
+                float[] widthsCellsTableUsers = new float[] { 100f, 100f, 100f, 100f };
                 tableUsers.WidthPercentage = 100;
                 tableUsers.SetWidths(widthsCellsTableUsers);
                 tableUsers.AddCell(new PdfPCell(new Phrase("Prepared by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableUsers.AddCell(new PdfPCell(new Phrase("Checked by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableUsers.AddCell(new PdfPCell(new Phrase("Approved by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableUsers.AddCell(new PdfPCell(new Phrase("Received by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableUsers.AddCell(new PdfPCell(new Phrase(" ")) { PaddingBottom = 50f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(" ")) { PaddingBottom = 50f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(" ")) { PaddingBottom = 50f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(" ")) { PaddingBottom = 50f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(preparedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableUsers.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                tableUsers.AddCell(new PdfPCell(new Phrase(receivedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 document.Add(tableUsers);
             }
 

@@ -19,9 +19,11 @@ namespace easyfis.Entities
         public String SIDate { get; set; }
         public String Remarks { get; set; }
         public String DocumentReference { get; set; }
+        public String ManualSWNumber { get; set; }
         public String ContactPerson { get; set; }
         public String ContactNumber { get; set; }
         public String Address { get; set; }
+        public Int32 ReceivedById { get; set; }
         public Int32 PreparedById { get; set; }
         public Int32 CheckedById { get; set; }
         public Int32 ApprovedById { get; set; }

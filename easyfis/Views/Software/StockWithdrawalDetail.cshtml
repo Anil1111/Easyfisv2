@@ -132,6 +132,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label class="control-label col-sm-4">Manual SW Number</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control requiredRR" id="inpStockWithdrawalManualSWNumber" placeholder="Manual RR Number">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="control-label col-sm-4">Contact Person</label>
                                         <div class="col-sm-8">
                                             <input type="text" class="form-control requiredStockWithdrawal" id="inpStockWithdrawalContactPerson" placeholder="Contact Person">
@@ -147,6 +153,12 @@
                                         <label class="control-label col-sm-4">Address</label>
                                         <div class="col-sm-8">
                                             <textarea rows="5" class="form-control textarea-custom requiredStockWithdrawal" id="inpStockWithdrawalAddress" placeholder="Address"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Received by</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboStockWithdrawalReceivedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -698,6 +710,7 @@
         var cboStockWithdrawalCustomer = new wijmo.input.ComboBox('#cboStockWithdrawalCustomer');
         var SIIdSelectedValue = 0;
         var SIBranchIdSelectedValue = 0;
+        var cboStockWithdrawalReceivedBy = new wijmo.input.ComboBox('#cboStockWithdrawalReceivedBy');
         var cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy');
         var cboStockWithdrawalCheckedBy = new wijmo.input.ComboBox('#cboStockWithdrawalCheckedBy');
         var cboStockWithdrawalApprovedBy = new wijmo.input.ComboBox('#cboStockWithdrawalApprovedBy');
@@ -895,6 +908,15 @@
                         }
                     }
 
+                    cboStockWithdrawalReceivedBy.dispose();
+                    cboStockWithdrawalReceivedBy = new wijmo.input.ComboBox('#cboStockWithdrawalReceivedBy', {
+                        isEditable: false,
+                        placeholder: "Select User",
+                        itemsSource: usersObservableArray,
+                        displayMemberPath: "FullName",
+                        selectedValuePath: "Id"
+                    });
+
                     cboStockWithdrawalPreparedBy.dispose();
                     cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy', {
                         disabled: true,
@@ -957,9 +979,11 @@
                             document.getElementById('inpStockWithdrawalSIBranch').value = results.SIBranch;
                             document.getElementById('inpStockWithdrawalSINumber').value = results.SINumber + " - (" + results.SIDate.replace("/", "-") + ")";
                             document.getElementById('inpStockWithdrawalRemarks').value = results.Remarks;
+                            document.getElementById('inpStockWithdrawalManualSWNumber').value = results.ManualSWNumber;
                             document.getElementById('inpStockWithdrawalContactPerson').value = results.ContactPerson;
                             document.getElementById('inpStockWithdrawalContactNumber').value = results.ContactNumber;
                             document.getElementById('inpStockWithdrawalAddress').value = results.Address;
+                            cboStockWithdrawalReceivedBy.selectedValue = results.ReceivedById;
                             cboStockWithdrawalPreparedBy.selectedValue = results.PreparedById;
                             cboStockWithdrawalCheckedBy.selectedValue = results.CheckedById;
                             cboStockWithdrawalApprovedBy.selectedValue = results.ApprovedById;
@@ -971,9 +995,11 @@
                                 cboSalesInvoiceStatusSINumberFilter.disabled = true;
                                 document.getElementById('inpStockWithdrawalRemarks').disabled = true;
                                 document.getElementById('inpStockWithdrawalDocumentReference').disabled = true;
+                                document.getElementById('inpStockWithdrawalManualSWNumber').disabled = true;
                                 document.getElementById('inpStockWithdrawalContactPerson').disabled = true;
                                 document.getElementById('inpStockWithdrawalContactNumber').disabled = true;
                                 document.getElementById('inpStockWithdrawalAddress').disabled = true;
+                                cboStockWithdrawalReceivedBy.disabled = true;
                                 cboStockWithdrawalCheckedBy.disabled = true;
                                 cboStockWithdrawalApprovedBy.disabled = true;
 
@@ -1014,9 +1040,11 @@
             stockWithdrawalObject.SIId = SIIdSelectedValue;
             stockWithdrawalObject.Remarks = document.getElementById('inpStockWithdrawalRemarks').value;
             stockWithdrawalObject.DocumentReference = document.getElementById('inpStockWithdrawalDocumentReference').value;
+            stockWithdrawalObject.ManualSWNumber = document.getElementById('inpStockWithdrawalManualSWNumber').value;
             stockWithdrawalObject.ContactPerson = document.getElementById('inpStockWithdrawalContactPerson').value;
             stockWithdrawalObject.ContactNumber = document.getElementById('inpStockWithdrawalContactNumber').value;
             stockWithdrawalObject.Address = document.getElementById('inpStockWithdrawalAddress').value;
+            stockWithdrawalObject.ReceivedById = cboStockWithdrawalReceivedBy.selectedValue;
             stockWithdrawalObject.PreparedById = cboStockWithdrawalPreparedBy.selectedValue;
             stockWithdrawalObject.CheckedById = cboStockWithdrawalCheckedBy.selectedValue;
             stockWithdrawalObject.ApprovedById = cboStockWithdrawalApprovedBy.selectedValue;

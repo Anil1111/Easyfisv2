@@ -37,6 +37,7 @@ namespace easyfis.ModifiedApiControllers
                                         Id = d.Id,
                                         SWNumber = d.SWNumber,
                                         SWDate = d.SWDate.ToShortDateString(),
+                                        ManualSWNumber = d.ManualSWNumber,
                                         DocumentReference = d.DocumentReference,
                                         SIBranch = d.TrnSalesInvoice.MstBranch.Branch,
                                         SINumber = d.TrnSalesInvoice.SINumber,
@@ -73,6 +74,7 @@ namespace easyfis.ModifiedApiControllers
                                       SWNumber = d.SWNumber,
                                       SWDate = d.SWDate.ToShortDateString(),
                                       DocumentReference = d.DocumentReference,
+                                      ManualSWNumber = d.ManualSWNumber,
                                       CustomerId = d.CustomerId,
                                       SIId = d.SIId,
                                       SIBranchId = d.SIBranchId,
@@ -83,6 +85,7 @@ namespace easyfis.ModifiedApiControllers
                                       ContactPerson = d.ContactPerson,
                                       ContactNumber = d.ContactNumber,
                                       Address = d.Address,
+                                      ReceivedById = d.ReceivedById,
                                       PreparedById = d.PreparedById,
                                       CheckedById = d.CheckedById,
                                       ApprovedById = d.ApprovedById,
@@ -171,7 +174,6 @@ namespace easyfis.ModifiedApiControllers
             var salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
                                 where d.BranchId == Convert.ToInt32(branchId)
                                 && d.CustomerId == Convert.ToInt32(customerId)
-                                && d.BalanceAmount > 0
                                 && d.IsLocked == true
                                 select new Entities.TrnSalesInvoice
                                 {
@@ -234,7 +236,7 @@ namespace easyfis.ModifiedApiControllers
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalList") select d;
                     IQueryable<Data.TrnSalesInvoice> salesInvoices = from d in db.TrnSalesInvoices.OrderByDescending(d => d.SINumber)
                                                                      where d.MstBranch.CompanyId == currentCompanyId
-                                                                     && d.BalanceAmount > 0 && d.IsLocked == true
+                                                                     && d.IsLocked == true
                                                                      select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
 
@@ -285,9 +287,11 @@ namespace easyfis.ModifiedApiControllers
                             SIId = salesInvoices.FirstOrDefault().Id,
                             Remarks = "NA",
                             DocumentReference = "NA",
+                            ManualSWNumber = "NA",
                             ContactPerson = salesInvoices.FirstOrDefault().MstArticle.Article,
                             ContactNumber = salesInvoices.FirstOrDefault().MstArticle.ContactNumber,
                             Address = salesInvoices.FirstOrDefault().MstArticle.Address,
+                            ReceivedById = currentUserId,
                             PreparedById = currentUserId,
                             CheckedById = currentUserId,
                             ApprovedById = currentUserId,
@@ -335,7 +339,7 @@ namespace easyfis.ModifiedApiControllers
                     Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
                     IQueryable<Data.MstUserForm> userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("StockWithdrawalDetail") select d;
-                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.BalanceAmount > 0 && d.IsLocked == true select d;
+                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.IsLocked == true select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
                     IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(id) select d;
 
@@ -380,9 +384,11 @@ namespace easyfis.ModifiedApiControllers
                         lockStockWithdrawal.SIId = objStockWithdrawal.SIId;
                         lockStockWithdrawal.Remarks = objStockWithdrawal.Remarks;
                         lockStockWithdrawal.DocumentReference = objStockWithdrawal.DocumentReference;
+                        lockStockWithdrawal.ManualSWNumber = objStockWithdrawal.ManualSWNumber;
                         lockStockWithdrawal.ContactPerson = objStockWithdrawal.ContactPerson;
                         lockStockWithdrawal.ContactNumber = objStockWithdrawal.ContactNumber;
                         lockStockWithdrawal.Address = objStockWithdrawal.Address;
+                        lockStockWithdrawal.ReceivedById = objStockWithdrawal.ReceivedById;
                         lockStockWithdrawal.PreparedById = objStockWithdrawal.PreparedById;
                         lockStockWithdrawal.CheckedById = objStockWithdrawal.CheckedById;
                         lockStockWithdrawal.ApprovedById = objStockWithdrawal.ApprovedById;
