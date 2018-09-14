@@ -500,14 +500,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult AccountsPayable()
         {
-            if (PageAccess("AccountsPayableReport").Equals("AccountsPayableReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("AccountsPayableReport");
         }
 
         // ============================
@@ -516,14 +509,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult AccountsPayableReport()
         {
-            if (PageAccess("ViewAccountsPayableReport").Equals("ViewAccountsPayableReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewAccountsPayableReport");
         }
 
         // ============================
@@ -532,14 +518,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult PurchaseSummaryReport()
         {
-            if (PageAccess("ViewPurchaseSummaryReport").Equals("ViewPurchaseSummaryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewPurchaseSummaryReport");
         }
 
         // ===========================
@@ -548,14 +527,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult PurchaseDetailReport()
         {
-            if (PageAccess("ViewPurchaseDetailReport").Equals("ViewPurchaseDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewPurchaseDetailReport");
         }
 
         // =====================================
@@ -564,14 +536,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ReceivingReceiptSummaryReport()
         {
-            if (PageAccess("ViewReceivingReceiptSummaryReport").Equals("ViewReceivingReceiptSummaryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewReceivingReceiptSummaryReport");
         }
 
         // ====================================
@@ -580,14 +545,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ReceivingReceiptDetailReport()
         {
-            if (PageAccess("ViewReceivingReceiptDetailReport").Equals("ViewReceivingReceiptDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewReceivingReceiptDetailReport");
         }
 
         // ================================
@@ -596,14 +554,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult DisbursementSummaryReport()
         {
-            if (PageAccess("ViewDisbursementSummaryReport").Equals("ViewDisbursementSummaryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewDisbursementSummaryReport");
         }
 
         // ===============================
@@ -612,14 +563,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult DisbursementDetailReport()
         {
-            if (PageAccess("ViewDisbursementDetailReport").Equals("ViewDisbursementDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewDisbursementDetailReport");
         }
 
         // ===================
@@ -628,14 +572,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult AccountsReceivable()
         {
-            if (PageAccess("AccountsReceivableReport").Equals("AccountsReceivableReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("AccountsReceivableReport");
         }
 
         // ================================
@@ -644,14 +581,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult AccountsReceivableReport()
         {
-            if (PageAccess("ViewAccountsReceivableReport").Equals("ViewAccountsReceivableReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewAccountsReceivableReport");
         }
 
         // =========================
@@ -669,14 +599,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult SalesSummaryReport()
         {
-            if (PageAccess("ViewSalesSummaryReport").Equals("ViewSalesSummaryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewSalesSummaryReport");
         }
 
         // ========================
@@ -685,14 +608,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult SalesDetailReport()
         {
-            if (PageAccess("ViewSalesDetailReport").Equals("ViewSalesDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewSalesDetailReport");
         }
 
         // ==============================
@@ -701,14 +617,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CollectionSummaryReport()
         {
-            if (PageAccess("ViewCollectionSummaryReport").Equals("ViewCollectionSummaryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewCollectionSummaryReport");
         }
 
         // =============================
@@ -717,14 +626,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CollectionDetailReport()
         {
-            if (PageAccess("ViewCollectionDetailReport").Equals("ViewCollectionDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewCollectionDetailReport");
         }
 
         // =======================
@@ -733,14 +635,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ConsignmentReport()
         {
-            if (PageAccess("ViewConsignmentReport").Equals("ViewConsignmentReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewConsignmentReport");
         }
 
         // =========
@@ -749,14 +644,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult Inventory()
         {
-            if (PageAccess("InventoryReport").Equals("InventoryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("InventoryReport");
         }
 
         // =====================
@@ -765,14 +653,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult InventoryReport()
         {
-            if (PageAccess("ViewInventoryReport").Equals("ViewInventoryReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewInventoryReport");
         }
 
         // =====================
@@ -781,14 +662,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockCard()
         {
-            if (PageAccess("ViewStockCard").Equals("ViewStockCard"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockCard");
         }
 
         // ===========================
@@ -797,14 +671,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockInDetailReport()
         {
-            if (PageAccess("ViewStockInDetailReport").Equals("ViewStockInDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockInDetailReport");
         }
 
         // ============================
@@ -813,14 +680,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockOutDetailReport()
         {
-            if (PageAccess("ViewStockOutDetailReport").Equals("ViewStockOutDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockOutDetailReport");
         }
 
         // =================================
@@ -829,14 +689,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockTransferDetailReport()
         {
-            if (PageAccess("ViewStockTransferDetailReport").Equals("ViewStockTransferDetailReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockTransferDetailReport");
         }
 
         // =====================
@@ -845,14 +698,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ItemList()
         {
-            if (PageAccess("ViewItemList").Equals("ViewItemList"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewItemList");
         }
 
         // ===============================
@@ -861,14 +707,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ItemComponentList()
         {
-            if (PageAccess("ViewItemComponentList").Equals("ViewItemComponentList"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewItemComponentList");
         }
 
         // ================================
@@ -877,14 +716,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult PhysicalCountSheet()
         {
-            if (PageAccess("ViewPhysicalCountSheet").Equals("ViewPhysicalCountSheet"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewPhysicalCountSheet");
         }
 
         // ====================
@@ -893,14 +725,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult FinancialStatements()
         {
-            if (PageAccess("FinancialStatementReport").Equals("FinancialStatementReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("FinancialStatementReport");
         }
 
         // ==================
@@ -909,14 +734,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult TrialBalance()
         {
-            if (PageAccess("ViewTrialBalance").Equals("ViewTrialBalance"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewTrialBalance");
         }
 
         // ===================
@@ -925,14 +743,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult AccountLedger()
         {
-            if (PageAccess("ViewAccountLedger").Equals("ViewAccountLedger"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewAccountLedger");
         }
 
         // ===========================
@@ -941,14 +752,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult ReceivingReceiptBook()
         {
-            if (PageAccess("ViewReceivingReceiptBook").Equals("ViewReceivingReceiptBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewReceivingReceiptBook");
         }
 
         // ======================
@@ -957,14 +761,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult DisbursementBook()
         {
-            if (PageAccess("ViewDisbursementBook").Equals("ViewDisbursementBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewDisbursementBook");
         }
 
         // ===============
@@ -973,14 +770,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult SalesBook()
         {
-            if (PageAccess("ViewSalesBook").Equals("ViewSalesBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewSalesBook");
         }
 
         // ====================
@@ -989,14 +779,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CollectionBook()
         {
-            if (PageAccess("ViewCollectionBook").Equals("ViewCollectionBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewCollectionBook");
         }
 
         // ===================
@@ -1005,14 +788,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockInBook()
         {
-            if (PageAccess("ViewStockInBook").Equals("ViewStockInBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockInBook");
 
         }
 
@@ -1022,14 +798,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockOutBook()
         {
-            if (PageAccess("ViewStockOutBook").Equals("ViewStockOutBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockOutBook");
         }
 
         // ========================
@@ -1038,14 +807,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult StockTransferBook()
         {
-            if (PageAccess("ViewStockTransferBook").Equals("ViewStockTransferBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewStockTransferBook");
         }
 
         // =========================
@@ -1054,14 +816,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult JournalVoucherBook()
         {
-            if (PageAccess("ViewJournalVoucherBook").Equals("ViewJournalVoucherBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewJournalVoucherBook");
         }
 
         // ============
@@ -1106,14 +861,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BalanceSheet()
         {
-            if (PageAccess("ViewBalanceSheet").Equals("ViewBalanceSheet"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBalanceSheet");
         }
 
         // =============================
@@ -1122,14 +870,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BalanceSheetPerBranch()
         {
-            if (PageAccess("ViewBalanceSheetPerBranch").Equals("ViewBalanceSheetPerBranch"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBalanceSheetPerBranch");
         }
 
         // =====================
@@ -1138,14 +879,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult IncomeStatement()
         {
-            if (PageAccess("ViewIncomeStatement").Equals("ViewIncomeStatement"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewIncomeStatement");
         }
 
         // ==============
@@ -1154,14 +888,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult CashFlow()
         {
-            if (PageAccess("ViewCashFlow").Equals("ViewCashFlow"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewCashFlow");
         }
 
         // ===============
@@ -1170,14 +897,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASReports()
         {
-            if (PageAccess("BIRCASReport").Equals("BIRCASReport"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("BIRCASReport");
         }
 
         // ==============================
@@ -1186,14 +906,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASCashReceiptBook()
         {
-            if (PageAccess("ViewBIRCASCashReceiptBook").Equals("ViewBIRCASCashReceiptBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASCashReceiptBook");
         }
 
         // ==========================
@@ -1202,14 +915,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASSalesJournal()
         {
-            if (PageAccess("ViewBIRCASSalesJournal").Equals("ViewBIRCASSalesJournal"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASSalesJournal");
         }
 
         // =============================
@@ -1218,14 +924,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASPurchaseJournal()
         {
-            if (PageAccess("ViewBIRCASPurchaseJournal").Equals("ViewBIRCASPurchaseJournal"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASPurchaseJournal");
         }
 
         // ==============================
@@ -1234,14 +933,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASDisbursementBook()
         {
-            if (PageAccess("ViewBIRCASDisbursementBook").Equals("ViewBIRCASDisbursementBook"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASDisbursementBook");
         }
 
         // ===========================
@@ -1250,14 +942,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASGeneralLedger()
         {
-            if (PageAccess("ViewBIRCASGeneralLedger").Equals("ViewBIRCASGeneralLedger"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASGeneralLedger");
         }
 
         // ==============================
@@ -1266,14 +951,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASInventoryJournal()
         {
-            if (PageAccess("ViewBIRCASInventoryJournal").Equals("ViewBIRCASInventoryJournal"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASInventoryJournal");
         }
 
         // ========================
@@ -1282,14 +960,7 @@ namespace easyfis.Controllers
         [Authorize]
         public ActionResult BIRCASAuditTrail()
         {
-            if (PageAccess("ViewBIRCASAuditTrail").Equals("ViewBIRCASAuditTrail"))
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Software");
-            }
+            return UserRights("ViewBIRCASAuditTrail");
         }
 
         // ==================================
