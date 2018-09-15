@@ -6,6 +6,9 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
+using System.Data.Entity.Core.Objects.DataClasses;
+using System.Data.Entity.Core.EntityClient;
 
 namespace easyfis.Business
 {
@@ -40,6 +43,24 @@ namespace easyfis.Business
             {
                 Debug.WriteLine(e);
             }
+        }
+
+        // ==============
+        // Get Old Object
+        // ==============
+        public String GetOldObjectString<T>(T obj)
+        {
+            var properties = obj.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType == false && p.PropertyType.BaseType == typeof(ValueType));
+            if (properties.Any())
+            {
+                foreach (PropertyInfo property in properties)
+                {
+                    Debug.WriteLine(property.PropertyType.BaseType);
+                    Debug.WriteLine(property.Name + " : " + property.GetValue(obj));
+                }
+            }
+
+            return "";
         }
     }
 }

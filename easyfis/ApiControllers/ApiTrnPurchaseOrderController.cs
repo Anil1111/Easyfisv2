@@ -357,6 +357,9 @@ namespace easyfis.ModifiedApiControllers
 
                             if (purchaseOrder.Any())
                             {
+                                Business.AuditTrail at = new Business.AuditTrail();
+                                at.GetOldObjectString(purchaseOrder.FirstOrDefault());
+
                                 if (!purchaseOrder.FirstOrDefault().IsLocked)
                                 {
                                     var lockPurchaseOrder = purchaseOrder.FirstOrDefault();
