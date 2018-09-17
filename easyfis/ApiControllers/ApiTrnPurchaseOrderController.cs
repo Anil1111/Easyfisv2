@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,7 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =========================
         // Get Purchase Order Amount
@@ -67,7 +69,7 @@ namespace easyfis.ModifiedApiControllers
                                      UpdatedBy = d.MstUser5.FullName,
                                      UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
                                  };
-
+            
             return purchaseOrders.ToList();
         }
 
@@ -287,6 +289,18 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnPurchaseOrders.InsertOnSubmit(newPurchaseOrder);
                                         db.SubmitChanges();
 
+                                        String newObject = at.GetObjectString(newPurchaseOrder);
+
+                                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                        {
+                                            UserId = currentUser.FirstOrDefault().Id,
+                                            Entity = GetType().Name,
+                                            Activity = MethodBase.GetCurrentMethod().Name,
+                                            OldObject = "NA",
+                                            NewObject = newObject
+                                        };
+                                        //at.InsertAuditTrail(objAuditTrail);
+
                                         return Request.CreateResponse(HttpStatusCode.OK, newPurchaseOrder.Id);
                                     }
                                     else
@@ -357,11 +371,10 @@ namespace easyfis.ModifiedApiControllers
 
                             if (purchaseOrder.Any())
                             {
-                                Business.AuditTrail at = new Business.AuditTrail();
-                                at.GetOldObjectString(purchaseOrder.FirstOrDefault());
-
                                 if (!purchaseOrder.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
                                     var lockPurchaseOrder = purchaseOrder.FirstOrDefault();
                                     lockPurchaseOrder.PODate = Convert.ToDateTime(objPurchaseOrder.PODate);
                                     lockPurchaseOrder.SupplierId = objPurchaseOrder.SupplierId;
@@ -397,6 +410,18 @@ namespace easyfis.ModifiedApiControllers
 
                                         db.SubmitChanges();
                                     }
+
+                                    String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
+                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                    {
+                                        UserId = currentUser.FirstOrDefault().Id,
+                                        Entity = GetType().Name,
+                                        Activity = MethodBase.GetCurrentMethod().Name,
+                                        OldObject = oldObject,
+                                        NewObject = newObject
+                                    };
+                                    //at.InsertAuditTrail(objAuditTrail);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -472,6 +497,16 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
+                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                    {
+                                        UserId = currentUser.FirstOrDefault().Id,
+                                        Entity = GetType().Name,
+                                        Activity = MethodBase.GetCurrentMethod().Name,
+                                        OldObject = "NA",
+                                        NewObject = "NA"
+                                    };
+                                    //at.InsertAuditTrail(objAuditTrail);
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
@@ -540,6 +575,19 @@ namespace easyfis.ModifiedApiControllers
                                 if (!purchaseOrder.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnPurchaseOrders.DeleteOnSubmit(purchaseOrder.First());
+
+                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
+                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                    {
+                                        UserId = currentUser.FirstOrDefault().Id,
+                                        Entity = GetType().Name,
+                                        Activity = MethodBase.GetCurrentMethod().Name,
+                                        OldObject = oldObject,
+                                        NewObject = "NA"
+                                    };
+                                    //at.InsertAuditTrail(objAuditTrail);
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
@@ -667,6 +715,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (purchaseOrder.Any())
                             {
+                                String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
                                 var purchaseRequest = from d in db.TrnPurchaseRequests
                                                       where d.Id == Convert.ToInt32(PRId)
                                                       && d.IsLocked == true
@@ -725,6 +775,18 @@ namespace easyfis.ModifiedApiControllers
                                         }
 
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
+                                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                        {
+                                            UserId = currentUser.FirstOrDefault().Id,
+                                            Entity = GetType().Name,
+                                            Activity = MethodBase.GetCurrentMethod().Name,
+                                            OldObject = oldObject,
+                                            NewObject = newObject
+                                        };
+                                        //at.InsertAuditTrail(objAuditTrail);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -924,6 +986,16 @@ namespace easyfis.ModifiedApiControllers
                         }
 
                         db.SubmitChanges();
+
+                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                        {
+                            UserId = currentUser.FirstOrDefault().Id,
+                            Entity = GetType().Name,
+                            Activity = MethodBase.GetCurrentMethod().Name,
+                            OldObject = "NA",
+                            NewObject = "NA"
+                        };
+                        //at.InsertAuditTrail(objAuditTrail);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

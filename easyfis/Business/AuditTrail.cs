@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Data.Entity.Core.Objects.DataClasses;
 using System.Data.Entity.Core.EntityClient;
+using System.Dynamic;
+using Newtonsoft.Json;
 
 namespace easyfis.Business
 {
@@ -45,22 +47,30 @@ namespace easyfis.Business
             }
         }
 
-        // ==============
-        // Get Old Object
-        // ==============
-        public String GetOldObjectString<T>(T obj)
+        // =================
+        // Get Object String
+        // =================
+        public String GetObjectString<T>(T obj)
         {
+            String json = "";
+
             var properties = obj.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType == false && p.PropertyType.BaseType == typeof(ValueType));
             if (properties.Any())
             {
+                dynamic flexible = new ExpandoObject();
+                var dictionary = (IDictionary<string, object>)flexible;
+
                 foreach (PropertyInfo property in properties)
                 {
-                    Debug.WriteLine(property.PropertyType.BaseType);
-                    Debug.WriteLine(property.Name + " : " + property.GetValue(obj));
+                    dictionary.Add(property.Name, property.GetValue(obj));
                 }
+
+                var serialized = JsonConvert.SerializeObject(dictionary);
+
+                json = serialized;
             }
 
-            return "";
+            return json;
         }
     }
 }
