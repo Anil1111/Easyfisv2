@@ -133,6 +133,7 @@ namespace easyfis.ModifiedApiControllers
                                ContactPerson = d.ContactPerson,
                                EmailAddress = d.EmailAddress,
                                TaxNumber = d.TaxNumber,
+                               CreditLimit = d.CreditLimit,
                                IsLocked = d.IsLocked,
                                CreatedById = d.CreatedById,
                                CreatedBy = d.MstUser.FullName,
@@ -363,6 +364,7 @@ namespace easyfis.ModifiedApiControllers
                                         lockSupplier.TaxNumber = objSupplier.TaxNumber;
                                         lockSupplier.Particulars = objSupplier.Particulars;
                                         lockSupplier.EmailAddress = objSupplier.EmailAddress;
+                                        lockSupplier.CreditLimit = objSupplier.CreditLimit;
                                         lockSupplier.IsLocked = true;
                                         lockSupplier.UpdatedById = currentUserId;
                                         lockSupplier.UpdatedDateTime = DateTime.Now;
