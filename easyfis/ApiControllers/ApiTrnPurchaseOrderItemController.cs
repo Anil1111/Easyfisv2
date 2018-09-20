@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ========================
         // List Purchase Order Item
@@ -185,6 +191,18 @@ namespace easyfis.ModifiedApiControllers
                                             db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newPurchaseOrderItem);
+
+                                            Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                            {
+                                                UserId = currentUser.FirstOrDefault().Id,
+                                                Entity = GetType().Name,
+                                                Activity = MethodBase.GetCurrentMethod().Name,
+                                                OldObject = "NA",
+                                                NewObject = newObject
+                                            };
+                                            at.InsertAuditTrail(objAuditTrail);
+
                                             return Request.CreateResponse(HttpStatusCode.OK);
                                         }
                                         else
@@ -268,6 +286,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (purchaseOrderItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(purchaseOrderItem.FirstOrDefault());
+
                                         var item = from d in db.MstArticles
                                                    where d.Id == objPurchaseOrderItem.ItemId
                                                    && d.ArticleTypeId == 1
@@ -284,6 +304,7 @@ namespace easyfis.ModifiedApiControllers
 
                                             if (conversionUnit.Any())
                                             {
+
                                                 Decimal baseQuantity = objPurchaseOrderItem.Quantity * 1;
                                                 if (conversionUnit.FirstOrDefault().Multiplier > 0)
                                                 {
@@ -309,6 +330,18 @@ namespace easyfis.ModifiedApiControllers
                                                 updatePurchaseOrdeItem.BaseCost = baseCost;
 
                                                 db.SubmitChanges();
+
+                                                String newObject = at.GetObjectString(purchaseOrderItem.FirstOrDefault());
+
+                                                Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                                {
+                                                    UserId = currentUser.FirstOrDefault().Id,
+                                                    Entity = GetType().Name,
+                                                    Activity = MethodBase.GetCurrentMethod().Name,
+                                                    OldObject = oldObject,
+                                                    NewObject = newObject
+                                                };
+                                                at.InsertAuditTrail(objAuditTrail);
 
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
@@ -399,6 +432,19 @@ namespace easyfis.ModifiedApiControllers
                                     if (purchaseOrderItem.Any())
                                     {
                                         db.TrnPurchaseOrderItems.DeleteOnSubmit(purchaseOrderItem.First());
+
+                                        String oldObject = at.GetObjectString(purchaseOrderItem.FirstOrDefault());
+
+                                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
+                                        {
+                                            UserId = currentUser.FirstOrDefault().Id,
+                                            Entity = GetType().Name,
+                                            Activity = MethodBase.GetCurrentMethod().Name,
+                                            OldObject = oldObject,
+                                            NewObject = "NA"
+                                        };
+                                        at.InsertAuditTrail(objAuditTrail);
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

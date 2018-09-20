@@ -16,6 +16,10 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
         private Business.AuditTrail at = new Business.AuditTrail();
 
         // =========================
@@ -69,7 +73,7 @@ namespace easyfis.ModifiedApiControllers
                                      UpdatedBy = d.MstUser5.FullName,
                                      UpdatedDateTime = d.UpdatedDateTime.ToShortDateString()
                                  };
-            
+
             return purchaseOrders.ToList();
         }
 
@@ -299,7 +303,7 @@ namespace easyfis.ModifiedApiControllers
                                             OldObject = "NA",
                                             NewObject = newObject
                                         };
-                                        //at.InsertAuditTrail(objAuditTrail);
+                                        at.InsertAuditTrail(objAuditTrail);
 
                                         return Request.CreateResponse(HttpStatusCode.OK, newPurchaseOrder.Id);
                                     }
@@ -421,7 +425,7 @@ namespace easyfis.ModifiedApiControllers
                                         OldObject = oldObject,
                                         NewObject = newObject
                                     };
-                                    //at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(objAuditTrail);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -490,6 +494,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (purchaseOrder.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
                                     var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
                                     unlockPurchaseOrder.IsLocked = false;
                                     unlockPurchaseOrder.UpdatedById = currentUserId;
@@ -497,15 +503,17 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
+                                    String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
                                     Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
                                     {
                                         UserId = currentUser.FirstOrDefault().Id,
                                         Entity = GetType().Name,
                                         Activity = MethodBase.GetCurrentMethod().Name,
-                                        OldObject = "NA",
-                                        NewObject = "NA"
+                                        OldObject = oldObject,
+                                        NewObject = newObject
                                     };
-                                    //at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(objAuditTrail);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -586,7 +594,7 @@ namespace easyfis.ModifiedApiControllers
                                         OldObject = oldObject,
                                         NewObject = "NA"
                                     };
-                                    //at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(objAuditTrail);
 
                                     db.SubmitChanges();
 
