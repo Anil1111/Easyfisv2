@@ -84,6 +84,48 @@ namespace easyfis.Reports
             dateRangeFilters.AddCell(new PdfPCell(new Phrase("Date End:   " + Convert.ToDateTime(EndDate).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), fontArial11)) { Border = 0, HorizontalAlignment = 0, PaddingTop = 5f });
             document.Add(dateRangeFilters);
 
+            // =====
+            // Space
+            // =====
+            PdfPTable space = new PdfPTable(1);
+            space.SetWidths(new float[] { 100f });
+            space.WidthPercentage = 100;
+            space.AddCell(new PdfPCell(new Phrase(" ", fontArial11)) { Border = 0, PaddingTop = 7f });
+            document.Add(space);
+
+            // ====
+            // Data
+            // ====
+            var auditTrails = from d in db.SysAuditTrails
+                              where d.AuditDate >= Convert.ToDateTime(StartDate)
+                              && d.AuditDate <= Convert.ToDateTime(EndDate)
+                              select d;
+
+            if (auditTrails.Any())
+            {
+                PdfPTable data = new PdfPTable(6);
+                data.SetWidths(new float[] { 60f, 70f, 100f, 100f, 130f, 130f });
+                data.WidthPercentage = 100;
+                data.AddCell(new PdfPCell(new Phrase("Time Stamp", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("User", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Page", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Activity", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("Old Object", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+                data.AddCell(new PdfPCell(new Phrase("New Object", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
+
+                foreach (var auditTrail in auditTrails)
+                {
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.AuditDate.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture), fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.MstUser.FullName, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.Entity, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.Activity, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.OldObject, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase(auditTrail.NewObject, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                }
+
+                document.Add(data);
+            }
+
             // ==============
             // Document Close
             // ==============

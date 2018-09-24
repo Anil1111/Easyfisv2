@@ -24,22 +24,29 @@ namespace easyfis.Business
         // ==================
         // Insert Audit Trail
         // ==================
-        public void InsertAuditTrail(Entities.SysAuditTrail objAuditTrail)
+        public void InsertAuditTrail(Int32 UserId, String Entity, String Activity, String OldObject, String NewObject)
         {
             try
             {
-                Data.SysAuditTrail newAuditTrail = new Data.SysAuditTrail
+                var currentUser = from d in db.MstUsers where d.Id == UserId select d;
+                if (currentUser.Any())
                 {
-                    AuditDate = DateTime.Now,
-                    UserId = objAuditTrail.UserId,
-                    Entity = objAuditTrail.Entity,
-                    Activity = objAuditTrail.Activity,
-                    OldObject = objAuditTrail.OldObject,
-                    NewObject = objAuditTrail.NewObject
-                };
+                    if (currentUser.FirstOrDefault().ActivateAuditTrail)
+                    {
+                        Data.SysAuditTrail newAuditTrail = new Data.SysAuditTrail
+                        {
+                            AuditDate = DateTime.Now,
+                            UserId = UserId,
+                            Entity = Entity,
+                            Activity = Activity,
+                            OldObject = OldObject,
+                            NewObject = NewObject
+                        };
 
-                db.SysAuditTrails.InsertOnSubmit(newAuditTrail);
-                db.SubmitChanges();
+                        db.SysAuditTrails.InsertOnSubmit(newAuditTrail);
+                        db.SubmitChanges();
+                    }
+                }
             }
             catch (Exception e)
             {

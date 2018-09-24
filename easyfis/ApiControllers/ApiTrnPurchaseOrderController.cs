@@ -294,16 +294,7 @@ namespace easyfis.ModifiedApiControllers
                                         db.SubmitChanges();
 
                                         String newObject = at.GetObjectString(newPurchaseOrder);
-
-                                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                                        {
-                                            UserId = currentUser.FirstOrDefault().Id,
-                                            Entity = GetType().Name,
-                                            Activity = MethodBase.GetCurrentMethod().Name,
-                                            OldObject = "NA",
-                                            NewObject = newObject
-                                        };
-                                        at.InsertAuditTrail(objAuditTrail);
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK, newPurchaseOrder.Id);
                                     }
@@ -416,16 +407,7 @@ namespace easyfis.ModifiedApiControllers
                                     }
 
                                     String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-
-                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                                    {
-                                        UserId = currentUser.FirstOrDefault().Id,
-                                        Entity = GetType().Name,
-                                        Activity = MethodBase.GetCurrentMethod().Name,
-                                        OldObject = oldObject,
-                                        NewObject = newObject
-                                    };
-                                    at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -504,16 +486,7 @@ namespace easyfis.ModifiedApiControllers
                                     db.SubmitChanges();
 
                                     String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-
-                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                                    {
-                                        UserId = currentUser.FirstOrDefault().Id,
-                                        Entity = GetType().Name,
-                                        Activity = MethodBase.GetCurrentMethod().Name,
-                                        OldObject = oldObject,
-                                        NewObject = newObject
-                                    };
-                                    at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -585,16 +558,7 @@ namespace easyfis.ModifiedApiControllers
                                     db.TrnPurchaseOrders.DeleteOnSubmit(purchaseOrder.First());
 
                                     String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-
-                                    Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                                    {
-                                        UserId = currentUser.FirstOrDefault().Id,
-                                        Entity = GetType().Name,
-                                        Activity = MethodBase.GetCurrentMethod().Name,
-                                        OldObject = oldObject,
-                                        NewObject = "NA"
-                                    };
-                                    at.InsertAuditTrail(objAuditTrail);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 

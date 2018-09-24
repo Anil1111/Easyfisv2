@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -45,6 +46,28 @@ namespace easyfis.ApiControllers
                            };
 
             return branches.ToList();
+        }
+
+        // =====================
+        // List Audit Trail Data
+        // =====================
+        [Authorize, HttpGet, Route("api/BIRCASAuditTrail/list/{startDate}/{endDate}")]
+        public List<Entities.RepBIRCASAuditTrail> ListBIRCASAuditTrail(String startDate, String endDate)
+        {
+            var auditTrails = from d in db.SysAuditTrails
+                              where d.AuditDate >= Convert.ToDateTime(startDate)
+                              && d.AuditDate <= Convert.ToDateTime(endDate)
+                              select new Entities.RepBIRCASAuditTrail
+                              {
+                                  TimeStamp = d.AuditDate.ToString("MM-dd-yyyy hh:mm:ss tt", CultureInfo.InvariantCulture),
+                                  User = d.MstUser.FullName,
+                                  Entity = d.Entity,
+                                  Activity = d.Activity,
+                                  OldObject = d.OldObject,
+                                  NewObject = d.NewObject
+                              };
+
+            return auditTrails.ToList();
         }
     }
 }
