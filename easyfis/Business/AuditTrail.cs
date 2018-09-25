@@ -61,7 +61,7 @@ namespace easyfis.Business
         {
             String json = "";
 
-            var properties = obj.GetType().GetProperties().Where(p => p.PropertyType.IsGenericType == false && p.PropertyType.BaseType == typeof(ValueType));
+            var properties = obj.GetType().GetProperties().Where(p => p.PropertyType.IsSerializable == true);
             if (properties.Any())
             {
                 dynamic flexible = new ExpandoObject();

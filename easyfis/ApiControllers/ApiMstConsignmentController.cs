@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ================
         // List Consignment
@@ -64,7 +70,7 @@ namespace easyfis.ModifiedApiControllers
         // Add & Update Consignment
         // ========================
         [Authorize, HttpPut, Route("api/consignment/item/add/update/{supplierId}")]
-        public HttpResponseMessage AddConsignmentItem(Entities.MstArticle objItem, String supplierId)
+        public HttpResponseMessage AddUpdateConsignmentItem(Entities.MstArticle objItem, String supplierId)
         {
             try
             {
@@ -107,6 +113,9 @@ namespace easyfis.ModifiedApiControllers
                                         updateItem.IsConsignment = true;
                                         updateItem.IsInventory = true;
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(item.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -185,6 +194,9 @@ namespace easyfis.ModifiedApiControllers
                                 updateItem.ConsignmentCostPercentage = 0;
                                 updateItem.ConsignmentCostValue = 0;
                                 updateItem.IsConsignment = false;
+
+                                String oldObject = at.GetObjectString(item.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                 db.SubmitChanges();
 

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Supplier
@@ -262,6 +268,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.MstArticles.InsertOnSubmit(newSupplier);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newSupplier);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK, newSupplier.Id);
                                         }
                                         else
@@ -340,6 +349,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!supplier.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(supplier.FirstOrDefault());
+
                                     var supplierByManualCode = from d in db.MstArticles
                                                                where d.ArticleTypeId == 3
                                                                && d.ManualArticleCode.Equals(objSupplier.ManualArticleCode)
@@ -370,6 +381,9 @@ namespace easyfis.ModifiedApiControllers
                                         lockSupplier.UpdatedDateTime = DateTime.Now;
 
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(supplier.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -444,12 +458,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (supplier.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(supplier.FirstOrDefault());
+
                                     var unlockSupplier = supplier.FirstOrDefault();
                                     unlockSupplier.IsLocked = false;
                                     unlockSupplier.UpdatedById = currentUserId;
                                     unlockSupplier.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(supplier.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -518,6 +537,10 @@ namespace easyfis.ModifiedApiControllers
                             if (supplier.Any())
                             {
                                 db.MstArticles.DeleteOnSubmit(supplier.First());
+
+                                String oldObject = at.GetObjectString(supplier.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

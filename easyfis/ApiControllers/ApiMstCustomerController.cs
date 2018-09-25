@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Customer
@@ -262,6 +268,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.MstArticles.InsertOnSubmit(newCustomer);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newCustomer);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK, newCustomer.Id);
                                         }
                                         else
@@ -340,7 +349,9 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!customer.FirstOrDefault().IsLocked)
                                 {
-                                     var customerByManualCode = from d in db.MstArticles
+                                    String oldObject = at.GetObjectString(customer.FirstOrDefault());
+
+                                    var customerByManualCode = from d in db.MstArticles
                                                                where d.ArticleTypeId == 2
                                                                && d.ManualArticleCode.Equals(objCustomer.ManualArticleCode)
                                                                && d.IsLocked == true
@@ -370,6 +381,9 @@ namespace easyfis.ModifiedApiControllers
                                         lockCustomer.UpdatedDateTime = DateTime.Now;
 
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(customer.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -444,12 +458,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (customer.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(customer.FirstOrDefault());
+
                                     var unlockCustomer = customer.FirstOrDefault();
                                     unlockCustomer.IsLocked = false;
                                     unlockCustomer.UpdatedById = currentUserId;
                                     unlockCustomer.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(customer.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -518,6 +537,10 @@ namespace easyfis.ModifiedApiControllers
                             if (customer.Any())
                             {
                                 db.MstArticles.DeleteOnSubmit(customer.First());
+
+                                String oldObject = at.GetObjectString(customer.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

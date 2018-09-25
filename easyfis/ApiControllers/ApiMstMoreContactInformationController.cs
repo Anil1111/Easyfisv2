@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Web;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
@@ -16,6 +17,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============================
         // List More Contact Information
@@ -84,7 +90,6 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanAdd)
                         {
-
                             var article = from d in db.MstArticles
                                           where d.Id == Convert.ToInt32(articleId)
                                           select d;
@@ -103,6 +108,20 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.MstArticleContacts.InsertOnSubmit(newContact);
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(newContact);
+
+                                    if (article.FirstOrDefault().ArticleTypeId == 2)
+                                    {
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "AddCustomerMoreContactInformation", "NA", newObject);
+                                    }
+                                    else
+                                    {
+                                        if (article.FirstOrDefault().ArticleTypeId == 3)
+                                        {
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "AddSupplierMoreContactInformation", "NA", newObject);
+                                        }
+                                    }
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -257,11 +276,27 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (moreContactInformation.Any())
                                     {
+                                        String oldObject = at.GetObjectString(moreContactInformation.FirstOrDefault());
+
                                         var updateMoreContactInformation = moreContactInformation.FirstOrDefault();
                                         updateMoreContactInformation.ContactPerson = objContactInformation.ContactPerson;
                                         updateMoreContactInformation.ContactNumber = objContactInformation.ContactNumber;
                                         updateMoreContactInformation.Remarks = objContactInformation.Remarks;
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(moreContactInformation.FirstOrDefault());
+
+                                        if (article.FirstOrDefault().ArticleTypeId == 2)
+                                        {
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "UpdateCustomerMoreContactInformation", oldObject, newObject);
+                                        }
+                                        else
+                                        {
+                                            if (article.FirstOrDefault().ArticleTypeId == 3)
+                                            {
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "UpdateSupplierMoreContactInformation", oldObject, newObject);
+                                            }
+                                        }
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -422,6 +457,21 @@ namespace easyfis.ModifiedApiControllers
                                     if (moreContactInformation.Any())
                                     {
                                         db.MstArticleContacts.DeleteOnSubmit(moreContactInformation.First());
+
+                                        String oldObject = at.GetObjectString(moreContactInformation.FirstOrDefault());
+
+                                        if (article.FirstOrDefault().ArticleTypeId == 2)
+                                        {
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "DeleteCustomerMoreContactInformation", oldObject, "NA");
+                                        }
+                                        else
+                                        {
+                                            if (article.FirstOrDefault().ArticleTypeId == 3)
+                                            {
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, "DeleteSupplierMoreContactInformation", oldObject, "NA");
+                                            }
+                                        }
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
