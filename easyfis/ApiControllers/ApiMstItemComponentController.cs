@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============================================
         // Dropdown List - Item Component - Item (Field)
@@ -131,6 +137,9 @@ namespace easyfis.ModifiedApiControllers
                                     db.MstArticleComponents.InsertOnSubmit(newItemComponent);
                                     db.SubmitChanges();
 
+                                    String newObject = at.GetObjectString(newItemComponent);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
@@ -205,12 +214,17 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (itemComponent.Any())
                                     {
+                                        String oldObject = at.GetObjectString(itemComponent.FirstOrDefault());
+
                                         var updateItemComponent = itemComponent.FirstOrDefault();
                                         updateItemComponent.ArticleId = Convert.ToInt32(itemId);
                                         updateItemComponent.ComponentArticleId = objItemComponent.ComponentArticleId;
                                         updateItemComponent.Quantity = objItemComponent.Quantity;
                                         updateItemComponent.Particulars = objItemComponent.Particulars;
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(itemComponent.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -292,6 +306,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (itemComponent.Any())
                                     {
                                         db.MstArticleComponents.DeleteOnSubmit(itemComponent.First());
+
+                                        String oldObject = at.GetObjectString(itemComponent.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
