@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ===========================
         // List Receiving Receipt Item
@@ -386,6 +392,9 @@ namespace easyfis.ModifiedApiControllers
                                     };
 
                                     db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
+
+                                    String newObject = at.GetObjectString(newReceivingReceiptItem);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
                                 }
                             }
                         }
@@ -529,6 +538,9 @@ namespace easyfis.ModifiedApiControllers
                                                 updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
                                                 db.SubmitChanges();
 
+                                                String newObject = at.GetObjectString(newReceivingReceiptItem);
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
                                             else
@@ -618,6 +630,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (receivingReceiptItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
+
                                         var purchaseOrders = from d in db.TrnPurchaseOrders
                                                              where d.Id == Convert.ToInt32(objReceivingReceiptItem.POId)
                                                              && d.BranchId == currentBranchId
@@ -687,6 +701,9 @@ namespace easyfis.ModifiedApiControllers
                                                     var updateReceivingReceiptAmount = receivingReceipt.FirstOrDefault();
                                                     updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
                                                     db.SubmitChanges();
+
+                                                    String newObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
@@ -782,6 +799,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (receivingReceiptItem.Any())
                                     {
                                         db.TrnReceivingReceiptItems.DeleteOnSubmit(receivingReceiptItem.First());
+
+                                        String oldObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         Decimal receivingReceiptItemTotalAmount = 0;
