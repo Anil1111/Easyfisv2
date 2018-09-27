@@ -26,7 +26,7 @@ namespace easyfis.ModifiedApiControllers
         // List Item Unit Conversion
         // =========================
         [Authorize, HttpGet, Route("api/unitConversion/list/{itemId}")]
-        public List<Entities.MstArticleUnit> ListUnitConversion(String itemId)
+        public List<Entities.MstArticleUnit> ListItemUnitConversion(String itemId)
         {
             var unitConversions = from d in db.MstArticleUnits
                                   where d.ArticleId == Convert.ToInt32(itemId)
@@ -46,7 +46,7 @@ namespace easyfis.ModifiedApiControllers
         // Dropdown List - Item Unit Conversion - Unit (Field)
         // ===================================================
         [Authorize, HttpGet, Route("api/unitConversion/dropdown/list/unit")]
-        public List<Entities.MstUnit> DropdownListUnitConversionUnit()
+        public List<Entities.MstUnit> DropdownListItemUnitConversionUnit()
         {
             var unitConversionsUnit = from d in db.MstUnits.OrderBy(d => d.Unit)
                                       where d.IsLocked == true
@@ -63,7 +63,7 @@ namespace easyfis.ModifiedApiControllers
         // Add Item Unit Conversion
         // ========================
         [Authorize, HttpPost, Route("api/unitConversion/add/{itemId}")]
-        public HttpResponseMessage AddUnitConversion(Entities.MstArticleUnit objUnitConversion, String itemId)
+        public HttpResponseMessage AddItemUnitConversion(Entities.MstArticleUnit objUnitConversion, String itemId)
         {
             try
             {
@@ -145,7 +145,7 @@ namespace easyfis.ModifiedApiControllers
         // Update Item Unit Conversion
         // ===========================
         [Authorize, HttpPut, Route("api/unitConversion/update/{id}/{itemId}")]
-        public HttpResponseMessage UpdateUnitConversion(Entities.MstArticleUnit objUnitConversion, String id, String itemId)
+        public HttpResponseMessage UpdateItemUnitConversion(Entities.MstArticleUnit objUnitConversion, String id, String itemId)
         {
             try
             {
@@ -235,7 +235,7 @@ namespace easyfis.ModifiedApiControllers
         // Delete Item Unit Conversion
         // ===========================
         [Authorize, HttpDelete, Route("api/unitConversion/delete/{id}/{itemId}")]
-        public HttpResponseMessage DeleteUnitConversion(String id, String itemId)
+        public HttpResponseMessage DeleteItemUnitConversion(String id, String itemId)
         {
             try
             {

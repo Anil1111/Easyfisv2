@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==================
         // List Sales Invoice
@@ -279,6 +285,9 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnSalesInvoices.InsertOnSubmit(newSalesInvoice);
                                         db.SubmitChanges();
 
+                                        String newObject = at.GetObjectString(newSalesInvoice);
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                         return Request.CreateResponse(HttpStatusCode.OK, newSalesInvoice.Id);
                                     }
                                     else
@@ -370,6 +379,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!salesInvoice.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+
                                     Decimal paidAmount = 0;
                                     Decimal adjustmentAmount = 0;
 
@@ -427,6 +438,9 @@ namespace easyfis.ModifiedApiControllers
                                         inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
                                         journal.InsertSalesInvoiceJournal(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -495,6 +509,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (salesInvoice.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+
                                     var unlockSalesInvoice = salesInvoice.FirstOrDefault();
                                     unlockSalesInvoice.IsLocked = false;
                                     unlockSalesInvoice.UpdatedById = currentUserId;
@@ -513,6 +529,9 @@ namespace easyfis.ModifiedApiControllers
                                         inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
                                         journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -582,6 +601,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!salesInvoice.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnSalesInvoices.DeleteOnSubmit(salesInvoice.First());
+
+                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

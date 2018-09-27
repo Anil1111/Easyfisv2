@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =======================
         // List Sales Invoice Item
@@ -510,6 +516,9 @@ namespace easyfis.ModifiedApiControllers
                                                     updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
                                                     db.SubmitChanges();
 
+                                                    String newObject = at.GetObjectString(newSalesInvoiceItem);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
                                                 else
@@ -604,6 +613,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (salesInvoiceItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(salesInvoiceItem.FirstOrDefault());
+
                                         var item = from d in db.MstArticles
                                                    where d.Id == objSalesInvoiceItem.ItemId
                                                    && d.ArticleTypeId == 1
@@ -713,6 +724,9 @@ namespace easyfis.ModifiedApiControllers
                                                             updateSalesInvoiceAmount.Amount = salesInvoiceItemTotalAmount;
                                                             db.SubmitChanges();
 
+                                                            String newObject = at.GetObjectString(salesInvoiceItem.FirstOrDefault());
+                                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
                                                             return Request.CreateResponse(HttpStatusCode.OK);
                                                         }
                                                         else
@@ -818,6 +832,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (salesInvoiceItem.Any())
                                     {
                                         db.TrnSalesInvoiceItems.DeleteOnSubmit(salesInvoiceItem.First());
+
+                                        String oldObject = at.GetObjectString(salesInvoiceItem.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         Decimal salesInvoiceItemTotalAmount = 0;
