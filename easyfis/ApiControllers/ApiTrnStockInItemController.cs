@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==================
         // List Stock In Item
@@ -241,6 +247,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.TrnStockInItems.InsertOnSubmit(newStockInItem);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newStockInItem);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK);
                                         }
                                         else
@@ -324,6 +333,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (stockInItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(stockInItem.FirstOrDefault());
+
                                         var item = from d in db.MstArticles
                                                    where d.Id == objStockInItem.ItemId
                                                    && d.ArticleTypeId == 1
@@ -366,6 +377,9 @@ namespace easyfis.ModifiedApiControllers
                                                 updateStockInItem.BaseCost = baseCost;
 
                                                 db.SubmitChanges();
+
+                                                String newObject = at.GetObjectString(stockInItem.FirstOrDefault());
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
@@ -456,6 +470,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (stockInItem.Any())
                                     {
                                         db.TrnStockInItems.DeleteOnSubmit(stockInItem.First());
+
+                                        String oldObject = at.GetObjectString(stockInItem.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
