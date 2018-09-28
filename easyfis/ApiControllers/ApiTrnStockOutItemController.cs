@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ===================
         // List Stock Out Item
@@ -280,6 +286,9 @@ namespace easyfis.ModifiedApiControllers
                                                     db.TrnStockOutItems.InsertOnSubmit(newStockOutItem);
                                                     db.SubmitChanges();
 
+                                                    String newObject = at.GetObjectString(newStockOutItem);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
                                                 else
@@ -374,6 +383,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (stockOutItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(stockOutItem.FirstOrDefault());
+
                                         var item = from d in db.MstArticles
                                                    where d.Id == objStockOutItem.ItemId
                                                    && d.ArticleTypeId == 1
@@ -434,6 +445,9 @@ namespace easyfis.ModifiedApiControllers
                                                         updateStockOutItem.ExpenseAccountId = objStockOutItem.ExpenseAccountId;
 
                                                         db.SubmitChanges();
+
+                                                        String newObject = at.GetObjectString(stockOutItem.FirstOrDefault());
+                                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                         return Request.CreateResponse(HttpStatusCode.OK);
                                                     }
@@ -534,6 +548,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (stockOutItem.Any())
                                     {
                                         db.TrnStockOutItems.DeleteOnSubmit(stockOutItem.First());
+
+                                        String oldObject = at.GetObjectString(stockOutItem.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

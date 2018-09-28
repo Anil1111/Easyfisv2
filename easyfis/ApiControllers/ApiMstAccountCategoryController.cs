@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =========================================
         // List Account Category (Chart of Accounts)
@@ -79,6 +85,9 @@ namespace easyfis.ModifiedApiControllers
                             db.MstAccountCategories.InsertOnSubmit(newAccountCategory);
                             db.SubmitChanges();
 
+                            String newObject = at.GetObjectString(newAccountCategory);
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else
@@ -134,8 +143,9 @@ namespace easyfis.ModifiedApiControllers
 
                             if (accountCategory.Any())
                             {
-                                var updateAccountCategory = accountCategory.FirstOrDefault();
+                                String oldObject = at.GetObjectString(accountCategory.FirstOrDefault());
 
+                                var updateAccountCategory = accountCategory.FirstOrDefault();
                                 updateAccountCategory.AccountCategoryCode = objAccountCategory.AccountCategoryCode;
                                 updateAccountCategory.AccountCategory = objAccountCategory.AccountCategory;
                                 updateAccountCategory.IsLocked = true;
@@ -143,6 +153,9 @@ namespace easyfis.ModifiedApiControllers
                                 updateAccountCategory.UpdatedDateTime = DateTime.Now;
 
                                 db.SubmitChanges();
+
+                                String newObject = at.GetObjectString(accountCategory.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
@@ -205,7 +218,9 @@ namespace easyfis.ModifiedApiControllers
                             if (accountCategory.Any())
                             {
                                 db.MstAccountCategories.DeleteOnSubmit(accountCategory.First());
-                                db.SubmitChanges();
+
+                                String oldObject = at.GetObjectString(accountCategory.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                 db.SubmitChanges();
 

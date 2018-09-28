@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==============
         // List Stock Out
@@ -306,6 +312,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.TrnStockOuts.InsertOnSubmit(newStockOut);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newStockOut);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK, newStockOut.Id);
                                         }
                                         else
@@ -383,6 +392,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!stockOut.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(stockOut.FirstOrDefault());
+
                                     var lockStockOut = stockOut.FirstOrDefault();
                                     lockStockOut.OTDate = Convert.ToDateTime(objStockOut.OTDate);
                                     lockStockOut.AccountId = objStockOut.AccountId;
@@ -408,6 +419,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.InsertStockOutJournal(Convert.ToInt32(id));
                                         inventory.InsertStockOutInventory(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(stockOut.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -476,6 +490,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (stockOut.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(stockOut.FirstOrDefault());
+
                                     var unlockStockOut = stockOut.FirstOrDefault();
                                     unlockStockOut.IsLocked = false;
                                     unlockStockOut.UpdatedById = currentUserId;
@@ -494,6 +510,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.DeleteStockOutJournal(Convert.ToInt32(id));
                                         inventory.DeleteStockOutInventory(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(stockOut.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -563,6 +582,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!stockOut.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnStockOuts.DeleteOnSubmit(stockOut.First());
+
+                                    String oldObject = at.GetObjectString(stockOut.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

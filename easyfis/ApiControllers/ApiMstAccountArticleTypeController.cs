@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============================================
         // List Account Article Type (Chart of Accounts)
@@ -95,6 +101,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.MstAccountArticleTypes.InsertOnSubmit(newAccountArticleType);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newAccountArticleType);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
                             else
@@ -155,6 +164,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (accountArticleType.Any())
                             {
+                                String oldObject = at.GetObjectString(accountArticleType.FirstOrDefault());
+
                                 var account = from d in db.MstAccounts
                                               where d.IsLocked == true
                                               && d.Id == objAccountArticleType.AccountId
@@ -167,6 +178,9 @@ namespace easyfis.ModifiedApiControllers
                                     updateAccountArticleType.ArticleTypeId = objAccountArticleType.ArticleTypeId;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(accountArticleType.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -234,6 +248,10 @@ namespace easyfis.ModifiedApiControllers
                             if (accountArticleType.Any())
                             {
                                 db.MstAccountArticleTypes.DeleteOnSubmit(accountArticleType.First());
+
+                                String oldObject = at.GetObjectString(accountArticleType.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
