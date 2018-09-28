@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ============
         // List Company
@@ -113,6 +119,9 @@ namespace easyfis.ModifiedApiControllers
                             db.MstCompanies.InsertOnSubmit(newCompany);
                             db.SubmitChanges();
 
+                            String newObject = at.GetObjectString(newCompany);
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                             return Request.CreateResponse(HttpStatusCode.OK, newCompany.Id);
                         }
                         else
@@ -170,6 +179,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!company.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(company.FirstOrDefault());
+
                                     var lockCompany = company.FirstOrDefault();
                                     lockCompany.Company = objCompany.Company;
                                     lockCompany.Address = objCompany.Address;
@@ -180,6 +191,9 @@ namespace easyfis.ModifiedApiControllers
                                     lockCompany.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(company.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -248,12 +262,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (company.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(company.FirstOrDefault());
+
                                     var unlockCompany = company.FirstOrDefault();
                                     unlockCompany.IsLocked = false;
                                     unlockCompany.UpdatedById = currentUserId;
                                     unlockCompany.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(company.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -323,6 +342,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!company.FirstOrDefault().IsLocked)
                                 {
                                     db.MstCompanies.DeleteOnSubmit(company.First());
+
+                                    String oldObject = at.GetObjectString(company.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
