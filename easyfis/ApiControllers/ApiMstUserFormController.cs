@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==============
         // List User Form
@@ -240,6 +246,9 @@ namespace easyfis.ModifiedApiControllers
                                     db.MstUserForms.InsertOnSubmit(newUserForm);
                                     db.SubmitChanges();
 
+                                    String newObject = at.GetObjectString(newUserForm);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
@@ -313,6 +322,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (userForm.Any())
                                     {
+                                        String oldObject = at.GetObjectString(userForm.FirstOrDefault());
+
                                         var updateUserForm = userForm.FirstOrDefault();
                                         updateUserForm.FormId = objUserForm.FormId;
                                         updateUserForm.CanAdd = objUserForm.CanAdd;
@@ -322,6 +333,9 @@ namespace easyfis.ModifiedApiControllers
                                         updateUserForm.CanUnlock = objUserForm.CanUnlock;
                                         updateUserForm.CanPrint = objUserForm.CanPrint;
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(userForm.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -402,6 +416,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (userForm.Any())
                                     {
                                         db.MstUserForms.DeleteOnSubmit(userForm.First());
+
+                                        String oldObject = at.GetObjectString(userForm.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

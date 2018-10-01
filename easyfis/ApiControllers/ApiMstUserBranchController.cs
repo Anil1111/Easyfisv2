@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ===============================
         // List User Branch (Current User)
@@ -189,6 +195,9 @@ namespace easyfis.ModifiedApiControllers
                                     db.MstUserBranches.InsertOnSubmit(newUserBranch);
                                     db.SubmitChanges();
 
+                                    String newObject = at.GetObjectString(newUserBranch);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
@@ -262,9 +271,14 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (userBranch.Any())
                                     {
+                                        String oldObject = at.GetObjectString(userBranch.FirstOrDefault());
+
                                         var updateUserBranch = userBranch.FirstOrDefault();
                                         updateUserBranch.BranchId = objUserBranch.BranchId;
                                         db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(userBranch.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -345,6 +359,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (userBranch.Any())
                                     {
                                         db.MstUserBranches.DeleteOnSubmit(userBranch.First());
+
+                                        String oldObject = at.GetObjectString(userBranch.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

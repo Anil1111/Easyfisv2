@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==================
         // Get User Full Name
@@ -298,6 +304,8 @@ namespace easyfis.ModifiedApiControllers
 
                                             if (discounts.Any())
                                             {
+                                                String oldObject = at.GetObjectString(user.FirstOrDefault());
+
                                                 var lockUser = user.FirstOrDefault();
                                                 lockUser.FullName = objUser.FullName;
                                                 lockUser.CompanyId = objUser.CompanyId;
@@ -316,6 +324,9 @@ namespace easyfis.ModifiedApiControllers
                                                 lockUser.UpdatedById = currentUserId;
                                                 lockUser.UpdatedDateTime = DateTime.Now;
                                                 db.SubmitChanges();
+
+                                                String newObject = at.GetObjectString(user.FirstOrDefault());
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
@@ -399,12 +410,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (user.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(user.FirstOrDefault());
+
                                     var unlockUser = user.FirstOrDefault();
                                     unlockUser.IsLocked = false;
                                     unlockUser.UpdatedById = currentUserId;
                                     unlockUser.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(user.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
