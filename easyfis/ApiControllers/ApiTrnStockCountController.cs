@@ -241,6 +241,9 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnStockOuts.InsertOnSubmit(newStockOut);
                                         db.SubmitChanges();
 
+                                        String newObject = at.GetObjectString(newStockOut);
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                         foreach (var stockCountItem in stockCount.FirstOrDefault().TrnStockCountItems)
                                         {
                                             var articleInventory = from d in db.MstArticleInventories
@@ -266,6 +269,10 @@ namespace easyfis.ModifiedApiControllers
                                                 };
 
                                                 db.TrnStockOutItems.InsertOnSubmit(newStockOutItems);
+
+                                                String newObject2 = at.GetObjectString(newStockOutItems);
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject2);
+
                                             }
                                         }
 
