@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =================
         // List Disbursement
@@ -298,6 +304,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.TrnDisbursements.InsertOnSubmit(newDisbursement);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newDisbursement);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK, newDisbursement.Id);
                                         }
                                         else
@@ -458,6 +467,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+
                                     var lockDisbursement = disbursement.FirstOrDefault();
                                     lockDisbursement.CVDate = Convert.ToDateTime(objDisbursement.CVDate);
                                     lockDisbursement.SupplierId = objDisbursement.SupplierId;
@@ -489,6 +500,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.InsertCashVoucherJournal(Convert.ToInt32(id));
                                         UpdateAccountsPayable(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -557,6 +571,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (disbursement.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+
                                     var unlockDisbursement = disbursement.FirstOrDefault();
                                     unlockDisbursement.IsLocked = false;
                                     unlockDisbursement.UpdatedById = currentUserId;
@@ -574,6 +590,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
                                         UpdateAccountsPayable(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -643,6 +662,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnDisbursements.DeleteOnSubmit(disbursement.First());
+
+                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

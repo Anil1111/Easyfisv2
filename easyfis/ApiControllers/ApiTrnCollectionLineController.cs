@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ====================
         // List Collection Line
@@ -363,6 +369,9 @@ namespace easyfis.ModifiedApiControllers
 
                                                     db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
                                                     db.SubmitChanges();
+
+                                                    String newObject = at.GetObjectString(newCollectionLine);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
                                                 }
                                             }
                                         }
@@ -548,6 +557,9 @@ namespace easyfis.ModifiedApiControllers
                                                     db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
                                                     db.SubmitChanges();
 
+                                                    String newObject = at.GetObjectString(newCollectionLine);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
                                                 else
@@ -682,6 +694,9 @@ namespace easyfis.ModifiedApiControllers
                                                     db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
                                                     db.SubmitChanges();
 
+                                                    String newObject = at.GetObjectString(newCollectionLine);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
                                                 else
@@ -775,6 +790,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (collectionLine.Any())
                                     {
+                                        String oldObject = at.GetObjectString(collectionLine.FirstOrDefault());
+
                                         var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
                                                        where d.Id == objCollectionLine.AccountId
                                                        && d.IsLocked == true
@@ -818,6 +835,9 @@ namespace easyfis.ModifiedApiControllers
                                                         updateCollectionLine.IsClear = objCollectionLine.IsClear;
 
                                                         db.SubmitChanges();
+
+                                                        String newObject = at.GetObjectString(collectionLine.FirstOrDefault());
+                                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                         return Request.CreateResponse(HttpStatusCode.OK);
                                                     }
@@ -918,6 +938,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (collectionLine.Any())
                                     {
                                         db.TrnCollectionLines.DeleteOnSubmit(collectionLine.First());
+
+                                        String oldObject = at.GetObjectString(collectionLine.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

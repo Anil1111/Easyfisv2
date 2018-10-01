@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =====================
         // Get Collection Amount
@@ -254,6 +260,9 @@ namespace easyfis.ModifiedApiControllers
                                     db.TrnCollections.InsertOnSubmit(newCollection);
                                     db.SubmitChanges();
 
+                                    String newObject = at.GetObjectString(newCollection);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                     return Request.CreateResponse(HttpStatusCode.OK, newCollection.Id);
                                 }
                                 else
@@ -384,6 +393,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!collection.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
+
                                     var lockCollection = collection.FirstOrDefault();
                                     lockCollection.ORDate = Convert.ToDateTime(objCollection.ORDate);
                                     lockCollection.ManualORNumber = objCollection.ManualORNumber;
@@ -407,6 +418,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.InsertOfficialReceiptJournal(Convert.ToInt32(id));
                                         UpdateAccountsReceivable(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -475,6 +489,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (collection.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
+
                                     var unlockCollection = collection.FirstOrDefault();
                                     unlockCollection.IsLocked = false;
                                     unlockCollection.UpdatedById = currentUserId;
@@ -492,6 +508,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
                                         UpdateAccountsReceivable(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -561,6 +580,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!collection.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnCollections.DeleteOnSubmit(collection.First());
+
+                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
