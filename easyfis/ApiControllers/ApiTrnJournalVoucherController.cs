@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ====================
         // List Journal Voucher
@@ -206,6 +212,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.TrnJournalVouchers.InsertOnSubmit(newJournalVoucher);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newJournalVoucher);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newJournalVoucher.Id);
                             }
                             else
@@ -379,6 +388,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!journalVoucher.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+
                                     Decimal totalJournalVoucherLineDebitAmount = journalVoucher.FirstOrDefault().TrnJournalVoucherLines.Sum(d => d.DebitAmount);
                                     Decimal totalJournalVoucherLineCreditAmount = journalVoucher.FirstOrDefault().TrnJournalVoucherLines.Sum(d => d.CreditAmount);
                                     Decimal variance = totalJournalVoucherLineDebitAmount - totalJournalVoucherLineCreditAmount;
@@ -407,6 +418,9 @@ namespace easyfis.ModifiedApiControllers
                                             journal.InsertJournalVoucherJournal(Convert.ToInt32(id));
                                             UpdateBalances(Convert.ToInt32(id));
                                         }
+
+                                        String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -480,6 +494,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (journalVoucher.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+
                                     var unlockJournalVoucher = journalVoucher.FirstOrDefault();
                                     unlockJournalVoucher.IsLocked = false;
                                     unlockJournalVoucher.UpdatedById = currentUserId;
@@ -497,6 +513,9 @@ namespace easyfis.ModifiedApiControllers
                                         journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
                                         UpdateBalances(Convert.ToInt32(id));
                                     }
+
+                                    String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -566,6 +585,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!journalVoucher.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnJournalVouchers.DeleteOnSubmit(journalVoucher.First());
+
+                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ================
         // List Stock Count
@@ -366,6 +372,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.TrnStockCounts.InsertOnSubmit(newStockCount);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newStockCount);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newStockCount.Id);
                             }
                             else
@@ -428,6 +437,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!stockCount.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(stockCount.FirstOrDefault());
+
                                     var lockStockCount = stockCount.FirstOrDefault();
                                     lockStockCount.SCDate = Convert.ToDateTime(objStockCount.SCDate);
                                     lockStockCount.Particulars = objStockCount.Particulars;
@@ -438,6 +449,9 @@ namespace easyfis.ModifiedApiControllers
                                     lockStockCount.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(stockCount.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -506,12 +520,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (stockCount.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(stockCount.FirstOrDefault());
+
                                     var unlockStockCount = stockCount.FirstOrDefault();
                                     unlockStockCount.IsLocked = false;
                                     unlockStockCount.UpdatedById = currentUserId;
                                     unlockStockCount.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(stockCount.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -581,6 +600,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!stockCount.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnStockCounts.DeleteOnSubmit(stockCount.First());
+
+                                    String oldObject = at.GetObjectString(stockCount.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
