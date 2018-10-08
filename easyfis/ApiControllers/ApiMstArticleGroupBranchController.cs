@@ -6,15 +6,21 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
-    public class ApiMstArticleGroupBranchBranchController : ApiController
+    public class ApiMstArticleGroupBranchController : ApiController
     {
         // ============
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =========================
         // List Article Group Branch
@@ -167,6 +173,9 @@ namespace easyfis.ModifiedApiControllers
                                                     db.MstArticleGroupBranches.InsertOnSubmit(newArticleGroupBranch);
                                                     db.SubmitChanges();
 
+                                                    String newObject = at.GetObjectString(newArticleGroupBranch);
+                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                                     return Request.CreateResponse(HttpStatusCode.OK, newArticleGroupBranch.Id);
                                                 }
                                                 else
@@ -252,6 +261,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (articleGroupBranch.Any())
                             {
+                                String oldObject = at.GetObjectString(articleGroupBranch.FirstOrDefault());
+
                                 var accounts = from d in db.MstAccounts.OrderBy(d => d.Account)
                                                where d.IsLocked == true
                                                select d;
@@ -298,6 +309,9 @@ namespace easyfis.ModifiedApiControllers
                                                         updateArticleGroupBranch.ExpenseAccountId = objArticleGroupBranch.ExpenseAccountId;
 
                                                         db.SubmitChanges();
+
+                                                        String newObject = at.GetObjectString(articleGroupBranch.FirstOrDefault());
+                                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                         return Request.CreateResponse(HttpStatusCode.OK);
                                                     }
@@ -390,6 +404,10 @@ namespace easyfis.ModifiedApiControllers
                             if (articleGroupBranch.Any())
                             {
                                 db.MstArticleGroupBranches.DeleteOnSubmit(articleGroupBranch.First());
+
+                                String oldObject = at.GetObjectString(articleGroupBranch.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

@@ -164,6 +164,11 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
+                                    var uname = new { username = name };
+
+                                    String newObject = at.GetObjectString(uname);
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else

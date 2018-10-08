@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Discount
@@ -106,6 +112,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.MstDiscounts.InsertOnSubmit(newDiscount);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newDiscount);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newDiscount.Id);
                             }
                             else
@@ -166,6 +175,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (discount.Any())
                             {
+                                String oldObject = at.GetObjectString(discount.FirstOrDefault());
+
                                 var updateDiscount = discount.FirstOrDefault();
                                 updateDiscount.Discount = objDiscount.Discount;
                                 updateDiscount.DiscountRate = objDiscount.DiscountRate;
@@ -176,6 +187,9 @@ namespace easyfis.ModifiedApiControllers
                                 updateDiscount.UpdatedDateTime = DateTime.Now;
 
                                 db.SubmitChanges();
+
+                                String newObject = at.GetObjectString(discount.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
@@ -238,6 +252,10 @@ namespace easyfis.ModifiedApiControllers
                             if (discount.Any())
                             {
                                 db.MstDiscounts.DeleteOnSubmit(discount.First());
+
+                                String oldObject = at.GetObjectString(discount.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

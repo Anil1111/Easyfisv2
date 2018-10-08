@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Pay Type
@@ -102,6 +108,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.MstPayTypes.InsertOnSubmit(newPayType);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newPayType);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newPayType.Id);
                             }
                             else
@@ -162,6 +171,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (payType.Any())
                             {
+                                String oldObject = at.GetObjectString(payType.FirstOrDefault());
+
                                 var updatePayType = payType.FirstOrDefault();
                                 updatePayType.PayType = objPayType.PayType;
                                 updatePayType.AccountId = objPayType.AccountId;
@@ -170,6 +181,9 @@ namespace easyfis.ModifiedApiControllers
                                 updatePayType.UpdatedDateTime = DateTime.Now;
 
                                 db.SubmitChanges();
+
+                                String newObject = at.GetObjectString(payType.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
@@ -232,6 +246,10 @@ namespace easyfis.ModifiedApiControllers
                             if (payType.Any())
                             {
                                 db.MstPayTypes.DeleteOnSubmit(payType.First());
+
+                                String oldObject = at.GetObjectString(payType.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

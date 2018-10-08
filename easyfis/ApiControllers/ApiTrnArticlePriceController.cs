@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==================
         // List Article Price
@@ -211,6 +217,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.TrnArticlePrices.InsertOnSubmit(newArticlePrice);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newArticlePrice);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newArticlePrice.Id);
                             }
                             else
@@ -273,6 +282,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!articlePrice.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(articlePrice.FirstOrDefault());
+
                                     var lockArticlePrice = articlePrice.FirstOrDefault();
                                     lockArticlePrice.IPDate = Convert.ToDateTime(objArticlePrice.IPDate);
                                     lockArticlePrice.ManualIPNumber = objArticlePrice.ManualIPNumber;
@@ -283,6 +294,9 @@ namespace easyfis.ModifiedApiControllers
                                     lockArticlePrice.UpdatedById = currentUserId;
                                     lockArticlePrice.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(articlePrice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -351,12 +365,17 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (articlePrice.FirstOrDefault().IsLocked)
                                 {
+                                    String oldObject = at.GetObjectString(articlePrice.FirstOrDefault());
+
                                     var unlockArticlePrice = articlePrice.FirstOrDefault();
                                     unlockArticlePrice.IsLocked = false;
                                     unlockArticlePrice.UpdatedById = currentUserId;
                                     unlockArticlePrice.UpdatedDateTime = DateTime.Now;
 
                                     db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(articlePrice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -560,6 +579,10 @@ namespace easyfis.ModifiedApiControllers
                                 if (!articlePrice.FirstOrDefault().IsLocked)
                                 {
                                     db.TrnArticlePrices.DeleteOnSubmit(articlePrice.First());
+
+                                    String oldObject = at.GetObjectString(articlePrice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                     db.SubmitChanges();
 
                                     return Request.CreateResponse(HttpStatusCode.OK);

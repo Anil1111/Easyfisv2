@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =========================
         // List Article Price Item
@@ -131,6 +137,9 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnArticlePriceItems.InsertOnSubmit(newArticlePriceItem);
                                         db.SubmitChanges();
 
+                                        String newObject = at.GetObjectString(newArticlePriceItem);
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
                                     else
@@ -209,6 +218,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (articlePriceItem.Any())
                                     {
+                                        String oldObject = at.GetObjectString(articlePriceItem.FirstOrDefault());
+
                                         var articles = from d in db.MstArticles
                                                        where d.Id == objArticlePriceItem.ItemId
                                                        && d.IsLocked == true
@@ -222,6 +233,9 @@ namespace easyfis.ModifiedApiControllers
                                             updateArticlePriceItem.TriggerQuantity = objArticlePriceItem.TriggerQuantity;
 
                                             db.SubmitChanges();
+
+                                            String newObject = at.GetObjectString(articlePriceItem.FirstOrDefault());
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                             return Request.CreateResponse(HttpStatusCode.OK);
                                         }
@@ -307,6 +321,10 @@ namespace easyfis.ModifiedApiControllers
                                     if (articlePriceItem.Any())
                                     {
                                         db.TrnArticlePriceItems.DeleteOnSubmit(articlePriceItem.First());
+
+                                        String oldObject = at.GetObjectString(articlePriceItem.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                         db.SubmitChanges();
 
                                         return Request.CreateResponse(HttpStatusCode.OK);

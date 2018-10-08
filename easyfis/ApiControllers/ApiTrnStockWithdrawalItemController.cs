@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // ==========================
         // List Stock Withdrawal Item
@@ -295,6 +301,9 @@ namespace easyfis.ModifiedApiControllers
                                         };
 
                                         db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
+
+                                        String newObject = at.GetObjectString(newStockWithdrawalItem);
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
                                     }
                                 }
                             }
@@ -415,6 +424,9 @@ namespace easyfis.ModifiedApiControllers
                             db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
                             db.SubmitChanges();
 
+                            String newObject = at.GetObjectString(newStockWithdrawalItem);
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else
@@ -500,6 +512,8 @@ namespace easyfis.ModifiedApiControllers
 
                     if (isValid)
                     {
+                        String oldObject = at.GetObjectString(stockWithdrawalItem.FirstOrDefault());
+
                         var conversionUnit = from d in db.MstArticleUnits
                                              where d.ArticleId == objStockWithdrawalItem.ItemId
                                              && d.UnitId == objStockWithdrawalItem.UnitId
@@ -533,6 +547,9 @@ namespace easyfis.ModifiedApiControllers
                             updateStockWithdrawalItem.BaseQuantity = baseQuantity;
                             updateStockWithdrawalItem.BaseCost = baseCost;
                             db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(stockWithdrawalItem.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                             return Request.CreateResponse(HttpStatusCode.OK);
                         }
@@ -609,6 +626,10 @@ namespace easyfis.ModifiedApiControllers
                     if (isValid)
                     {
                         db.TrnStockWithdrawalItems.DeleteOnSubmit(stockWithdrawalItem.First());
+
+                        String oldObject = at.GetObjectString(stockWithdrawalItem.FirstOrDefault());
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                         db.SubmitChanges();
 
                         return Request.CreateResponse(HttpStatusCode.OK);

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Employee
@@ -203,6 +209,9 @@ namespace easyfis.ModifiedApiControllers
                                             db.MstArticles.InsertOnSubmit(newEmployee);
                                             db.SubmitChanges();
 
+                                            String newObject = at.GetObjectString(newEmployee);
+                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                             return Request.CreateResponse(HttpStatusCode.OK, newEmployee.Id);
                                         }
                                         else
@@ -279,6 +288,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (employee.Any())
                             {
+                                String oldObject = at.GetObjectString(employee.FirstOrDefault());
+
                                 var lockEmployee = employee.FirstOrDefault();
                                 lockEmployee.Article = objEmployee.Article;
                                 lockEmployee.ArticleGroupId = objEmployee.ArticleGroupId;
@@ -295,6 +306,9 @@ namespace easyfis.ModifiedApiControllers
                                 lockEmployee.UpdatedDateTime = DateTime.Now;
 
                                 db.SubmitChanges();
+
+                                String newObject = at.GetObjectString(employee.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
@@ -358,6 +372,10 @@ namespace easyfis.ModifiedApiControllers
                             if (employee.Any())
                             {
                                 db.MstArticles.DeleteOnSubmit(employee.First());
+
+                                String oldObject = at.GetObjectString(employee.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);

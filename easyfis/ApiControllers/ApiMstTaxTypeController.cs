@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -15,6 +16,11 @@ namespace easyfis.ModifiedApiControllers
         // Data Context
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
+
+        // ===========
+        // Audit Trail
+        // ===========
+        private Business.AuditTrail at = new Business.AuditTrail();
 
         // =============
         // List Tax Type
@@ -108,6 +114,9 @@ namespace easyfis.ModifiedApiControllers
                                 db.MstTaxTypes.InsertOnSubmit(newTaxType);
                                 db.SubmitChanges();
 
+                                String newObject = at.GetObjectString(newTaxType);
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+
                                 return Request.CreateResponse(HttpStatusCode.OK, newTaxType.Id);
                             }
                             else
@@ -168,6 +177,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (taxType.Any())
                             {
+                                String oldObject = at.GetObjectString(taxType.FirstOrDefault());
+
                                 var updateTaxType = taxType.FirstOrDefault();
                                 updateTaxType.TaxType = objTaxType.TaxType;
                                 updateTaxType.TaxRate = objTaxType.TaxRate;
@@ -178,6 +189,9 @@ namespace easyfis.ModifiedApiControllers
                                 updateTaxType.UpdatedDateTime = DateTime.Now;
 
                                 db.SubmitChanges();
+
+                                String newObject = at.GetObjectString(taxType.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
                             }
@@ -240,6 +254,10 @@ namespace easyfis.ModifiedApiControllers
                             if (taxType.Any())
                             {
                                 db.MstTaxTypes.DeleteOnSubmit(taxType.First());
+
+                                String oldObject = at.GetObjectString(taxType.FirstOrDefault());
+                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+
                                 db.SubmitChanges();
 
                                 return Request.CreateResponse(HttpStatusCode.OK);
