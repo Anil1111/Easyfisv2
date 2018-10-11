@@ -664,36 +664,22 @@ namespace easyfis.ModifiedApiControllers
         {
             try
             {
-                var currentUser = from d in db.MstUsers
-                                  where d.UserId == User.Identity.GetUserId()
-                                  select d;
-
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
                 if (currentUser.Any())
                 {
                     var currentUserId = currentUser.FirstOrDefault().Id;
 
-                    var userForms = from d in db.MstUserForms
-                                    where d.UserId == currentUserId
-                                    && d.SysForm.FormName.Equals("PurchaseOrderDetail")
-                                    select d;
-
+                    var userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("PurchaseOrderDetail") select d;
                     if (userForms.Any())
                     {
                         if (userForms.FirstOrDefault().CanAdd)
                         {
-                            var purchaseOrder = from d in db.TrnPurchaseOrders
-                                                where d.Id == Convert.ToInt32(POId)
-                                                select d;
-
+                            var purchaseOrder = from d in db.TrnPurchaseOrders where d.Id == Convert.ToInt32(POId) select d;
                             if (purchaseOrder.Any())
                             {
-                                String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                String oldObject = "[" + at.GetObjectString(purchaseOrder.FirstOrDefault());
 
-                                var purchaseRequest = from d in db.TrnPurchaseRequests
-                                                      where d.Id == Convert.ToInt32(PRId)
-                                                      && d.IsLocked == true
-                                                      select d;
-
+                                var purchaseRequest = from d in db.TrnPurchaseRequests where d.Id == Convert.ToInt32(PRId) && d.IsLocked == true select d;
                                 if (purchaseRequest.Any())
                                 {
                                     var updatePurchaseOrder = purchaseOrder.FirstOrDefault();
@@ -712,24 +698,52 @@ namespace easyfis.ModifiedApiControllers
                                     updatePurchaseOrder.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
 
-                                    var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
-                                                             where d.POId == purchaseOrder.FirstOrDefault().Id
-                                                             select d;
-
+                                    var purchaseOrderItems = from d in db.TrnPurchaseOrderItems where d.POId == purchaseOrder.FirstOrDefault().Id select d;
                                     if (purchaseOrderItems.Any())
                                     {
+                                        oldObject += ", ";
+
+                                        Int32 oldObjectCount = 0;
+
+                                        foreach (var purchaseOrderItem in purchaseOrderItems)
+                                        {
+                                            oldObjectCount += 1;
+
+                                            if (purchaseOrderItems.Count() == 1)
+                                            {
+                                                oldObject += at.GetObjectString(purchaseOrderItem);
+                                            }
+                                            else
+                                            {
+                                                if (oldObjectCount == purchaseOrderItems.Count())
+                                                {
+                                                    oldObject += at.GetObjectString(purchaseOrderItem);
+                                                }
+                                                else
+                                                {
+                                                    oldObject += at.GetObjectString(purchaseOrderItem) + ", ";
+                                                }
+                                            }
+                                        }
+
                                         db.TrnPurchaseOrderItems.DeleteAllOnSubmit(purchaseOrderItems);
                                         db.SubmitChanges();
                                     }
 
-                                    var purchaseRequestItems = from d in db.TrnPurchaseRequestItems
-                                                               where d.PRId == purchaseRequest.FirstOrDefault().Id
-                                                               select d;
+                                    oldObject += "]";
 
+                                    String newObject = "[" + at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                    Int32 newObjectCount = 0;
+
+                                    var purchaseRequestItems = from d in db.TrnPurchaseRequestItems where d.PRId == purchaseRequest.FirstOrDefault().Id select d;
                                     if (purchaseRequestItems.Any())
                                     {
+                                        newObject += ", ";
+
                                         foreach (var purchaseRequestItem in purchaseRequestItems)
                                         {
+                                            newObjectCount += 1;
+
                                             Data.TrnPurchaseOrderItem newPurchaseOrderItem = new Data.TrnPurchaseOrderItem()
                                             {
                                                 POId = purchaseOrder.FirstOrDefault().Id,
@@ -743,22 +757,30 @@ namespace easyfis.ModifiedApiControllers
                                                 BaseQuantity = purchaseRequestItem.BaseQuantity,
                                                 BaseCost = purchaseRequestItem.BaseCost,
                                             };
+
                                             db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
+
+                                            if (purchaseRequestItems.Count() == 1)
+                                            {
+                                                newObject += at.GetObjectString(newPurchaseOrderItem);
+                                            }
+                                            else
+                                            {
+                                                if (newObjectCount == purchaseRequestItems.Count())
+                                                {
+                                                    newObject += at.GetObjectString(newPurchaseOrderItem);
+                                                }
+                                                else
+                                                {
+                                                    newObject += at.GetObjectString(newPurchaseOrderItem) + ", ";
+                                                }
+                                            }
                                         }
 
                                         db.SubmitChanges();
 
-                                        String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-
-                                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                                        {
-                                            UserId = currentUser.FirstOrDefault().Id,
-                                            Entity = GetType().Name,
-                                            Activity = MethodBase.GetCurrentMethod().Name,
-                                            OldObject = oldObject,
-                                            NewObject = newObject
-                                        };
-                                        //at.InsertAuditTrail(objAuditTrail);
+                                        newObject += "]";
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -908,8 +930,13 @@ namespace easyfis.ModifiedApiControllers
 
                     if (isValid)
                     {
+                        String newObject = "[";
+                        Int32 count = 0;
+
                         foreach (var objItem in objItems)
                         {
+                            count += 1;
+
                             var item = from d in db.MstArticles
                                        where d.Id == objItem.ItemId
                                        && d.ArticleTypeId == 1
@@ -953,21 +980,30 @@ namespace easyfis.ModifiedApiControllers
                                     };
 
                                     db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
+
+                                    if (objItems.Count() == 1)
+                                    {
+                                        newObject += at.GetObjectString(newPurchaseOrderItem);
+                                    }
+                                    else
+                                    {
+                                        if (count == objItems.Count())
+                                        {
+                                            newObject += at.GetObjectString(newPurchaseOrderItem);
+                                        }
+                                        else
+                                        {
+                                            newObject += at.GetObjectString(newPurchaseOrderItem) + ", ";
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         db.SubmitChanges();
 
-                        Entities.SysAuditTrail objAuditTrail = new Entities.SysAuditTrail()
-                        {
-                            UserId = currentUser.FirstOrDefault().Id,
-                            Entity = GetType().Name,
-                            Activity = MethodBase.GetCurrentMethod().Name,
-                            OldObject = "NA",
-                            NewObject = "NA"
-                        };
-                        //at.InsertAuditTrail(objAuditTrail);
+                        newObject += "]";
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

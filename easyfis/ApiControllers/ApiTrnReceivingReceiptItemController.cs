@@ -338,8 +338,13 @@ namespace easyfis.ModifiedApiControllers
 
                     if (isValid)
                     {
+                        String newObject = "[";
+                        Int32 count = 0;
+
                         foreach (var objReceivingReceiptItem in objReceivingReceiptItems)
                         {
+                            count += 1;
+
                             var item = from d in db.MstArticles
                                        where d.Id == objReceivingReceiptItem.ItemId
                                        && d.ArticleTypeId == 1
@@ -393,13 +398,29 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
 
-                                    String newObject = at.GetObjectString(newReceivingReceiptItem);
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                    if (objReceivingReceiptItems.Count() == 1)
+                                    {
+                                        newObject += at.GetObjectString(newReceivingReceiptItem);
+                                    }
+                                    else
+                                    {
+                                        if (count == objReceivingReceiptItems.Count())
+                                        {
+                                            newObject += at.GetObjectString(newReceivingReceiptItem);
+                                        }
+                                        else
+                                        {
+                                            newObject += at.GetObjectString(newReceivingReceiptItem) + ", ";
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         db.SubmitChanges();
+
+                        newObject += "]";
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                         Decimal receivingReceiptItemTotalAmount = 0;
 
