@@ -247,8 +247,13 @@ namespace easyfis.ModifiedApiControllers
 
                     if (isValid)
                     {
+                        String newObject = "[";
+                        Int32 count = 0;
+
                         foreach (var objSalesInvoiceItem in objSalesInvoiceItems)
                         {
+                            count += 1;
+
                             var item = from d in db.MstArticles
                                        where d.Id == objSalesInvoiceItem.ItemId
                                        && d.ArticleTypeId == 1
@@ -302,14 +307,30 @@ namespace easyfis.ModifiedApiControllers
 
                                         db.TrnStockWithdrawalItems.InsertOnSubmit(newStockWithdrawalItem);
 
-                                        String newObject = at.GetObjectString(newStockWithdrawalItem);
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                        if (objSalesInvoiceItems.Count() == 1)
+                                        {
+                                            newObject += at.GetObjectString(newStockWithdrawalItem);
+                                        }
+                                        else
+                                        {
+                                            if (count == objSalesInvoiceItems.Count())
+                                            {
+                                                newObject += at.GetObjectString(newStockWithdrawalItem);
+                                            }
+                                            else
+                                            {
+                                                newObject += at.GetObjectString(newStockWithdrawalItem) + ", ";
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
 
                         db.SubmitChanges();
+
+                        newObject += "]";
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

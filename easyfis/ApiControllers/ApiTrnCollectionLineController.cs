@@ -326,8 +326,13 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!collection.FirstOrDefault().IsLocked)
                                 {
+                                    String newObject = "[";
+                                    Int32 count = 0;
+
                                     foreach (var objCollectionLine in objCollectionLines)
                                     {
+                                        count += 1;
+
                                         var salesInvoice = from d in db.TrnSalesInvoices
                                                            where d.Id == objCollectionLine.SIId
                                                            && d.IsLocked == true
@@ -368,14 +373,31 @@ namespace easyfis.ModifiedApiControllers
                                                     };
 
                                                     db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
-                                                    db.SubmitChanges();
 
-                                                    String newObject = at.GetObjectString(newCollectionLine);
-                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                                    if (objCollectionLines.Count() == 1)
+                                                    {
+                                                        newObject += at.GetObjectString(newCollectionLine);
+                                                    }
+                                                    else
+                                                    {
+                                                        if (count == objCollectionLines.Count())
+                                                        {
+                                                            newObject += at.GetObjectString(newCollectionLine);
+                                                        }
+                                                        else
+                                                        {
+                                                            newObject += at.GetObjectString(newCollectionLine) + ", ";
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+
+                                    db.SubmitChanges();
+
+                                    newObject += "]";
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }

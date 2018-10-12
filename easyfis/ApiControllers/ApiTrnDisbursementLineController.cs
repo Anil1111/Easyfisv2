@@ -225,8 +225,13 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!disbursement.FirstOrDefault().IsLocked)
                                 {
+                                    String newObject = "[";
+                                    Int32 count = 0;
+
                                     foreach (var objDisbursementLine in objDisbursementLines)
                                     {
+                                        count += 1;
+
                                         var receivingReceipt = from d in db.TrnReceivingReceipts
                                                                where d.Id == objDisbursementLine.RRId
                                                                && d.BranchId == currentBranchId
@@ -247,12 +252,26 @@ namespace easyfis.ModifiedApiControllers
                                             };
 
                                             db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
-                                            db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newDisbursementLine);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                            if (objDisbursementLines.Count() == 1)
+                                            {
+                                                newObject += at.GetObjectString(newDisbursementLine);
+                                            }
+                                            else
+                                            {
+                                                if (count == objDisbursementLines.Count())
+                                                {
+                                                    newObject += at.GetObjectString(newDisbursementLine);
+                                                }
+                                                else
+                                                {
+                                                    newObject += at.GetObjectString(newDisbursementLine) + ", ";
+                                                }
+                                            }
                                         }
                                     }
+
+                                    db.SubmitChanges();
 
                                     Decimal disbursementItemTotalAmount = 0;
 
@@ -264,6 +283,9 @@ namespace easyfis.ModifiedApiControllers
                                     var updateDisbursement = disbursement.FirstOrDefault();
                                     updateDisbursement.Amount = disbursementItemTotalAmount;
                                     db.SubmitChanges();
+
+                                    newObject += "]";
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }

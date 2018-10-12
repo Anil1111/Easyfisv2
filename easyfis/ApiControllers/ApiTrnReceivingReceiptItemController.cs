@@ -419,9 +419,6 @@ namespace easyfis.ModifiedApiControllers
 
                         db.SubmitChanges();
 
-                        newObject += "]";
-                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
-
                         Decimal receivingReceiptItemTotalAmount = 0;
 
                         if (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Any())
@@ -432,6 +429,9 @@ namespace easyfis.ModifiedApiControllers
                         var updateReceivingReceiptAmount = receivingReceipt.FirstOrDefault();
                         updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
                         db.SubmitChanges();
+
+                        newObject += "]";
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }

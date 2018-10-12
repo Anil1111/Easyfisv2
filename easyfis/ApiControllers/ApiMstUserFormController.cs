@@ -133,20 +133,55 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 var userFormSource = from d in db.MstUserForms
                                                      where d.MstUser.UserName.Equals(name)
-                                                     && d.MstUser.IsLocked == true
+                                                     //&& d.MstUser.IsLocked == true
                                                      select d;
 
                                 if (userFormSource.Any())
                                 {
+                                    String oldObject = "[";
+
                                     var deleteUserForms = from d in db.MstUserForms
                                                           where d.UserId == Convert.ToInt32(userId)
                                                           select d;
 
-                                    db.MstUserForms.DeleteAllOnSubmit(deleteUserForms.ToList());
-                                    db.SubmitChanges();
+                                    if (deleteUserForms.Any())
+                                    {
+                                        db.MstUserForms.DeleteAllOnSubmit(deleteUserForms.ToList());
+
+                                        Int32 oldObjectCount = 0;
+                                        foreach (var deleteUserForm in deleteUserForms)
+                                        {
+                                            oldObjectCount += 1;
+
+                                            if (deleteUserForms.Count() == 1)
+                                            {
+                                                oldObject += at.GetObjectString(deleteUserForm);
+                                            }
+                                            else
+                                            {
+                                                if (oldObjectCount == deleteUserForms.Count())
+                                                {
+                                                    oldObject += at.GetObjectString(deleteUserForm);
+                                                }
+                                                else
+                                                {
+                                                    oldObject += at.GetObjectString(deleteUserForm) + ", ";
+                                                }
+                                            }
+                                        }
+
+                                        db.SubmitChanges();
+                                    }
+
+                                    oldObject += "]";
+
+                                    String newObject = "[";
+                                    Int32 newObjectCount = 0;
 
                                     foreach (var userForm in userFormSource)
                                     {
+                                        newObjectCount += 1;
+
                                         Data.MstUserForm newUserForm = new Data.MstUserForm
                                         {
                                             UserId = Convert.ToInt32(userId),
@@ -160,14 +195,28 @@ namespace easyfis.ModifiedApiControllers
                                         };
 
                                         db.MstUserForms.InsertOnSubmit(newUserForm);
+
+                                        if (userFormSource.Count() == 1)
+                                        {
+                                            newObject += at.GetObjectString(newUserForm);
+                                        }
+                                        else
+                                        {
+                                            if (newObjectCount == userFormSource.Count())
+                                            {
+                                                newObject += at.GetObjectString(newUserForm);
+                                            }
+                                            else
+                                            {
+                                                newObject += at.GetObjectString(newUserForm) + ", ";
+                                            }
+                                        }
                                     }
 
                                     db.SubmitChanges();
 
-                                    var uname = new { username = name };
-
-                                    String newObject = at.GetObjectString(uname);
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                    newObject += "]";
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
