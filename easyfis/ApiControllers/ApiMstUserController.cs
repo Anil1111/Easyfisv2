@@ -123,6 +123,7 @@ namespace easyfis.ModifiedApiControllers
                            SalesInvoiceApprovedById = d.SalesInvoiceApprovedById,
                            OfficialReceiptName = d.OfficialReceiptName,
                            IsIncludeCostStockReports = d.IsIncludeCostStockReports,
+                           ActivateAuditTrail = d.ActivateAuditTrail,
                            IsLocked = d.IsLocked,
                            CreatedBy = GetCurrentUserFullName(d.CreatedById),
                            CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -320,6 +321,7 @@ namespace easyfis.ModifiedApiControllers
                                                 lockUser.SalesInvoiceApprovedById = objUser.SalesInvoiceApprovedById;
                                                 lockUser.OfficialReceiptName = objUser.OfficialReceiptName;
                                                 lockUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
+                                                lockUser.ActivateAuditTrail = objUser.ActivateAuditTrail;
                                                 lockUser.IsLocked = true;
                                                 lockUser.UpdatedById = currentUserId;
                                                 lockUser.UpdatedDateTime = DateTime.Now;

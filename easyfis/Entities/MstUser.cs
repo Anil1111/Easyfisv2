@@ -24,6 +24,7 @@ namespace easyfis.Entities
         public Int32? SalesInvoiceApprovedById { get; set; }
         public String OfficialReceiptName { get; set; }
         public Boolean IsIncludeCostStockReports { get; set; }
+        public Boolean ActivateAuditTrail { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32? CreatedById { get; set; }
         public String CreatedBy { get; set; }
