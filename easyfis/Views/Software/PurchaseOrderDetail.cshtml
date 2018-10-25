@@ -123,6 +123,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredPO" id="inpPurchaseOrderRemarks" placeholder="Remarks"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboPurchaseOrderStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -741,6 +747,7 @@
         var cboPurchaseOrderPreparedBy = new wijmo.input.InputDate('#cboPurchaseOrderPreparedBy');
         var cboPurchaseOrderCheckedBy = new wijmo.input.InputDate('#cboPurchaseOrderCheckedBy');
         var cboPurchaseOrderApprovedBy = new wijmo.input.InputDate('#cboPurchaseOrderApprovedBy');
+        var cboPurchaseOrderStatus = new wijmo.input.InputDate('#cboPurchaseOrderStatus');
         var isLocked = false;
 
         // =====================================================================
@@ -1015,6 +1022,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboPurchaseOrderDetailStatus();
+                }
+            });
+        }
+
+        // =========================================
+        // Create Purchase Order Detail Combo Status
+        // =========================================
+        function createCboPurchaseOrderDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/purchaseOrder/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboPurchaseOrderStatus.dispose();
+                    cboPurchaseOrderStatus = new wijmo.input.ComboBox('#cboPurchaseOrderStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getPurchaseOrderDetailData();
                 }
             });
@@ -1054,6 +1101,7 @@
                             cboPurchaseOrderPreparedBy.selectedValue = results.PreparedById;
                             cboPurchaseOrderCheckedBy.selectedValue = results.CheckedById;
                             cboPurchaseOrderApprovedBy.selectedValue = results.ApprovedById;
+                            cboPurchaseOrderStatus.selectedValue = results.Status;
                             document.getElementById('inpPurchaseOrderIsClose').checked = results.IsClose;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
@@ -1074,6 +1122,7 @@
                                 cboPurchaseOrderPreparedBy.disabled = true;
                                 cboPurchaseOrderCheckedBy.disabled = true;
                                 cboPurchaseOrderApprovedBy.disabled = true;
+                                cboPurchaseOrderStatus.disabled = true;
                                 document.getElementById('inpPurchaseOrderIsClose').disabled = true;
 
                                 $("#btnPurchaseOrderConsignment").prop("disabled", true);
@@ -1150,6 +1199,7 @@
             purchaseOrderObject.RequestedById = cboPurchaseOrderRequestedBy.selectedValue;
             purchaseOrderObject.CheckedById = cboPurchaseOrderCheckedBy.selectedValue;
             purchaseOrderObject.ApprovedById = cboPurchaseOrderApprovedBy.selectedValue;
+            purchaseOrderObject.Status = cboPurchaseOrderStatus.selectedValue;
             var purchaseOrderData = JSON.stringify(purchaseOrderObject);
 
             var isValid = true;

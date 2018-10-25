@@ -109,6 +109,7 @@ namespace easyfis.ModifiedApiControllers
                                     PreparedById = d.PreparedById,
                                     CheckedById = d.CheckedById,
                                     ApprovedById = d.ApprovedById,
+                                    Status = d.Status,
                                     IsLocked = d.IsLocked,
                                     CreatedBy = d.MstUser2.FullName,
                                     CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -400,6 +401,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockPurchaseOrder.RequestedById = objPurchaseOrder.RequestedById;
                                     lockPurchaseOrder.CheckedById = objPurchaseOrder.CheckedById;
                                     lockPurchaseOrder.ApprovedById = objPurchaseOrder.ApprovedById;
+                                    lockPurchaseOrder.Status = objPurchaseOrder.Status;
                                     lockPurchaseOrder.IsLocked = true;
                                     lockPurchaseOrder.UpdatedById = currentUserId;
                                     lockPurchaseOrder.UpdatedDateTime = DateTime.Now;
