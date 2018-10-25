@@ -177,6 +177,24 @@ namespace easyfis.ModifiedApiControllers
             return users.ToList();
         }
 
+        // ==============================
+        // Dropdown List - Status (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/receivingReceipt/dropdown/list/status")]
+        public List<Entities.MstStatus> DropdownListReceivingReceiptStatus()
+        {
+            var statuses = from d in db.MstStatus.OrderBy(d => d.Status)
+                           where d.IsLocked == true
+                           && d.Category.Equals("RR")
+                           select new Entities.MstStatus
+                           {
+                               Id = d.Id,
+                               Status = d.Status
+                           };
+
+            return statuses.ToList();
+        }
+
         // ===================
         // Fill Leading Zeroes
         // ===================

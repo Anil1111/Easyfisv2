@@ -102,6 +102,9 @@ namespace easyfis.Data
     partial void InsertMstPayType(MstPayType instance);
     partial void UpdateMstPayType(MstPayType instance);
     partial void DeleteMstPayType(MstPayType instance);
+    partial void InsertMstStatus(MstStatus instance);
+    partial void UpdateMstStatus(MstStatus instance);
+    partial void DeleteMstStatus(MstStatus instance);
     partial void InsertMstTaxType(MstTaxType instance);
     partial void UpdateMstTaxType(MstTaxType instance);
     partial void DeleteMstTaxType(MstTaxType instance);
@@ -434,6 +437,14 @@ namespace easyfis.Data
 			get
 			{
 				return this.GetTable<MstPayType>();
+			}
+		}
+		
+		public System.Data.Linq.Table<MstStatus> MstStatus
+		{
+			get
+			{
+				return this.GetTable<MstStatus>();
 			}
 		}
 		
@@ -12939,6 +12950,318 @@ namespace easyfis.Data
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstStatus")]
+	public partial class MstStatus : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Status;
+		
+		private string _Category;
+		
+		private bool _IsLocked;
+		
+		private int _CreatedById;
+		
+		private System.DateTime _CreatedDateTime;
+		
+		private int _UpdatedById;
+		
+		private System.DateTime _UpdatedDateTime;
+		
+		private EntityRef<MstUser> _MstUser;
+		
+		private EntityRef<MstUser> _MstUser1;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
+    partial void OnCategoryChanging(string value);
+    partial void OnCategoryChanged();
+    partial void OnIsLockedChanging(bool value);
+    partial void OnIsLockedChanged();
+    partial void OnCreatedByIdChanging(int value);
+    partial void OnCreatedByIdChanged();
+    partial void OnCreatedDateTimeChanging(System.DateTime value);
+    partial void OnCreatedDateTimeChanged();
+    partial void OnUpdatedByIdChanging(int value);
+    partial void OnUpdatedByIdChanged();
+    partial void OnUpdatedDateTimeChanging(System.DateTime value);
+    partial void OnUpdatedDateTimeChanged();
+    #endregion
+		
+		public MstStatus()
+		{
+			this._MstUser = default(EntityRef<MstUser>);
+			this._MstUser1 = default(EntityRef<MstUser>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Category", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Category
+		{
+			get
+			{
+				return this._Category;
+			}
+			set
+			{
+				if ((this._Category != value))
+				{
+					this.OnCategoryChanging(value);
+					this.SendPropertyChanging();
+					this._Category = value;
+					this.SendPropertyChanged("Category");
+					this.OnCategoryChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsLocked", DbType="Bit NOT NULL")]
+		public bool IsLocked
+		{
+			get
+			{
+				return this._IsLocked;
+			}
+			set
+			{
+				if ((this._IsLocked != value))
+				{
+					this.OnIsLockedChanging(value);
+					this.SendPropertyChanging();
+					this._IsLocked = value;
+					this.SendPropertyChanged("IsLocked");
+					this.OnIsLockedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedById", DbType="Int NOT NULL")]
+		public int CreatedById
+		{
+			get
+			{
+				return this._CreatedById;
+			}
+			set
+			{
+				if ((this._CreatedById != value))
+				{
+					if (this._MstUser.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCreatedByIdChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedById = value;
+					this.SendPropertyChanged("CreatedById");
+					this.OnCreatedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime CreatedDateTime
+		{
+			get
+			{
+				return this._CreatedDateTime;
+			}
+			set
+			{
+				if ((this._CreatedDateTime != value))
+				{
+					this.OnCreatedDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedDateTime = value;
+					this.SendPropertyChanged("CreatedDateTime");
+					this.OnCreatedDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdatedById", DbType="Int NOT NULL")]
+		public int UpdatedById
+		{
+			get
+			{
+				return this._UpdatedById;
+			}
+			set
+			{
+				if ((this._UpdatedById != value))
+				{
+					if (this._MstUser1.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnUpdatedByIdChanging(value);
+					this.SendPropertyChanging();
+					this._UpdatedById = value;
+					this.SendPropertyChanged("UpdatedById");
+					this.OnUpdatedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UpdatedDateTime", DbType="DateTime NOT NULL")]
+		public System.DateTime UpdatedDateTime
+		{
+			get
+			{
+				return this._UpdatedDateTime;
+			}
+			set
+			{
+				if ((this._UpdatedDateTime != value))
+				{
+					this.OnUpdatedDateTimeChanging(value);
+					this.SendPropertyChanging();
+					this._UpdatedDateTime = value;
+					this.SendPropertyChanged("UpdatedDateTime");
+					this.OnUpdatedDateTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_MstStatus", Storage="_MstUser", ThisKey="CreatedById", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser
+		{
+			get
+			{
+				return this._MstUser.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser.Entity = null;
+						previousValue.MstStatus.Remove(this);
+					}
+					this._MstUser.Entity = value;
+					if ((value != null))
+					{
+						value.MstStatus.Add(this);
+						this._CreatedById = value.Id;
+					}
+					else
+					{
+						this._CreatedById = default(int);
+					}
+					this.SendPropertyChanged("MstUser");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_MstStatus1", Storage="_MstUser1", ThisKey="UpdatedById", OtherKey="Id", IsForeignKey=true)]
+		public MstUser MstUser1
+		{
+			get
+			{
+				return this._MstUser1.Entity;
+			}
+			set
+			{
+				MstUser previousValue = this._MstUser1.Entity;
+				if (((previousValue != value) 
+							|| (this._MstUser1.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._MstUser1.Entity = null;
+						previousValue.MstStatus1.Remove(this);
+					}
+					this._MstUser1.Entity = value;
+					if ((value != null))
+					{
+						value.MstStatus1.Add(this);
+						this._UpdatedById = value.Id;
+					}
+					else
+					{
+						this._UpdatedById = default(int);
+					}
+					this.SendPropertyChanged("MstUser1");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.MstTaxType")]
 	public partial class MstTaxType : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -14848,6 +15171,10 @@ namespace easyfis.Data
 		
 		private EntitySet<MstPayType> _MstPayTypes1;
 		
+		private EntitySet<MstStatus> _MstStatus;
+		
+		private EntitySet<MstStatus> _MstStatus1;
+		
 		private EntitySet<MstTaxType> _MstTaxTypes;
 		
 		private EntitySet<MstTaxType> _MstTaxTypes1;
@@ -15096,6 +15423,8 @@ namespace easyfis.Data
 			this._MstDiscounts1 = new EntitySet<MstDiscount>(new Action<MstDiscount>(this.attach_MstDiscounts1), new Action<MstDiscount>(this.detach_MstDiscounts1));
 			this._MstPayTypes = new EntitySet<MstPayType>(new Action<MstPayType>(this.attach_MstPayTypes), new Action<MstPayType>(this.detach_MstPayTypes));
 			this._MstPayTypes1 = new EntitySet<MstPayType>(new Action<MstPayType>(this.attach_MstPayTypes1), new Action<MstPayType>(this.detach_MstPayTypes1));
+			this._MstStatus = new EntitySet<MstStatus>(new Action<MstStatus>(this.attach_MstStatus), new Action<MstStatus>(this.detach_MstStatus));
+			this._MstStatus1 = new EntitySet<MstStatus>(new Action<MstStatus>(this.attach_MstStatus1), new Action<MstStatus>(this.detach_MstStatus1));
 			this._MstTaxTypes = new EntitySet<MstTaxType>(new Action<MstTaxType>(this.attach_MstTaxTypes), new Action<MstTaxType>(this.detach_MstTaxTypes));
 			this._MstTaxTypes1 = new EntitySet<MstTaxType>(new Action<MstTaxType>(this.attach_MstTaxTypes1), new Action<MstTaxType>(this.detach_MstTaxTypes1));
 			this._MstTerms = new EntitySet<MstTerm>(new Action<MstTerm>(this.attach_MstTerms), new Action<MstTerm>(this.detach_MstTerms));
@@ -15956,6 +16285,32 @@ namespace easyfis.Data
 			set
 			{
 				this._MstPayTypes1.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_MstStatus", Storage="_MstStatus", ThisKey="Id", OtherKey="CreatedById")]
+		public EntitySet<MstStatus> MstStatus
+		{
+			get
+			{
+				return this._MstStatus;
+			}
+			set
+			{
+				this._MstStatus.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="MstUser_MstStatus1", Storage="_MstStatus1", ThisKey="Id", OtherKey="UpdatedById")]
+		public EntitySet<MstStatus> MstStatus1
+		{
+			get
+			{
+				return this._MstStatus1;
+			}
+			set
+			{
+				this._MstStatus1.Assign(value);
 			}
 		}
 		
@@ -17503,6 +17858,30 @@ namespace easyfis.Data
 		}
 		
 		private void detach_MstPayTypes1(MstPayType entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser1 = null;
+		}
+		
+		private void attach_MstStatus(MstStatus entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = this;
+		}
+		
+		private void detach_MstStatus(MstStatus entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser = null;
+		}
+		
+		private void attach_MstStatus1(MstStatus entity)
+		{
+			this.SendPropertyChanging();
+			entity.MstUser1 = this;
+		}
+		
+		private void detach_MstStatus1(MstStatus entity)
 		{
 			this.SendPropertyChanging();
 			entity.MstUser1 = null;
@@ -19896,6 +20275,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -19942,6 +20323,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -20158,6 +20541,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -20786,6 +21189,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -20838,6 +21243,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -21080,6 +21487,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -22204,6 +22631,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -22276,6 +22705,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -22688,6 +23119,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -25519,6 +25970,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -25567,6 +26020,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -25784,6 +26239,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -26755,6 +27230,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -26821,6 +27298,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -27173,6 +27652,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -28162,6 +28661,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -28224,6 +28725,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -28555,6 +29058,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -29527,6 +30050,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -29607,6 +30132,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -30023,6 +30550,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -31474,6 +32021,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -31554,6 +32103,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -31951,6 +32502,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -33392,6 +33963,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -33436,6 +34009,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -33632,6 +34207,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -34264,6 +34859,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -34324,6 +34921,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -34612,6 +35211,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -35586,6 +36205,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -35644,6 +36265,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -35912,6 +36535,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -37016,6 +37659,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -37074,6 +37719,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -37342,6 +37989,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}
@@ -38393,6 +39060,8 @@ namespace easyfis.Data
 		
 		private int _ApprovedById;
 		
+		private string _Status;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -38467,6 +39136,8 @@ namespace easyfis.Data
     partial void OnCheckedByIdChanged();
     partial void OnApprovedByIdChanging(int value);
     partial void OnApprovedByIdChanged();
+    partial void OnStatusChanging(string value);
+    partial void OnStatusChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -38865,6 +39536,26 @@ namespace easyfis.Data
 					this._ApprovedById = value;
 					this.SendPropertyChanged("ApprovedById");
 					this.OnApprovedByIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Status", DbType="NVarChar(255)")]
+		public string Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
 				}
 			}
 		}

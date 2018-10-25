@@ -173,6 +173,24 @@ namespace easyfis.ModifiedApiControllers
             return users.ToList();
         }
 
+        // ==============================
+        // Dropdown List - Status (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/collection/dropdown/list/status")]
+        public List<Entities.MstStatus> DropdownListCollectionStatus()
+        {
+            var statuses = from d in db.MstStatus.OrderBy(d => d.Status)
+                           where d.IsLocked == true
+                           && d.Category.Equals("OR")
+                           select new Entities.MstStatus
+                           {
+                               Id = d.Id,
+                               Status = d.Status
+                           };
+
+            return statuses.ToList();
+        }
+
         // ===================
         // Fill Leading Zeroes
         // ===================

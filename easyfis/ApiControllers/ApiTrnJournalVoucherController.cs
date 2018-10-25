@@ -133,6 +133,24 @@ namespace easyfis.ModifiedApiControllers
             return users.ToList();
         }
 
+        // ==============================
+        // Dropdown List - Status (Field)
+        // ==============================
+        [Authorize, HttpGet, Route("api/journalVoucher/dropdown/list/status")]
+        public List<Entities.MstStatus> DropdownListJournalVoucherStatus()
+        {
+            var statuses = from d in db.MstStatus.OrderBy(d => d.Status)
+                           where d.IsLocked == true
+                           && d.Category.Equals("JV")
+                           select new Entities.MstStatus
+                           {
+                               Id = d.Id,
+                               Status = d.Status
+                           };
+
+            return statuses.ToList();
+        }
+
         // ===================
         // Fill Leading Zeroes
         // ===================
