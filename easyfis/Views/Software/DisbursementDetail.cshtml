@@ -130,6 +130,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredDisbursement" id="inpDisbursementDetailParticulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboDisbursementDetailStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -733,6 +739,7 @@
         var cboDisbursementDetailPreparedBy = new wijmo.input.ComboBox('#cboDisbursementDetailPreparedBy');
         var cboDisbursementDetailCheckedBy = new wijmo.input.ComboBox('#cboDisbursementDetailCheckedBy');
         var cboDisbursementDetailApprovedBy = new wijmo.input.ComboBox('#cboDisbursementDetailApprovedBy');
+        var cboDisbursementDetailStatus = new wijmo.input.ComboBox('#cboDisbursementDetailStatus');
         var isLocked = false;
 
         // ====================================================================
@@ -999,6 +1006,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboDisbursementDetailStatus();
+                }
+            });
+        }
+
+        // =======================================
+        // Create Disbursement Detail Combo Status
+        // =======================================
+        function createCboDisbursementDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/disbursement/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboDisbursementDetailStatus.dispose();
+                    cboDisbursementDetailStatus = new wijmo.input.ComboBox('#cboDisbursementDetailStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getDisbursementDetailData();
                 }
             });
@@ -1041,6 +1088,7 @@
                             cboDisbursementDetailPreparedBy.selectedValue = results.PreparedById;
                             cboDisbursementDetailCheckedBy.selectedValue = results.CheckedById;
                             cboDisbursementDetailApprovedBy.selectedValue = results.ApprovedById;
+                            cboDisbursementDetailStatus.selectedValue = results.Status;
                             document.getElementById('inpDisbursementDetailIsClear').checked = results.IsClear;
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -1061,6 +1109,7 @@
                                 cboDisbursementDetailPreparedBy.disabled = true;
                                 cboDisbursementDetailCheckedBy.disabled = true;
                                 cboDisbursementDetailApprovedBy.disabled = true;
+                                cboDisbursementDetailStatus.disabled = true;
                                 document.getElementById('inpDisbursementDetailIsClear').disabled = true;
 
                                 $("#btnDisbursementDetailLock").prop("disabled", true);
@@ -1106,6 +1155,7 @@
             disbursementObject.IsCrossCheck = document.getElementById('inpDisbursementDetailIsCrossCheck').checked;
             disbursementObject.CheckedById = cboDisbursementDetailCheckedBy.selectedValue;
             disbursementObject.ApprovedById = cboDisbursementDetailApprovedBy.selectedValue;
+            disbursementObject.Status = cboDisbursementDetailStatus.selectedValue;
             disbursementObject.IsClear = document.getElementById('inpDisbursementDetailIsClear').checked;
             var data = JSON.stringify(disbursementObject);
 

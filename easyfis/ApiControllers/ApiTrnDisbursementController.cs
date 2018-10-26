@@ -92,6 +92,7 @@ namespace easyfis.ModifiedApiControllers
                                    PreparedById = d.PreparedById,
                                    CheckedById = d.CheckedById,
                                    ApprovedById = d.ApprovedById,
+                                   Status = d.Status,
                                    IsClear = d.IsClear,
                                    IsLocked = d.IsLocked,
                                    CreatedBy = d.MstUser2.FullName,
@@ -501,6 +502,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockDisbursement.IsCrossCheck = objDisbursement.IsCrossCheck;
                                     lockDisbursement.CheckedById = objDisbursement.CheckedById;
                                     lockDisbursement.ApprovedById = objDisbursement.ApprovedById;
+                                    lockDisbursement.Status = objDisbursement.Status;
                                     lockDisbursement.IsClear = objDisbursement.IsClear;
                                     lockDisbursement.IsLocked = true;
                                     lockDisbursement.UpdatedById = currentUserId;
