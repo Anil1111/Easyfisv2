@@ -83,6 +83,7 @@ namespace easyfis.ModifiedApiControllers
                                      PreparedById = d.PreparedById,
                                      CheckedById = d.CheckedById,
                                      ApprovedById = d.ApprovedById,
+                                     Status = d.Status,
                                      IsLocked = d.IsLocked,
                                      CreatedBy = d.MstUser2.FullName,
                                      CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -420,6 +421,7 @@ namespace easyfis.ModifiedApiControllers
                                         lockJournalVoucher.Particulars = objJournalVoucher.Particulars;
                                         lockJournalVoucher.CheckedById = objJournalVoucher.CheckedById;
                                         lockJournalVoucher.ApprovedById = objJournalVoucher.ApprovedById;
+                                        lockJournalVoucher.Status = objJournalVoucher.Status;
                                         lockJournalVoucher.IsLocked = true;
                                         lockJournalVoucher.UpdatedById = currentUserId;
                                         lockJournalVoucher.UpdatedDateTime = DateTime.Now;
