@@ -90,6 +90,7 @@ namespace easyfis.ModifiedApiControllers
                                        PreparedById = d.PreparedById,
                                        CheckedById = d.CheckedById,
                                        ApprovedById = d.ApprovedById,
+                                       Status = d.Status,
                                        IsLocked = d.IsLocked,
                                        CreatedById = d.CreatedById,
                                        CreatedBy = d.MstUser2.FullName,
@@ -504,6 +505,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
                                     lockReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
                                     lockReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;
+                                    lockReceivingReceipt.Status = objReceivingReceipt.Status;
                                     lockReceivingReceipt.IsLocked = true;
                                     lockReceivingReceipt.UpdatedById = currentUserId;
                                     lockReceivingReceipt.UpdatedDateTime = DateTime.Now;

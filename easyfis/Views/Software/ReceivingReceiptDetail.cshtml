@@ -123,6 +123,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredRR" id="inpReceivingReceiptRemarks" placeholder="Remarks"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboReceivingReceiptStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -736,6 +742,7 @@
         var cboReceivingReceiptPreparedBy = new wijmo.input.ComboBox('#cboReceivingReceiptPreparedBy');
         var cboReceivingReceiptCheckedBy = new wijmo.input.ComboBox('#cboReceivingReceiptCheckedBy');
         var cboReceivingReceiptApprovedBy = new wijmo.input.ComboBox('#cboReceivingReceiptApprovedBy');
+        var cboReceivingReceiptStatus = new wijmo.input.ComboBox('#cboReceivingReceiptStatus');
         var isLocked = false;
 
         // ========================================================================
@@ -977,6 +984,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboReceivingReceiptDetailStatus();
+                }
+            });
+        }
+
+        // ============================================
+        // Create Receiving Receipt Detail Combo Status
+        // ============================================
+        function createCboReceivingReceiptDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/receivingReceipt/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboReceivingReceiptStatus.dispose();
+                    cboReceivingReceiptStatus = new wijmo.input.ComboBox('#cboReceivingReceiptStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getReceivingReceiptDetailData();
                 }
             });
@@ -1013,6 +1060,7 @@
                             cboReceivingReceiptPreparedBy.selectedValue = results.PreparedById;
                             cboReceivingReceiptCheckedBy.selectedValue = results.CheckedById;
                             cboReceivingReceiptApprovedBy.selectedValue = results.ApprovedById;
+                            cboReceivingReceiptStatus.selectedValue = results.Status;
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
                             document.getElementById('updatedBy').innerHTML = results.UpdatedBy;
@@ -1030,6 +1078,7 @@
                                 cboReceivingReceiptPreparedBy.disabled = true;
                                 cboReceivingReceiptCheckedBy.disabled = true;
                                 cboReceivingReceiptApprovedBy.disabled = true;
+                                cboReceivingReceiptStatus.disabled = true;
                                 isLocked = true;
 
                                 $("#btnReceivingReceiptLock").prop("disabled", true);
@@ -1073,6 +1122,7 @@
             receivingReceiptObject.PreparedById = cboReceivingReceiptPreparedBy.selectedValue;
             receivingReceiptObject.CheckedById = cboReceivingReceiptCheckedBy.selectedValue;
             receivingReceiptObject.ApprovedById = cboReceivingReceiptApprovedBy.selectedValue;
+            receivingReceiptObject.Status = cboReceivingReceiptStatus.selectedValue;
             var receivingReceiptData = JSON.stringify(receivingReceiptObject);
 
             var isValid = true;
