@@ -109,6 +109,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredSales" id="SI_SIRemarks" placeholder="Remarks"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboSIStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -620,6 +626,7 @@
         var cboSIBranch = new wijmo.input.ComboBox('#cboSIBranch');
         var cboSICustomer = new wijmo.input.ComboBox('#cboSICustomer');
         var cboSITerm = new wijmo.input.ComboBox('#cboSITerm');
+        var cboSIStatus = new wijmo.input.ComboBox('#cboSIStatus');
         var cboSISoldBy = new wijmo.input.ComboBox('#cboSISoldBy');
         var cboSIPreparedBy = new wijmo.input.ComboBox('#cboSIPreparedBy');
         var cboSICheckedBy = new wijmo.input.ComboBox('#cboSICheckedBy');
@@ -852,6 +859,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    getStatusForComboBox();
+                }
+            });
+        }
+
+        // ========================
+        // GET Status for Combo Box
+        // ========================
+        function getStatusForComboBox() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/salesInvoice/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboSIStatus.dispose();
+                    cboSIStatus = new wijmo.input.ComboBox('#cboSIStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getSalesById();
                 }
             });
@@ -886,6 +933,7 @@
                             cboSIPreparedBy.selectedValue = results.PreparedById;
                             cboSICheckedBy.selectedValue = results.CheckedById;
                             cboSIApprovedBy.selectedValue = results.ApprovedById;
+                            cboSIStatus.selectedValue = results.Status;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -903,6 +951,7 @@
                                 cboSIPreparedBy.disabled = true;
                                 cboSICheckedBy.disabled = true;
                                 cboSIApprovedBy.disabled = true;
+                                cboSIStatus.disabled = true;
 
                                 $("#btnLockSalesInvoice").prop("disabled", true);
                                 $("#btnAddSalesInvoiceItem").prop("disabled", true);
@@ -945,6 +994,7 @@
             salesObject.SoldById = cboSISoldBy.selectedValue;
             salesObject.CheckedById = cboSICheckedBy.selectedValue;
             salesObject.ApprovedById = cboSIApprovedBy.selectedValue;
+            salesObject.Status = cboSIStatus.selectedValue;
             var salesData = JSON.stringify(salesObject);
 
             var isValid = true;

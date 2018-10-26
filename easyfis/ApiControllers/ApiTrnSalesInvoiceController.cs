@@ -88,6 +88,7 @@ namespace easyfis.ModifiedApiControllers
                                    PreparedById = d.PreparedById,
                                    CheckedById = d.CheckedById,
                                    ApprovedById = d.ApprovedById,
+                                   Status = d.Status,
                                    IsLocked = d.IsLocked,
                                    CreatedBy = d.MstUser2.FullName,
                                    CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -439,6 +440,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockSalesInvoice.SoldById = objSalesInvoice.SoldById;
                                     lockSalesInvoice.CheckedById = objSalesInvoice.CheckedById;
                                     lockSalesInvoice.ApprovedById = objSalesInvoice.ApprovedById;
+                                    lockSalesInvoice.Status = objSalesInvoice.Status;
                                     lockSalesInvoice.IsLocked = true;
                                     lockSalesInvoice.UpdatedById = currentUserId;
                                     lockSalesInvoice.UpdatedDateTime = DateTime.Now;
