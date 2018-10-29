@@ -28,7 +28,7 @@ namespace easyfis.ApiControllers
         [Authorize, HttpGet, Route("api/status/list")]
         public List<Entities.MstStatus> ListStatus()
         {
-            var statuss = from d in db.MstStatus.OrderBy(d => d.Status)
+            var statuss = from d in db.MstStatus
                           select new Entities.MstStatus
                           {
                               Id = d.Id,
