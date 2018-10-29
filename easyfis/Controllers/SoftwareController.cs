@@ -39,6 +39,7 @@ namespace easyfis.Controllers
                                     CanDelete = d.CanDelete,
                                     CanLock = d.CanLock,
                                     CanUnlock = d.CanUnlock,
+                                    CanCancel = d.CanCancel,
                                     CanPrint = d.CanPrint
                                 };
 
@@ -51,6 +52,7 @@ namespace easyfis.Controllers
                         ViewData.Add("CanDelete", userForm.CanDelete);
                         ViewData.Add("CanLock", userForm.CanLock);
                         ViewData.Add("CanUnlock", userForm.CanUnlock);
+                        ViewData.Add("CanCancel", userForm.CanCancel);
                         ViewData.Add("CanPrint", userForm.CanPrint);
 
                         form = userForm.Form;
@@ -87,6 +89,7 @@ namespace easyfis.Controllers
                                     CanDelete = d.CanDelete,
                                     CanLock = d.CanLock,
                                     CanUnlock = d.CanUnlock,
+                                    CanCancel = d.CanCancel,
                                     CanPrint = d.CanPrint
                                 };
 
@@ -127,6 +130,7 @@ namespace easyfis.Controllers
                         CanDelete = userFormsRights.CanDelete,
                         CanLock = userFormsRights.CanLock,
                         CanUnlock = userFormsRights.CanUnlock,
+                        CanCancel = userFormsRights.CanCancel,
                         CanPrint = userFormsRights.CanPrint
                     };
 
