@@ -575,6 +575,52 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ======================
+        // Cancel Journal Voucher
+        // ======================
+        [Authorize, HttpPut, Route("api/journalVoucher/cancel/{id}")]
+        public HttpResponseMessage CancelJournalVoucher(String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("JournalVoucherDetail") select d;
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanCancel)
+                        {
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to cancel journal voucher.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this journal voucher page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ======================
         // Delete Journal Voucher
         // ======================
         [Authorize, HttpDelete, Route("api/journalVoucher/delete/{id}")]

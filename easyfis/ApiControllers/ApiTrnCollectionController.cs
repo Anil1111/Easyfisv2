@@ -570,6 +570,52 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =================
+        // Cancel Collection
+        // =================
+        [Authorize, HttpPut, Route("api/collection/cancel/{id}")]
+        public HttpResponseMessage CancelCollection(String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("CollectionDetail") select d;
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanCancel)
+                        {
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to cancel collection.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this collection page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =================
         // Delete Collection
         // =================
         [Authorize, HttpDelete, Route("api/collection/delete/{id}")]

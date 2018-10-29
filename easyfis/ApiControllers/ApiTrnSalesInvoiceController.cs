@@ -591,6 +591,52 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ====================
+        // Cancel Sales Invoice
+        // ====================
+        [Authorize, HttpPut, Route("api/salesInvoice/cancel/{id}")]
+        public HttpResponseMessage CancelSalesInvoice(String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var userForms = from d in db.MstUserForms where d.UserId == currentUserId && d.SysForm.FormName.Equals("SalesInvoiceDetail") select d;
+                    if (userForms.Any())
+                    {
+                        if (userForms.FirstOrDefault().CanCancel)
+                        {
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no rights to cancel sales invoice.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this sales invoice page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ====================
         // Delete Sales Invoice
         // ====================
         [Authorize, HttpDelete, Route("api/salesInvoice/delete/{id}")]
