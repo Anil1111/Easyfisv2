@@ -113,6 +113,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredStockIn" id="StockIn_Particulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboINStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -496,6 +502,7 @@
         var cboINPreparedBy = new wijmo.input.ComboBox('#cboINPreparedBy');
         var cboINCheckedBy = new wijmo.input.ComboBox('#cboINCheckedBy');
         var cboINApprovedBy = new wijmo.input.ComboBox('#cboINApprovedBy');
+        var cboINStatus = new wijmo.input.ComboBox('#cboINStatus');
         var INDate = new wijmo.input.InputDate('#INDate');
         var isAccountChanged = false;
         var isLocked = false;
@@ -742,6 +749,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboStockInDetailStatus();
+                }
+            });
+        }
+
+        // ===================================
+        // Create Stock In Detail Combo Status
+        // ===================================
+        function createCboStockInDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockIn/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboINStatus.dispose();
+                    cboINStatus = new wijmo.input.ComboBox('#cboINStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getStockInById();
                 }
             });
@@ -777,6 +824,7 @@
                             cboINPreparedBy.selectedValue = results.PreparedById;
                             cboINCheckedBy.selectedValue = results.CheckedById;
                             cboINApprovedBy.selectedValue = results.ApprovedById;
+                            cboINStatus.selectedValue = results.Status;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -795,6 +843,7 @@
                                 cboINPreparedBy.disabled = true;
                                 cboINCheckedBy.disabled = true;
                                 cboINApprovedBy.disabled = true;
+                                cboINStatus.disabled = true;
 
                                 $("#cmdStockInSaveLock").prop("disabled", true);
                                 $("#btnAddStockInItem").prop("disabled", true);
@@ -838,6 +887,7 @@
             stockInObject.PreparedById = cboINPreparedBy.selectedValue;
             stockInObject.CheckedById = cboINCheckedBy.selectedValue;
             stockInObject.ApprovedById = cboINApprovedBy.selectedValue;
+            stockInObject.Status = cboINStatus.selectedValue;
             var data = JSON.stringify(stockInObject);
 
             var isValid = true;
