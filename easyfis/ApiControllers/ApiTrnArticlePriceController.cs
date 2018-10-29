@@ -86,6 +86,7 @@ namespace easyfis.ModifiedApiControllers
                                    PreparedById = d.PreparedById,
                                    CheckedById = d.CheckedById,
                                    ApprovedById = d.ApprovedById,
+                                   Status = d.Status,
                                    IsLocked = d.IsLocked,
                                    CreatedById = d.CreatedById,
                                    CreatedBy = d.MstUser3.FullName,
@@ -308,6 +309,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockArticlePrice.Particulars = objArticlePrice.Particulars;
                                     lockArticlePrice.CheckedById = objArticlePrice.CheckedById;
                                     lockArticlePrice.ApprovedById = objArticlePrice.ApprovedById;
+                                    lockArticlePrice.Status = objArticlePrice.Status;
                                     lockArticlePrice.IsLocked = true;
                                     lockArticlePrice.UpdatedById = currentUserId;
                                     lockArticlePrice.UpdatedDateTime = DateTime.Now;

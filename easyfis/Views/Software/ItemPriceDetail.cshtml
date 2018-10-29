@@ -109,6 +109,12 @@
                                             <textarea rows="5" type="text" id="inpItemPriceParticulars" class="form-control textarea-custom requiredItemPrice" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboItemPriceStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -397,6 +403,7 @@
         var cboItemPricePreparedBy = new wijmo.input.ComboBox('#cboItemPricePreparedBy');
         var cboItemPriceCheckedBy = new wijmo.input.ComboBox('#cboItemPriceCheckedBy');
         var cboItemPriceApprovedBy = new wijmo.input.ComboBox('#cboItemPriceApprovedBy');
+        var cboItemPriceStatus = new wijmo.input.ComboBox('#cboItemPriceStatus');
         var isLocked = false;
 
         // ====================================================================
@@ -530,6 +537,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboItemPriceDetailStatus();
+                }
+            });
+        }
+
+        // =====================================
+        // Create Item Price Detail Combo Status
+        // =====================================
+        function createCboItemPriceDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/articlePrice/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboItemPriceStatus.dispose();
+                    cboItemPriceStatus = new wijmo.input.ComboBox('#cboItemPriceStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     createCboArticlePriceItemDataPriceDetailData();
                 }
             });
@@ -564,6 +611,7 @@
                             cboItemPricePreparedBy.selectedValue = results.PreparedById;
                             cboItemPriceCheckedBy.selectedValue = results.CheckedById;
                             cboItemPriceApprovedBy.selectedValue = results.ApprovedById;
+                            cboItemPriceStatus.selectedValue = results.Status;
 
                             if (results.IsLocked) {
                                 cboItemPriceIPDate.disabled = true;
@@ -572,6 +620,7 @@
                                 cboItemPricePreparedBy.disabled = true;
                                 cboItemPriceCheckedBy.disabled = true;
                                 cboItemPriceApprovedBy.disabled = true;
+                                cboItemPriceStatus.disabled = true;
 
                                 $("#btnItemPriceDetailLock").prop("disabled", true);
                                 $("#btnArticlePriceItemAdd").prop("disabled", true);
@@ -617,6 +666,7 @@
             itemPriceObject.ManualIPNumber = document.getElementById('inpItemPriceManualIPNumber').value;
             itemPriceObject.CheckedById = cboItemPriceCheckedBy.selectedValue;
             itemPriceObject.ApprovedById = cboItemPriceApprovedBy.selectedValue;
+            itemPriceObject.Status = cboItemPriceStatus.selectedValue;
             var data = JSON.stringify(itemPriceObject);
 
             var isValid = true;
