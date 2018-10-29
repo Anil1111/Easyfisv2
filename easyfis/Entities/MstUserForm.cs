@@ -18,6 +18,7 @@ namespace easyfis.Entities
         public Boolean CanDelete { get; set; }
         public Boolean CanLock { get; set; }
         public Boolean CanUnlock { get; set; }
+        public Boolean CanCancel { get; set; }
         public Boolean CanPrint { get; set; }
     }
 }

@@ -41,6 +41,7 @@ namespace easyfis.ModifiedApiControllers
                                 CanDelete = d.CanDelete,
                                 CanLock = d.CanLock,
                                 CanUnlock = d.CanUnlock,
+                                CanCancel = d.CanCancel,
                                 CanPrint = d.CanPrint
                             };
 
@@ -191,6 +192,7 @@ namespace easyfis.ModifiedApiControllers
                                             CanDelete = userForm.CanDelete,
                                             CanLock = userForm.CanLock,
                                             CanUnlock = userForm.CanUnlock,
+                                            CanCancel = userForm.CanCancel,
                                             CanPrint = userForm.CanPrint
                                         };
 
@@ -294,6 +296,7 @@ namespace easyfis.ModifiedApiControllers
                                         CanDelete = objUserForm.CanDelete,
                                         CanLock = objUserForm.CanLock,
                                         CanUnlock = objUserForm.CanUnlock,
+                                        CanCancel = objUserForm.CanCancel,
                                         CanPrint = objUserForm.CanPrint
                                     };
 
@@ -385,6 +388,7 @@ namespace easyfis.ModifiedApiControllers
                                         updateUserForm.CanDelete = objUserForm.CanDelete;
                                         updateUserForm.CanLock = objUserForm.CanLock;
                                         updateUserForm.CanUnlock = objUserForm.CanUnlock;
+                                        updateUserForm.CanCancel = objUserForm.CanCancel;
                                         updateUserForm.CanPrint = objUserForm.CanPrint;
                                         db.SubmitChanges();
 
