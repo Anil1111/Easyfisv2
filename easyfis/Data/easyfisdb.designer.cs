@@ -19050,6 +19050,8 @@ namespace easyfis.Data
 		
 		private bool _CanUnlock;
 		
+		private bool _CanCancel;
+		
 		private bool _CanPrint;
 		
 		private EntityRef<MstUser> _MstUser;
@@ -19076,6 +19078,8 @@ namespace easyfis.Data
     partial void OnCanLockChanged();
     partial void OnCanUnlockChanging(bool value);
     partial void OnCanUnlockChanged();
+    partial void OnCanCancelChanging(bool value);
+    partial void OnCanCancelChanged();
     partial void OnCanPrintChanging(bool value);
     partial void OnCanPrintChanged();
     #endregion
@@ -19251,6 +19255,26 @@ namespace easyfis.Data
 					this._CanUnlock = value;
 					this.SendPropertyChanged("CanUnlock");
 					this.OnCanUnlockChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CanCancel", DbType="Bit NOT NULL")]
+		public bool CanCancel
+		{
+			get
+			{
+				return this._CanCancel;
+			}
+			set
+			{
+				if ((this._CanCancel != value))
+				{
+					this.OnCanCancelChanging(value);
+					this.SendPropertyChanging();
+					this._CanCancel = value;
+					this.SendPropertyChanged("CanCancel");
+					this.OnCanCancelChanged();
 				}
 			}
 		}
@@ -19524,6 +19548,8 @@ namespace easyfis.Data
 		
 		private bool _CanUnlock;
 		
+		private bool _CanCancel;
+		
 		private bool _CanPrint;
 		
 		private EntityRef<MstUserRole> _MstUserRole;
@@ -19550,6 +19576,8 @@ namespace easyfis.Data
     partial void OnCanLockChanged();
     partial void OnCanUnlockChanging(bool value);
     partial void OnCanUnlockChanged();
+    partial void OnCanCancelChanging(bool value);
+    partial void OnCanCancelChanged();
     partial void OnCanPrintChanging(bool value);
     partial void OnCanPrintChanged();
     #endregion
@@ -19725,6 +19753,26 @@ namespace easyfis.Data
 					this._CanUnlock = value;
 					this.SendPropertyChanged("CanUnlock");
 					this.OnCanUnlockChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CanCancel", DbType="Bit NOT NULL")]
+		public bool CanCancel
+		{
+			get
+			{
+				return this._CanCancel;
+			}
+			set
+			{
+				if ((this._CanCancel != value))
+				{
+					this.OnCanCancelChanging(value);
+					this.SendPropertyChanging();
+					this._CanCancel = value;
+					this.SendPropertyChanged("CanCancel");
+					this.OnCanCancelChanged();
 				}
 			}
 		}
@@ -21191,6 +21239,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -21245,6 +21295,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -21507,6 +21559,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}
@@ -22633,6 +22705,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -22707,6 +22781,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -23139,6 +23215,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}
@@ -25972,6 +26068,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -26022,6 +26120,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -26259,6 +26359,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}
@@ -27232,6 +27352,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -27300,6 +27422,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -27672,6 +27796,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}
@@ -30052,6 +30196,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -30134,6 +30280,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -30570,6 +30718,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}
@@ -32023,6 +32191,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsCancelled;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -32105,6 +32275,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsCancelledChanging(bool value);
+    partial void OnIsCancelledChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -32522,6 +32694,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsCancelled", DbType="Bit NOT NULL")]
+		public bool IsCancelled
+		{
+			get
+			{
+				return this._IsCancelled;
+			}
+			set
+			{
+				if ((this._IsCancelled != value))
+				{
+					this.OnIsCancelledChanging(value);
+					this.SendPropertyChanging();
+					this._IsCancelled = value;
+					this.SendPropertyChanged("IsCancelled");
+					this.OnIsCancelledChanged();
 				}
 			}
 		}

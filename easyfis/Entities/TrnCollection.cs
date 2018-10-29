@@ -20,6 +20,7 @@ namespace easyfis.Entities
         public Int32 CheckedById { get; set; }
         public Int32 ApprovedById { get; set; }
         public String Status { get; set; }
+        public Boolean IsCancelled { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
         public String CreatedBy { get; set; }
