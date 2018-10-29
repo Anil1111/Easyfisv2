@@ -104,6 +104,12 @@
                                                 <textarea rows="5" class="form-control textarea-custom requiredStockTransfer" id="stockTransfer_Particulars" placeholder="Particulars"></textarea>
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-4">Status</label>
+                                            <div class="col-sm-8">
+                                                <div class="comboBox-wide" id="cboStockTransferStatus"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -486,6 +492,7 @@
         var cboStockTransferPreparedBy = new wijmo.input.ComboBox('#cboStockTransferPreparedBy');
         var cboStockTransferCheckedBy = new wijmo.input.ComboBox('#cboStockTransferCheckedBy');
         var cboStockTransferApprovedBy = new wijmo.input.ComboBox('#cboStockTransferApprovedBy');
+        var cboStockTransferStatus = new wijmo.input.ComboBox('#cboStockTransferStatus');
         var cboStockTransferSTDate = new wijmo.input.InputDate('#cboStockTransferSTDate');
         var isLocked = false;
         var stockTransferItemCollectionView;
@@ -698,6 +705,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboStockTransferDetailStatus();
+                }
+            });
+        }
+
+        // =========================================
+        // Create Stock Transfer Detail Combo Status
+        // =========================================
+        function createCboStockTransferDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockTransfer/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboStockTransferStatus.dispose();
+                    cboStockTransferStatus = new wijmo.input.ComboBox('#cboStockTransferStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getStockTransferById();
                 }
             });
@@ -730,6 +777,7 @@
                             cboStockTransferPreparedBy.selectedValue = results.PreparedById;
                             cboStockTransferCheckedBy.selectedValue = results.CheckedById;
                             cboStockTransferApprovedBy.selectedValue = results.ApprovedById;
+                            cboStockTransferStatus.selectedValue = results.Status;
 
                             if (results.IsLocked == true) {
                                 cboStockTransferSTDate.disabled = true;
@@ -739,6 +787,7 @@
                                 document.getElementById('stockTransfer_ManualSTNumber').disabled = true;
                                 cboStockTransferCheckedBy.disabled = true;
                                 cboStockTransferApprovedBy.disabled = true;
+                                cboStockTransferStatus.disabled = true;
 
                                 $("#cmdStockTransferSaveLock").prop("disabled", true);
                                 $('#btnAddStockTransferItem').prop('disabled', true);
@@ -1498,6 +1547,7 @@
             stockTransferObject.PreparedById = cboStockTransferPreparedBy.selectedValue;
             stockTransferObject.CheckedById = cboStockTransferCheckedBy.selectedValue;
             stockTransferObject.ApprovedById = cboStockTransferApprovedBy.selectedValue;
+            stockTransferObject.Status = cboStockTransferStatus.selectedValue;
             var stockTransferData = JSON.stringify(stockTransferObject);
 
             var isValid = true;
