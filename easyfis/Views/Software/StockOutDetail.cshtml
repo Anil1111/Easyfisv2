@@ -113,6 +113,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredStockOut" id="StockOut_Particulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboOUTStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -519,6 +525,7 @@
         var cboOUTPreparedBy = new wijmo.input.ComboBox('#cboOUTPreparedBy');
         var cboOUTCheckedBy = new wijmo.input.ComboBox('#cboOUTCheckedBy');
         var cboOUTApprovedBy = new wijmo.input.ComboBox('#cboOUTApprovedBy');
+        var cboOUTStatus = new wijmo.input.ComboBox('#cboOUTStatus');
         var cboOUTDate = new wijmo.input.InputDate('#cboOUTDate');
         var articleIdSelectedId = 0;
         var isLocked = false;
@@ -772,6 +779,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboStockOutDetailStatus();
+                }
+            });
+        }
+
+        // ====================================
+        // Create Stock Out Detail Combo Status
+        // ====================================
+        function createCboStockOutDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockOut/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboOUTStatus.dispose();
+                    cboOUTStatus = new wijmo.input.ComboBox('#cboOUTStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getStockOutById();
                 }
             });
@@ -806,6 +853,7 @@
                             cboOUTPreparedBy.selectedValue = results.PreparedById;
                             cboOUTCheckedBy.selectedValue = results.CheckedById;
                             cboOUTApprovedBy.selectedValue = results.ApprovedById;
+                            cboOUTStatus.selectedValue = results.Status;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -823,6 +871,7 @@
                                 cboOUTPreparedBy.disabled = true;
                                 cboOUTCheckedBy.disabled = true;
                                 cboOUTApprovedBy.disabled = true;
+                                cboOUTStatus.disabled = true;
 
                                 $("#cmdStockOutSaveLock").prop("disabled", true);
                                 $('#btnStockOutAddItem').prop("disabled", true);
@@ -863,6 +912,7 @@
             stockOutObject.PreparedById = cboOUTPreparedBy.selectedValue;
             stockOutObject.CheckedById = cboOUTCheckedBy.selectedValue;
             stockOutObject.ApprovedById = cboOUTApprovedBy.selectedValue;
+            stockOutObject.Status = cboOUTStatus.selectedValue;
             var data = JSON.stringify(stockOutObject);
 
             var isValid = true;
