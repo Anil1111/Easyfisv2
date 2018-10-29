@@ -79,6 +79,7 @@ namespace easyfis.ModifiedApiControllers
                                  PreparedById = d.PreparedById,
                                  CheckedById = d.CheckedById,
                                  ApprovedById = d.ApprovedById,
+                                 Status = d.Status,
                                  IsLocked = d.IsLocked,
                                  CreatedBy = d.MstUser2.FullName,
                                  CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -249,6 +250,7 @@ namespace easyfis.ModifiedApiControllers
                                             PreparedById = currentUserId,
                                             CheckedById = currentUserId,
                                             ApprovedById = currentUserId,
+                                            Status = stockCount.FirstOrDefault().Status,
                                             IsLocked = false,
                                             CreatedById = currentUserId,
                                             CreatedDateTime = DateTime.Now,
@@ -469,6 +471,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockStockCount.Particulars = objStockCount.Particulars;
                                     lockStockCount.CheckedById = objStockCount.CheckedById;
                                     lockStockCount.ApprovedById = objStockCount.ApprovedById;
+                                    lockStockCount.Status = objStockCount.Status;
                                     lockStockCount.IsLocked = true;
                                     lockStockCount.UpdatedById = currentUserId;
                                     lockStockCount.UpdatedDateTime = DateTime.Now;

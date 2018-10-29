@@ -91,6 +91,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredStockCount" id="txtAreaStockCountDetailParticulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboSCStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -332,6 +338,7 @@
         var cboSCPreparedBy = new wijmo.input.ComboBox('#cboSCPreparedBy');
         var cboSCCheckedBy = new wijmo.input.ComboBox('#cboSCCheckedBy');
         var cboSCApprovedBy = new wijmo.input.ComboBox('#cboSCApprovedBy');
+        var cboSCStatus = new wijmo.input.ComboBox('#cboSCStatus');
         var cboSCDate = new wijmo.input.InputDate('#cboSCDate');
         var cboSCItemCode = new wijmo.input.ComboBox('#cboSCItemCode');
         var cboSCItem = new wijmo.input.ComboBox('#cboSCItem');
@@ -452,6 +459,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboStockCountDetailStatus();
+                }
+            });
+        }
+
+        // ======================================
+        // Create Stock Count Detail Combo Status
+        // ======================================
+        function createCboStockCountDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockCount/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboSCStatus.dispose();
+                    cboSCStatus = new wijmo.input.ComboBox('#cboSCStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getStockCountById();
                 }
             });
@@ -481,6 +528,7 @@
                             cboSCPreparedBy.selectedValue = results.PreparedById;
                             cboSCCheckedBy.selectedValue = results.CheckedById;
                             cboSCApprovedBy.selectedValue = results.ApprovedById;
+                            cboSCStatus.selectedValue = results.Status;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -493,6 +541,7 @@
                                 cboSCPreparedBy.disabled = true;
                                 cboSCCheckedBy.disabled = true;
                                 cboSCApprovedBy.disabled = true;
+                                cboSCStatus.disabled = true;
 
                                 $("#btnIdStockCountDetailLock").prop("disabled", true);
                                 $("#btnIdStockCountItemAdd").prop("disabled", true);
@@ -529,6 +578,7 @@
             stockCountObject.PreparedById = cboSCPreparedBy.selectedValue;
             stockCountObject.CheckedById = cboSCCheckedBy.selectedValue;
             stockCountObject.ApprovedById = cboSCApprovedBy.selectedValue;
+            stockCountObject.Status = cboSCStatus.selectedValue;
             return JSON.stringify(stockCountObject);
         }
 
