@@ -238,6 +238,7 @@ namespace easyfis.ModifiedApiControllers
                                 CanDelete = d.CanDelete,
                                 CanLock = d.CanLock,
                                 CanUnlock = d.CanUnlock,
+                                CanCancel = d.CanCancel,
                                 CanPrint = d.CanPrint
                             };
 
