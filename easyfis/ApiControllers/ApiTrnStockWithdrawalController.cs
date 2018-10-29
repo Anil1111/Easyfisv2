@@ -95,6 +95,7 @@ namespace easyfis.ModifiedApiControllers
                                       PreparedById = d.PreparedById,
                                       CheckedById = d.CheckedById,
                                       ApprovedById = d.ApprovedById,
+                                      Status = d.Status,
                                       IsLocked = d.IsLocked,
                                       CreatedBy = d.MstUser2.FullName,
                                       CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -421,6 +422,7 @@ namespace easyfis.ModifiedApiControllers
                         lockStockWithdrawal.PreparedById = objStockWithdrawal.PreparedById;
                         lockStockWithdrawal.CheckedById = objStockWithdrawal.CheckedById;
                         lockStockWithdrawal.ApprovedById = objStockWithdrawal.ApprovedById;
+                        lockStockWithdrawal.Status = objStockWithdrawal.Status;
                         lockStockWithdrawal.IsLocked = true;
                         lockStockWithdrawal.UpdatedById = currentUserId;
                         lockStockWithdrawal.UpdatedDateTime = DateTime.Now;

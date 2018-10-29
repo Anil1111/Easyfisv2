@@ -129,6 +129,12 @@
                                             <textarea rows="5" class="form-control textarea-custom requiredStockWithdrawal" id="inpStockWithdrawalRemarks" placeholder="Remarks"></textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-4">Status</label>
+                                        <div class="col-sm-8">
+                                            <div class="comboBox-wide" id="cboStockWithdrawalStatus"></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -714,6 +720,7 @@
         var cboStockWithdrawalPreparedBy = new wijmo.input.ComboBox('#cboStockWithdrawalPreparedBy');
         var cboStockWithdrawalCheckedBy = new wijmo.input.ComboBox('#cboStockWithdrawalCheckedBy');
         var cboStockWithdrawalApprovedBy = new wijmo.input.ComboBox('#cboStockWithdrawalApprovedBy');
+        var cboStockWithdrawalStatus = new wijmo.input.ComboBox('#cboStockWithdrawalStatus');
         var isLocked = false;
 
         // =======================================================================
@@ -945,6 +952,46 @@
                         selectedValuePath: "Id"
                     });
 
+                    createCboStockWithdrawalDetailStatus();
+                }
+            });
+        }
+
+        // ===========================================
+        // Create Stock Withdrawal Detail Combo Status
+        // ===========================================
+        function createCboStockWithdrawalDetailStatus() {
+            var statusObservableArray = new wijmo.collections.ObservableArray();
+            $.ajax({
+                url: '/api/stockWithdrawal/dropdown/list/status',
+                cache: false,
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                data: {},
+                success: function (results) {
+                    var disabled = false;
+
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            statusObservableArray.push({
+                                Id: results[i]["Id"],
+                                Status: results[i]["Status"]
+                            });
+                        }
+                    } else {
+                        disabled = true;
+                    }
+
+                    cboStockWithdrawalStatus.dispose();
+                    cboStockWithdrawalStatus = new wijmo.input.ComboBox('#cboStockWithdrawalStatus', {
+                        disabled: disabled,
+                        isEditable: false,
+                        //placeholder: "Select Status",
+                        itemsSource: statusObservableArray,
+                        displayMemberPath: "Status",
+                        selectedValuePath: "Status"
+                    });
+
                     getStockWithdrawalData();
                 }
             });
@@ -987,6 +1034,7 @@
                             cboStockWithdrawalPreparedBy.selectedValue = results.PreparedById;
                             cboStockWithdrawalCheckedBy.selectedValue = results.CheckedById;
                             cboStockWithdrawalApprovedBy.selectedValue = results.ApprovedById;
+                            cboStockWithdrawalStatus.selectedValue = results.Status;
 
                             if (results.IsLocked == true) {
                                 cboStockWithdrawalSWDate.disabled = true;
@@ -1002,6 +1050,7 @@
                                 cboStockWithdrawalReceivedBy.disabled = true;
                                 cboStockWithdrawalCheckedBy.disabled = true;
                                 cboStockWithdrawalApprovedBy.disabled = true;
+                                cboStockWithdrawalStatus.disabled = true;
 
                                 $("#btnStockWithdrawalLock").prop("disabled", true);
                                 $('#btnStockWithdrawalItemAdd').prop('disabled', true);
@@ -1048,6 +1097,7 @@
             stockWithdrawalObject.PreparedById = cboStockWithdrawalPreparedBy.selectedValue;
             stockWithdrawalObject.CheckedById = cboStockWithdrawalCheckedBy.selectedValue;
             stockWithdrawalObject.ApprovedById = cboStockWithdrawalApprovedBy.selectedValue;
+            stockWithdrawalObject.Status = cboStockWithdrawalStatus.selectedValue;
             var stockWithdrawalData = JSON.stringify(stockWithdrawalObject);
 
             var isValid = true;
