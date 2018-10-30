@@ -566,8 +566,34 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var purchaseOrder = from d in db.TrnPurchaseOrders where d.Id == Convert.ToInt32(id) select d;
+                            if (purchaseOrder.Any())
+                            {
+                                if (purchaseOrder.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
+                                    unlockPurchaseOrder.IsCancelled = true;
+                                    unlockPurchaseOrder.UpdatedById = currentUserId;
+                                    unlockPurchaseOrder.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel purchase order detail if purchase order detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These purchase order details are not found in the server.");
+                            }
                         }
                         else
                         {

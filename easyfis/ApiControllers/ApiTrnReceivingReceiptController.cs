@@ -686,8 +686,51 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var receivingReceipt = from d in db.TrnReceivingReceipts where d.Id == Convert.ToInt32(id) select d;
+                            if (receivingReceipt.Any())
+                            {
+                                if (receivingReceipt.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockReceivingReceipt = receivingReceipt.FirstOrDefault();
+                                    unlockReceivingReceipt.IsCancelled = true;
+                                    unlockReceivingReceipt.UpdatedById = currentUserId;
+                                    unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    //// ============================
+                                    //// Update Purchase Order Status
+                                    //// ============================
+                                    //UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+
+                                    //// =====================
+                                    //// Inventory and Journal
+                                    //// =====================
+                                    //Business.Inventory inventory = new Business.Inventory();
+                                    //Business.Journal journal = new Business.Journal();
+
+                                    //if (!unlockReceivingReceipt.IsLocked)
+                                    //{
+                                    //    inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
+                                    //    journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
+                                    //}
+
+                                    String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel receiving receipt detail if receiving receipt detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These receiving receipt details are not found in the server.");
+                            }
                         }
                         else
                         {

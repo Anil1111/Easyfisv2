@@ -672,8 +672,45 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var disbursement = from d in db.TrnDisbursements where d.Id == Convert.ToInt32(id) select d;
+                            if (disbursement.Any())
+                            {
+                                if (disbursement.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockDisbursement = disbursement.FirstOrDefault();
+                                    unlockDisbursement.IsCancelled = true;
+                                    unlockDisbursement.UpdatedById = currentUserId;
+                                    unlockDisbursement.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    //// ============================
+                                    //// Journal and Accounts Payable
+                                    //// ============================
+                                    //Business.Journal journal = new Business.Journal();
+
+                                    //if (!unlockDisbursement.IsLocked)
+                                    //{
+                                    //    journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
+                                    //    UpdateAccountsPayable(Convert.ToInt32(id));
+                                    //}
+
+                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel disbursement detail if disbursement detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These disbursement details are not found in the server.");
+                            }
                         }
                         else
                         {

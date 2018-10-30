@@ -590,8 +590,45 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var collection = from d in db.TrnCollections where d.Id == Convert.ToInt32(id) select d;
+                            if (collection.Any())
+                            {
+                                if (collection.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockCollection = collection.FirstOrDefault();
+                                    unlockCollection.IsCancelled = true;
+                                    unlockCollection.UpdatedById = currentUserId;
+                                    unlockCollection.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    //// ===============================
+                                    //// Journal and Accounts Receivable
+                                    //// ===============================
+                                    //Business.Journal journal = new Business.Journal();
+
+                                    //if (!unlockCollection.IsLocked)
+                                    //{
+                                    //    journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
+                                    //    UpdateAccountsReceivable(Convert.ToInt32(id));
+                                    //}
+
+                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel collection detail if collection detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These collection details are not found in the server.");
+                            }
                         }
                         else
                         {

@@ -595,8 +595,45 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var journalVoucher = from d in db.TrnJournalVouchers where d.Id == Convert.ToInt32(id) select d;
+                            if (journalVoucher.Any())
+                            {
+                                if (journalVoucher.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockJournalVoucher = journalVoucher.FirstOrDefault();
+                                    unlockJournalVoucher.IsCancelled = true;
+                                    unlockJournalVoucher.UpdatedById = currentUserId;
+                                    unlockJournalVoucher.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    //// =======
+                                    //// Journal
+                                    //// =======
+                                    //Business.Journal journal = new Business.Journal();
+
+                                    //if (!unlockJournalVoucher.IsLocked)
+                                    //{
+                                    //    journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
+                                    //    UpdateBalances(Convert.ToInt32(id));
+                                    //}
+
+                                    String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel journal voucher detail if journal voucher detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These journal voucher details are not found in the server.");
+                            }
                         }
                         else
                         {

@@ -611,8 +611,46 @@ namespace easyfis.ModifiedApiControllers
                     {
                         if (userForms.FirstOrDefault().CanCancel)
                         {
+                            var salesInvoice = from d in db.TrnSalesInvoices where d.Id == Convert.ToInt32(id) select d;
+                            if (salesInvoice.Any())
+                            {
+                                if (salesInvoice.FirstOrDefault().IsLocked)
+                                {
+                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
 
-                            return Request.CreateResponse(HttpStatusCode.OK);
+                                    var unlockSalesInvoice = salesInvoice.FirstOrDefault();
+                                    unlockSalesInvoice.IsCancelled = true;
+                                    unlockSalesInvoice.UpdatedById = currentUserId;
+                                    unlockSalesInvoice.UpdatedDateTime = DateTime.Now;
+
+                                    db.SubmitChanges();
+
+                                    //// =====================
+                                    //// Inventory and Journal
+                                    //// =====================
+                                    //Business.Inventory inventory = new Business.Inventory();
+                                    //Business.Journal journal = new Business.Journal();
+
+                                    //if (!unlockSalesInvoice.IsLocked)
+                                    //{
+                                    //    inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
+                                    //    journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
+                                    //}
+
+                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel sales invoice detail if sales invoice detail is locked.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These sales invoice details are not found in the server.");
+                            }
                         }
                         else
                         {
