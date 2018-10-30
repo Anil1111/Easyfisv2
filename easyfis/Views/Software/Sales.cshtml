@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <title>Sales Invoice</title>
-
-    <!-- CSS StyleSheets-->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
+
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpSalesInvoiceFilterSearch" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,57 +58,81 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddSalesInvoice" onclick="btnAddSalesInvoiceInvoiceOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnAddSalesInvoice" onclick="btnSalesInvoiceAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseSalesInvoice" onclick="btnCloseSalesInvoiceInvoiceOnclick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnCloseSalesInvoice" onclick="btnSalesInvoiceCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 29%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div id="cboStartDateFilter"></div>
+                                        <div id="cboSalesInvoiceStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 29%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div id="cboEndDateFilter"></div>
+                                        <div id="cboSalesInvoiceEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 41%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="salesFlexGrid" class="grid" align="left"></div>
+                        <div id="salesInvoiceFlexGrid" class="grid" align="left"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="salesInvoiceNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesInvoiceMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesInvoiceMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnSalesInvoiceCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesInvoiceMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesInvoiceMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -134,24 +161,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Sales Delete Modal -->
-    <div class="modal fade" id="deleteSalesConfirm" role="dialog">
+    <!--
+        ====================================
+        Sales Invoice Confirm Delete (Modal)
+        ====================================
+    -->
+    <div class="modal fade" id="salesInvoiceConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this sales invoice?
+                    Delete Sales Invoice?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteSales" class="btn btn-danger" onclick="cmdSalesConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnSalesInvoiceConfirmDelete" class="btn btn-danger" onclick="btnSalesInvoiceConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnSalesInvoiceConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -159,59 +191,67 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var salesCollectionView;
-        var salesFlexGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
-        var cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter');
-        var cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter');
-        var isStartDateFirstSelect = true;
-        var isEndDateFirstSelect = true;
+        // ================================
+        // Sales Invoice Date Range Filters
+        // ================================
+        var cboSalesInvoiceStartDateFilter = new wijmo.input.InputDate('#cboSalesInvoiceStartDateFilter');
+        var cboSalesInvoiceEndDateFilter = new wijmo.input.InputDate('#cboSalesInvoiceEndDateFilter');
+        var isCboSalesInvoiceStartDateFilterSelected = true;
+        var isCboSalesInvoiceEndDateFilterSelected = true;
 
-        // ===========
-        // Date Filter
-        // ===========
-        function cboDateFilters() {
-            cboStartDateFilter.dispose();
-            cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter', {
+        // ===========================================
+        // Sales Invoice Collection View and Flex Grid
+        // ===========================================
+        var salesInvoiceCollectionView;
+        var salesInvoiceFlexGrid;
+
+        // ================================
+        // Sales Invoice Navigation Buttons
+        // ================================
+        var btnSalesInvoiceMoveToFirstPageGrid;
+        var btnSalesInvoiceMoveToPreviousPageGrid;
+        var btnSalesInvoiceMoveToNextPageGrid;
+        var btnSalesInvoiceMoveToLastPageGrid;
+        var btnSalesInvoiceCurrentPageGrid;
+
+        // ===============================
+        // Create Combo Date Range Filters
+        // ===============================
+        function createCboDateRangeFilters() {
+            cboSalesInvoiceStartDateFilter.dispose();
+            cboSalesInvoiceStartDateFilter = new wijmo.input.InputDate('#cboSalesInvoiceStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
-                        refreshSalesFlexGrid();
+                    if (!isCboSalesInvoiceStartDateFilterSelected) {
+                        refreshSalesInvoiceFlexGrid();
                     } else {
-                        isStartDateFirstSelect = false;
+                        isCboSalesInvoiceStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboEndDateFilter.dispose();
-            cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter', {
+            cboSalesInvoiceEndDateFilter.dispose();
+            cboSalesInvoiceEndDateFilter = new wijmo.input.InputDate('#cboSalesInvoiceEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isEndDateFirstSelect) {
-                        refreshSalesFlexGrid();
+                    if (!isCboSalesInvoiceEndDateFilterSelected) {
+                        refreshSalesInvoiceFlexGrid();
                     } else {
-                        isEndDateFirstSelect = false;
+                        isCboSalesInvoiceEndDateFilterSelected = false;
                     }
                 }
             });
         }
 
-        // ==========================
-        // GET Sales Filter By SIDate
-        // ==========================
-        function getSalesFilterBySIDate() {
+        // ======================
+        // Get Sales Invoice Data
+        // ======================
+        function getSalesInvoiceData() {
             NProgress.start();
-            var startDate = cboStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboSalesInvoiceStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboSalesInvoiceEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
             var salesObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
@@ -254,11 +294,237 @@
             return salesObservableArray;
         }
 
-        // ================
-        // Sales Add Button
-        // ================
-        function btnAddSalesInvoiceInvoiceOnclick() {
-            document.getElementById('btnAddSalesInvoice').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
+        // =============================
+        // Create Sales Invoice FlexGrid
+        // =============================
+        function createSalesInvoiceFlexGrid() {
+            createCboDateRangeFilters();
+            salesInvoiceCollectionView = new wijmo.collections.CollectionView(getSalesInvoiceData());
+            salesInvoiceCollectionView.canFilter = true;
+            salesInvoiceCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpSalesInvoiceFilterSearch').keyup(function () {
+                filterText = this.value.toLowerCase();
+                salesInvoiceCollectionView.refresh();
+            });
+
+            salesInvoiceCollectionView.filter = function (item) {
+                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualSINumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
+                    || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            salesInvoiceCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSalesInvoiceNavigationButtons();
+            });
+
+            salesInvoiceCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateSalesInvoiceDetailsFlexGridSelection();
+            });
+
+            salesInvoiceFlexGrid = new wijmo.grid.FlexGrid('#salesInvoiceFlexGrid');
+            salesInvoiceFlexGrid.initialize({
+                columns: [
+                    @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
+                    {
+                        "header": "SI Number",
+                        "binding": "SINumber",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "SI Date",
+                        "binding": "SIDate",
+                        "allowSorting": true,
+                        "width": 90
+                    },
+                    {
+                        "header": "Manual SI No.",
+                        "binding": "ManualSINumber",
+                        "allowSorting": true,
+                        "width": 120
+                    },
+                    {
+                        "header": "Customer",
+                        "binding": "Customer",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "Remarks",
+                        "binding": "Remarks",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "Doc. Reference",
+                        "binding": "DocumentReference",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Amount",
+                        "binding": "AmountDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "2*"
+                    },
+                    {
+                        "header": "L",
+                        "binding": "IsLocked",
+                        "allowSorting": true,
+                        "width": 50
+                    }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: salesInvoiceCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            salesInvoiceFlexGrid.trackChanges = true;
+
+            btnSalesInvoiceMoveToFirstPageGrid = document.getElementById('btnSalesInvoiceMoveToFirstPageGrid');
+            btnSalesInvoiceMoveToPreviousPageGrid = document.getElementById('btnSalesInvoiceMoveToPreviousPageGrid');
+            btnSalesInvoiceMoveToNextPageGrid = document.getElementById('btnSalesInvoiceMoveToNextPageGrid');
+            btnSalesInvoiceMoveToLastPageGrid = document.getElementById('btnSalesInvoiceMoveToLastPageGrid');
+            btnSalesInvoiceCurrentPageGrid = document.getElementById('btnSalesInvoiceCurrentPageGrid');
+
+            updateSalesInvoiceNavigationButtons();
+
+            btnSalesInvoiceMoveToFirstPageGrid.addEventListener('click', function () {
+                salesInvoiceCollectionView.moveToFirstPage();
+                updateSalesInvoiceNavigationButtons();
+            });
+
+            btnSalesInvoiceMoveToPreviousPageGrid.addEventListener('click', function () {
+                salesInvoiceCollectionView.moveToPreviousPage();
+                updateSalesInvoiceNavigationButtons();
+            });
+
+            btnSalesInvoiceMoveToNextPageGrid.addEventListener('click', function () {
+                salesInvoiceCollectionView.moveToNextPage();
+                updateSalesInvoiceNavigationButtons();
+            });
+
+            btnSalesInvoiceMoveToLastPageGrid.addEventListener('click', function () {
+                salesInvoiceCollectionView.moveToLastPage();
+                updateSalesInvoiceNavigationButtons();
+            });
+        }
+
+        // ================================================
+        // Update Sales Invoice Details Flex Grid Selection
+        // ================================================
+        function updateSalesInvoiceDetailsFlexGridSelection() {
+            var item = salesInvoiceCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // =======================================
+        // Update Sales Invoice Navigation Buttons
+        // =======================================
+        function updateSalesInvoiceNavigationButtons() {
+            if (salesInvoiceCollectionView.pageSize <= 0) {
+                document.getElementById('salesInvoiceNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('salesInvoiceNavigationPageGrid').style.display = 'block';
+            if (salesInvoiceCollectionView.pageIndex === 0) {
+                btnSalesInvoiceMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesInvoiceMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesInvoiceMoveToNextPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (salesInvoiceCollectionView.pageIndex === (salesInvoiceCollectionView.pageCount - 1)) {
+                btnSalesInvoiceMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesInvoiceMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnSalesInvoiceMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToNextPageGrid.removeAttribute('disabled');
+                btnSalesInvoiceMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnSalesInvoiceCurrentPageGrid.innerHTML = (salesInvoiceCollectionView.pageIndex + 1) + ' / ' + salesInvoiceCollectionView.pageCount;
+        }
+
+        // ==============================
+        // Refresh Sales Invoice FlexGrid
+        // ==============================
+        function refreshSalesInvoiceFlexGrid() {
+            salesInvoiceCollectionView = new wijmo.collections.CollectionView(getSalesInvoiceData());
+            salesInvoiceCollectionView.canFilter = true;
+            salesInvoiceCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpSalesInvoiceFilterSearch').keyup(function () {
+                filterText = this.value.toLowerCase();
+                salesInvoiceCollectionView.refresh();
+            });
+
+            salesInvoiceCollectionView.filter = function (item) {
+                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualSINumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
+                    || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            salesInvoiceCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSalesInvoiceNavigationButtons();
+            });
+
+            salesInvoiceCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateSalesInvoiceDetailsFlexGridSelection();
+            });
+
+            salesInvoiceFlexGrid.itemsSource = salesInvoiceCollectionView;
+            salesInvoiceFlexGrid.trackChanges = true;
+        }
+
+        // =================
+        // Add Sales Invoice
+        // =================
+        function btnSalesInvoiceAddOnclick() {
+            document.getElementById('btnAddSalesInvoice').innerHTML = "<i class='fa fa-plus'></i> Adding...";
             $('#btnAddSalesInvoice').prop('disabled', true);
             $('#btnCloseSalesInvoice').prop('disabled', true);
 
@@ -292,51 +558,46 @@
             });
         }
 
-        // =================
-        // Sales Edit Button
-        // =================
+        // ==================
+        // Edit Sales Invoice
+        // ==================
         function btnEditSalesInvoiceOnclick() {
-            salesCollectionView.editItem(salesCollectionView.currentItem);
-            var sale = salesCollectionView.currentEditItem;
+            salesInvoiceCollectionView.editItem(salesInvoiceCollectionView.currentItem);
+            var sale = salesInvoiceCollectionView.currentEditItem;
             var saleId = sale.Id;
             window.location = '/Software/SalesDetail?id=' + saleId;
         }
 
-        // ==================
-        // Sales Close Button
-        // ==================
-        function btnCloseSalesInvoiceInvoiceOnclick() {
-            window.location = '/Software';
-        }
-
-        // ===================
-        // Sales delete Button
-        // ===================
+        // ====================
+        // Delete Sales Invoice
+        // ====================
         function btnDeleteSalesInvoiceOnclick() {
-            salesCollectionView.editItem(salesCollectionView.currentItem);
-            var sale = salesCollectionView.currentEditItem;
+            salesInvoiceCollectionView.editItem(salesInvoiceCollectionView.currentItem);
+            var sale = salesInvoiceCollectionView.currentEditItem;
             if (sale.IsLocked) {
                 toastr.error("Delete is not allowed when the selected record is locked!");
             } else {
-                $('#deleteSalesConfirm').modal({
+                $('#salesInvoiceConfirmDeleteModal').modal({
                     show: true,
                     backdrop: 'static'
                 });
 
-                document.getElementById('cmdConfirmDeleteSales').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteSales").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                document.getElementById('btnSalesInvoiceConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $("#btnSalesInvoiceConfirmDelete").prop("disabled", false);
+                $("#btnSalesInvoiceConfirmDeleteCloseModal").prop("disabled", false);
             }
         }
 
-        // Sales Confirm Delete Button
-        function cmdSalesConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteSales').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteSales").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
+        // ============================
+        // Confirm Delete Sales Invoice
+        // ============================
+        function btnSalesInvoiceConfirmDeleteOnclick() {
+            document.getElementById('btnSalesInvoiceConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnSalesInvoiceConfirmDelete").prop("disabled", true);
+            $("#btnSalesInvoiceConfirmDeleteCloseModal").prop("disabled", true);
 
-            salesCollectionView.editItem(salesCollectionView.currentItem);
-            var id = salesCollectionView.currentEditItem.Id;
+            salesInvoiceCollectionView.editItem(salesInvoiceCollectionView.currentItem);
+            var id = salesInvoiceCollectionView.currentEditItem.Id;
 
             $.ajax({
                 url: '/api/salesInvoice/delete/' + id,
@@ -346,271 +607,57 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Delete Successful");
-                        $('#deleteSalesConfirm').modal('hide');
-                        refreshSalesFlexGrid();
+                        $('#salesInvoiceConfirmDeleteModal').modal('hide');
+                        refreshSalesInvoiceFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteSalesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteSales').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteSales").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#salesInvoiceConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSalesInvoiceConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnSalesInvoiceConfirmDelete").prop("disabled", false);
+                        $("#btnSalesInvoiceConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteSalesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteSales').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteSales").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#salesInvoiceConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSalesInvoiceConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnSalesInvoiceConfirmDelete").prop("disabled", false);
+                        $("#btnSalesInvoiceConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteSalesConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteSales').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteSales").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#salesInvoiceConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSalesInvoiceConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnSalesInvoiceConfirmDelete").prop("disabled", false);
+                        $("#btnSalesInvoiceConfirmDeleteCloseModal").prop("disabled", false);
                     }
                 }
             });
         }
 
         // ===================
-        // FlexGrid Selection
+        // Close Sales Invoice
         // ===================
-        function updateDetails() {
-            var item = salesCollectionView.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        function btnSalesInvoiceCloseOnclick() {
+            window.location = '/Software';
         }
 
-        // ============================
-        // Navigation Buttons for Sales
-        // ============================
-        function updateNavigateButtonsSales() {
-            if (salesCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (salesCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (salesCollectionView.pageIndex === (salesCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (salesCollectionView.pageIndex + 1) + ' / ' + salesCollectionView.pageCount;
-        }
-
-        // ======================
-        // Refresh Sales FlexGrid
-        // ======================
-        function refreshSalesFlexGrid() {
-            salesCollectionView = new wijmo.collections.CollectionView(getSalesFilterBySIDate());
-            salesCollectionView.canFilter = true;
-            salesCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                salesCollectionView.refresh();
-            });
-
-            salesCollectionView.filter = function (item) {
-                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualSINumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
-                    || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            salesCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsSales();
-            });
-
-            salesCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            // Flex Grid
-            salesFlexGrid.itemsSource = salesCollectionView;
-            salesFlexGrid.trackChanges = true;
-        }
-
-        // ==============
-        // Sales FlexGrid
-        // ==============
-        function createSalesFlexGrid() {
-            cboDateFilters();
-            salesCollectionView = new wijmo.collections.CollectionView(getSalesFilterBySIDate());
-            salesCollectionView.canFilter = true;
-            salesCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                salesCollectionView.refresh();
-            });
-
-            salesCollectionView.filter = function (item) {
-                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualSINumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Remarks.toLowerCase().indexOf(filterText) > -1)
-                    || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            salesCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsSales();
-            });
-
-            salesCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            // Flex Grid
-            salesFlexGrid = new wijmo.grid.FlexGrid('#salesFlexGrid');
-            salesFlexGrid.initialize({
-                columns: [
-                            @{
-                                if (canEdit)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Edit",
-                                            "binding": "EditId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                                if (canDelete)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Delete",
-                                            "binding": "DeleteId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                            }
-                            {
-                                "header": "SI Number",
-                                "binding": "SINumber",
-                                "allowSorting": true,
-                                "width": 100
-                            },
-                            {
-                                "header": "SI Date",
-                                "binding": "SIDate",
-                                "allowSorting": true,
-                                "width": 90
-                            },
-                            {
-                                "header": "Manual SI No.",
-                                "binding": "ManualSINumber",
-                                "allowSorting": true,
-                                "width": 120
-                            },
-                            {
-                                "header": "Customer",
-                                "binding": "Customer",
-                                "allowSorting": true,
-                                "width": "2.5*"
-                            },
-                            {
-                                "header": "Remarks",
-                                "binding": "Remarks",
-                                "allowSorting": true,
-                                "width": "2.5*"
-                            },
-                            {
-                                "header": "Doc. Reference",
-                                "binding": "DocumentReference",
-                                "allowSorting": true,
-                                "width": "2*"
-                            },
-                            {
-                                "header": "Amount",
-                                "binding": "AmountDisplay",
-                                "allowSorting": true,
-                                "align": "right",
-                                "width": "2*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
-                            }
-                ],
-                autoGenerateColumns: false,
-                itemsSource: salesCollectionView,
-                isReadOnly: true,
-                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
-                allowDragging: wijmo.grid.AllowDragging.None,
-                selectionMode: wijmo.grid.SelectionMode.Row
-            });
-
-            salesFlexGrid.trackChanges = true;
-
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-
-            updateNavigateButtonsSales();
-
-            btnFirstPageGrid.addEventListener('click', function () {
-                salesCollectionView.moveToFirstPage();
-                updateNavigateButtonsSales();
-            });
-
-            btnPreviousPageGrid.addEventListener('click', function () {
-                salesCollectionView.moveToPreviousPage();
-                updateNavigateButtonsSales();
-            });
-
-            btnNextPageGrid.addEventListener('click', function () {
-                salesCollectionView.moveToNextPage();
-                updateNavigateButtonsSales();
-            });
-
-            btnLastPageGrid.addEventListener('click', function () {
-                salesCollectionView.moveToLastPage();
-                updateNavigateButtonsSales();
-            });
-        }
-
-        // ===========
-        // Onload Page
-        // ===========
+        // ============
+        // On Load Page
+        // ============
         $(document).ready(function () {
-            createSalesFlexGrid();
+            createSalesInvoiceFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -628,12 +675,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -657,6 +704,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -696,6 +746,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

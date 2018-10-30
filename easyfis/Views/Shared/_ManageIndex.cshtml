@@ -4,169 +4,155 @@
 @if (Request.IsAuthenticated)
 {
     <section class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <ul class="nav nav-pills nav-stacked pill-custom" role="tablist" id="myTab">
-                    <li class="active"><a data-toggle="pill" href="#UserDetail" id="UserDetailPill">User Detail</a></li>
-                    <li class="manageDivider"></li>
-                    <li><a data-toggle="pill" href="#Company">Company</a></li>
-                    <li><a data-toggle="pill" href="#SalesInvoice">Sales Invoice</a></li>
-                    <li><a data-toggle="pill" href="#Collection">Collection</a></li>
-                    <li class="manageDivider"></li>
-                    <li><a data-toggle="pill" href="#System">System</a></li>
-                    <li class="manageDivider"></li>
-                    <li><a data-toggle="pill" href="#AuditTrail">Audit Trail</a></li>
-                    <li><a data-toggle="pill" href="#DeleteAllTransaction">Archive</a></li>
-                </ul>
-                <br />
-                <br /><br />
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-12" align="right">
+                        <button class="btn btn-primary" onclick="btnSaveCurrentUserOnclick()" id="btnSaveCurrentUser" disabled><i class="fa fa-lock"></i> Lock</button>
+                        <button class="btn btn-primary" onclick="btnEditCurrentUserOnclick()" id="btnEditCurrentUser" disabled><i class="fa fa-unlock"></i> Unlock</button>
+                        <button class="btn btn-primary" onclick="window.location.href = '/Manage/ChangePassword'"><i class="fa fa-edit"></i> Change Password</button>
+                        <button class="btn btn-danger" onclick="cmdLaunchSoftware_OnClick()"><i class="fa fa-close"></i> Close</button>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-9">
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Fullname</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="userDetail_Fullname" disabled />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Username</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="userDetail_Username" disabled />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" role="tablist" id="myTab">
+            <li role="presentation" class="active"><a data-toggle="tab" href="#UserForm" id="userForm">Forms</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#UserBranches" id="userBranches">Branches</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#Settings">Settings</a></li>
+            @*<li role="presentation"><a data-toggle="tab" href="#AuditTrail">Audit Trail</a></li>*@
+            <li role="presentation"><a data-toggle="tab" href="#DeleteAllTransaction">Archive</a></li>
+        </ul>
+
+        <br />
+
+        <div class="tab-content">
+            <div id="UserForm" class="tab-pane active">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
-                                <td style="width: 30%">
-                                    <button class="btn btn-primary" id="LaunchSoftware" onclick="cmdLaunchSoftware_OnClick()"><i class="fa fa-dashboard"></i> Main Menu</button>
+                                <td style="width: 49.5%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                        <input type="text" class="form-control " id="UserFormInputFilter" placeholder="Search...">
+                                    </div>
                                 </td>
-                                <td style="width: 70%" align="right">
-                                    <button class="btn btn-primary" onclick="btnSaveCurrentUserOnclick()" id="btnSaveCurrentUser" disabled><i class="fa fa-save"></i> Save</button>
-                                    <button class="btn btn-primary" onclick="btnEditCurrentUserOnclick()" id="btnEditCurrentUser" disabled><i class="fa fa-edit"></i> Edit</button>
-                                    <a href="/Manage/ChangePassword" class="btn btn-primary"><i class="fa fa-edit"></i> Change Password</a>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboUserFormShowNumberOfRows"></div>
+                                    </div>
                                 </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right"></td>
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div class="tab-content">
-                    <div id="UserDetail" class="tab-pane active">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                User Information
-                            </div>
-                            <div class="panel-body">
-                                <form class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Fullname</label>
-                                        <div class="col-sm-7">
-                                            <input type="text" class="form-control" id="userDetail_Fullname" disabled />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Username</label>
-                                        <div class="col-sm-7">
-                                            <input type="text" class="form-control" id="userDetail_Username" disabled />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <ul class="nav nav-tabs" role="tablist" id="myTab">
-                            <li role="presentation" class="active"><a data-toggle="tab" href="#UserForm" id="userForm">User Right Forms</a></li>
-                            <li role="presentation"><a data-toggle="tab" href="#UserBranches" id="userBranches">User Branches</a></li>
-                        </ul>
-                        <br />
-                        <div class="tab-content">
-                            <div id="UserForm" class="tab-pane active">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <table style="width: 100%" border="0">
-                                            <tr>
-                                                <td style="width: 49.5%">
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                        <input type="text" class="form-control " id="UserFormInputFilter" placeholder="Search...">
-                                                    </div>
-                                                </td>
-                                                <td style="width: 1%"></td>
-                                                <td style="width: 24%">
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                        <div class="comboBox-wide" id="cboUserFormShowNumberOfRows"></div>
-                                                    </div>
-                                                </td>
-                                                <td style="width: 1%"></td>
-                                                <td style="width: 24.5%" align="right"></td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div id="userDetailUserFormGrid" class="grid" align="left"></div>
-                                    </div>
-                                    <div class="panel-footer">
-                                        <div class="row">
-                                            <div class="btn-group col-md-7" id="naviagtionPageGridUserForm">
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridUserForm">
-                                                    <span class="glyphicon glyphicon-fast-backward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridUserForm">
-                                                    <span class="glyphicon glyphicon-step-backward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridUserForm"></button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridUserForm">
-                                                    <span class="glyphicon glyphicon-step-forward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridUserForm">
-                                                    <span class="glyphicon glyphicon-fast-forward"></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="UserBranches" class="tab-pane">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <table style="width: 100%" border="0">
-                                            <tr>
-                                                <td style="width: 49.5%">
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                        <input type="text" class="form-control " id="UserDefaultBranchesInputFilter" placeholder="Search...">
-                                                    </div>
-                                                </td>
-                                                <td style="width: 1%"></td>
-                                                <td style="width: 24%">
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                        <div class="comboBox-wide" id="cboUserDefaultBranchesShowNumberOfRows"></div>
-                                                    </div>
-                                                </td>
-                                                <td style="width: 1%"></td>
-                                                <td style="width: 24.5%" align="right"></td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div id="userDefaultBranchesFlexGrid" class="grid" align="left"></div>
-                                    </div>
-                                    <div class="panel-footer">
-                                        <div class="row">
-                                            <div class="btn-group col-md-7" id="naviagtionPageGridUserDefaultBranches">
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridUserDefaultBranches">
-                                                    <span class="glyphicon glyphicon-fast-backward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridUserDefaultBranches">
-                                                    <span class="glyphicon glyphicon-step-backward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridUserDefaultBranches"></button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridUserDefaultBranches">
-                                                    <span class="glyphicon glyphicon-step-forward"></span>
-                                                </button>
-                                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridUserDefaultBranches">
-                                                    <span class="glyphicon glyphicon-fast-forward"></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="panel-body">
+                        <div id="userDetailUserFormGrid" class="grid" align="left"></div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGridUserForm">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridUserForm">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridUserForm">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridUserForm"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridUserForm">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridUserForm">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div id="Company" class="tab-pane">
+                </div>
+            </div>
+
+            <div id="UserBranches" class="tab-pane">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <table style="width: 100%" border="0">
+                            <tr>
+                                <td style="width: 49.5%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                                        <input type="text" class="form-control " id="UserDefaultBranchesInputFilter" placeholder="Search...">
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24%">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
+                                        <div class="comboBox-wide" id="cboUserDefaultBranchesShowNumberOfRows"></div>
+                                    </div>
+                                </td>
+                                <td style="width: 1%"></td>
+                                <td style="width: 24.5%" align="right"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="panel-body">
+                        <div id="userDefaultBranchesFlexGrid" class="grid" align="left"></div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="btn-group col-md-7" id="naviagtionPageGridUserDefaultBranches">
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridUserDefaultBranches">
+                                    <span class="glyphicon glyphicon-fast-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridUserDefaultBranches">
+                                    <span class="glyphicon glyphicon-step-backward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridUserDefaultBranches"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridUserDefaultBranches">
+                                    <span class="glyphicon glyphicon-step-forward"></span>
+                                </button>
+                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridUserDefaultBranches">
+                                    <span class="glyphicon glyphicon-fast-forward"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="Settings" class="tab-pane">
+                <div class="row">
+                    <div class="col-md-6">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Company Settings and Defaults
+                                Company
                             </div>
                             <div class="panel-body">
                                 <form class="form-horizontal" role="form">
@@ -185,60 +171,6 @@
                                 </form>
                             </div>
                         </div>
-                    </div>
-                    <div id="SalesInvoice" class="tab-pane">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                Sales Invoice Settings and Defaults
-                            </div>
-                            <div class="panel-body">
-                                <form class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Sales Invoice Name</label>
-                                        <div class="col-sm-7">
-                                            <input type="text" class="form-control " id="defaultSalesInvoiceName" disabled />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Discount</label>
-                                        <div class="col-sm-7">
-                                            <div id="cboDiscounts"></div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Checked By</label>
-                                        <div class="col-sm-7">
-                                            <div id="cboSalesInvoiceCheckedBy"></div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Approved By</label>
-                                        <div class="col-sm-7">
-                                            <div id="cboSalesInvoiceApprovedBy"></div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="Collection" class="tab-pane">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                Collection Settings and Defaults
-                            </div>
-                            <div class="panel-body">
-                                <form class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-5">Official Receipt Name</label>
-                                        <div class="col-sm-7">
-                                            <input type="text" class="form-control " id="defaultOfficialReceiptName" disabled />
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="System" class="tab-pane">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 System Settings
@@ -279,15 +211,67 @@
                             </div>
                         </div>
                     </div>
-                    <div id="AuditTrail" class="tab-pane">
-
-                    </div>
-                    <div id="DeleteAllTransaction" class="tab-pane">
+                    <div class="col-md-6">
                         <div class="panel panel-default">
-                            <div class="panel-body" align="right">
-                                <button class="btn btn-danger" id="btnDeleteAllTransaction" onclick="btnDeleteAllTransactionOnclick()"><i class="fa fa-trash"></i> Delete All Transaction</button>
+                            <div class="panel-heading">
+                                Sales Invoice
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Sales Invoice Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " id="defaultSalesInvoiceName" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Discount</label>
+                                        <div class="col-sm-7">
+                                            <div id="cboDiscounts"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Checked By</label>
+                                        <div class="col-sm-7">
+                                            <div id="cboSalesInvoiceCheckedBy"></div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Approved By</label>
+                                        <div class="col-sm-7">
+                                            <div id="cboSalesInvoiceApprovedBy"></div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Collection
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" role="form">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-5">Official Receipt Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control " id="defaultOfficialReceiptName" disabled />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*<div id="AuditTrail" class="tab-pane">
+
+            </div>*@
+
+            <div id="DeleteAllTransaction" class="tab-pane">
+                <div class="panel panel-default">
+                    <div class="panel-body" align="right">
+                        <button class="btn btn-danger" id="btnDeleteAllTransaction" onclick="btnDeleteAllTransactionOnclick()"><i class="fa fa-trash"></i> Delete All Transaction</button>
                     </div>
                 </div>
             </div>
