@@ -1225,9 +1225,15 @@
                                 $("#cmdAdvances").prop("disabled", true);
 
                                 isLocked = true;
+
+                                if (results.IsCancelled) {
+                                    $("#btnCollectionDetailUnlock").prop("disabled", true);
+                                    $("#btnCollectionDetailCancel").prop("disabled", true);
+                                }
                             } else {
                                 $("#btnCollectionDetailJournal").prop("disabled", true);
                                 $("#btnCollectionDetailUnlock").prop("disabled", true);
+                                $("#btnCollectionDetailCancel").prop("disabled", true);
                                 $("#btnCollectionDetailPrint").prop("disabled", true);
                                 $("#cmdAR").prop("disabled", false);
                                 $("#cmdAdvances").prop("disabled", false);
@@ -1251,6 +1257,14 @@
         // Lock Collection
         // ===============
         function btnCollectionDetailLockOnclick() {
+            document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnCollectionDetailJournal").prop("disabled", true);
+            $("#btnCollectionDetailLock").prop("disabled", true);
+            $("#btnCollectionDetailUnlock").prop("disabled", true);
+            $("#btnCollectionDetailCancel").prop("disabled", true);
+            $("#btnCollectionDetailPrint").prop("disabled", true);
+            $("#btnCloseCollection").prop("disabled", true);
+
             var collectionObject = new Object();
             collectionObject.BranchId = cboCollectionDetailBranch.selectedValue;
             collectionObject.ORNumber = document.getElementById('inpCollectionDetailORNumber').value;
@@ -1278,13 +1292,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnCollectionDetailJournal").prop("disabled", true);
-                $("#btnCollectionDetailLock").prop("disabled", true);
-                $("#btnCollectionDetailUnlock").prop("disabled", true);
-                $("#btnCollectionDetailPrint").prop("disabled", true);
-                $("#btnCloseCollection").prop("disabled", true);
-
                 var id = getURLParameterValue("id");
 
                 $.ajax({
@@ -1334,6 +1341,7 @@
             $("#btnCollectionDetailJournal").prop("disabled", true);
             $("#btnCollectionDetailLock").prop("disabled", true);
             $("#btnCollectionDetailUnlock").prop("disabled", true);
+            $("#btnCollectionDetailCancel").prop("disabled", true);
             $("#btnCollectionDetailPrint").prop("disabled", true);
             $("#btnCloseCollection").prop("disabled", true);
 
@@ -1356,6 +1364,7 @@
                         document.getElementById('btnCollectionDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnCollectionDetailJournal").prop("disabled", false);
                         $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
                     },
@@ -1364,6 +1373,7 @@
                         document.getElementById('btnCollectionDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnCollectionDetailJournal").prop("disabled", false);
                         $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
                     },
@@ -1372,6 +1382,65 @@
                         document.getElementById('btnCollectionDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnCollectionDetailJournal").prop("disabled", false);
                         $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
+                        $("#btnCollectionDetailPrint").prop("disabled", false);
+                        $("#btnCloseCollection").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // =================
+        // Cancel Collection
+        // =================
+        function btnCollectionDetailCancelOnclick() {
+            var collectonId = getURLParameterValue("id");
+            document.getElementById('btnCollectionDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnCollectionDetailJournal").prop("disabled", true);
+            $("#btnCollectionDetailLock").prop("disabled", true);
+            $("#btnCollectionDetailUnlock").prop("disabled", true);
+            $("#btnCollectionDetailCancel").prop("disabled", true);
+            $("#btnCollectionDetailPrint").prop("disabled", true);
+            $("#btnCloseCollection").prop("disabled", true);
+
+            var id = getURLParameterValue("id");
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/collection/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Cancel Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCollectionDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionDetailJournal").prop("disabled", false);
+                        $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
+                        $("#btnCollectionDetailPrint").prop("disabled", false);
+                        $("#btnCloseCollection").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCollectionDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionDetailJournal").prop("disabled", false);
+                        $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
+                        $("#btnCollectionDetailPrint").prop("disabled", false);
+                        $("#btnCloseCollection").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCollectionDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionDetailJournal").prop("disabled", false);
+                        $("#btnCollectionDetailUnlock").prop("disabled", false);
+                        $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
                     }

@@ -1084,14 +1084,21 @@
                                 cboReceivingReceiptCheckedBy.disabled = true;
                                 cboReceivingReceiptApprovedBy.disabled = true;
                                 cboReceivingReceiptStatus.disabled = true;
+
                                 isLocked = true;
 
                                 $("#btnReceivingReceiptLock").prop("disabled", true);
                                 $("#btnReceivingReceiptPO").prop("disabled", true);
                                 $("#btnReceivingReceiptItemAdd").prop("disabled", true);
+
+                                if (results.IsCancelled) {
+                                    $("#btnReceivingReceiptUnlock").prop("disabled", true);
+                                    $("#btnReceivingReceiptCancel").prop("disabled", true);
+                                }
                             } else {
                                 $("#btnReceivingReceiptJournal").prop("disabled", true);
                                 $("#btnReceivingReceiptUnlock").prop("disabled", true);
+                                $("#btnReceivingReceiptCancel").prop("disabled", true);
                                 $("#btnReceivingReceiptPrint").prop("disabled", true);
                             }
 
@@ -1114,6 +1121,14 @@
         // Lock Receiving Receipt
         // ======================
         function btnReceivingReceiptLockOnclick() {
+            document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnReceivingReceiptJournal").prop("disabled", true);
+            $("#btnReceivingReceiptLock").prop("disabled", true);
+            $("#btnReceivingReceiptUnlock").prop("disabled", true);
+            $("#btnReceivingReceiptCancel").prop("disabled", true);
+            $("#btnReceivingReceiptPrint").prop("disabled", true);
+            $("#btnReceivingReceiptClose").prop("disabled", true);
+
             var receivingReceiptObject = new Object();
             receivingReceiptObject.BranchId = cboReceivingReceiptBranch.selectedValue;
             receivingReceiptObject.RRDate = cboReceivingReceiptRRDate.value.toLocaleDateString();
@@ -1146,13 +1161,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnReceivingReceiptJournal").prop("disabled", true);
-                $("#btnReceivingReceiptLock").prop("disabled", true);
-                $("#btnReceivingReceiptUnlock").prop("disabled", true);
-                $("#btnReceivingReceiptPrint").prop("disabled", true);
-                $("#btnReceivingReceiptClose").prop("disabled", true);
-
                 var id = getURLParameterValue('id');
 
                 $.ajax({
@@ -1201,6 +1209,7 @@
             $("#btnReceivingReceiptJournal").prop("disabled", true);
             $("#btnReceivingReceiptLock").prop("disabled", true);
             $("#btnReceivingReceiptUnlock").prop("disabled", true);
+            $("#btnReceivingReceiptCancel").prop("disabled", true);
             $("#btnReceivingReceiptPrint").prop("disabled", true);
             $("#btnReceivingReceiptClose").prop("disabled", true);
 
@@ -1223,6 +1232,7 @@
                         document.getElementById('btnReceivingReceiptUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnReceivingReceiptJournal").prop("disabled", false);
                         $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
                     },
@@ -1231,6 +1241,7 @@
                         document.getElementById('btnReceivingReceiptUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnReceivingReceiptJournal").prop("disabled", false);
                         $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
                     },
@@ -1239,6 +1250,64 @@
                         document.getElementById('btnReceivingReceiptUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnReceivingReceiptJournal").prop("disabled", false);
                         $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
+                        $("#btnReceivingReceiptPrint").prop("disabled", false);
+                        $("#btnReceivingReceiptClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ========================
+        // Cancel Receiving Receipt
+        // ========================
+        function btnReceivingReceiptCancelOnclick() {
+            document.getElementById('btnReceivingReceiptCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnReceivingReceiptJournal").prop("disabled", true);
+            $("#btnReceivingReceiptLock").prop("disabled", true);
+            $("#btnReceivingReceiptUnlock").prop("disabled", true);
+            $("#btnReceivingReceiptCancel").prop("disabled", true);
+            $("#btnReceivingReceiptPrint").prop("disabled", true);
+            $("#btnReceivingReceiptClose").prop("disabled", true);
+
+            var id = getURLParameterValue('id');
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/receivingReceipt/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Cancel Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnReceivingReceiptCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptJournal").prop("disabled", false);
+                        $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
+                        $("#btnReceivingReceiptPrint").prop("disabled", false);
+                        $("#btnReceivingReceiptClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnReceivingReceiptCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptJournal").prop("disabled", false);
+                        $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
+                        $("#btnReceivingReceiptPrint").prop("disabled", false);
+                        $("#btnReceivingReceiptClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnReceivingReceiptCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptJournal").prop("disabled", false);
+                        $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                        $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
                     }

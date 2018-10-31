@@ -48,7 +48,6 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-12" align="right">
-                                @*<button class="btn btn-primary" id="btnEmailPO" onclick="btnPurchaseOrderEmailOnclick()"><i class="fa fa-envelope"></i> Email</button>*@
                                 @{
                                     if (canLock)
                                     {
@@ -1130,16 +1129,22 @@
                                 cboPurchaseOrderStatus.disabled = true;
                                 document.getElementById('inpPurchaseOrderIsClose').disabled = true;
 
-                                $("#btnPurchaseOrderConsignment").prop("disabled", true);
+                                isLocked = true;
+
                                 $("#btnPurchaseOrderLock").prop("disabled", true);
+                                $("#btnPurchaseOrderConsignment").prop("disabled", true);
+                                $("#btnpurchaseRequestModal").prop("disabled", true);
                                 $("#btnPurchaseOrderItemAdd").prop("disabled", true);
                                 $("#btnPurchaseOrderItemItemQuery").prop("disabled", true);
-                                $("#btnpurchaseRequestModal").prop("disabled", true);
 
-                                isLocked = true;
+                                if (results.IsCancelled) {
+                                    $("#btnPurchaseOrderUnlock").prop("disabled", true);
+                                    $("#btnPurchaseOrderCancel").prop("disabled", true);
+                                }
                             } else {
                                 $("#btnEmailPO").prop("disabled", true);
                                 $("#btnPurchaseOrderUnlock").prop("disabled", true);
+                                $("#btnPurchaseOrderCancel").prop("disabled", true);
                                 $("#btnPurchaseOrderPrint").prop("disabled", true);
                             }
 
@@ -1192,6 +1197,13 @@
         // Lock Purchase Order
         // ===================
         function btnPurchaseOrderLockOnclick() {
+            document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnPurchaseOrderLock").prop("disabled", true);
+            $("#btnPurchaseOrderUnlock").prop("disabled", true);
+            $("#btnPurchaseOrderCancel").prop("disabled", true);
+            $("#btnPurchaseOrderPrint").prop("disabled", true);
+            $("#btnPurchaseOrderClose").prop("disabled", true);
+
             var purchaseOrderObject = new Object();
             purchaseOrderObject.PODate = cboPurchaseOrderPODate.value.toLocaleDateString();
             purchaseOrderObject.SupplierId = cboPurchaseOrderSupplier.selectedValue;
@@ -1223,12 +1235,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnPurchaseOrderLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnPurchaseOrderLock").prop("disabled", true);
-                $("#btnPurchaseOrderUnlock").prop("disabled", true);
-                $("#btnPurchaseOrderPrint").prop("disabled", true);
-                $("#btnPurchaseOrderClose").prop("disabled", true);
-
                 var id = getURLParameterValue('id');
 
                 $.ajax({
@@ -1276,6 +1282,7 @@
             document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
             $("#btnPurchaseOrderLock").prop("disabled", true);
             $("#btnPurchaseOrderUnlock").prop("disabled", true);
+            $("#btnPurchaseOrderCancel").prop("disabled", true);
             $("#btnPurchaseOrderPrint").prop("disabled", true);
             $("#btnPurchaseOrderClose").prop("disabled", true);
 
@@ -1297,6 +1304,7 @@
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
                         $("#btnPurchaseOrderPrint").prop("disabled", false);
                         $("#btnPurchaseOrderClose").prop("disabled", false);
                     },
@@ -1304,6 +1312,7 @@
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                         document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
                         $("#btnPurchaseOrderPrint").prop("disabled", false);
                         $("#btnPurchaseOrderClose").prop("disabled", false);
                     },
@@ -1311,6 +1320,60 @@
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnPurchaseOrderUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // =====================
+        // Cancel Purchase Order
+        // =====================
+        function btnPurchaseOrderCancelOnclick() {
+            document.getElementById('btnPurchaseOrderCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnPurchaseOrderLock").prop("disabled", true);
+            $("#btnPurchaseOrderUnlock").prop("disabled", true);
+            $("#btnPurchaseOrderCancel").prop("disabled", true);
+            $("#btnPurchaseOrderPrint").prop("disabled", true);
+            $("#btnPurchaseOrderClose").prop("disabled", true);
+
+            var id = getURLParameterValue('id');
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/purchaseOrder/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Cancel Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnPurchaseOrderCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnPurchaseOrderCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
+                        $("#btnPurchaseOrderPrint").prop("disabled", false);
+                        $("#btnPurchaseOrderClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnPurchaseOrderCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnPurchaseOrderUnlock").prop("disabled", false);
+                        $("#btnPurchaseOrderCancel").prop("disabled", false);
                         $("#btnPurchaseOrderPrint").prop("disabled", false);
                         $("#btnPurchaseOrderClose").prop("disabled", false);
                     }

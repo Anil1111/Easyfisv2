@@ -688,10 +688,16 @@
                                 $("#btnJournalVoucherLineAdd").prop("disabled", true);
 
                                 isLocked = true;
+
+                                if (results.IsCancelled) {
+                                    $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
+                                    $("#btnJournalVoucherDetailCancel").prop("disabled", true);
+                                }
                             } else  {
                                 $("#btnJournalVoucherDetailJournal").prop("disabled", true);
-                                $("#btnJournalVoucherDetailPrint").prop("disabled", true);
                                 $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
+                                $("#btnJournalVoucherDetailCancel").prop("disabled", true);
+                                $("#btnJournalVoucherDetailPrint").prop("disabled", true);
                             }
 
                             createCboDisplayNumberOfRows();
@@ -709,6 +715,14 @@
         // Lock Journal Voucher
         // ====================
         function btnJournalVoucherDetailLockOnclick() {
+            document.getElementById('btnJournalVoucherDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnJournalVoucherDetailJournal").prop("disabled", true);
+            $("#btnJournalVoucherDetailLock").prop("disabled", true);
+            $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
+            $("#btnJournalVoucherDetailCancel").prop("disabled", true);
+            $("#btnJournalVoucherDetailPrint").prop("disabled", true);
+            $("#btnJournalVoucherDetailClose").prop("disabled", true);
+
             var journalVoucherObject = new Object();
             var id = getURLParameterValue("id");
             journalVoucherObject.JVDate = cboJournalVoucherDetailJVDate.value.toLocaleDateString();
@@ -734,13 +748,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnJournalVoucherDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnJournalVoucherDetailJournal").prop("disabled", true);
-                $("#btnJournalVoucherDetailLock").prop("disabled", true);
-                $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
-                $("#btnJournalVoucherDetailPrint").prop("disabled", true);
-                $("#btnJournalVoucherDetailClose").prop("disabled", true);
-
                 var id = getURLParameterValue('id');
 
                 $.ajax({
@@ -789,6 +796,7 @@
             $("#btnJournalVoucherDetailJournal").prop("disabled", true);
             $("#btnJournalVoucherDetailLock").prop("disabled", true);
             $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
+            $("#btnJournalVoucherDetailCancel").prop("disabled", true);
             $("#btnJournalVoucherDetailPrint").prop("disabled", true);
             $("#btnJournalVoucherDetailClose").prop("disabled", true);
 
@@ -811,6 +819,7 @@
                         document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalVoucherDetailJournal").prop("disabled", false);
                         $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
                     },
@@ -819,6 +828,7 @@
                         document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalVoucherDetailJournal").prop("disabled", false);
                         $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
                     },
@@ -827,6 +837,64 @@
                         document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalVoucherDetailJournal").prop("disabled", false);
                         $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
+                        $("#btnJournalVoucherDetailPrint").prop("disabled", false);
+                        $("#btnJournalVoucherDetailClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ======================
+        // Cancel Journal Voucher
+        // ======================
+        function btnJournalVoucherDetailCancelOnclick() {
+            document.getElementById('btnJournalVoucherDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnJournalVoucherDetailJournal").prop("disabled", true);
+            $("#btnJournalVoucherDetailLock").prop("disabled", true);
+            $("#btnJournalVoucherDetailUnlock").prop("disabled", true);
+            $("#btnJournalVoucherDetailCancel").prop("disabled", true);
+            $("#btnJournalVoucherDetailPrint").prop("disabled", true);
+            $("#btnJournalVoucherDetailClose").prop("disabled", true);
+
+            var id = getURLParameterValue('id');
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/journalVoucher/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Cancel Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherDetailJournal").prop("disabled", false);
+                        $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
+                        $("#btnJournalVoucherDetailPrint").prop("disabled", false);
+                        $("#btnJournalVoucherDetailClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherDetailJournal").prop("disabled", false);
+                        $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
+                        $("#btnJournalVoucherDetailPrint").prop("disabled", false);
+                        $("#btnJournalVoucherDetailClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnJournalVoucherDetailUnlock').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherDetailJournal").prop("disabled", false);
+                        $("#btnJournalVoucherDetailUnlock").prop("disabled", false);
+                        $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
                     }

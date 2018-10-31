@@ -510,36 +510,43 @@ namespace easyfis.ModifiedApiControllers
 
                             if (collection.Any())
                             {
-                                if (collection.FirstOrDefault().IsLocked)
+                                if (!collection.FirstOrDefault().IsCancelled)
                                 {
-                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
-
-                                    var unlockCollection = collection.FirstOrDefault();
-                                    unlockCollection.IsLocked = false;
-                                    unlockCollection.UpdatedById = currentUserId;
-                                    unlockCollection.UpdatedDateTime = DateTime.Now;
-
-                                    db.SubmitChanges();
-
-                                    // ===============================
-                                    // Journal and Accounts Receivable
-                                    // ===============================
-                                    Business.Journal journal = new Business.Journal();
-
-                                    if (!unlockCollection.IsLocked)
+                                    if (collection.FirstOrDefault().IsLocked)
                                     {
-                                        journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
-                                        UpdateAccountsReceivable(Convert.ToInt32(id));
+                                        String oldObject = at.GetObjectString(collection.FirstOrDefault());
+
+                                        var unlockCollection = collection.FirstOrDefault();
+                                        unlockCollection.IsLocked = false;
+                                        unlockCollection.UpdatedById = currentUserId;
+                                        unlockCollection.UpdatedDateTime = DateTime.Now;
+
+                                        db.SubmitChanges();
+
+                                        // ===============================
+                                        // Journal and Accounts Receivable
+                                        // ===============================
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (!unlockCollection.IsLocked)
+                                        {
+                                            journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
+                                            UpdateAccountsReceivable(Convert.ToInt32(id));
+                                        }
+
+                                        String newObject = at.GetObjectString(collection.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
-
-                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These collection details are already unlocked.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These collection details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These collection details are already cancelled.");
                                 }
                             }
                             else

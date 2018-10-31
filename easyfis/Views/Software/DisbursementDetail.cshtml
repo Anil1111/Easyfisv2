@@ -1123,9 +1123,15 @@
                                 $("#btnDisbursementLineAdd").prop("disabled", true);
 
                                 isLocked = true;
+
+                                if (results.IsCancelled) {
+                                    $("#btnDisbursementDetailUnlock").prop("disabled", true);
+                                    $("#btnDisbursementDetailCancel").prop("disabled", true);
+                                }
                             } else {
                                 $("#btnDisbursementDetailJournal").prop("disabled", true);
                                 $("#btnDisbursementDetailUnlock").prop("disabled", true);
+                                $("#btnDisbursementDetailCancel").prop("disabled", true);
                                 $("#btnDisbursementDetailPrint").prop("disabled", true);
                             }
 
@@ -1147,6 +1153,14 @@
         // Lock Disbursement
         // =================
         function btnDisbursementDetailLockOnclick() {
+            document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnDisbursementDetailJournal").prop("disabled", true);
+            $("#btnDisbursementDetailLock").prop("disabled", true);
+            $("#btnDisbursementDetailUnlock").prop("disabled", true);
+            $("#btnDisbursementDetailCancel").prop("disabled", true);
+            $("#btnDisbursementDetailPrint").prop("disabled", true);
+            $("#btnDisbursementDetailClose").prop("disabled", true);
+
             var disbursementObject = new Object();
             disbursementObject.CVDate = cboDisbursementDetailCVDate.value.toLocaleDateString();
             disbursementObject.SupplierId = cboDisbursementDetailSupplier.selectedValue;
@@ -1179,13 +1193,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnDisbursementDetailJournal").prop("disabled", true);
-                $("#btnDisbursementDetailLock").prop("disabled", true);
-                $("#btnDisbursementDetailUnlock").prop("disabled", true);
-                $("#btnDisbursementDetailPrint").prop("disabled", true);
-                $("#btnDisbursementDetailClose").prop("disabled", true);
-
                 var id = getURLParameterValue('id');
 
                 $.ajax({
@@ -1234,6 +1241,7 @@
             $("#btnDisbursementDetailJournal").prop("disabled", true);
             $("#btnDisbursementDetailLock").prop("disabled", true);
             $("#btnDisbursementDetailUnlock").prop("disabled", true);
+            $("#btnDisbursementDetailCancel").prop("disabled", true);
             $("#btnDisbursementDetailPrint").prop("disabled", true);
             $("#btnDisbursementDetailClose").prop("disabled", true);
 
@@ -1256,6 +1264,7 @@
                         document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnDisbursementDetailJournal").prop("disabled", false);
                         $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
                         $("#btnDisbursementDetailPrint").prop("disabled", false);
                         $("#btnDisbursementDetailClose").prop("disabled", false);
                     },
@@ -1264,6 +1273,7 @@
                         document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnDisbursementDetailJournal").prop("disabled", false);
                         $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
                         $("#btnDisbursementDetailPrint").prop("disabled", false);
                         $("#btnDisbursementDetailClose").prop("disabled", false);
                     },
@@ -1272,6 +1282,64 @@
                         document.getElementById('btnDisbursementDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnDisbursementDetailJournal").prop("disabled", false);
                         $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ==================
+        // Cancel Disbursment
+        // ==================
+        function btnDisbursementDetailCancelOnclick() {
+            document.getElementById('btnDisbursementDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnDisbursementDetailJournal").prop("disabled", true);
+            $("#btnDisbursementDetailLock").prop("disabled", true);
+            $("#btnDisbursementDetailUnlock").prop("disabled", true);
+            $("#btnDisbursementDetailCancel").prop("disabled", true);
+            $("#btnDisbursementDetailPrint").prop("disabled", true);
+            $("#btnDisbursementDetailClose").prop("disabled", true);
+
+            var id = getURLParameterValue("id");
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/disbursement/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Cancel Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnDisbursementDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnDisbursementDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
+                        $("#btnDisbursementDetailPrint").prop("disabled", false);
+                        $("#btnDisbursementDetailClose").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnDisbursementDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnDisbursementDetailJournal").prop("disabled", false);
+                        $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                        $("#btnDisbursementDetailCancel").prop("disabled", false);
                         $("#btnDisbursementDetailPrint").prop("disabled", false);
                         $("#btnDisbursementDetailClose").prop("disabled", false);
                     }

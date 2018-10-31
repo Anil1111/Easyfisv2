@@ -515,36 +515,43 @@ namespace easyfis.ModifiedApiControllers
 
                             if (journalVoucher.Any())
                             {
-                                if (journalVoucher.FirstOrDefault().IsLocked)
+                                if (!journalVoucher.FirstOrDefault().IsCancelled)
                                 {
-                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-
-                                    var unlockJournalVoucher = journalVoucher.FirstOrDefault();
-                                    unlockJournalVoucher.IsLocked = false;
-                                    unlockJournalVoucher.UpdatedById = currentUserId;
-                                    unlockJournalVoucher.UpdatedDateTime = DateTime.Now;
-
-                                    db.SubmitChanges();
-
-                                    // =======
-                                    // Journal
-                                    // =======
-                                    Business.Journal journal = new Business.Journal();
-
-                                    if (!unlockJournalVoucher.IsLocked)
+                                    if (journalVoucher.FirstOrDefault().IsLocked)
                                     {
-                                        journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
-                                        UpdateBalances(Convert.ToInt32(id));
+                                        String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+
+                                        var unlockJournalVoucher = journalVoucher.FirstOrDefault();
+                                        unlockJournalVoucher.IsLocked = false;
+                                        unlockJournalVoucher.UpdatedById = currentUserId;
+                                        unlockJournalVoucher.UpdatedDateTime = DateTime.Now;
+
+                                        db.SubmitChanges();
+
+                                        // =======
+                                        // Journal
+                                        // =======
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (!unlockJournalVoucher.IsLocked)
+                                        {
+                                            journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
+                                            UpdateBalances(Convert.ToInt32(id));
+                                        }
+
+                                        String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
-
-                                    String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These journal voucher details are already unlocked.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These journal voucher details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These journal voucher details are already cancelled.");
                                 }
                             }
                             else

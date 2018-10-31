@@ -600,42 +600,49 @@ namespace easyfis.ModifiedApiControllers
 
                             if (receivingReceipt.Any())
                             {
-                                if (receivingReceipt.FirstOrDefault().IsLocked)
+                                if (!receivingReceipt.FirstOrDefault().IsCancelled)
                                 {
-                                    String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-
-                                    var unlockReceivingReceipt = receivingReceipt.FirstOrDefault();
-                                    unlockReceivingReceipt.IsLocked = false;
-                                    unlockReceivingReceipt.UpdatedById = currentUserId;
-                                    unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
-
-                                    db.SubmitChanges();
-
-                                    // ============================
-                                    // Update Purchase Order Status
-                                    // ============================
-                                    UpdatePurchaseOrderStatus(Convert.ToInt32(id));
-
-                                    // =====================
-                                    // Inventory and Journal
-                                    // =====================
-                                    Business.Inventory inventory = new Business.Inventory();
-                                    Business.Journal journal = new Business.Journal();
-
-                                    if (!unlockReceivingReceipt.IsLocked)
+                                    if (receivingReceipt.FirstOrDefault().IsLocked)
                                     {
-                                        inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
-                                        journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
+                                        String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+
+                                        var unlockReceivingReceipt = receivingReceipt.FirstOrDefault();
+                                        unlockReceivingReceipt.IsLocked = false;
+                                        unlockReceivingReceipt.UpdatedById = currentUserId;
+                                        unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
+
+                                        db.SubmitChanges();
+
+                                        // ============================
+                                        // Update Purchase Order Status
+                                        // ============================
+                                        UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+
+                                        // =====================
+                                        // Inventory and Journal
+                                        // =====================
+                                        Business.Inventory inventory = new Business.Inventory();
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (!unlockReceivingReceipt.IsLocked)
+                                        {
+                                            inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
+                                            journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
+                                        }
+
+                                        String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
-
-                                    String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These receiving receipt details are already unlocked.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These receiving receipt details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These receiving receipt details are already cancelled.");
                                 }
                             }
                             else

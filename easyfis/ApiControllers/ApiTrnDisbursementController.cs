@@ -592,36 +592,43 @@ namespace easyfis.ModifiedApiControllers
 
                             if (disbursement.Any())
                             {
-                                if (disbursement.FirstOrDefault().IsLocked)
+                                if (!disbursement.FirstOrDefault().IsCancelled)
                                 {
-                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
-
-                                    var unlockDisbursement = disbursement.FirstOrDefault();
-                                    unlockDisbursement.IsLocked = false;
-                                    unlockDisbursement.UpdatedById = currentUserId;
-                                    unlockDisbursement.UpdatedDateTime = DateTime.Now;
-
-                                    db.SubmitChanges();
-
-                                    // ============================
-                                    // Journal and Accounts Payable
-                                    // ============================
-                                    Business.Journal journal = new Business.Journal();
-
-                                    if (!unlockDisbursement.IsLocked)
+                                    if (disbursement.FirstOrDefault().IsLocked)
                                     {
-                                        journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
-                                        UpdateAccountsPayable(Convert.ToInt32(id));
+                                        String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+
+                                        var unlockDisbursement = disbursement.FirstOrDefault();
+                                        unlockDisbursement.IsLocked = false;
+                                        unlockDisbursement.UpdatedById = currentUserId;
+                                        unlockDisbursement.UpdatedDateTime = DateTime.Now;
+
+                                        db.SubmitChanges();
+
+                                        // ============================
+                                        // Journal and Accounts Payable
+                                        // ============================
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (!unlockDisbursement.IsLocked)
+                                        {
+                                            journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
+                                            UpdateAccountsPayable(Convert.ToInt32(id));
+                                        }
+
+                                        String newObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
                                     }
-
-                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These disbursement details are already unlocked.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These disbursement details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These disbursement details are already cancelled.");
                                 }
                             }
                             else

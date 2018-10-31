@@ -497,25 +497,32 @@ namespace easyfis.ModifiedApiControllers
 
                             if (purchaseOrder.Any())
                             {
-                                if (purchaseOrder.FirstOrDefault().IsLocked)
+                                if (!purchaseOrder.FirstOrDefault().IsCancelled)
                                 {
-                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                    if (purchaseOrder.FirstOrDefault().IsLocked)
+                                    {
+                                        String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
 
-                                    var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
-                                    unlockPurchaseOrder.IsLocked = false;
-                                    unlockPurchaseOrder.UpdatedById = currentUserId;
-                                    unlockPurchaseOrder.UpdatedDateTime = DateTime.Now;
+                                        var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
+                                        unlockPurchaseOrder.IsLocked = false;
+                                        unlockPurchaseOrder.UpdatedById = currentUserId;
+                                        unlockPurchaseOrder.UpdatedDateTime = DateTime.Now;
 
-                                    db.SubmitChanges();
+                                        db.SubmitChanges();
 
-                                    String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These purchase order details are already unlocked.");
+                                    }
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These purchase order details are already unlocked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Unlocking Error. These purchase order details are already cancelled.");
                                 }
                             }
                             else
