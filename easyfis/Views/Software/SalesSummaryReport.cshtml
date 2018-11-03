@@ -26,13 +26,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="salesSummaryReportInputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpSalesSummaryReportFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -44,69 +50,93 @@
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnSalesSummaryReportCSVOnclick()" id="btnSalesSummaryReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnSalesSummaryReportDownloadCSVOnclick()" id="btnSalesSummaryReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
                                     <button onclick="btnSalesSummaryReportPDFOnclick()" id="btnSalesSummaryReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboSalesSummaryReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboSalesSummaryReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboSalesSummaryReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboSalesSummaryReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboSalesSummaryReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboSalesSummaryReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboSalesSummaryReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboSalesSummaryReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="salesSummaryReportGrid" class="grid"></div>
+                        <div id="salesSummaryReportFlexGrid" style="font-size: 12px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
                             <div class="btn-group col-md-7" id="salesSummaryReportNavigationPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummarReportMoveToFirstPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummaryReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummarReportMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummaryReportMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnSalesSummarReportCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummarReportMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnSalesSummaryReportCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummaryReportMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummarReportMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSalesSummaryReportMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -117,7 +147,7 @@
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -133,34 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboSalesSummaryReportStartDate = new wijmo.input.InputDate('#cboSalesSummaryReportStartDate');
-        var cboSalesSummaryReportEndDate = new wijmo.input.InputDate('#cboSalesSummaryReportEndDate');
-        var isARSalesSummaryReportStartDateSelected = false;
-        var isARSalesSummaryReportEndDateSelected = false;
+        // ============
+        // Date Filters
+        // ============
+        var cboSalesSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboSalesSummaryReportStartDateFilter');
+        var cboSalesSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboSalesSummaryReportEndDateFilter');
+        var isSalesSummaryReportStartDateSelected = false;
+        var isSalesSummaryReportEndDateSelected = false;
 
-        var cboSalesSummaryReportCompany = new wijmo.input.ComboBox('#cboSalesSummaryReportCompany');
-        var cboSalesSummaryReportBranch = new wijmo.input.ComboBox('#cboSalesSummaryReportBranch');
-        var isARSalesSummaryReportCompanySelected = false;
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboSalesSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboSalesSummaryReportCompanyFilter');
+        var cboSalesSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboSalesSummaryReportBranchFilter');
+        var isSalesSummaryReportCompanySelected = false;
 
-        var salesSummaryReportCollections;
-        var salesSummaryReportGrid;
-
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var salesSummaryReportCollectionView;
+        var salesSummaryReportFlexGrid;
         var cboSalesSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboSalesSummaryReportShowNumberOfRows');
 
-        var btnSalesSummarReportMoveToFirstPageGrid = document.getElementById('btnSalesSummarReportMoveToFirstPageGrid');
-        var btnSalesSummarReportMoveToPreviousPageGrid = document.getElementById('btnSalesSummarReportMoveToPreviousPageGrid');
-        var btnSalesSummarReportMoveToNextPageGrid = document.getElementById('btnSalesSummarReportMoveToNextPageGrid');
-        var btnSalesSummarReportMoveToLastPageGrid = document.getElementById('btnSalesSummarReportMoveToLastPageGrid');
-        var btnSalesSummarReportCurrentPageGrid = document.getElementById('btnSalesSummarReportCurrentPageGrid');
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnSalesSummaryReportMoveToFirstPageGrid = document.getElementById('btnSalesSummaryReportMoveToFirstPageGrid');
+        var btnSalesSummaryReportMoveToPreviousPageGrid = document.getElementById('btnSalesSummaryReportMoveToPreviousPageGrid');
+        var btnSalesSummaryReportMoveToNextPageGrid = document.getElementById('btnSalesSummaryReportMoveToNextPageGrid');
+        var btnSalesSummaryReportMoveToLastPageGrid = document.getElementById('btnSalesSummaryReportMoveToLastPageGrid');
+        var btnSalesSummaryReportCurrentPageGrid = document.getElementById('btnSalesSummaryReportCurrentPageGrid');
         var currentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getURLParameter(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -174,47 +212,47 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function salesSummaryReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
 
-            cboSalesSummaryReportStartDate.dispose();
-            cboSalesSummaryReportStartDate = new wijmo.input.InputDate('#cboSalesSummaryReportStartDate', {
+            cboSalesSummaryReportStartDateFilter.dispose();
+            cboSalesSummaryReportStartDateFilter = new wijmo.input.InputDate('#cboSalesSummaryReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isARSalesSummaryReportStartDateSelected) {
+                    if (!isSalesSummaryReportStartDateSelected) {
                         NProgress.start();
                         refreshSalesSummaryReportFlexGrid();
                     } else {
-                        isARSalesSummaryReportStartDateSelected = false;
+                        isSalesSummaryReportStartDateSelected = false;
                     }
                 }
             });
 
-            cboSalesSummaryReportEndDate.dispose();
-            cboSalesSummaryReportEndDate = new wijmo.input.InputDate('#cboSalesSummaryReportEndDate', {
+            cboSalesSummaryReportEndDateFilter.dispose();
+            cboSalesSummaryReportEndDateFilter = new wijmo.input.InputDate('#cboSalesSummaryReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getURLParameter("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isARSalesSummaryReportEndDateSelected) {
+                    if (!isSalesSummaryReportEndDateSelected) {
                         NProgress.start();
                         refreshSalesSummaryReportFlexGrid();
                     } else {
-                        isARSalesSummaryReportEndDateSelected = false;
+                        isSalesSummaryReportEndDateSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/salesSummaryReport/dropdown/list/company',
@@ -235,40 +273,40 @@
                     if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnSalesSummaryReportCSV").prop("disabled", true);
+                        $("#btnSalesSummaryReportDownloadCSV").prop("disabled", true);
                         $("#btnSalesSummaryReportPDF").prop("disabled", true);
                     }
 
-                    cboSalesSummaryReportCompany.dispose();
-                    cboSalesSummaryReportCompany = new wijmo.input.ComboBox('#cboSalesSummaryReportCompany', {
+                    cboSalesSummaryReportCompanyFilter.dispose();
+                    cboSalesSummaryReportCompanyFilter = new wijmo.input.ComboBox('#cboSalesSummaryReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getURLParameter("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnSalesSummaryReportCSV").prop("disabled", false);
+                            $("#btnSalesSummaryReportDownloadCSV").prop("disabled", false);
                             $("#btnSalesSummaryReportPDF").prop("disabled", false);
-                            isARSalesSummaryReportCompanySelected = true;
-                            createCboBranch();
+                            isSalesSummaryReportCompanySelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboSalesSummaryReportCompany.selectedValue != null) {
+            if (cboSalesSummaryReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/salesSummaryReport/dropdown/list/branch/' + cboSalesSummaryReportCompany.selectedValue,
+                    url: '/api/salesSummaryReport/dropdown/list/branch/' + cboSalesSummaryReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -286,18 +324,18 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnSalesSummaryReportCSV").prop("disabled", true);
+                            $("#btnSalesSummaryReportDownloadCSV").prop("disabled", true);
                             $("#btnSalesSummaryReportPDF").prop("disabled", true);
                         }
 
-                        cboSalesSummaryReportBranch.dispose();
-                        cboSalesSummaryReportBranch = new wijmo.input.ComboBox('#cboSalesSummaryReportBranch', {
+                        cboSalesSummaryReportBranchFilter.dispose();
+                        cboSalesSummaryReportBranchFilter = new wijmo.input.ComboBox('#cboSalesSummaryReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getURLParameter("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshSalesSummaryReportFlexGrid();
@@ -310,9 +348,9 @@
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
         function createCboShowRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
@@ -355,33 +393,35 @@
 
                     setTimeout(function () {
                         var numberOfRows = cboSalesSummaryReportShowNumberOfRows.selectedValue;
-                        salesSummaryReportCollections.pageSize = parseInt(numberOfRows);
-                        salesSummaryReportCollections.refresh();
-                        salesSummaryReportGrid.refresh();
+                        salesSummaryReportCollectionView.pageSize = parseInt(numberOfRows);
+                        salesSummaryReportCollectionView.refresh();
+                        salesSummaryReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isARSalesSummaryReportCompanySelected) {
+            if (!isSalesSummaryReportCompanySelected) {
                 createSalesSummaryReportFlexGrid();
             } else {
                 refreshSalesSummaryReportFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Sales Order Summary Data
-        // ===============================
-        function getSalesSummaryReport() {
+        // =============================
+        // Get Sales Summary Report Data
+        // =============================
+        function getSalesSummaryReportData() {
             var salesSummaryReports = new wijmo.collections.ObservableArray;
-            if (cboSalesSummaryReportCompany.selectedValue != null) {
-                if (cboSalesSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboSalesSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboSalesSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboSalesSummaryReportCompany.selectedValue;
-                    var branchId = cboSalesSummaryReportBranch.selectedValue;
+
+            if (cboSalesSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboSalesSummaryReportBranchFilter.selectedValue != null) {
+
+                    var startDate = cboSalesSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboSalesSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboSalesSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboSalesSummaryReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/salesSummaryReport/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId,
@@ -416,97 +456,37 @@
                                 }
                             }
 
-                            document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            document.getElementById("inpTotalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             NProgress.done();
                         }
                     });
                 } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return salesSummaryReports;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (salesSummaryReportCollections.pageSize <= 0) {
-                document.getElementById('salesSummaryReportNavigationPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('salesSummaryReportNavigationPageGrid').style.display = 'block';
-            if (salesSummaryReportCollections.pageIndex === 0) {
-                btnSalesSummarReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnSalesSummarReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnSalesSummarReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (salesSummaryReportCollections.pageIndex === (salesSummaryReportCollections.pageCount - 1)) {
-                btnSalesSummarReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
-                btnSalesSummarReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnSalesSummarReportMoveToFirstPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToPreviousPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToNextPageGrid.removeAttribute('disabled');
-                btnSalesSummarReportMoveToLastPageGrid.removeAttribute('disabled');
-            }
-            btnSalesSummarReportCurrentPageGrid.innerHTML = (salesSummaryReportCollections.pageIndex + 1) + ' / ' + salesSummaryReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshSalesSummaryReportFlexGrid() {
-            salesSummaryReportCollections = new wijmo.collections.CollectionView(getSalesSummaryReport());
-            salesSummaryReportCollections.canFilter = true;
-            salesSummaryReportCollections.pageSize = cboSalesSummaryReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#salesSummaryReportInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                salesSummaryReportCollections.refresh();
-            });
-
-            salesSummaryReportCollections.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Term.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Sales.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Time.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            salesSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            salesSummaryReportGrid.itemsSource = salesSummaryReportCollections;
-            salesSummaryReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // =====================================
+        // Create Sales Summary Report Flex Grid
+        // =====================================
         function createSalesSummaryReportFlexGrid() {
-            salesSummaryReportCollections = new wijmo.collections.CollectionView(getSalesSummaryReport());
-            salesSummaryReportCollections.canFilter = true;
-            salesSummaryReportCollections.pageSize = cboSalesSummaryReportShowNumberOfRows.selectedValue;
+            salesSummaryReportCollectionView = new wijmo.collections.CollectionView(getSalesSummaryReportData());
+            salesSummaryReportCollectionView.canFilter = true;
+            salesSummaryReportCollectionView.pageSize = cboSalesSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#salesSummaryReportInputFilter').keyup(function () {
+            $('#inpSalesSummaryReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                salesSummaryReportCollections.refresh();
+                salesSummaryReportCollectionView.refresh();
             });
 
-            salesSummaryReportCollections.filter = function (item) {
+            salesSummaryReportCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
@@ -516,12 +496,12 @@
                     || !filterText || (item.Time.toLowerCase().indexOf(filterText) > -1);
             }
 
-            salesSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            salesSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSalesSummaryReportNavigationButtons();
             });
 
-            salesSummaryReportGrid = new wijmo.grid.FlexGrid('#salesSummaryReportGrid');
-            salesSummaryReportGrid.initialize({
+            salesSummaryReportFlexGrid = new wijmo.grid.FlexGrid('#salesSummaryReportFlexGrid');
+            salesSummaryReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -581,71 +561,130 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: salesSummaryReportCollections,
+                itemsSource: salesSummaryReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            salesSummaryReportGrid.trackChanges = true;
+            salesSummaryReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateSalesSummaryReportNavigationButtons();
 
-            btnSalesSummarReportMoveToFirstPageGrid.addEventListener('click', function () {
-                salesSummaryReportCollections.moveToFirstPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnSalesSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
+                salesSummaryReportCollectionView.moveToFirstPage();
+                currentPageIndex = salesSummaryReportCollectionView.pageIndex + 1;
+                updateSalesSummaryReportNavigationButtons();
             });
 
-            btnSalesSummarReportMoveToPreviousPageGrid.addEventListener('click', function () {
-                salesSummaryReportCollections.moveToPreviousPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnSalesSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
+                salesSummaryReportCollectionView.moveToPreviousPage();
+                currentPageIndex = salesSummaryReportCollectionView.pageIndex + 1;
+                updateSalesSummaryReportNavigationButtons();
             });
 
-            btnSalesSummarReportMoveToNextPageGrid.addEventListener('click', function () {
-                salesSummaryReportCollections.moveToNextPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnSalesSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
+                salesSummaryReportCollectionView.moveToNextPage();
+                currentPageIndex = salesSummaryReportCollectionView.pageIndex + 1;
+                updateSalesSummaryReportNavigationButtons();
             });
 
-            btnSalesSummarReportMoveToLastPageGrid.addEventListener('click', function () {
-                salesSummaryReportCollections.moveToLastPage();
-                currentPageIndex = salesSummaryReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnSalesSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
+                salesSummaryReportCollectionView.moveToLastPage();
+                currentPageIndex = salesSummaryReportCollectionView.pageIndex + 1;
+                updateSalesSummaryReportNavigationButtons();
             });
+        }
+
+        // ==============================================
+        // Update Sales Summary Report Navigation Buttons
+        // ==============================================
+        function updateSalesSummaryReportNavigationButtons() {
+            if (salesSummaryReportCollectionView.pageSize <= 0) {
+                document.getElementById('salesSummaryReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('salesSummaryReportNavigationPageGrid').style.display = 'block';
+            if (salesSummaryReportCollectionView.pageIndex === 0) {
+                btnSalesSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (salesSummaryReportCollectionView.pageIndex === (salesSummaryReportCollectionView.pageCount - 1)) {
+                btnSalesSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnSalesSummaryReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnSalesSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnSalesSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnSalesSummaryReportCurrentPageGrid.innerHTML = (salesSummaryReportCollectionView.pageIndex + 1) + ' / ' + salesSummaryReportCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshSalesSummaryReportFlexGrid() {
+            salesSummaryReportCollectionView = new wijmo.collections.CollectionView(getSalesSummaryReportData());
+            salesSummaryReportCollectionView.canFilter = true;
+            salesSummaryReportCollectionView.pageSize = cboSalesSummaryReportShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpSalesSummaryReportFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                salesSummaryReportCollectionView.refresh();
+            });
+
+            salesSummaryReportCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Term.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Sales.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Time.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            salesSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSalesSummaryReportNavigationButtons();
+            });
+
+            salesSummaryReportFlexGrid.itemsSource = salesSummaryReportCollectionView;
+            salesSummaryReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnSalesSummaryReportCSVOnclick() {
+        function btnSalesSummaryReportDownloadCSVOnclick() {
             var CSV = '';
             var salesSummaryReport = [];
             var fileName = 'SalesSummaryReport.CSV';
 
-            salesSummaryReportCollections.moveToFirstPage();
+            salesSummaryReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= salesSummaryReportCollections.pageCount; p++) {
-                for (i = 0; i < salesSummaryReportCollections.items.length; i++) {
-
+            for (var p = 1; p <= salesSummaryReportCollectionView.pageCount; p++) {
+                for (i = 0; i < salesSummaryReportCollectionView.items.length; i++) {
                     salesSummaryReport.push({
-                        Branch: salesSummaryReportCollections.items[i].Branch,
-                        SINumber: "SI-" + salesSummaryReportCollections.items[i].SINumber,
-                        SIDate: salesSummaryReportCollections.items[i].SIDate,
-                        Customer: salesSummaryReportCollections.items[i].Customer,
-                        Term: salesSummaryReportCollections.items[i].Term,
-                        DocumentReference: salesSummaryReportCollections.items[i].DocumentReference,
-                        Sales: salesSummaryReportCollections.items[i].Sales,
-                        Time: salesSummaryReportCollections.items[i].Time,
-                        Amount: salesSummaryReportCollections.items[i].Amount,
+                        Branch: salesSummaryReportCollectionView.items[i].Branch,
+                        SINumber: "SI-" + salesSummaryReportCollectionView.items[i].SINumber,
+                        SIDate: salesSummaryReportCollectionView.items[i].SIDate,
+                        Customer: salesSummaryReportCollectionView.items[i].Customer,
+                        Term: salesSummaryReportCollectionView.items[i].Term,
+                        DocumentReference: salesSummaryReportCollectionView.items[i].DocumentReference,
+                        Sales: salesSummaryReportCollectionView.items[i].Sales,
+                        Time: salesSummaryReportCollectionView.items[i].Time,
+                        Amount: salesSummaryReportCollectionView.items[i].Amount,
                     });
                 }
 
-                salesSummaryReportCollections.moveToNextPage();
-                if (p == salesSummaryReportCollections.pageCount) {
-                    salesSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                salesSummaryReportCollectionView.moveToNextPage();
+                if (p == salesSummaryReportCollectionView.pageCount) {
+                    salesSummaryReportCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
@@ -711,12 +750,12 @@
         // Preview and Print PDF
         // =====================
         function btnSalesSummaryReportPDFOnclick() {
-            if (cboSalesSummaryReportCompany.selectedValue != null) {
-                if (cboSalesSummaryReportBranch.selectedValue != null) {
-                    var startDate = cboSalesSummaryReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboSalesSummaryReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboSalesSummaryReportCompany.selectedValue;
-                    var branchId = cboSalesSummaryReportBranch.selectedValue;
+            if (cboSalesSummaryReportCompanyFilter.selectedValue != null) {
+                if (cboSalesSummaryReportBranchFilter.selectedValue != null) {
+                    var startDate = cboSalesSummaryReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboSalesSummaryReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboSalesSummaryReportCompanyFilter.selectedValue;
+                    var branchId = cboSalesSummaryReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepSalesSummaryReport/SalesSummaryReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -731,11 +770,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            salesSummaryReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -782,6 +828,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -821,6 +870,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

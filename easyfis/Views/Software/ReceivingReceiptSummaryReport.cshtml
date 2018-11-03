@@ -181,7 +181,7 @@
         // =============================
         // Collection View and Flex Grid
         // =============================
-        var receivingReceiptSummaryReportCollections;
+        var receivingReceiptSummaryReportCollectionView;
         var receivingReceiptSummaryReportFlexGrid;
         var cboReceivingReceiptSummaryReportShowNumberOfRows = new wijmo.input.ComboBox('#cboReceivingReceiptSummaryReportShowNumberOfRows');
 
@@ -393,8 +393,8 @@
 
                     setTimeout(function () {
                         var numberOfRows = cboReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
-                        receivingReceiptSummaryReportCollections.pageSize = parseInt(numberOfRows);
-                        receivingReceiptSummaryReportCollections.refresh();
+                        receivingReceiptSummaryReportCollectionView.pageSize = parseInt(numberOfRows);
+                        receivingReceiptSummaryReportCollectionView.refresh();
                         receivingReceiptSummaryReportFlexGrid.refresh();
 
                         NProgress.done();
@@ -479,17 +479,17 @@
         // Create Receiving Receipt Summary Report Flex Grid
         // =================================================
         function createReceivingReceiptSummaryReportFlexGrid() {
-            receivingReceiptSummaryReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReportData());
-            receivingReceiptSummaryReportCollections.canFilter = true;
-            receivingReceiptSummaryReportCollections.pageSize = cboReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
+            receivingReceiptSummaryReportCollectionView = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReportData());
+            receivingReceiptSummaryReportCollectionView.canFilter = true;
+            receivingReceiptSummaryReportCollectionView.pageSize = cboReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#inpReceivingReceiptSummaryReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                receivingReceiptSummaryReportCollections.refresh();
+                receivingReceiptSummaryReportCollectionView.refresh();
             });
 
-            receivingReceiptSummaryReportCollections.filter = function (item) {
+            receivingReceiptSummaryReportCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
@@ -497,7 +497,7 @@
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            receivingReceiptSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+            receivingReceiptSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
 
@@ -569,7 +569,7 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: receivingReceiptSummaryReportCollections,
+                itemsSource: receivingReceiptSummaryReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
@@ -581,26 +581,26 @@
             updateReceivingReceiptSummaryReportNavigationButtons();
 
             btnReceivingReceiptSummaryReportMoveToFirstPageGrid.addEventListener('click', function () {
-                receivingReceiptSummaryReportCollections.moveToFirstPage();
-                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                receivingReceiptSummaryReportCollectionView.moveToFirstPage();
+                currentPageIndex = receivingReceiptSummaryReportCollectionView.pageIndex + 1;
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
 
             btnReceivingReceiptSummaryReportMoveToPreviousPageGrid.addEventListener('click', function () {
-                receivingReceiptSummaryReportCollections.moveToPreviousPage();
-                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                receivingReceiptSummaryReportCollectionView.moveToPreviousPage();
+                currentPageIndex = receivingReceiptSummaryReportCollectionView.pageIndex + 1;
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
 
             btnReceivingReceiptSummaryReportMoveToNextPageGrid.addEventListener('click', function () {
-                receivingReceiptSummaryReportCollections.moveToNextPage();
-                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                receivingReceiptSummaryReportCollectionView.moveToNextPage();
+                currentPageIndex = receivingReceiptSummaryReportCollectionView.pageIndex + 1;
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
 
             btnReceivingReceiptSummaryReportMoveToLastPageGrid.addEventListener('click', function () {
-                receivingReceiptSummaryReportCollections.moveToLastPage();
-                currentPageIndex = receivingReceiptSummaryReportCollections.pageIndex + 1;
+                receivingReceiptSummaryReportCollectionView.moveToLastPage();
+                currentPageIndex = receivingReceiptSummaryReportCollectionView.pageIndex + 1;
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
         }
@@ -609,17 +609,17 @@
         // Update Receiving Receipt Summary Report Navigation Buttons
         // ==========================================================
         function updateReceivingReceiptSummaryReportNavigationButtons() {
-            if (receivingReceiptSummaryReportCollections.pageSize <= 0) {
+            if (receivingReceiptSummaryReportCollectionView.pageSize <= 0) {
                 document.getElementById('receivingReceiptSummaryReportNavigationPageGrid').style.display = 'none';
                 return;
             }
             document.getElementById('receivingReceiptSummaryReportNavigationPageGrid').style.display = 'block';
-            if (receivingReceiptSummaryReportCollections.pageIndex === 0) {
+            if (receivingReceiptSummaryReportCollectionView.pageIndex === 0) {
                 btnReceivingReceiptSummaryReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
                 btnReceivingReceiptSummaryReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
                 btnReceivingReceiptSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
                 btnReceivingReceiptSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
-            } else if (receivingReceiptSummaryReportCollections.pageIndex === (receivingReceiptSummaryReportCollections.pageCount - 1)) {
+            } else if (receivingReceiptSummaryReportCollectionView.pageIndex === (receivingReceiptSummaryReportCollectionView.pageCount - 1)) {
                 btnReceivingReceiptSummaryReportMoveToFirstPageGrid.removeAttribute('disabled');
                 btnReceivingReceiptSummaryReportMoveToPreviousPageGrid.removeAttribute('disabled');
                 btnReceivingReceiptSummaryReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
@@ -630,24 +630,24 @@
                 btnReceivingReceiptSummaryReportMoveToNextPageGrid.removeAttribute('disabled');
                 btnReceivingReceiptSummaryReportMoveToLastPageGrid.removeAttribute('disabled');
             }
-            btnReceivingReceiptSummaryReportCurrentPageGrid.innerHTML = (receivingReceiptSummaryReportCollections.pageIndex + 1) + ' / ' + receivingReceiptSummaryReportCollections.pageCount;
+            btnReceivingReceiptSummaryReportCurrentPageGrid.innerHTML = (receivingReceiptSummaryReportCollectionView.pageIndex + 1) + ' / ' + receivingReceiptSummaryReportCollectionView.pageCount;
         }
 
         // =================
         // Refresh Flex Grid
         // =================
         function refreshReceivingReceiptSummaryReportFlexGrid() {
-            receivingReceiptSummaryReportCollections = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReportData());
-            receivingReceiptSummaryReportCollections.canFilter = true;
-            receivingReceiptSummaryReportCollections.pageSize = cboReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
+            receivingReceiptSummaryReportCollectionView = new wijmo.collections.CollectionView(getReceivingReceiptSummaryReportData());
+            receivingReceiptSummaryReportCollectionView.canFilter = true;
+            receivingReceiptSummaryReportCollectionView.pageSize = cboReceivingReceiptSummaryReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
             $('#inpReceivingReceiptSummaryReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                receivingReceiptSummaryReportCollections.refresh();
+                receivingReceiptSummaryReportCollectionView.refresh();
             });
 
-            receivingReceiptSummaryReportCollections.filter = function (item) {
+            receivingReceiptSummaryReportCollectionView.filter = function (item) {
                 return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.RRNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Supplier.toLowerCase().indexOf(filterText) > -1)
@@ -655,11 +655,11 @@
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            receivingReceiptSummaryReportCollections.collectionChanged.addHandler(function (sender, args) {
+            receivingReceiptSummaryReportCollectionView.collectionChanged.addHandler(function (sender, args) {
                 updateReceivingReceiptSummaryReportNavigationButtons();
             });
 
-            receivingReceiptSummaryReportFlexGrid.itemsSource = receivingReceiptSummaryReportCollections;
+            receivingReceiptSummaryReportFlexGrid.itemsSource = receivingReceiptSummaryReportCollectionView;
             receivingReceiptSummaryReportFlexGrid.trackChanges = true;
         }
 
@@ -671,27 +671,27 @@
             var receivingReceiptSummaryReport = [];
             var fileName = 'ReceivingReceiptSummaryReport.CSV';
 
-            receivingReceiptSummaryReportCollections.moveToFirstPage();
+            receivingReceiptSummaryReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= receivingReceiptSummaryReportCollections.pageCount; p++) {
-                for (i = 0; i < receivingReceiptSummaryReportCollections.items.length; i++) {
+            for (var p = 1; p <= receivingReceiptSummaryReportCollectionView.pageCount; p++) {
+                for (i = 0; i < receivingReceiptSummaryReportCollectionView.items.length; i++) {
                     receivingReceiptSummaryReport.push({
-                        Branch: receivingReceiptSummaryReportCollections.items[i].Branch,
-                        RRNumber: "RR-" + receivingReceiptSummaryReportCollections.items[i].RRNumber,
-                        RRDate: receivingReceiptSummaryReportCollections.items[i].RRDate,
-                        Supplier: receivingReceiptSummaryReportCollections.items[i].Supplier,
-                        Term: receivingReceiptSummaryReportCollections.items[i].Term,
-                        Remarks: receivingReceiptSummaryReportCollections.items[i].Remarks,
-                        DocumentReference: receivingReceiptSummaryReportCollections.items[i].DocumentReference,
-                        Amount: receivingReceiptSummaryReportCollections.items[i].Amount,
-                        WTaxAmount: receivingReceiptSummaryReportCollections.items[i].WTaxAmount,
-                        RRAmount: receivingReceiptSummaryReportCollections.items[i].RRAmount
+                        Branch: receivingReceiptSummaryReportCollectionView.items[i].Branch,
+                        RRNumber: "RR-" + receivingReceiptSummaryReportCollectionView.items[i].RRNumber,
+                        RRDate: receivingReceiptSummaryReportCollectionView.items[i].RRDate,
+                        Supplier: receivingReceiptSummaryReportCollectionView.items[i].Supplier,
+                        Term: receivingReceiptSummaryReportCollectionView.items[i].Term,
+                        Remarks: receivingReceiptSummaryReportCollectionView.items[i].Remarks,
+                        DocumentReference: receivingReceiptSummaryReportCollectionView.items[i].DocumentReference,
+                        Amount: receivingReceiptSummaryReportCollectionView.items[i].Amount,
+                        WTaxAmount: receivingReceiptSummaryReportCollectionView.items[i].WTaxAmount,
+                        RRAmount: receivingReceiptSummaryReportCollectionView.items[i].RRAmount
                     });
                 }
 
-                receivingReceiptSummaryReportCollections.moveToNextPage();
-                if (p == receivingReceiptSummaryReportCollections.pageCount) {
-                    receivingReceiptSummaryReportCollections.moveToPage(currentPageIndex - 1);
+                receivingReceiptSummaryReportCollectionView.moveToNextPage();
+                if (p == receivingReceiptSummaryReportCollectionView.pageCount) {
+                    receivingReceiptSummaryReportCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
