@@ -1319,5 +1319,48 @@ namespace easyfis.Business
                 Debug.WriteLine(e);
             }
         }
+
+        // ==============
+        // Cancel Journal
+        // ==============
+        public void CancelJournal(Int32 id, String document)
+        {
+            Int32? RRId = null, SIId = null, ORId = null, CVId = null;
+
+            switch (document)
+            {
+                case "ReceivingReceipt": RRId = id; break;
+                case "SalesInvoice": SIId = id; break;
+                case "Collection": ORId = id; break;
+                case "Disbursement": CVId = id; break;
+            }
+
+            var journals = from d in db.TrnJournals where d.RRId == RRId || d.SIId == SIId || d.ORId == ORId || d.CVId == CVId select d;
+            if (journals.Any())
+            {
+                foreach (var journal in journals)
+                {
+                    Data.TrnJournal newJournal = new Data.TrnJournal
+                    {
+                        JournalDate = journal.JournalDate,
+                        BranchId = journal.BranchId,
+                        AccountId = journal.AccountId,
+                        ArticleId = journal.ArticleId,
+                        Particulars = "Cancelled",
+                        DebitAmount = journal.CreditAmount * -1,
+                        CreditAmount = journal.DebitAmount * -1,
+                        RRId = RRId,
+                        SIId = SIId,
+                        ORId = ORId,
+                        CVId = CVId,
+                        DocumentReference = journal.DocumentReference
+                    };
+
+                    db.TrnJournals.InsertOnSubmit(newJournal);
+                }
+
+                db.SubmitChanges();
+            }
+        }
     }
 }

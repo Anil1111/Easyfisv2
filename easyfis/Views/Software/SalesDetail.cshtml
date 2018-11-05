@@ -58,13 +58,13 @@
                                     {
                                         <button class="btn btn-primary" id="btnUnlockSalesInvoice" onclick="btnSalesInvoiceUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
-                                    if (canCancel)
-                                    {
-                                        <button class="btn btn-primary" id="btnCancelSalesInvoice" onclick="btnSalesInvoiceCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
-                                    }
                                     if (canPrint)
                                     {
                                         <button class="btn btn-primary" id="btnPrintSalesInvoice" onclick="btnSalesInvoicePrintOnclick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                    if (canCancel)
+                                    {
+                                        <button class="btn btn-warning" id="btnCancelSalesInvoice" onclick="btnSalesInvoiceCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
                                     }
                                 }
                                 <button class="btn btn-danger" id="btnCloseSalesInvoice" onclick="window.location.href = '/Software/Sales'"><i class="fa fa-times"></i> Close</button>
@@ -800,6 +800,28 @@
         </div>
     </div>
 
+    <!--
+        ===================================
+        Sales Invoice: Cancel Confirm Modal
+        ===================================
+    -->
+    <div class="modal fade" id="salesInvoiceCancelConfirmModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cancel</h4>
+                </div>
+                <div class="modal-body">
+                    Cancel Sales Invoice?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnSalesInvoiceCancelConfirm" class="btn btn-warning" onclick="btnSalesInvoiceCancelConfirmOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
+                    <button id="btnSalesInvoiceCancelConfirmCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
         // ==========================================
@@ -1170,9 +1192,15 @@
                                 $("#btnSalesInvoiceItemItemQuery").prop("disabled", true);
 
                                 isLocked = true;
+
+                                if (results.IsCancelled) {
+                                    $("#btnUnlockSalesInvoice").prop("disabled", true);
+                                    $("#btnCancelSalesInvoice").prop("disabled", true);
+                                }
                             } else {
                                 $("#btnJournalSalesInvoice").prop("disabled", true);
                                 $("#btnUnlockSalesInvoice").prop("disabled", true);
+                                $("#btnCancelSalesInvoice").prop("disabled", true);
                                 $("#btnPrintSalesInvoice").prop("disabled", true);
                             }
 
@@ -1195,6 +1223,14 @@
         // Lock Sales Invoice
         // ==================
         function btnSalesInvoiceLockOnclick() {
+            document.getElementById('btnLockSalesInvoice').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnJournalSalesInvoice").prop("disabled", true);
+            $("#btnLockSalesInvoice").prop("disabled", true);
+            $("#btnUnlockSalesInvoice").prop("disabled", true);
+            $("#btnCancelSalesInvoice").prop("disabled", true);
+            $("#btnPrintSalesInvoice").prop("disabled", true);
+            $("#btnCloseSalesInvoice").prop("disabled", true);
+
             var salesObject = new Object();
             salesObject.SIDate = cboSalesInvoiceSIDate.value.toLocaleDateString();
             salesObject.CustomerId = cboSalesInvoiceCustomer.selectedValue;
@@ -1223,13 +1259,6 @@
             });
 
             if (isValid) {
-                document.getElementById('btnLockSalesInvoice').innerHTML = "<i class='fa fa-lock'></i> Locking...";
-                $("#btnJournalSalesInvoice").prop("disabled", true);
-                $("#btnLockSalesInvoice").prop("disabled", true);
-                $("#btnUnlockSalesInvoice").prop("disabled", true);
-                $("#btnPrintSalesInvoice").prop("disabled", true);
-                $("#btnCloseSalesInvoice").prop("disabled", true);
-
                 var id = getURLParameterValue('id');
 
                 $.ajax({
@@ -1278,6 +1307,7 @@
             $("#btnJournalSalesInvoice").prop("disabled", true);
             $("#btnLockSalesInvoice").prop("disabled", true);
             $("#btnUnlockSalesInvoice").prop("disabled", true);
+            $("#btnCancelSalesInvoice").prop("disabled", true);
             $("#btnPrintSalesInvoice").prop("disabled", true);
             $("#btnCloseSalesInvoice").prop("disabled", true);
 
@@ -1300,6 +1330,7 @@
                         document.getElementById('btnUnlockSalesInvoice').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalSalesInvoice").prop("disabled", false);
                         $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
                         $("#btnPrintSalesInvoice").prop("disabled", false);
                         $("#btnCloseSalesInvoice").prop("disabled", false);
                     },
@@ -1308,6 +1339,7 @@
                         document.getElementById('btnUnlockSalesInvoice').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalSalesInvoice").prop("disabled", false);
                         $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
                         $("#btnPrintSalesInvoice").prop("disabled", false);
                         $("#btnCloseSalesInvoice").prop("disabled", false);
                     },
@@ -1316,6 +1348,82 @@
                         document.getElementById('btnUnlockSalesInvoice').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
                         $("#btnJournalSalesInvoice").prop("disabled", false);
                         $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
+                        $("#btnPrintSalesInvoice").prop("disabled", false);
+                        $("#btnCloseSalesInvoice").prop("disabled", false);
+                    }
+                }
+            });
+        }
+
+        // ====================
+        // Cancel Sales Invoice
+        // ====================
+        function btnSalesInvoiceCancelOnclick() {
+            $('#salesInvoiceCancelConfirmModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnSalesInvoiceCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+            $("#btnSalesInvoiceCancelConfirm").prop("disabled", false);
+            $("#btnSalesInvoiceCancelConfirmCloseModal").prop("disabled", false);
+        }
+
+        // ============================
+        // Confirm Cancel Sales Invoice
+        // ============================
+        function btnSalesInvoiceCancelConfirmOnclick() {
+            document.getElementById('btnSalesInvoiceCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnSalesInvoiceCancelConfirm").prop("disabled", true);
+            $("#btnSalesInvoiceCancelConfirmCloseModal").prop("disabled", true);
+
+            document.getElementById('btnCancelSalesInvoice').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnJournalSalesInvoice").prop("disabled", true);
+            $("#btnLockSalesInvoice").prop("disabled", true);
+            $("#btnUnlockSalesInvoice").prop("disabled", true);
+            $("#btnCancelSalesInvoice").prop("disabled", true);
+            $("#btnPrintSalesInvoice").prop("disabled", true);
+            $("#btnCloseSalesInvoice").prop("disabled", true);
+
+            var id = getURLParameterValue('id');
+
+            $.ajax({
+                type: "PUT",
+                url: '/api/salesInvoice/cancel/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Unlock Successful");
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1000);
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnCancelSalesInvoice').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalSalesInvoice").prop("disabled", false);
+                        $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
+                        $("#btnPrintSalesInvoice").prop("disabled", false);
+                        $("#btnCloseSalesInvoice").prop("disabled", false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnCancelSalesInvoice').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalSalesInvoice").prop("disabled", false);
+                        $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
+                        $("#btnPrintSalesInvoice").prop("disabled", false);
+                        $("#btnCloseSalesInvoice").prop("disabled", false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnCancelSalesInvoice').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalSalesInvoice").prop("disabled", false);
+                        $("#btnUnlockSalesInvoice").prop("disabled", false);
+                        $("#btnCancelSalesInvoice").prop("disabled", false);
                         $("#btnPrintSalesInvoice").prop("disabled", false);
                         $("#btnCloseSalesInvoice").prop("disabled", false);
                     }
@@ -3046,6 +3154,11 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (results) {
+                    var totalDebitAmount = 0;
+                    var totalCreditAmount = 0;
+
+                    var variance = 0;
+
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -3062,22 +3175,19 @@
                                 CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
-                            var debitAmountTotal = 0;
-                            var creditAmountTotal = 0;
+                            var debit = parseFloat(Math.round(results[i]["DebitAmount"] * 100) / 100);
+                            var credit = parseFloat(Math.round(results[i]["CreditAmount"] * 100) / 100);
 
-                            var a = 0;
-                            while (a < results.length) {
-                                debitAmountTotal += results[a]["DebitAmount"];
-                                creditAmountTotal += results[a]["CreditAmount"];
-                                a++;
-                            }
+                            totalDebitAmount += debit;
+                            totalCreditAmount += credit;
                         }
 
-                        document.getElementById('inpJournalTotalDebit').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('inpJournalTotalCredit').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var inpJournalVariance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('inpJournalVariance').value = inpJournalVariance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        variance = totalDebitAmount - totalCreditAmount;
                     }
+
+                    document.getElementById('inpJournalTotalDebit').value = parseFloat(Math.round(totalDebitAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalTotalCredit').value = parseFloat(Math.round(totalCreditAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalVariance').value = parseFloat(Math.round(variance * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                     $("#journalLoading").hide();
                     $("#journalContent").show();

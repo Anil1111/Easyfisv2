@@ -616,31 +616,67 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (salesInvoice.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    Decimal paidAmount = 0;
+                                    Decimal adjustmentAmount = 0;
 
-                                    var unlockSalesInvoice = salesInvoice.FirstOrDefault();
-                                    unlockSalesInvoice.IsCancelled = true;
-                                    unlockSalesInvoice.UpdatedById = currentUserId;
-                                    unlockSalesInvoice.UpdatedDateTime = DateTime.Now;
+                                    var collectionLines = from d in db.TrnCollectionLines
+                                                          where d.SIId == Convert.ToInt32(id)
+                                                          && d.TrnCollection.IsLocked == true
+                                                          select d;
 
-                                    db.SubmitChanges();
+                                    if (collectionLines.Any())
+                                    {
+                                        paidAmount = collectionLines.Sum(d => d.Amount);
+                                    }
 
-                                    //// =====================
-                                    //// Inventory and Journal
-                                    //// =====================
-                                    //Business.Inventory inventory = new Business.Inventory();
-                                    //Business.Journal journal = new Business.Journal();
+                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                                              where d.ARSIId == Convert.ToInt32(id)
+                                                              && d.TrnJournalVoucher.IsLocked == true
+                                                              select d;
 
-                                    //if (!unlockSalesInvoice.IsLocked)
-                                    //{
-                                    //    inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
-                                    //    journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
-                                    //}
+                                    if (journalVoucherLines.Any())
+                                    {
+                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
+                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
 
-                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        adjustmentAmount = debitAmount - creditAmount;
+                                    }
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                    if (paidAmount + adjustmentAmount == 0)
+                                    {
+                                        String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+
+                                        var cancelSalesInvoice = salesInvoice.FirstOrDefault();
+                                        cancelSalesInvoice.Amount = 0;
+                                        cancelSalesInvoice.PaidAmount = 0;
+                                        cancelSalesInvoice.AdjustmentAmount = 0;
+                                        cancelSalesInvoice.BalanceAmount = 0;
+                                        cancelSalesInvoice.IsCancelled = true;
+                                        cancelSalesInvoice.UpdatedById = currentUserId;
+                                        cancelSalesInvoice.UpdatedDateTime = DateTime.Now;
+                                        db.SubmitChanges();
+
+                                        // =====================
+                                        // Inventory and Journal
+                                        // =====================
+                                        Business.Inventory inventory = new Business.Inventory();
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (cancelSalesInvoice.IsCancelled)
+                                        {
+                                            inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
+                                            journal.CancelJournal(Convert.ToInt32(id), "SalesInvoice");
+                                        }
+
+                                        String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel sales invoice detail if sales invoice detail is paid and adjusted.");
+                                    }
                                 }
                                 else
                                 {

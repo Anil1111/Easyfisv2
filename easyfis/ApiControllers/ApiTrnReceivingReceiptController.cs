@@ -698,36 +698,68 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (receivingReceipt.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                    Decimal paidAmount = 0;
+                                    Decimal adjustmentAmount = 0;
 
-                                    var unlockReceivingReceipt = receivingReceipt.FirstOrDefault();
-                                    unlockReceivingReceipt.IsCancelled = true;
-                                    unlockReceivingReceipt.UpdatedById = currentUserId;
-                                    unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
+                                    var disbursementLines = from d in db.TrnDisbursementLines
+                                                            where d.RRId == Convert.ToInt32(id)
+                                                            && d.TrnDisbursement.IsLocked == true
+                                                            select d;
 
-                                    db.SubmitChanges();
+                                    if (disbursementLines.Any())
+                                    {
+                                        paidAmount = disbursementLines.Sum(d => d.Amount);
+                                    }
 
-                                    //// ============================
-                                    //// Update Purchase Order Status
-                                    //// ============================
-                                    //UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
+                                                              where d.APRRId == Convert.ToInt32(id)
+                                                              && d.TrnJournalVoucher.IsLocked == true
+                                                              select d;
 
-                                    //// =====================
-                                    //// Inventory and Journal
-                                    //// =====================
-                                    //Business.Inventory inventory = new Business.Inventory();
-                                    //Business.Journal journal = new Business.Journal();
+                                    if (journalVoucherLines.Any())
+                                    {
+                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
+                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
 
-                                    //if (!unlockReceivingReceipt.IsLocked)
-                                    //{
-                                    //    inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
-                                    //    journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
-                                    //}
+                                        adjustmentAmount = creditAmount - debitAmount;
+                                    }
 
-                                    String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    if (paidAmount + adjustmentAmount == 0)
+                                    {
+                                        String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                        var cancelReceivingReceipt = receivingReceipt.FirstOrDefault();
+                                        cancelReceivingReceipt.Amount = 0;
+                                        cancelReceivingReceipt.WTaxAmount = 0;
+                                        cancelReceivingReceipt.PaidAmount = 0;
+                                        cancelReceivingReceipt.AdjustmentAmount = 0;
+                                        cancelReceivingReceipt.BalanceAmount = 0;
+                                        cancelReceivingReceipt.IsCancelled = true;
+                                        cancelReceivingReceipt.UpdatedById = currentUserId;
+                                        cancelReceivingReceipt.UpdatedDateTime = DateTime.Now;
+                                        db.SubmitChanges();
+
+                                        // =====================
+                                        // Inventory and Journal
+                                        // =====================
+                                        Business.Inventory inventory = new Business.Inventory();
+                                        Business.Journal journal = new Business.Journal();
+
+                                        if (cancelReceivingReceipt.IsCancelled)
+                                        {
+                                            inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
+                                            journal.CancelJournal(Convert.ToInt32(id), "ReceivingReceipt");
+                                        }
+
+                                        String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel receiving receipt detail if receiving receipt detail is paid or adjusted.");
+                                    }
                                 }
                                 else
                                 {

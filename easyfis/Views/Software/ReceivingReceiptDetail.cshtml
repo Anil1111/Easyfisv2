@@ -58,13 +58,13 @@
                                     {
                                         <button class="btn btn-primary" id="btnReceivingReceiptUnlock" onclick="btnReceivingReceiptUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
-                                    if (canCancel)
-                                    {
-                                        <button class="btn btn-primary" id="btnReceivingReceiptCancel" onclick="btnReceivingReceiptCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
-                                    }
                                     if (canPrint)
                                     {
                                         <button class="btn btn-primary" id="btnReceivingReceiptPrint" onclick="btnReceivingReceiptPrintOnclick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                    if (canCancel)
+                                    {
+                                        <button class="btn btn-warning" id="btnReceivingReceiptCancel" onclick="btnReceivingReceiptCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
                                     }
                                 }
                                 <button class="btn btn-danger" id="btnReceivingReceiptClose" onclick="window.location.href = '/Software/ReceivingReceipt'"><i class="fa fa-times"></i> Close</button>
@@ -733,6 +733,28 @@
             </div>
         </div>
     </div>
+    
+    <!--
+        =======================================
+        Receiving Receipt: Cancel Confirm Modal
+        =======================================
+    -->
+    <div class="modal fade" id="receivingReceiptCancelConfirmModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cancel</h4>
+                </div>
+                <div class="modal-body">
+                    Cancel Receiving Receipt?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnReceivingReceiptCancelConfirm" class="btn btn-warning" onclick="btnReceivingReceiptCancelConfirmOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
+                    <button id="btnReceivingReceiptCancelConfirmCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
@@ -1262,6 +1284,24 @@
         // Cancel Receiving Receipt
         // ========================
         function btnReceivingReceiptCancelOnclick() {
+            $('#receivingReceiptCancelConfirmModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnReceivingReceiptCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+            $("#btnReceivingReceiptCancelConfirm").prop("disabled", false);
+            $("#btnReceivingReceiptCancelConfirmCloseModal").prop("disabled", false);
+        }
+
+        // ================================
+        // Confirm Cancel Receiving Receipt
+        // ================================
+        function btnReceivingReceiptCancelConfirmOnclick() {
+            document.getElementById('btnReceivingReceiptCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnReceivingReceiptCancelConfirm").prop("disabled", true);
+            $("#btnReceivingReceiptCancelConfirmCloseModal").prop("disabled", true);
+
             document.getElementById('btnReceivingReceiptCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
             $("#btnReceivingReceiptJournal").prop("disabled", true);
             $("#btnReceivingReceiptLock").prop("disabled", true);
@@ -1292,6 +1332,10 @@
                         $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
+
+                        document.getElementById('btnReceivingReceiptCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptCancelConfirm").prop("disabled", false);
+                        $("#btnReceivingReceiptCancelConfirmCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
@@ -1301,6 +1345,10 @@
                         $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
+
+                        document.getElementById('btnReceivingReceiptCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptCancelConfirm").prop("disabled", false);
+                        $("#btnReceivingReceiptCancelConfirmCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
@@ -1310,6 +1358,10 @@
                         $("#btnReceivingReceiptCancel").prop("disabled", false);
                         $("#btnReceivingReceiptPrint").prop("disabled", false);
                         $("#btnReceivingReceiptClose").prop("disabled", false);
+
+                        document.getElementById('btnReceivingReceiptCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnReceivingReceiptCancelConfirm").prop("disabled", false);
+                        $("#btnReceivingReceiptCancelConfirmCloseModal").prop("disabled", false);
                     }
                 }
             });
@@ -3383,6 +3435,11 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (results) {
+                    var totalDebitAmount = 0;
+                    var totalCreditAmount = 0;
+
+                    var variance = 0;
+
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -3399,22 +3456,19 @@
                                 CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
-                            var debitAmountTotal = 0;
-                            var creditAmountTotal = 0;
+                            var debit = parseFloat(Math.round(results[i]["DebitAmount"] * 100) / 100);
+                            var credit = parseFloat(Math.round(results[i]["CreditAmount"] * 100) / 100);
 
-                            var a = 0;
-                            while (a < results.length) {
-                                debitAmountTotal += results[a]["DebitAmount"];
-                                creditAmountTotal += results[a]["CreditAmount"];
-                                a++;
-                            }
+                            totalDebitAmount += debit;
+                            totalCreditAmount += credit;
                         }
 
-                        document.getElementById('inpJournalTotalDebit').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('inpJournalTotalCredit').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var inpJournalVariance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('inpJournalVariance').value = inpJournalVariance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        variance = totalDebitAmount - totalCreditAmount;
                     }
+
+                    document.getElementById('inpJournalTotalDebit').value = parseFloat(Math.round(totalDebitAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalTotalCredit').value = parseFloat(Math.round(totalCreditAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalVariance').value = parseFloat(Math.round(variance * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                     $("#journalLoading").hide();
                     $("#journalContent").show();
