@@ -17,10 +17,14 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.PurchaseOrderStatus purchaseOrderStatus = new Business.PurchaseOrderStatus();
+        private Business.AccountsPayable accountsPayable = new Business.AccountsPayable();
+        private Business.Inventory inventory = new Business.Inventory();
+        private Business.Journal journal = new Business.Journal();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // ======================
         // List Receiving Receipt
@@ -213,77 +217,6 @@ namespace easyfis.ModifiedApiControllers
             return result;
         }
 
-        // ============================
-        // Update Purchase Order Status
-        // ============================
-        public void UpdatePurchaseOrderStatus(Int32 RRId)
-        {
-            var groupedReceivingReceiptItemPOIds = from d in db.TrnReceivingReceiptItems
-                                                   where d.RRId == RRId
-                                                   group d by d.POId into g
-                                                   select g;
-
-            if (groupedReceivingReceiptItemPOIds.Any())
-            {
-                foreach (var groupedReceivingReceiptItemPOId in groupedReceivingReceiptItemPOIds)
-                {
-                    Decimal balanceQuantity = 0;
-
-                    var groupedPurchaseOrderItems = from d in db.TrnPurchaseOrderItems
-                                                    where d.POId == groupedReceivingReceiptItemPOId.Key
-                                                    group d by new
-                                                    {
-                                                        d.ItemId
-                                                    } into g
-                                                    select g;
-
-                    if (groupedPurchaseOrderItems.Any())
-                    {
-                        Decimal totalPurchaseOrderItemQuantity = 0;
-                        Decimal totalReceivingReceiptItemQuantity = 0;
-
-                        foreach (var groupedPurchaseOrderItem in groupedPurchaseOrderItems)
-                        {
-                            totalPurchaseOrderItemQuantity = groupedPurchaseOrderItem.Sum(d => d.Quantity);
-
-                            var groupedReceivingReceiptItem = from d in db.TrnReceivingReceiptItems
-                                                              where d.POId == groupedReceivingReceiptItemPOId.Key
-                                                              && d.ItemId == groupedPurchaseOrderItem.Key.ItemId
-                                                              && d.TrnReceivingReceipt.IsLocked == true
-                                                              group d by d.ItemId into g
-                                                              select g;
-
-                            if (groupedReceivingReceiptItem.Any())
-                            {
-                                totalReceivingReceiptItemQuantity = groupedReceivingReceiptItem.FirstOrDefault().Sum(d => d.Quantity);
-                            }
-
-                            balanceQuantity += totalPurchaseOrderItemQuantity - totalReceivingReceiptItemQuantity;
-                        }
-                    }
-
-                    var currentPurchaseOrder = from d in db.TrnPurchaseOrders
-                                               where d.Id == groupedReceivingReceiptItemPOId.Key
-                                               select d;
-
-                    if (currentPurchaseOrder.Any())
-                    {
-                        Boolean isClose = false;
-                        if (balanceQuantity <= 0)
-                        {
-                            isClose = true;
-                        }
-
-                        var updatePurchaseOrder = currentPurchaseOrder.FirstOrDefault();
-                        updatePurchaseOrder.IsClose = isClose;
-                        db.SubmitChanges();
-
-                        balanceQuantity = 0;
-                    }
-                }
-            }
-        }
-
         // =====================
         // Add Receiving Receipt
         // =====================
@@ -371,8 +304,8 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnReceivingReceipts.InsertOnSubmit(newReceivingReceipt);
                                         db.SubmitChanges();
 
-                                        String newObject = at.GetObjectString(newReceivingReceipt);
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                        String newObject = auditTrail.GetObjectString(newReceivingReceipt);
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK, newReceivingReceipt.Id);
                                     }
@@ -413,25 +346,6 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // ============================
-        // Get Receiving Receipt Amount
-        // ============================
-        public Decimal GetReceivingReceiptAmount(Int32 RRId)
-        {
-            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
-                                        where d.RRId == RRId
-                                        select d;
-
-            if (receivingReceiptItems.Any())
-            {
-                return receivingReceiptItems.Sum(d => d.Amount);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         // ======================
         // Lock Receiving Receipt
         // ======================
@@ -465,33 +379,11 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!receivingReceipt.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
-                                    Decimal paidAmount = 0;
-                                    Decimal adjustmentAmount = 0;
-
-                                    var disbursementLines = from d in db.TrnDisbursementLines
-                                                            where d.RRId == Convert.ToInt32(id)
-                                                            && d.TrnDisbursement.IsLocked == true
-                                                            select d;
-
-                                    if (disbursementLines.Any())
-                                    {
-                                        paidAmount = disbursementLines.Sum(d => d.Amount);
-                                    }
-
-                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                              where d.APRRId == Convert.ToInt32(id)
-                                                              && d.TrnJournalVoucher.IsLocked == true
-                                                              select d;
-
-                                    if (journalVoucherLines.Any())
-                                    {
-                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                                        adjustmentAmount = creditAmount - debitAmount;
-                                    }
+                                    Decimal amount = 0;
+                                    var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == Convert.ToInt32(id) select d;
+                                    if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); }
 
                                     var lockReceivingReceipt = receivingReceipt.FirstOrDefault();
                                     lockReceivingReceipt.RRDate = Convert.ToDateTime(objReceivingReceipt.RRDate);
@@ -500,11 +392,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockReceivingReceipt.TermId = objReceivingReceipt.TermId;
                                     lockReceivingReceipt.Remarks = objReceivingReceipt.Remarks;
                                     lockReceivingReceipt.ManualRRNumber = objReceivingReceipt.ManualRRNumber;
-                                    lockReceivingReceipt.Amount = GetReceivingReceiptAmount(Convert.ToInt32(id));
-                                    lockReceivingReceipt.WTaxAmount = 0;
-                                    lockReceivingReceipt.PaidAmount = paidAmount;
-                                    lockReceivingReceipt.AdjustmentAmount = adjustmentAmount;
-                                    lockReceivingReceipt.BalanceAmount = (GetReceivingReceiptAmount(Convert.ToInt32(id)) - paidAmount) + adjustmentAmount;
+                                    lockReceivingReceipt.Amount = amount;
                                     lockReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
                                     lockReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
                                     lockReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;
@@ -512,28 +400,18 @@ namespace easyfis.ModifiedApiControllers
                                     lockReceivingReceipt.IsLocked = true;
                                     lockReceivingReceipt.UpdatedById = currentUserId;
                                     lockReceivingReceipt.UpdatedDateTime = DateTime.Now;
-
                                     db.SubmitChanges();
-
-                                    // ============================
-                                    // Update Purchase Order Status
-                                    // ============================
-                                    UpdatePurchaseOrderStatus(Convert.ToInt32(id));
-
-                                    // =====================
-                                    // Inventory and Journal
-                                    // =====================
-                                    Business.Inventory inventory = new Business.Inventory();
-                                    Business.Journal journal = new Business.Journal();
 
                                     if (lockReceivingReceipt.IsLocked)
                                     {
+                                        purchaseOrderStatus.UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+                                        accountsPayable.UpdateAccountsPayable(Convert.ToInt32(id));
                                         inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
                                         journal.InsertReceivingReceiptJournal(Convert.ToInt32(id));
                                     }
 
-                                    String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -604,34 +482,23 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     if (receivingReceipt.FirstOrDefault().IsLocked)
                                     {
-                                        String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
                                         var unlockReceivingReceipt = receivingReceipt.FirstOrDefault();
                                         unlockReceivingReceipt.IsLocked = false;
                                         unlockReceivingReceipt.UpdatedById = currentUserId;
                                         unlockReceivingReceipt.UpdatedDateTime = DateTime.Now;
-
                                         db.SubmitChanges();
-
-                                        // ============================
-                                        // Update Purchase Order Status
-                                        // ============================
-                                        UpdatePurchaseOrderStatus(Convert.ToInt32(id));
-
-                                        // =====================
-                                        // Inventory and Journal
-                                        // =====================
-                                        Business.Inventory inventory = new Business.Inventory();
-                                        Business.Journal journal = new Business.Journal();
 
                                         if (!unlockReceivingReceipt.IsLocked)
                                         {
+                                            purchaseOrderStatus.UpdatePurchaseOrderStatus(Convert.ToInt32(id));
                                             inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                                             journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
                                         }
 
-                                        String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -698,35 +565,9 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (receivingReceipt.FirstOrDefault().IsLocked)
                                 {
-                                    Decimal paidAmount = 0;
-                                    Decimal adjustmentAmount = 0;
-
-                                    var disbursementLines = from d in db.TrnDisbursementLines
-                                                            where d.RRId == Convert.ToInt32(id)
-                                                            && d.TrnDisbursement.IsLocked == true
-                                                            select d;
-
-                                    if (disbursementLines.Any())
+                                    if (receivingReceipt.FirstOrDefault().PaidAmount + receivingReceipt.FirstOrDefault().AdjustmentAmount == 0)
                                     {
-                                        paidAmount = disbursementLines.Sum(d => d.Amount);
-                                    }
-
-                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                              where d.APRRId == Convert.ToInt32(id)
-                                                              && d.TrnJournalVoucher.IsLocked == true
-                                                              select d;
-
-                                    if (journalVoucherLines.Any())
-                                    {
-                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                                        adjustmentAmount = creditAmount - debitAmount;
-                                    }
-
-                                    if (paidAmount + adjustmentAmount == 0)
-                                    {
-                                        String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
                                         var cancelReceivingReceipt = receivingReceipt.FirstOrDefault();
                                         cancelReceivingReceipt.Amount = 0;
@@ -739,20 +580,14 @@ namespace easyfis.ModifiedApiControllers
                                         cancelReceivingReceipt.UpdatedDateTime = DateTime.Now;
                                         db.SubmitChanges();
 
-                                        // =====================
-                                        // Inventory and Journal
-                                        // =====================
-                                        Business.Inventory inventory = new Business.Inventory();
-                                        Business.Journal journal = new Business.Journal();
-
                                         if (cancelReceivingReceipt.IsCancelled)
                                         {
                                             inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                                             journal.CancelJournal(Convert.ToInt32(id), "ReceivingReceipt");
                                         }
 
-                                        String newObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -828,8 +663,8 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     db.TrnReceivingReceipts.DeleteOnSubmit(receivingReceipt.First());
 
-                                    String oldObject = at.GetObjectString(receivingReceipt.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                    String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 

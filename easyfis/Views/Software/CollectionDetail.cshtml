@@ -58,13 +58,13 @@
                                     {
                                         <button class="btn btn-primary" id="btnCollectionDetailUnlock" onclick="btnCollectionDetailUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
-                                    if (canCancel)
-                                    {
-                                        <button class="btn btn-primary" id="btnCollectionDetailCancel" onclick="btnCollectionDetailCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
-                                    }
                                     if (canPrint)
                                     {
                                         <button class="btn btn-primary" id="btnCollectionDetailPrint" onclick="btnCollectionDetailPrintOnclick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                    if (canCancel)
+                                    {
+                                        <button class="btn btn-warning" id="btnCollectionDetailCancel" onclick="btnCollectionDetailCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
                                     }
                                 }
                                 <button class="btn btn-danger" id="btnCloseCollection" onclick="window.location.href = '/Software/Collection'"><i class="fa fa-times"></i> Close</button>
@@ -882,6 +882,28 @@
             </div>
         </div>
     </div>
+    
+    <!--
+        ================================
+        Collection: Cancel Confirm Modal
+        ================================
+    -->
+    <div class="modal fade" id="collectionCancelConfirmModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cancel</h4>
+                </div>
+                <div class="modal-body">
+                    Cancel Collection?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnCollectionCancelConfirm" class="btn btn-warning" onclick="btnCollectionCancelConfirmOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
+                    <button id="btnCollectionCancelConfirmCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
@@ -1394,6 +1416,24 @@
         // Cancel Collection
         // =================
         function btnCollectionDetailCancelOnclick() {
+            $('#collectionCancelConfirmModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnCollectionCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+            $("#btnCollectionCancelConfirm").prop("disabled", false);
+            $("#btnCollectionCancelConfirmCloseModal").prop("disabled", false);
+        }
+
+        // =========================
+        // Confirm Cancel Collection
+        // =========================
+        function btnCollectionCancelConfirmOnclick() {
+            document.getElementById('btnCollectionCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnCollectionCancelConfirm").prop("disabled", true);
+            $("#btnCollectionCancelConfirmCloseModal").prop("disabled", true);
+
             var collectonId = getURLParameterValue("id");
             document.getElementById('btnCollectionDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
             $("#btnCollectionDetailJournal").prop("disabled", true);
@@ -1425,6 +1465,10 @@
                         $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
+
+                        document.getElementById('btnCollectionCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionCancelConfirm").prop("disabled", false);
+                        $("#btnCollectionCancelConfirmCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
@@ -1434,6 +1478,10 @@
                         $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
+
+                        document.getElementById('btnCollectionCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionCancelConfirm").prop("disabled", false);
+                        $("#btnCollectionCancelConfirmCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
@@ -1443,6 +1491,10 @@
                         $("#btnCollectionDetailCancel").prop("disabled", false);
                         $("#btnCollectionDetailPrint").prop("disabled", false);
                         $("#btnCloseCollection").prop("disabled", false);
+
+                        document.getElementById('btnCollectionCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnCollectionCancelConfirm").prop("disabled", false);
+                        $("#btnCollectionCancelConfirmCloseModal").prop("disabled", false);
                     }
                 }
             });

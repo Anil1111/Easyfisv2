@@ -17,29 +17,12 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
-
-        // =====================
-        // Get Collection Amount
-        // =====================
-        public Decimal GetCollectionAmount(Int32 ORId)
-        {
-            var collectionLines = from d in db.TrnCollectionLines
-                                  where d.ORId == ORId
-                                  select d;
-
-            if (collectionLines.Any())
-            {
-                return collectionLines.Sum(d => d.Amount);
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        // ========
+        // Business
+        // ========
+        private Business.AccountsReceivable accountsReceivable = new Business.AccountsReceivable();
+        private Business.Journal journal = new Business.Journal();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // ===============
         // List Collection
@@ -65,7 +48,7 @@ namespace easyfis.ModifiedApiControllers
                                   ManualORNumber = d.ManualORNumber,
                                   Customer = d.MstArticle.Article,
                                   Particulars = d.Particulars,
-                                  Amount = GetCollectionAmount(d.Id),
+                                  Amount = d.TrnCollectionLines.Any() ? d.TrnCollectionLines.Sum(a => a.Amount) : 0,
                                   IsLocked = d.IsLocked,
                                   CreatedById = d.CreatedById,
                                   CreatedBy = d.MstUser2.FullName,
@@ -282,8 +265,8 @@ namespace easyfis.ModifiedApiControllers
                                     db.TrnCollections.InsertOnSubmit(newCollection);
                                     db.SubmitChanges();
 
-                                    String newObject = at.GetObjectString(newCollection);
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                    String newObject = auditTrail.GetObjectString(newCollection);
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK, newCollection.Id);
                                 }
@@ -319,69 +302,6 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // ==========================
-        // Update Accounts Receivable
-        // ==========================
-        public void UpdateAccountsReceivable(Int32 ORId)
-        {
-            var collectionLines = from d in db.TrnCollectionLines
-                                  where d.ORId == ORId
-                                  select d;
-
-            if (collectionLines.Any())
-            {
-                foreach (var collectionLine in collectionLines)
-                {
-                    if (collectionLine.SIId != null)
-                    {
-                        Decimal paidAmount = 0;
-
-                        var collectionLinesAmount = from d in db.TrnCollectionLines
-                                                    where d.SIId == collectionLine.SIId
-                                                    && d.TrnCollection.IsLocked == true
-                                                    select d;
-
-                        if (collectionLinesAmount.Any())
-                        {
-                            paidAmount = collectionLinesAmount.Sum(d => d.Amount);
-                        }
-
-                        Decimal adjustmentAmount = 0;
-
-                        var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                  where d.ARSIId == collectionLine.SIId
-                                                  && d.TrnJournalVoucher.IsLocked == true
-                                                  select d;
-
-                        if (journalVoucherLines.Any())
-                        {
-                            Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                            Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                            adjustmentAmount = debitAmount - creditAmount;
-                        }
-
-                        var salesInvoice = from d in db.TrnSalesInvoices
-                                           where d.Id == collectionLine.SIId
-                                           && d.IsLocked == true
-                                           select d;
-
-                        if (salesInvoice.Any())
-                        {
-                            Decimal salesInvoiceAmount = salesInvoice.FirstOrDefault().Amount;
-                            Decimal balanceAmount = (salesInvoiceAmount - paidAmount) + adjustmentAmount;
-
-                            var updateSalesInvoice = salesInvoice.FirstOrDefault();
-                            updateSalesInvoice.PaidAmount = paidAmount;
-                            updateSalesInvoice.AdjustmentAmount = adjustmentAmount;
-                            updateSalesInvoice.BalanceAmount = balanceAmount;
-                            db.SubmitChanges();
-                        }
-                    }
-                }
-            }
-        }
-
         // ===============
         // Lock Collection
         // ===============
@@ -413,9 +333,10 @@ namespace easyfis.ModifiedApiControllers
 
                             if (collection.Any())
                             {
-                                if (!collection.FirstOrDefault().IsLocked)
+                                int countInvalidSI = (collection.FirstOrDefault().TrnCollectionLines.Where(d => d.TrnSalesInvoice.IsLocked == false || d.TrnSalesInvoice.IsCancelled == true).Count());
+                                if (!collection.FirstOrDefault().IsLocked && countInvalidSI == 0)
                                 {
-                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
 
                                     var lockCollection = collection.FirstOrDefault();
                                     lockCollection.ORDate = Convert.ToDateTime(objCollection.ORDate);
@@ -428,28 +349,27 @@ namespace easyfis.ModifiedApiControllers
                                     lockCollection.IsLocked = true;
                                     lockCollection.UpdatedById = currentUserId;
                                     lockCollection.UpdatedDateTime = DateTime.Now;
-
                                     db.SubmitChanges();
-
-                                    // ===============================
-                                    // Journal and Accounts Receivable
-                                    // ===============================
-                                    Business.Journal journal = new Business.Journal();
 
                                     if (lockCollection.IsLocked)
                                     {
+                                        var collectionLines = from d in db.TrnCollectionLines where d.ORId == Convert.ToInt32(id) && d.SIId != null select d;
+                                        if (collectionLines.Any())
+                                        {
+                                            foreach (var collectionLine in collectionLines) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(collectionLine.SIId)); }
+                                        }
+
                                         journal.InsertOfficialReceiptJournal(Convert.ToInt32(id));
-                                        UpdateAccountsReceivable(Convert.ToInt32(id));
                                     }
 
-                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These collection details are already locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These collection details are already locked or SI is invalid.");
                                 }
                             }
                             else
@@ -514,28 +434,27 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     if (collection.FirstOrDefault().IsLocked)
                                     {
-                                        String oldObject = at.GetObjectString(collection.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
 
                                         var unlockCollection = collection.FirstOrDefault();
                                         unlockCollection.IsLocked = false;
                                         unlockCollection.UpdatedById = currentUserId;
                                         unlockCollection.UpdatedDateTime = DateTime.Now;
-
                                         db.SubmitChanges();
-
-                                        // ===============================
-                                        // Journal and Accounts Receivable
-                                        // ===============================
-                                        Business.Journal journal = new Business.Journal();
 
                                         if (!unlockCollection.IsLocked)
                                         {
+                                            var collectionLines = from d in db.TrnCollectionLines where d.ORId == Convert.ToInt32(id) && d.SIId != null select d;
+                                            if (collectionLines.Any())
+                                            {
+                                                foreach (var collectionLine in collectionLines) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(collectionLine.SIId)); }
+                                            }
+
                                             journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
-                                            UpdateAccountsReceivable(Convert.ToInt32(id));
                                         }
 
-                                        String newObject = at.GetObjectString(collection.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -602,28 +521,28 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (collection.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
 
-                                    var unlockCollection = collection.FirstOrDefault();
-                                    unlockCollection.IsCancelled = true;
-                                    unlockCollection.UpdatedById = currentUserId;
-                                    unlockCollection.UpdatedDateTime = DateTime.Now;
-
+                                    var cancelCollection = collection.FirstOrDefault();
+                                    cancelCollection.IsCancelled = true;
+                                    cancelCollection.UpdatedById = currentUserId;
+                                    cancelCollection.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
 
-                                    //// ===============================
-                                    //// Journal and Accounts Receivable
-                                    //// ===============================
-                                    //Business.Journal journal = new Business.Journal();
+                                    if (cancelCollection.IsCancelled)
+                                    {
+                                        var collectionLines = from d in db.TrnCollectionLines where d.ORId == Convert.ToInt32(id) select d;
+                                        if (collectionLines.Any())
+                                        {
+                                            foreach (var collectionLine in collectionLines) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(collectionLine.SIId)); collectionLine.Amount = 0; }
+                                            db.SubmitChanges();
+                                        }
 
-                                    //if (!unlockCollection.IsLocked)
-                                    //{
-                                    //    journal.DeleteOfficialReceiptJournal(Convert.ToInt32(id));
-                                    //    UpdateAccountsReceivable(Convert.ToInt32(id));
-                                    //}
+                                        journal.CancelJournal(Convert.ToInt32(id), "Collection");
+                                    }
 
-                                    String newObject = at.GetObjectString(collection.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -694,8 +613,8 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     db.TrnCollections.DeleteOnSubmit(collection.First());
 
-                                    String oldObject = at.GetObjectString(collection.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                    String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 

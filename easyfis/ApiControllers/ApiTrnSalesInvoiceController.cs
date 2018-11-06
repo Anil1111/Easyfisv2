@@ -17,10 +17,13 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.AccountsReceivable accountsReceivable = new Business.AccountsReceivable();
+        private Business.Inventory inventory = new Business.Inventory();
+        private Business.Journal journal = new Business.Journal();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // ==================
         // List Sales Invoice
@@ -307,8 +310,8 @@ namespace easyfis.ModifiedApiControllers
                                         db.TrnSalesInvoices.InsertOnSubmit(newSalesInvoice);
                                         db.SubmitChanges();
 
-                                        String newObject = at.GetObjectString(newSalesInvoice);
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                        String newObject = auditTrail.GetObjectString(newSalesInvoice);
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK, newSalesInvoice.Id);
                                     }
@@ -349,25 +352,6 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // ========================
-        // Get Sales Invoice Amount
-        // ========================
-        public Decimal GetSalesInvoiceAmount(Int32 SIId)
-        {
-            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
-                                    where d.SIId == SIId
-                                    select d;
-
-            if (salesInvoiceItems.Any())
-            {
-                return salesInvoiceItems.Sum(d => d.Amount);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         // ==================
         // Lock Sales Invoice
         // ==================
@@ -401,33 +385,11 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!salesInvoice.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
 
-                                    Decimal paidAmount = 0;
-                                    Decimal adjustmentAmount = 0;
-
-                                    var collectionLines = from d in db.TrnCollectionLines
-                                                          where d.SIId == Convert.ToInt32(id)
-                                                          && d.TrnCollection.IsLocked == true
-                                                          select d;
-
-                                    if (collectionLines.Any())
-                                    {
-                                        paidAmount = collectionLines.Sum(d => d.Amount);
-                                    }
-
-                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                              where d.ARSIId == Convert.ToInt32(id)
-                                                              && d.TrnJournalVoucher.IsLocked == true
-                                                              select d;
-
-                                    if (journalVoucherLines.Any())
-                                    {
-                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                                        adjustmentAmount = debitAmount - creditAmount;
-                                    }
+                                    Decimal amount = 0;
+                                    var salesInvoiceItems = from d in db.TrnSalesInvoiceItems where d.SIId == Convert.ToInt32(id) select d;
+                                    if (salesInvoiceItems.Any()) { amount = salesInvoiceItems.Sum(d => d.Amount); }
 
                                     var lockSalesInvoice = salesInvoice.FirstOrDefault();
                                     lockSalesInvoice.SIDate = Convert.ToDateTime(objSalesInvoice.SIDate);
@@ -436,10 +398,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockSalesInvoice.DocumentReference = objSalesInvoice.DocumentReference;
                                     lockSalesInvoice.ManualSINumber = objSalesInvoice.ManualSINumber;
                                     lockSalesInvoice.Remarks = objSalesInvoice.Remarks;
-                                    lockSalesInvoice.Amount = GetSalesInvoiceAmount(Convert.ToInt32(id));
-                                    lockSalesInvoice.PaidAmount = paidAmount;
-                                    lockSalesInvoice.AdjustmentAmount = adjustmentAmount;
-                                    lockSalesInvoice.BalanceAmount = (GetSalesInvoiceAmount(Convert.ToInt32(id)) - paidAmount) + adjustmentAmount;
+                                    lockSalesInvoice.Amount = amount;
                                     lockSalesInvoice.SoldById = objSalesInvoice.SoldById;
                                     lockSalesInvoice.CheckedById = objSalesInvoice.CheckedById;
                                     lockSalesInvoice.ApprovedById = objSalesInvoice.ApprovedById;
@@ -447,23 +406,17 @@ namespace easyfis.ModifiedApiControllers
                                     lockSalesInvoice.IsLocked = true;
                                     lockSalesInvoice.UpdatedById = currentUserId;
                                     lockSalesInvoice.UpdatedDateTime = DateTime.Now;
-
                                     db.SubmitChanges();
-
-                                    // =====================
-                                    // Inventory and Journal
-                                    // =====================
-                                    Business.Inventory inventory = new Business.Inventory();
-                                    Business.Journal journal = new Business.Journal();
 
                                     if (lockSalesInvoice.IsLocked)
                                     {
+                                        accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(id));
                                         inventory.InsertSalesInvoiceInventory(Convert.ToInt32(id));
                                         journal.InsertSalesInvoiceJournal(Convert.ToInt32(id));
                                     }
 
-                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -532,20 +485,13 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (salesInvoice.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
 
                                     var unlockSalesInvoice = salesInvoice.FirstOrDefault();
                                     unlockSalesInvoice.IsLocked = false;
                                     unlockSalesInvoice.UpdatedById = currentUserId;
                                     unlockSalesInvoice.UpdatedDateTime = DateTime.Now;
-
                                     db.SubmitChanges();
-
-                                    // =====================
-                                    // Inventory and Journal
-                                    // =====================
-                                    Business.Inventory inventory = new Business.Inventory();
-                                    Business.Journal journal = new Business.Journal();
 
                                     if (!unlockSalesInvoice.IsLocked)
                                     {
@@ -553,8 +499,8 @@ namespace easyfis.ModifiedApiControllers
                                         journal.DeleteSalesInvoiceJournal(Convert.ToInt32(id));
                                     }
 
-                                    String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -616,35 +562,9 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (salesInvoice.FirstOrDefault().IsLocked)
                                 {
-                                    Decimal paidAmount = 0;
-                                    Decimal adjustmentAmount = 0;
-
-                                    var collectionLines = from d in db.TrnCollectionLines
-                                                          where d.SIId == Convert.ToInt32(id)
-                                                          && d.TrnCollection.IsLocked == true
-                                                          select d;
-
-                                    if (collectionLines.Any())
+                                    if (salesInvoice.FirstOrDefault().PaidAmount + salesInvoice.FirstOrDefault().AdjustmentAmount == 0)
                                     {
-                                        paidAmount = collectionLines.Sum(d => d.Amount);
-                                    }
-
-                                    var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                              where d.ARSIId == Convert.ToInt32(id)
-                                                              && d.TrnJournalVoucher.IsLocked == true
-                                                              select d;
-
-                                    if (journalVoucherLines.Any())
-                                    {
-                                        Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                                        Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                                        adjustmentAmount = debitAmount - creditAmount;
-                                    }
-
-                                    if (paidAmount + adjustmentAmount == 0)
-                                    {
-                                        String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
 
                                         var cancelSalesInvoice = salesInvoice.FirstOrDefault();
                                         cancelSalesInvoice.Amount = 0;
@@ -656,20 +576,14 @@ namespace easyfis.ModifiedApiControllers
                                         cancelSalesInvoice.UpdatedDateTime = DateTime.Now;
                                         db.SubmitChanges();
 
-                                        // =====================
-                                        // Inventory and Journal
-                                        // =====================
-                                        Business.Inventory inventory = new Business.Inventory();
-                                        Business.Journal journal = new Business.Journal();
-
                                         if (cancelSalesInvoice.IsCancelled)
                                         {
                                             inventory.DeleteSalesInvoiceInventory(Convert.ToInt32(id));
                                             journal.CancelJournal(Convert.ToInt32(id), "SalesInvoice");
                                         }
 
-                                        String newObject = at.GetObjectString(salesInvoice.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -745,8 +659,8 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     db.TrnSalesInvoices.DeleteOnSubmit(salesInvoice.First());
 
-                                    String oldObject = at.GetObjectString(salesInvoice.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                    String oldObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 

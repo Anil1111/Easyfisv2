@@ -17,10 +17,12 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.AccountsPayable accountsPayable = new Business.AccountsPayable();
+        private Business.Journal journal = new Business.Journal();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // =================
         // List Disbursement
@@ -326,8 +328,8 @@ namespace easyfis.ModifiedApiControllers
                                             db.TrnDisbursements.InsertOnSubmit(newDisbursement);
                                             db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newDisbursement);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                            String newObject = auditTrail.GetObjectString(newDisbursement);
+                                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                             return Request.CreateResponse(HttpStatusCode.OK, newDisbursement.Id);
                                         }
@@ -373,89 +375,6 @@ namespace easyfis.ModifiedApiControllers
             }
         }
 
-        // =======================
-        // Update Accounts Payable
-        // =======================
-        public void UpdateAccountsPayable(Int32 CVId)
-        {
-            var disbursementLines = from d in db.TrnDisbursementLines
-                                    where d.CVId == CVId
-                                    select d;
-
-            if (disbursementLines.Any())
-            {
-                foreach (var disbursementLine in disbursementLines)
-                {
-                    if (disbursementLine.RRId != null)
-                    {
-                        Decimal paidAmount = 0;
-
-                        var disbursementLinesAmount = from d in db.TrnDisbursementLines
-                                                      where d.RRId == disbursementLine.RRId
-                                                      && d.TrnDisbursement.IsLocked == true
-                                                      select d;
-
-                        if (disbursementLinesAmount.Any())
-                        {
-                            paidAmount = disbursementLinesAmount.Sum(d => d.Amount);
-                        }
-
-                        Decimal adjustmentAmount = 0;
-
-                        var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                                  where d.APRRId == disbursementLine.RRId
-                                                  && d.TrnJournalVoucher.IsLocked == true
-                                                  select d;
-
-                        if (journalVoucherLines.Any())
-                        {
-                            Decimal debitAmount = journalVoucherLines.Sum(d => d.DebitAmount);
-                            Decimal creditAmount = journalVoucherLines.Sum(d => d.CreditAmount);
-
-                            adjustmentAmount = creditAmount - debitAmount;
-                        }
-
-                        var receivingReceipt = from d in db.TrnReceivingReceipts
-                                               where d.Id == disbursementLine.RRId
-                                               && d.IsLocked == true
-                                               select d;
-
-                        if (receivingReceipt.Any())
-                        {
-                            Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
-                            Decimal receivingReceiptWTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
-                            Decimal balanceAmount = (receivingReceiptAmount - receivingReceiptWTAXAmount - paidAmount) + adjustmentAmount;
-
-                            var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
-                            updateReceivingReceipt.PaidAmount = paidAmount;
-                            updateReceivingReceipt.AdjustmentAmount = adjustmentAmount;
-                            updateReceivingReceipt.BalanceAmount = balanceAmount;
-                            db.SubmitChanges();
-                        }
-                    }
-                }
-            }
-        }
-
-        // =======================
-        // Get Disbursement Amount
-        // =======================
-        public Decimal GetDisbursementAmount(Int32 CVId)
-        {
-            var disbursementLines = from d in db.TrnDisbursementLines
-                                    where d.CVId == CVId
-                                    select d;
-
-            if (disbursementLines.Any())
-            {
-                return disbursementLines.Sum(d => d.Amount);
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         // =================
         // Lock Disbursement
         // =================
@@ -487,9 +406,14 @@ namespace easyfis.ModifiedApiControllers
 
                             if (disbursement.Any())
                             {
-                                if (!disbursement.FirstOrDefault().IsLocked)
+                                int countInvalidRR = (disbursement.FirstOrDefault().TrnDisbursementLines.Where(d => d.TrnReceivingReceipt.IsLocked == false || d.TrnReceivingReceipt.IsCancelled == true).Count());
+                                if (!disbursement.FirstOrDefault().IsLocked && countInvalidRR == 0)
                                 {
-                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+
+                                    Decimal amount = 0;
+                                    var disbursementLines = from d in db.TrnDisbursementLines where d.CVId == Convert.ToInt32(id) select d;
+                                    if (disbursementLines.Any()) { amount = disbursementLines.Sum(d => d.Amount); }
 
                                     var lockDisbursement = disbursement.FirstOrDefault();
                                     lockDisbursement.CVDate = Convert.ToDateTime(objDisbursement.CVDate);
@@ -501,7 +425,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockDisbursement.BankId = objDisbursement.BankId;
                                     lockDisbursement.CheckNumber = objDisbursement.CheckNumber;
                                     lockDisbursement.CheckDate = Convert.ToDateTime(objDisbursement.CheckDate);
-                                    lockDisbursement.Amount = GetDisbursementAmount(Convert.ToInt32(id));
+                                    lockDisbursement.Amount = amount;
                                     lockDisbursement.IsCrossCheck = objDisbursement.IsCrossCheck;
                                     lockDisbursement.CheckedById = objDisbursement.CheckedById;
                                     lockDisbursement.ApprovedById = objDisbursement.ApprovedById;
@@ -510,28 +434,26 @@ namespace easyfis.ModifiedApiControllers
                                     lockDisbursement.IsLocked = true;
                                     lockDisbursement.UpdatedById = currentUserId;
                                     lockDisbursement.UpdatedDateTime = DateTime.Now;
-
                                     db.SubmitChanges();
-
-                                    // ============================
-                                    // Journal and Accounts Payable
-                                    // ============================
-                                    Business.Journal journal = new Business.Journal();
 
                                     if (lockDisbursement.IsLocked)
                                     {
+                                        if (disbursementLines.Any())
+                                        {
+                                            foreach (var disbursementLine in disbursementLines) { if (disbursementLine.RRId != null) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(disbursementLine.RRId)); } }
+                                        }
+
                                         journal.InsertCashVoucherJournal(Convert.ToInt32(id));
-                                        UpdateAccountsPayable(Convert.ToInt32(id));
                                     }
 
-                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These disbursement details are already locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These disbursement details are already locked or RR is invalid.");
                                 }
                             }
                             else
@@ -596,28 +518,27 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     if (disbursement.FirstOrDefault().IsLocked)
                                     {
-                                        String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
 
                                         var unlockDisbursement = disbursement.FirstOrDefault();
                                         unlockDisbursement.IsLocked = false;
                                         unlockDisbursement.UpdatedById = currentUserId;
                                         unlockDisbursement.UpdatedDateTime = DateTime.Now;
-
                                         db.SubmitChanges();
-
-                                        // ============================
-                                        // Journal and Accounts Payable
-                                        // ============================
-                                        Business.Journal journal = new Business.Journal();
 
                                         if (!unlockDisbursement.IsLocked)
                                         {
+                                            var disbursementLines = from d in db.TrnDisbursementLines where d.CVId == Convert.ToInt32(id) && d.RRId != null select d;
+                                            if (disbursementLines.Any())
+                                            {
+                                                foreach (var disbursementLine in disbursementLines) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(disbursementLine.RRId)); }
+                                            }
+
                                             journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
-                                            UpdateAccountsPayable(Convert.ToInt32(id));
                                         }
 
-                                        String newObject = at.GetObjectString(disbursement.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -684,28 +605,29 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (disbursement.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
 
-                                    var unlockDisbursement = disbursement.FirstOrDefault();
-                                    unlockDisbursement.IsCancelled = true;
-                                    unlockDisbursement.UpdatedById = currentUserId;
-                                    unlockDisbursement.UpdatedDateTime = DateTime.Now;
-
+                                    var cancelDisbursement = disbursement.FirstOrDefault();
+                                    cancelDisbursement.Amount = 0;
+                                    cancelDisbursement.IsCancelled = true;
+                                    cancelDisbursement.UpdatedById = currentUserId;
+                                    cancelDisbursement.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
 
-                                    //// ============================
-                                    //// Journal and Accounts Payable
-                                    //// ============================
-                                    //Business.Journal journal = new Business.Journal();
+                                    if (cancelDisbursement.IsCancelled)
+                                    {
+                                        var disbursementLines = from d in db.TrnDisbursementLines where d.CVId == Convert.ToInt32(id) select d;
+                                        if (disbursementLines.Any())
+                                        {
+                                            foreach (var disbursementLine in disbursementLines) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(disbursementLine.RRId)); disbursementLine.Amount = 0; }
+                                            db.SubmitChanges();
+                                        }
 
-                                    //if (!unlockDisbursement.IsLocked)
-                                    //{
-                                    //    journal.DeleteCashVoucherJournal(Convert.ToInt32(id));
-                                    //    UpdateAccountsPayable(Convert.ToInt32(id));
-                                    //}
+                                        journal.CancelJournal(Convert.ToInt32(id), "Disbursement");
+                                    }
 
-                                    String newObject = at.GetObjectString(disbursement.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -776,8 +698,8 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     db.TrnDisbursements.DeleteOnSubmit(disbursement.First());
 
-                                    String oldObject = at.GetObjectString(disbursement.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                    String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 
