@@ -20,7 +20,6 @@ namespace easyfis.ModifiedApiControllers
         // ========
         // Business
         // ========
-        private Business.PurchaseOrderStatus purchaseOrderStatus = new Business.PurchaseOrderStatus();
         private Business.AccountsPayable accountsPayable = new Business.AccountsPayable();
         private Business.Inventory inventory = new Business.Inventory();
         private Business.Journal journal = new Business.Journal();
@@ -201,6 +200,61 @@ namespace easyfis.ModifiedApiControllers
             return statuses.ToList();
         }
 
+        // ============================
+        // Update Purchase Order Status
+        // ============================
+        public void UpdatePurchaseOrderStatus(Int32 RRId)
+        {
+            var receivedPOs = from d in db.TrnReceivingReceiptItems where d.RRId == RRId group d by d.POId into g select g;
+            if (receivedPOs.Any())
+            {
+                foreach (var receivedPO in receivedPOs)
+                {
+                    Decimal balanceQuantity = 0;
+
+                    var purchasedItems = from d in db.TrnPurchaseOrderItems where d.POId == receivedPO.Key group d by d.ItemId into g select g;
+                    if (purchasedItems.Any())
+                    {
+                        Decimal purchasedItemsQuantity = 0;
+                        Decimal receivedItemsQuantity = 0;
+
+                        foreach (var purchasedItem in purchasedItems)
+                        {
+                            purchasedItemsQuantity = purchasedItem.Sum(d => d.Quantity);
+
+                            var receivedItems = from d in db.TrnReceivingReceiptItems
+                                                where d.POId == receivedPO.Key && d.ItemId == purchasedItem.Key && d.TrnReceivingReceipt.IsLocked == true
+                                                group d by d.ItemId into g
+                                                select g;
+
+                            if (receivedItems.Any())
+                            {
+                                receivedItemsQuantity = receivedItems.FirstOrDefault().Sum(d => d.Quantity);
+                            }
+
+                            balanceQuantity += purchasedItemsQuantity - receivedItemsQuantity;
+                        }
+                    }
+
+                    var currentPurchaseOrder = from d in db.TrnPurchaseOrders where d.Id == receivedPO.Key select d;
+                    if (currentPurchaseOrder.Any())
+                    {
+                        Boolean isClose = false;
+                        if (balanceQuantity <= 0)
+                        {
+                            isClose = true;
+                        }
+
+                        var updatePurchaseOrder = currentPurchaseOrder.FirstOrDefault();
+                        updatePurchaseOrder.IsClose = isClose;
+                        db.SubmitChanges();
+
+                        balanceQuantity = 0;
+                    }
+                }
+            }
+        }
+
         // ===================
         // Fill Leading Zeroes
         // ===================
@@ -377,7 +431,8 @@ namespace easyfis.ModifiedApiControllers
 
                             if (receivingReceipt.Any())
                             {
-                                if (!receivingReceipt.FirstOrDefault().IsLocked)
+                                int countInvalidPO = (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Where(d => d.TrnPurchaseOrder.IsLocked == false || d.TrnPurchaseOrder.IsCancelled == true).Count());
+                                if (!receivingReceipt.FirstOrDefault().IsLocked && countInvalidPO == 0)
                                 {
                                     String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
@@ -404,7 +459,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (lockReceivingReceipt.IsLocked)
                                     {
-                                        purchaseOrderStatus.UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+                                        UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+
                                         accountsPayable.UpdateAccountsPayable(Convert.ToInt32(id));
                                         inventory.InsertReceivingReceiptInventory(Convert.ToInt32(id));
                                         journal.InsertReceivingReceiptJournal(Convert.ToInt32(id));
@@ -417,7 +473,7 @@ namespace easyfis.ModifiedApiControllers
                                 }
                                 else
                                 {
-                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These receiving receipt details are already locked.");
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Locking Error. These receiving receipt details are already locked or PO is invalid..");
                                 }
                             }
                             else
@@ -492,7 +548,8 @@ namespace easyfis.ModifiedApiControllers
 
                                         if (!unlockReceivingReceipt.IsLocked)
                                         {
-                                            purchaseOrderStatus.UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+                                            UpdatePurchaseOrderStatus(Convert.ToInt32(id));
+
                                             inventory.DeleteReceivingReceiptInventory(Convert.ToInt32(id));
                                             journal.DeleteReceivingReceiptJournal(Convert.ToInt32(id));
                                         }

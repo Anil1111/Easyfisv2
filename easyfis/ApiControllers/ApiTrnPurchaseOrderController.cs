@@ -578,19 +578,26 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (purchaseOrder.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                    var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.POId == Convert.ToInt32(id) && (d.TrnReceivingReceipt.IsLocked == true  && d.TrnReceivingReceipt.IsCancelled == false) select d;
+                                    if (!receivingReceiptItems.Any())
+                                    {
+                                        String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
 
-                                    var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
-                                    unlockPurchaseOrder.IsCancelled = true;
-                                    unlockPurchaseOrder.UpdatedById = currentUserId;
-                                    unlockPurchaseOrder.UpdatedDateTime = DateTime.Now;
+                                        var unlockPurchaseOrder = purchaseOrder.FirstOrDefault();
+                                        unlockPurchaseOrder.IsCancelled = true;
+                                        unlockPurchaseOrder.UpdatedById = currentUserId;
+                                        unlockPurchaseOrder.UpdatedDateTime = DateTime.Now;
+                                        db.SubmitChanges();
 
-                                    db.SubmitChanges();
+                                        String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
-                                    String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
-
-                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Cancel Error. Cannot cancel purchase order detail if there are receiving items.");
+                                    }
                                 }
                                 else
                                 {

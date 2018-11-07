@@ -17,10 +17,13 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.AccountsPayable accountsPayable = new Business.AccountsPayable();
+        private Business.AccountsReceivable accountsReceivable = new Business.AccountsReceivable();
+        private Business.Journal journal = new Business.Journal();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // ====================
         // List Journal Voucher
@@ -234,8 +237,8 @@ namespace easyfis.ModifiedApiControllers
                                 db.TrnJournalVouchers.InsertOnSubmit(newJournalVoucher);
                                 db.SubmitChanges();
 
-                                String newObject = at.GetObjectString(newJournalVoucher);
-                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                String newObject = auditTrail.GetObjectString(newJournalVoucher);
+                                auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                 return Request.CreateResponse(HttpStatusCode.OK, newJournalVoucher.Id);
                             }
@@ -263,117 +266,6 @@ namespace easyfis.ModifiedApiControllers
             {
                 Debug.WriteLine(e);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
-            }
-        }
-
-        // =========================
-        // Update AP and AR Balances
-        // =========================
-        public void UpdateBalances(Int32 JVId)
-        {
-            var journalVoucherLines = from d in db.TrnJournalVoucherLines
-                                      where d.JVId == JVId
-                                      select d;
-
-            if (journalVoucherLines.Any())
-            {
-                foreach (var journalVoucherLine in journalVoucherLines)
-                {
-                    if (journalVoucherLine.APRRId != null)
-                    {
-                        Decimal paidAmount = 0;
-
-                        var disbursementLines = from d in db.TrnDisbursementLines
-                                                where d.RRId == journalVoucherLine.APRRId
-                                                && d.TrnDisbursement.IsLocked == true
-                                                select d;
-
-                        if (disbursementLines.Any())
-                        {
-                            paidAmount = disbursementLines.Sum(d => d.Amount);
-                        }
-
-                        Decimal adjustmentAmount = 0;
-
-                        var journalVoucherLinesAPAdjustments = from d in db.TrnJournalVoucherLines
-                                                               where d.APRRId == journalVoucherLine.APRRId
-                                                               && d.TrnJournalVoucher.IsLocked == true
-                                                               select d;
-
-                        if (journalVoucherLinesAPAdjustments.Any())
-                        {
-                            Decimal debitAmount = journalVoucherLinesAPAdjustments.Sum(d => d.DebitAmount);
-                            Decimal creditAmount = journalVoucherLinesAPAdjustments.Sum(d => d.CreditAmount);
-
-                            adjustmentAmount = creditAmount - debitAmount;
-                        }
-
-                        var receivingReceipt = from d in db.TrnReceivingReceipts
-                                               where d.Id == journalVoucherLine.APRRId
-                                               && d.IsLocked == true
-                                               select d;
-
-                        if (receivingReceipt.Any())
-                        {
-                            Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
-                            Decimal receivingReceiptWTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
-                            Decimal balanceAmount = (receivingReceiptAmount - receivingReceiptWTAXAmount - paidAmount) + adjustmentAmount;
-
-                            var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
-                            updateReceivingReceipt.PaidAmount = paidAmount;
-                            updateReceivingReceipt.AdjustmentAmount = adjustmentAmount;
-                            updateReceivingReceipt.BalanceAmount = balanceAmount;
-                            db.SubmitChanges();
-                        }
-                    }
-
-                    if (journalVoucherLine.ARSIId != null)
-                    {
-                        Decimal paidAmount = 0;
-
-                        var collectionLines = from d in db.TrnCollectionLines
-                                              where d.SIId == journalVoucherLine.ARSIId
-                                              && d.TrnCollection.IsLocked == true
-                                              select d;
-
-                        if (collectionLines.Any())
-                        {
-                            paidAmount = collectionLines.Sum(d => d.Amount);
-                        }
-
-                        Decimal adjustmentAmount = 0;
-
-                        var journalVoucherLinesARAdjustments = from d in db.TrnJournalVoucherLines
-                                                               where d.ARSIId == journalVoucherLine.ARSIId
-                                                               && d.TrnJournalVoucher.IsLocked == true
-                                                               select d;
-
-                        if (journalVoucherLinesARAdjustments.Any())
-                        {
-                            Decimal debitAmount = journalVoucherLinesARAdjustments.Sum(d => d.DebitAmount);
-                            Decimal creditAmount = journalVoucherLinesARAdjustments.Sum(d => d.CreditAmount);
-
-                            adjustmentAmount = debitAmount - creditAmount;
-                        }
-
-                        var salesInvoice = from d in db.TrnSalesInvoices
-                                           where d.Id == journalVoucherLine.ARSIId
-                                           && d.IsLocked == true
-                                           select d;
-
-                        if (salesInvoice.Any())
-                        {
-                            Decimal salesInvoiceAmount = salesInvoice.FirstOrDefault().Amount;
-                            Decimal balanceAmount = (salesInvoiceAmount - paidAmount) + adjustmentAmount;
-
-                            var updateSalesInvoice = salesInvoice.FirstOrDefault();
-                            updateSalesInvoice.PaidAmount = paidAmount;
-                            updateSalesInvoice.AdjustmentAmount = adjustmentAmount;
-                            updateSalesInvoice.BalanceAmount = balanceAmount;
-                            db.SubmitChanges();
-                        }
-                    }
-                }
             }
         }
 
@@ -410,7 +302,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!journalVoucher.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
 
                                     Decimal totalJournalVoucherLineDebitAmount = journalVoucher.FirstOrDefault().TrnJournalVoucherLines.Sum(d => d.DebitAmount);
                                     Decimal totalJournalVoucherLineCreditAmount = journalVoucher.FirstOrDefault().TrnJournalVoucherLines.Sum(d => d.CreditAmount);
@@ -428,22 +320,25 @@ namespace easyfis.ModifiedApiControllers
                                         lockJournalVoucher.IsLocked = true;
                                         lockJournalVoucher.UpdatedById = currentUserId;
                                         lockJournalVoucher.UpdatedDateTime = DateTime.Now;
-
                                         db.SubmitChanges();
-
-                                        // =======
-                                        // Journal
-                                        // =======
-                                        Business.Journal journal = new Business.Journal();
 
                                         if (lockJournalVoucher.IsLocked)
                                         {
+                                            var journalVoucherLines = from d in db.TrnJournalVoucherLines where d.JVId == Convert.ToInt32(id) select d;
+                                            if (journalVoucherLines.Any())
+                                            {
+                                                foreach (var journalVoucherLine in journalVoucherLines)
+                                                {
+                                                    if (journalVoucherLine.APRRId != null) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(journalVoucherLine.APRRId)); }
+                                                    if (journalVoucherLine.ARSIId != null) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(journalVoucherLine.ARSIId)); }
+                                                }
+                                            }
+
                                             journal.InsertJournalVoucherJournal(Convert.ToInt32(id));
-                                            UpdateBalances(Convert.ToInt32(id));
                                         }
 
-                                        String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -519,28 +414,31 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     if (journalVoucher.FirstOrDefault().IsLocked)
                                     {
-                                        String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
 
                                         var unlockJournalVoucher = journalVoucher.FirstOrDefault();
                                         unlockJournalVoucher.IsLocked = false;
                                         unlockJournalVoucher.UpdatedById = currentUserId;
                                         unlockJournalVoucher.UpdatedDateTime = DateTime.Now;
-
                                         db.SubmitChanges();
-
-                                        // =======
-                                        // Journal
-                                        // =======
-                                        Business.Journal journal = new Business.Journal();
 
                                         if (!unlockJournalVoucher.IsLocked)
                                         {
+                                            var journalVoucherLines = from d in db.TrnJournalVoucherLines where d.JVId == Convert.ToInt32(id) select d;
+                                            if (journalVoucherLines.Any())
+                                            {
+                                                foreach (var journalVoucherLine in journalVoucherLines)
+                                                {
+                                                    if (journalVoucherLine.APRRId != null) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(journalVoucherLine.APRRId)); }
+                                                    if (journalVoucherLine.ARSIId != null) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(journalVoucherLine.ARSIId)); }
+                                                }
+                                            }
+
                                             journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
-                                            UpdateBalances(Convert.ToInt32(id));
                                         }
 
-                                        String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -607,28 +505,36 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (journalVoucher.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
 
-                                    var unlockJournalVoucher = journalVoucher.FirstOrDefault();
-                                    unlockJournalVoucher.IsCancelled = true;
-                                    unlockJournalVoucher.UpdatedById = currentUserId;
-                                    unlockJournalVoucher.UpdatedDateTime = DateTime.Now;
-
+                                    var cancelJournalVoucher = journalVoucher.FirstOrDefault();
+                                    cancelJournalVoucher.IsCancelled = true;
+                                    cancelJournalVoucher.UpdatedById = currentUserId;
+                                    cancelJournalVoucher.UpdatedDateTime = DateTime.Now;
                                     db.SubmitChanges();
 
-                                    //// =======
-                                    //// Journal
-                                    //// =======
-                                    //Business.Journal journal = new Business.Journal();
+                                    if (cancelJournalVoucher.IsCancelled)
+                                    {
+                                        var journalVoucherLines = from d in db.TrnJournalVoucherLines where d.JVId == Convert.ToInt32(id) select d;
+                                        if (journalVoucherLines.Any())
+                                        {
+                                            foreach (var journalVoucherLine in journalVoucherLines)
+                                            {
+                                                if (journalVoucherLine.APRRId != null) { accountsPayable.UpdateAccountsPayable(Convert.ToInt32(journalVoucherLine.APRRId)); }
+                                                if (journalVoucherLine.ARSIId != null) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(journalVoucherLine.ARSIId)); }
 
-                                    //if (!unlockJournalVoucher.IsLocked)
-                                    //{
-                                    //    journal.DeleteJournalVoucherJournal(Convert.ToInt32(id));
-                                    //    UpdateBalances(Convert.ToInt32(id));
-                                    //}
+                                                journalVoucherLine.DebitAmount = 0;
+                                                journalVoucherLine.CreditAmount = 0;
+                                            }
 
-                                    String newObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                            db.SubmitChanges();
+                                        }
+
+                                        journal.CancelJournal(Convert.ToInt32(id), "JournalVoucher");
+                                    }
+
+                                    String newObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -699,8 +605,8 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     db.TrnJournalVouchers.DeleteOnSubmit(journalVoucher.First());
 
-                                    String oldObject = at.GetObjectString(journalVoucher.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                    String oldObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                     db.SubmitChanges();
 

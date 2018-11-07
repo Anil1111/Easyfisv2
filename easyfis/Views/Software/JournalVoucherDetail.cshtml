@@ -58,13 +58,13 @@
                                     {
                                         <button class="btn btn-primary" id="btnJournalVoucherDetailUnlock" onclick="btnJournalVoucherDetailUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
-                                    if (canCancel)
-                                    {
-                                        <button class="btn btn-primary" id="btnJournalVoucherDetailCancel" onclick="btnJournalVoucherDetailCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
-                                    }
                                     if (canPrint)
                                     {
                                         <button class="btn btn-primary" id="btnJournalVoucherDetailPrint" onclick="btnJournalVoucherDetailPrintOnclick()"><i class="fa fa-print"></i> Print</button>
+                                    }
+                                    if (canCancel)
+                                    {
+                                        <button class="btn btn-warning" id="btnJournalVoucherDetailCancel" onclick="btnJournalVoucherDetailCancelOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
                                     }
                                 }
                                 <button class="btn btn-danger" id="btnJournalVoucherDetailClose" onclick="window.location.href ='@Url.Action("JournalVoucher", "Software")'"><i class="fa fa-times"></i> Close</button>
@@ -446,6 +446,28 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--
+        =====================================
+        Journal Voucher: Cancel Confirm Modal
+        =====================================
+    -->
+    <div class="modal fade" id="journalVoucherCancelConfirmModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cancel</h4>
+                </div>
+                <div class="modal-body">
+                    Cancel Journal Voucher?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnJournalVoucherCancelConfirm" class="btn btn-warning" onclick="btnJournalVoucherCancelConfirmOnclick()"><i class="fa fa-times-circle-o"></i> Cancel</button>
+                    <button id="btnJournalVoucherCancelConfirmCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
@@ -849,6 +871,24 @@
         // Cancel Journal Voucher
         // ======================
         function btnJournalVoucherDetailCancelOnclick() {
+            $('#journalVoucherCancelConfirmModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnJournalVoucherCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+            $("#btnJournalVoucherCancelConfirm").prop("disabled", false);
+            $("#btnJournalVoucherCancelConfirmCloseModal").prop("disabled", false);
+        }
+
+        // ==============================
+        // Confirm Cancel Journal Voucher
+        // ==============================
+        function btnJournalVoucherCancelConfirmOnclick() {
+            document.getElementById('btnJournalVoucherCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
+            $("#btnJournalVoucherCancelConfirm").prop("disabled", true);
+            $("#btnJournalVoucherCancelConfirmCloseModal").prop("disabled", true);
+
             document.getElementById('btnJournalVoucherDetailCancel').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancelling...";
             $("#btnJournalVoucherDetailJournal").prop("disabled", true);
             $("#btnJournalVoucherDetailLock").prop("disabled", true);
@@ -879,6 +919,10 @@
                         $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
+
+                        document.getElementById('btnJournalVoucherCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherCancelConfirm").prop("disabled", false);
+                        $("#btnJournalVoucherCancelConfirmCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
@@ -888,6 +932,10 @@
                         $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
+
+                        document.getElementById('btnJournalVoucherCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherCancelConfirm").prop("disabled", false);
+                        $("#btnJournalVoucherCancelConfirmCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
@@ -897,6 +945,10 @@
                         $("#btnJournalVoucherDetailCancel").prop("disabled", false);
                         $("#btnJournalVoucherDetailPrint").prop("disabled", false);
                         $("#btnJournalVoucherDetailClose").prop("disabled", false);
+
+                        document.getElementById('btnJournalVoucherCancelConfirm').innerHTML = "<i class='fa fa-times-circle-o'></i> Cancel";
+                        $("#btnJournalVoucherCancelConfirm").prop("disabled", false);
+                        $("#btnJournalVoucherCancelConfirmCloseModal").prop("disabled", false);
                     }
                 }
             });
@@ -1750,6 +1802,11 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (results) {
+                    var totalDebitAmount = 0;
+                    var totalCreditAmount = 0;
+
+                    var variance = 0;
+
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -1766,22 +1823,19 @@
                                 CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
-                            var debitAmountTotal = 0;
-                            var creditAmountTotal = 0;
+                            var debit = parseFloat(Math.round(results[i]["DebitAmount"] * 100) / 100);
+                            var credit = parseFloat(Math.round(results[i]["CreditAmount"] * 100) / 100);
 
-                            var a = 0;
-                            while (a < results.length) {
-                                debitAmountTotal += results[a]["DebitAmount"];
-                                creditAmountTotal += results[a]["CreditAmount"];
-                                a++;
-                            }
+                            totalDebitAmount += debit;
+                            totalCreditAmount += credit;
                         }
 
-                        document.getElementById('inpJournalTotalDebit').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('inpJournalTotalCredit').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var inpJournalVariance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('inpJournalVariance').value = inpJournalVariance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        variance = totalDebitAmount - totalCreditAmount;
                     }
+
+                    document.getElementById('inpJournalTotalDebit').value = parseFloat(Math.round(totalDebitAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalTotalCredit').value = parseFloat(Math.round(totalCreditAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalVariance').value = parseFloat(Math.round(variance * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                     $("#journalLoading").hide();
                     $("#journalContent").show();

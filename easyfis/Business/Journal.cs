@@ -1325,7 +1325,7 @@ namespace easyfis.Business
         // ==============
         public void CancelJournal(Int32 id, String document)
         {
-            Int32? RRId = null, SIId = null, ORId = null, CVId = null;
+            Int32? RRId = null, SIId = null, ORId = null, CVId = null, JVId = null;
 
             switch (document)
             {
@@ -1333,9 +1333,10 @@ namespace easyfis.Business
                 case "SalesInvoice": SIId = id; break;
                 case "Collection": ORId = id; break;
                 case "Disbursement": CVId = id; break;
+                case "JournalVoucher": JVId = id; break;
             }
 
-            var journals = from d in db.TrnJournals where d.RRId == RRId || d.SIId == SIId || d.ORId == ORId || d.CVId == CVId select d;
+            var journals = from d in db.TrnJournals where d.RRId == RRId || d.SIId == SIId || d.ORId == ORId || d.CVId == CVId || d.JVId == JVId select d;
             if (journals.Any())
             {
                 foreach (var journal in journals)
@@ -1353,6 +1354,7 @@ namespace easyfis.Business
                         SIId = SIId,
                         ORId = ORId,
                         CVId = CVId,
+                        JVId = JVId,
                         DocumentReference = journal.DocumentReference
                     };
 

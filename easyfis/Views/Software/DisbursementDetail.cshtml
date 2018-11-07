@@ -2184,6 +2184,11 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (results) {
+                    var totalDebitAmount = 0;
+                    var totalCreditAmount = 0;
+
+                    var variance = 0;
+
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -2200,22 +2205,19 @@
                                 CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
-                            var debitAmountTotal = 0;
-                            var creditAmountTotal = 0;
+                            var debit = parseFloat(Math.round(results[i]["DebitAmount"] * 100) / 100);
+                            var credit = parseFloat(Math.round(results[i]["CreditAmount"] * 100) / 100);
 
-                            var a = 0;
-                            while (a < results.length) {
-                                debitAmountTotal += results[a]["DebitAmount"];
-                                creditAmountTotal += results[a]["CreditAmount"];
-                                a++;
-                            }
+                            totalDebitAmount += debit;
+                            totalCreditAmount += credit;
                         }
 
-                        document.getElementById('inpJournalTotalDebit').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('inpJournalTotalCredit').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var inpJournalVariance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('inpJournalVariance').value = inpJournalVariance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        variance = totalDebitAmount - totalCreditAmount;
                     }
+
+                    document.getElementById('inpJournalTotalDebit').value = parseFloat(Math.round(totalDebitAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalTotalCredit').value = parseFloat(Math.round(totalCreditAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalVariance').value = parseFloat(Math.round(variance * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
                     $("#journalLoading").hide();
                     $("#journalContent").show();

@@ -81,6 +81,7 @@ namespace easyfis.ModifiedApiControllers
                                  where d.BranchId == branchId
                                  && d.SupplierId == Convert.ToInt32(supplierId)
                                  && d.IsLocked == true
+                                 && d.IsCancelled == false
                                  select new Entities.TrnPurchaseOrder
                                  {
                                      Id = d.Id,
