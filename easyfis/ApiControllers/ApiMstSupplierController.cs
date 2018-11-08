@@ -17,10 +17,10 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // =============
         // List Supplier
@@ -268,8 +268,8 @@ namespace easyfis.ModifiedApiControllers
                                             db.MstArticles.InsertOnSubmit(newSupplier);
                                             db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newSupplier);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                            String newObject = auditTrail.GetObjectString(newSupplier);
+                                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                             return Request.CreateResponse(HttpStatusCode.OK, newSupplier.Id);
                                         }
@@ -301,6 +301,81 @@ namespace easyfis.ModifiedApiControllers
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.BadRequest, "No rights.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =============
+        // Save Supplier
+        // =============
+        [Authorize, HttpPut, Route("api/supplier/save/{id}")]
+        public HttpResponseMessage SaveSupplier(Entities.MstArticle objSupplier, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var supplier = from d in db.MstArticles
+                                   where d.Id == Convert.ToInt32(id)
+                                   && d.ArticleTypeId == 3
+                                   select d;
+
+                    if (supplier.Any())
+                    {
+                        if (!supplier.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
+
+                            var saveSupplier = supplier.FirstOrDefault();
+                            saveSupplier.ManualArticleCode = objSupplier.ManualArticleCode;
+                            saveSupplier.Article = objSupplier.Article;
+                            saveSupplier.ArticleGroupId = objSupplier.ArticleGroupId;
+                            saveSupplier.AccountId = objSupplier.AccountId;
+                            saveSupplier.SalesAccountId = objSupplier.SalesAccountId;
+                            saveSupplier.CostAccountId = objSupplier.CostAccountId;
+                            saveSupplier.AssetAccountId = objSupplier.AssetAccountId;
+                            saveSupplier.ExpenseAccountId = objSupplier.ExpenseAccountId;
+                            saveSupplier.TermId = objSupplier.TermId;
+                            saveSupplier.Address = objSupplier.Address;
+                            saveSupplier.ContactNumber = objSupplier.ContactNumber;
+                            saveSupplier.ContactPerson = objSupplier.ContactPerson;
+                            saveSupplier.TaxNumber = objSupplier.TaxNumber;
+                            saveSupplier.Particulars = objSupplier.Particulars;
+                            saveSupplier.EmailAddress = objSupplier.EmailAddress;
+                            saveSupplier.CreditLimit = objSupplier.CreditLimit;
+                            saveSupplier.UpdatedById = currentUserId;
+                            saveSupplier.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These supplier details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "This supplier detail is no longer exist.");
                     }
                 }
                 else
@@ -349,7 +424,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!supplier.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(supplier.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
 
                                     var supplierByManualCode = from d in db.MstArticles
                                                                where d.ArticleTypeId == 3
@@ -382,8 +457,8 @@ namespace easyfis.ModifiedApiControllers
 
                                         db.SubmitChanges();
 
-                                        String newObject = at.GetObjectString(supplier.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                        String newObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                         return Request.CreateResponse(HttpStatusCode.OK);
                                     }
@@ -458,7 +533,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (supplier.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(supplier.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
 
                                     var unlockSupplier = supplier.FirstOrDefault();
                                     unlockSupplier.IsLocked = false;
@@ -467,8 +542,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
-                                    String newObject = at.GetObjectString(supplier.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -538,8 +613,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 db.MstArticles.DeleteOnSubmit(supplier.First());
 
-                                String oldObject = at.GetObjectString(supplier.FirstOrDefault());
-                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                String oldObject = auditTrail.GetObjectString(supplier.FirstOrDefault());
+                                auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                 db.SubmitChanges();
 

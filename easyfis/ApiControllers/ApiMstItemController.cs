@@ -17,10 +17,10 @@ namespace easyfis.ModifiedApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-        // ===========
-        // Audit Trail
-        // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        // ========
+        // Business
+        // ========
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // =========
         // List Item
@@ -317,8 +317,8 @@ namespace easyfis.ModifiedApiControllers
                                             db.MstArticles.InsertOnSubmit(newItem);
                                             db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newItem);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                            String newObject = auditTrail.GetObjectString(newItem);
+                                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                             return Request.CreateResponse(HttpStatusCode.OK, newItem.Id);
                                         }
@@ -350,6 +350,105 @@ namespace easyfis.ModifiedApiControllers
                     else
                     {
                         return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry. You have no access for this item page.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =========
+        // Save Item
+        // =========
+        [Authorize, HttpPut, Route("api/item/save/{id}")]
+        public HttpResponseMessage SaveItem(Entities.MstArticle objItem, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var item = from d in db.MstArticles
+                               where d.Id == Convert.ToInt32(id)
+                               && d.ArticleTypeId == 1
+                               select d;
+
+                    if (item.Any())
+                    {
+                        if (!item.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(item.FirstOrDefault());
+
+                            if (item.FirstOrDefault().MstArticleUnits.Any())
+                            {
+                                if (item.FirstOrDefault().MstArticlePrices.Any())
+                                {
+                                    var saveItem = item.FirstOrDefault();
+                                    saveItem.ManualArticleCode = objItem.ManualArticleCode;
+                                    saveItem.Article = objItem.Article;
+                                    saveItem.ArticleGroupId = objItem.ArticleGroupId;
+                                    saveItem.AccountId = objItem.AccountId;
+                                    saveItem.SalesAccountId = objItem.SalesAccountId;
+                                    saveItem.CostAccountId = objItem.CostAccountId;
+                                    saveItem.AssetAccountId = objItem.AssetAccountId;
+                                    saveItem.ExpenseAccountId = objItem.ExpenseAccountId;
+                                    saveItem.Category = objItem.Category;
+                                    saveItem.UnitId = objItem.UnitId;
+                                    saveItem.Price = objItem.Price;
+                                    saveItem.Particulars = objItem.Particulars;
+                                    saveItem.InputTaxId = objItem.InputTaxId;
+                                    saveItem.OutputTaxId = objItem.OutputTaxId;
+                                    saveItem.WTaxTypeId = objItem.WTaxTypeId;
+                                    saveItem.IsInventory = objItem.IsInventory;
+                                    saveItem.IsConsignment = objItem.IsConsignment;
+                                    saveItem.ConsignmentCostPercentage = objItem.ConsignmentCostPercentage;
+                                    saveItem.ConsignmentCostValue = objItem.ConsignmentCostValue;
+                                    saveItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
+                                    saveItem.Cost = objItem.Cost;
+                                    saveItem.Kitting = objItem.Kitting;
+                                    saveItem.DefaultSupplierId = objItem.DefaultSupplierId;
+                                    saveItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
+                                    saveItem.UsefulLife = objItem.UsefulLife;
+                                    saveItem.SalvageValue = objItem.SalvageValue;
+                                    saveItem.UpdatedById = currentUserId;
+                                    saveItem.UpdatedDateTime = DateTime.Now;
+                                    db.SubmitChanges();
+
+                                    String newObject = auditTrail.GetObjectString(item.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No Price Found. Please provide at least one price.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "No Unit Conversion Found. Please provide at least one unit conversion.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These item details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These item details are not found in the server.");
                     }
                 }
                 else
@@ -398,7 +497,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (!item.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(item.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(item.FirstOrDefault());
 
                                     if (item.FirstOrDefault().MstArticleUnits.Any())
                                     {
@@ -445,8 +544,8 @@ namespace easyfis.ModifiedApiControllers
 
                                                 db.SubmitChanges();
 
-                                                String newObject = at.GetObjectString(item.FirstOrDefault());
-                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                                String newObject = auditTrail.GetObjectString(item.FirstOrDefault());
+                                                auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
@@ -531,7 +630,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (item.FirstOrDefault().IsLocked)
                                 {
-                                    String oldObject = at.GetObjectString(item.FirstOrDefault());
+                                    String oldObject = auditTrail.GetObjectString(item.FirstOrDefault());
 
                                     var unlockItem = item.FirstOrDefault();
                                     unlockItem.IsLocked = false;
@@ -540,8 +639,8 @@ namespace easyfis.ModifiedApiControllers
 
                                     db.SubmitChanges();
 
-                                    String newObject = at.GetObjectString(item.FirstOrDefault());
-                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    String newObject = auditTrail.GetObjectString(item.FirstOrDefault());
+                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                     return Request.CreateResponse(HttpStatusCode.OK);
                                 }
@@ -611,8 +710,8 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 db.MstArticles.DeleteOnSubmit(item.First());
 
-                                String oldObject = at.GetObjectString(item.FirstOrDefault());
-                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                String oldObject = auditTrail.GetObjectString(item.FirstOrDefault());
+                                auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                 db.SubmitChanges();
 

@@ -46,7 +46,10 @@
                     -->
                     <div class="panel-heading">
                         <div class="row">
-                            <div class="col-md-12" align="right">
+                            <div class="col-md-2">
+                                <button class="btn btn-primary" id="btnCustomerDetailSave" onclick="btnCustomerDetailSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                            </div>
+                            <div class="col-md-10" align="right">
                                 @{
                                     if (canLock)
                                     {
@@ -685,6 +688,7 @@
                                 document.getElementById('inpCustomerDetailCustomerEmailAddress').disabled = true;
                                 document.getElementById('inpCustomerDetailCreditLimit').disabled = true;
 
+                                $('#btnCustomerDetailSave').prop('disabled', true);
                                 $('#btnCustomerDetailLock').prop('disabled', true);
                                 $('#btnContactInformationAdd').prop('disabled', true);
 
@@ -755,11 +759,64 @@
         }
 
         // =============
+        // Save Customer
+        // =============
+        function btnCustomerDetailSaveOnclick() {
+            if (customerEntryValidation()) {
+                document.getElementById('btnCustomerDetailSave').innerHTML = "<i class='fa fa-lock'></i> Saving...";
+                $('#btnCustomerDetailSave').prop('disabled', true);
+                $('#btnCustomerDetailLock').prop('disabled', true);
+                $('#btnCustomerDetailUnlock').prop('disabled', true);
+                $('#btnCustomerDetailClose').prop('disabled', true);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/customer/save/' + customerId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: getCustomerDataObject(),
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnCustomerDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
+                            $('#btnCustomerDetailLock').prop('disabled', false);
+                            $('#btnCustomerDetailClose').prop('disabled', false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnCustomerDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
+                            $('#btnCustomerDetailLock').prop('disabled', false);
+                            $('#btnCustomerDetailClose').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnCustomerDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
+                            $('#btnCustomerDetailLock').prop('disabled', false);
+                            $('#btnCustomerDetailClose').prop('disabled', false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =============
         // Lock Customer
         // =============
         function btnCustomerDetailLockOnclick() {
             if (customerEntryValidation()) {
                 document.getElementById('btnCustomerDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $('#btnCustomerDetailSave').prop('disabled', true);
                 $('#btnCustomerDetailLock').prop('disabled', true);
                 $('#btnCustomerDetailUnlock').prop('disabled', true);
                 $('#btnCustomerDetailClose').prop('disabled', true);
@@ -780,18 +837,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnCustomerDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
                             $('#btnCustomerDetailLock').prop('disabled', false);
                             $('#btnCustomerDetailClose').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnCustomerDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
                             $('#btnCustomerDetailLock').prop('disabled', false);
                             $('#btnCustomerDetailClose').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnCustomerDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnCustomerDetailSave').prop('disabled', false);
                             $('#btnCustomerDetailLock').prop('disabled', false);
                             $('#btnCustomerDetailClose').prop('disabled', false);
                         }
@@ -807,6 +867,7 @@
         // ===============
         function btnCustomerDetailUnlockOnclick() {
             document.getElementById('btnCustomerDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $('#btnCustomerDetailSave').prop('disabled', true);
             $('#btnCustomerDetailLock').prop('disabled', true);
             $('#btnCustomerDetailUnlock').prop('disabled', true);
             $('#btnCustomerDetailClose').prop('disabled', true);
@@ -826,18 +887,21 @@
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('btnCustomerDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnCustomerDetailSave').prop('disabled', false);
                         $('#btnCustomerDetailUnlock').prop('disabled', false);
                         $('#btnCustomerDetailClose').prop('disabled', false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                         document.getElementById('btnCustomerDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnCustomerDetailSave').prop('disabled', false);
                         $('#btnCustomerDetailUnlock').prop('disabled', false);
                         $('#btnCustomerDetailClose').prop('disabled', false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnCustomerDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnCustomerDetailSave').prop('disabled', false);
                         $('#btnCustomerDetailUnlock').prop('disabled', false);
                         $('#btnCustomerDetailClose').prop('disabled', false);
                     }

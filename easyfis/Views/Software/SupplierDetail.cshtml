@@ -43,7 +43,10 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <div class="row">
-                            <div class="col-md-12" align="right">
+                            <div class="col-md-2">
+                                <button class="btn btn-primary" id="btnSaveSupplier" onclick="btnSaveSupplierOnclick()"><i class="fa fa-save"></i> Save</button>
+                            </div>
+                            <div class="col-md-10" align="right">
                                 @{
                                     if (canLock)
                                     {
@@ -731,6 +734,7 @@
                                 document.getElementById('inpSupplierEmail').disabled = true;
                                 document.getElementById('inpSupplierCreditLimit').disabled = true;
 
+                                $('#btnSaveSupplier').prop('disabled', true);
                                 $('#btnLockSupplier').prop('disabled', true);
                                 $('#btnAddMoreContactInformation').prop('disabled', true);
                                 $('#btnAddConsignment').prop('disabled', true);
@@ -802,11 +806,64 @@
         }
 
         // =============
+        // Save Supplier
+        // =============
+        function btnSaveSupplierOnclick() {
+            if (supplierEntryValidation()) {
+                document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                $('#btnSaveSupplier').prop('disabled', true);
+                $('#btnLockSupplier').prop('disabled', true);
+                $('#btnUnlockSupplier').prop('disabled', true);
+                $('#btnCloseSupplier').prop('disabled', true);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/supplier/save/' + supplierId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: getSupplierDataObject(),
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveSupplier').prop('disabled', false);
+                            $('#btnLockSupplier').prop('disabled', false);
+                            $('#btnCloseSupplier').prop('disabled', false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveSupplier').prop('disabled', false);
+                            $('#btnLockSupplier').prop('disabled', false);
+                            $('#btnCloseSupplier').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnSaveSupplier').prop('disabled', false);
+                            $('#btnLockSupplier').prop('disabled', false);
+                            $('#btnCloseSupplier').prop('disabled', false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =============
         // Lock Supplier
         // =============
         function btnLockSupplierOnclick() {
             if (supplierEntryValidation()) {
                 document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $('#btnSaveSupplier').prop('disabled', true);
                 $('#btnLockSupplier').prop('disabled', true);
                 $('#btnUnlockSupplier').prop('disabled', true);
                 $('#btnCloseSupplier').prop('disabled', true);
@@ -827,18 +884,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSaveSupplier').prop('disabled', false);
                             $('#btnLockSupplier').prop('disabled', false);
                             $('#btnCloseSupplier').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSaveSupplier').prop('disabled', false);
                             $('#btnLockSupplier').prop('disabled', false);
                             $('#btnCloseSupplier').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSaveSupplier').prop('disabled', false);
                             $('#btnLockSupplier').prop('disabled', false);
                             $('#btnCloseSupplier').prop('disabled', false);
                         }
@@ -854,6 +914,7 @@
         // ===============
         function btnUnlockSupplierOnclick() {
             document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
+            $('#btnSaveSupplier').prop('disabled', true);
             $('#btnLockSupplier').prop('disabled', true);
             $('#btnUnlockSupplier').prop('disabled', true);
             $('#btnCloseSupplier').prop('disabled', true);
@@ -873,18 +934,21 @@
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSaveSupplier').prop('disabled', false);
                         $('#btnUnlockSupplier').prop('disabled', false);
                         $('#btnCloseSupplier').prop('disabled', false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                         document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSaveSupplier').prop('disabled', false);
                         $('#btnUnlockSupplier').prop('disabled', false);
                         $('#btnCloseSupplier').prop('disabled', false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSaveSupplier').prop('disabled', false);
                         $('#btnUnlockSupplier').prop('disabled', false);
                         $('#btnCloseSupplier').prop('disabled', false);
                     }

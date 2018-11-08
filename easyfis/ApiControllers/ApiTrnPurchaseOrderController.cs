@@ -358,6 +358,76 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ===================
+        // Save Purchase Order
+        // ===================
+        [Authorize, HttpPut, Route("api/purchaseOrder/save/{id}")]
+        public HttpResponseMessage SavePurchaseOrder(Entities.TrnPurchaseOrder objPurchaseOrder, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var purchaseOrder = from d in db.TrnPurchaseOrders
+                                        where d.Id == Convert.ToInt32(id)
+                                        select d;
+
+                    if (purchaseOrder.Any())
+                    {
+                        if (!purchaseOrder.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+
+                            var savePurchaseOrder = purchaseOrder.FirstOrDefault();
+                            savePurchaseOrder.PODate = Convert.ToDateTime(objPurchaseOrder.PODate);
+                            savePurchaseOrder.SupplierId = objPurchaseOrder.SupplierId;
+                            savePurchaseOrder.TermId = objPurchaseOrder.TermId;
+                            savePurchaseOrder.ManualRequestNumber = objPurchaseOrder.ManualRequestNumber;
+                            savePurchaseOrder.ManualPONumber = objPurchaseOrder.ManualPONumber;
+                            savePurchaseOrder.DateNeeded = Convert.ToDateTime(objPurchaseOrder.DateNeeded);
+                            savePurchaseOrder.Remarks = objPurchaseOrder.Remarks;
+                            savePurchaseOrder.IsClose = objPurchaseOrder.IsClose;
+                            savePurchaseOrder.RequestedById = objPurchaseOrder.RequestedById;
+                            savePurchaseOrder.CheckedById = objPurchaseOrder.CheckedById;
+                            savePurchaseOrder.ApprovedById = objPurchaseOrder.ApprovedById;
+                            savePurchaseOrder.Status = objPurchaseOrder.Status;
+                            savePurchaseOrder.UpdatedById = currentUserId;
+                            savePurchaseOrder.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These purchase order details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These purchase order details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===================
         // Lock Purchase Order
         // ===================
         [Authorize, HttpPut, Route("api/purchaseOrder/lock/{id}")]

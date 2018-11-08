@@ -46,7 +46,10 @@
                     -->
                     <div class="panel-heading">
                         <div class="row">
-                            <div class="col-md-12" align="right">
+                            <div class="col-md-2">
+                                <button class="btn btn-primary" id="btnItemDetailSave" onclick="btnItemDetailSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                            </div>
+                            <div class="col-md-10" align="right">
                                 @{
                                     if (canLock)
                                     {
@@ -1476,6 +1479,7 @@
                                 document.getElementById('inpItemDetailConsignmentCostPercentage').disabled = true;
                                 document.getElementById('inpItemDetailConsignmentCostValue').disabled = true;
 
+                                $('#btnItemDetailSave').prop('disabled', true);
                                 $('#btnItemDetailLock').prop('disabled', true);
                                 $('#btnUnitConversionAdd').prop('disabled', true);
                                 $('#btnPriceAdd').prop('disabled', true);
@@ -1552,11 +1556,64 @@
         }
 
         // =========
+        // Save Item
+        // =========
+        function btnItemDetailSaveOnclick() {
+            if (itemEntryValidation()) {
+                document.getElementById('btnItemDetailSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $('#btnItemDetailSave').prop('disabled', true);
+                $('#btnItemDetailLock').prop('disabled', true);
+                $('#btnItemDetailUnlock').prop('disabled', true);
+                $('#btnItemDetailClose').prop('disabled', true);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/item/save/' + getURLParameterValue("id"),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: itemDataObject(),
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnItemDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnItemDetailSave').prop('disabled', false);
+                            $('#btnItemDetailLock').prop('disabled', false);
+                            $('#btnItemDetailClose').prop('disabled', false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnItemDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnItemDetailSave').prop('disabled', false);
+                            $('#btnItemDetailLock').prop('disabled', false);
+                            $('#btnItemDetailClose').prop('disabled', false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnItemDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $('#btnItemDetailSave').prop('disabled', false);
+                            $('#btnItemDetailLock').prop('disabled', false);
+                            $('#btnItemDetailClose').prop('disabled', false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =========
         // Lock Item
         // =========
         function btnItemDetailLockOnclick() {
             if (itemEntryValidation()) {
                 document.getElementById('btnItemDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $('#btnItemDetailSave').prop('disabled', true);
                 $('#btnItemDetailLock').prop('disabled', true);
                 $('#btnItemDetailUnlock').prop('disabled', true);
                 $('#btnItemDetailClose').prop('disabled', true);
@@ -1577,18 +1634,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnItemDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnItemDetailSave').prop('disabled', false);
                             $('#btnItemDetailLock').prop('disabled', false);
                             $('#btnItemDetailClose').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnItemDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnItemDetailSave').prop('disabled', false);
                             $('#btnItemDetailLock').prop('disabled', false);
                             $('#btnItemDetailClose').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnItemDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnItemDetailSave').prop('disabled', false);
                             $('#btnItemDetailLock').prop('disabled', false);
                             $('#btnItemDetailClose').prop('disabled', false);
                         }
@@ -1604,6 +1664,7 @@
         // ===========
         function btnItemDetailUnlockOnclick() {
             document.getElementById('btnItemDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $('#btnItemDetailSave').prop('disabled', true);
             $('#btnItemDetailLock').prop('disabled', true);
             $('#btnItemDetailUnlock').prop('disabled', true);
             $('#btnItemDetailClose').prop('disabled', true);
@@ -1623,18 +1684,21 @@
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                         document.getElementById('btnItemDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnItemDetailSave').prop('disabled', false);
                         $('#btnItemDetailUnlock').prop('disabled', false);
                         $('#btnItemDetailClose').prop('disabled', false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                         document.getElementById('btnItemDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnItemDetailSave').prop('disabled', false);
                         $('#btnItemDetailUnlock').prop('disabled', false);
                         $('#btnItemDetailClose').prop('disabled', false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnItemDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnItemDetailSave').prop('disabled', false);
                         $('#btnItemDetailUnlock').prop('disabled', false);
                         $('#btnItemDetailClose').prop('disabled', false);
                     }
