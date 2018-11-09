@@ -98,7 +98,7 @@ namespace easyfis.Reports
             // ====
             var auditTrails = from d in db.SysAuditTrails
                               where d.AuditDate >= Convert.ToDateTime(StartDate)
-                              && d.AuditDate <= Convert.ToDateTime(EndDate)
+                              && d.AuditDate <= Convert.ToDateTime(EndDate).AddHours(24)
                               select d;
 
             if (auditTrails.Any())

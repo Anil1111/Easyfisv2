@@ -26,7 +26,7 @@ namespace easyfis.ApiControllers
                                 && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                 && d.SIDate >= Convert.ToDateTime(startDate)
                                 && d.SIDate <= Convert.ToDateTime(endDate)
-                                && d.IsLocked == false
+                                && (d.IsLocked == true && d.IsCancelled == true)
                                 select new Entities.RepCancelledSalesSummaryReport
                                 {
                                     Id = d.Id,
@@ -36,7 +36,7 @@ namespace easyfis.ApiControllers
                                     Customer = d.MstArticle.Article,
                                     Remarks = d.Remarks,
                                     SoldBy = d.MstUser4.FullName,
-                                    Amount = d.Amount
+                                    Amount = d.TrnSalesInvoiceItems.Any() ? d.TrnSalesInvoiceItems.Sum(l=>l.Amount) : 0
                                 };
 
             return salesInvoices.ToList();

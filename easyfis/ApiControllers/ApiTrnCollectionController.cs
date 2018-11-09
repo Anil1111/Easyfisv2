@@ -50,6 +50,7 @@ namespace easyfis.ModifiedApiControllers
                                   Particulars = d.Particulars,
                                   Amount = d.TrnCollectionLines.Any() ? d.TrnCollectionLines.Sum(a => a.Amount) : 0,
                                   IsLocked = d.IsLocked,
+                                  IsCancelled = d.IsCancelled,
                                   CreatedById = d.CreatedById,
                                   CreatedBy = d.MstUser2.FullName,
                                   CreatedDateTime = d.CreatedDateTime.ToShortDateString(),

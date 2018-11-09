@@ -68,6 +68,7 @@ namespace easyfis.ModifiedApiControllers
                                      Amount = GetPurchaseOrderAmount(d.Id),
                                      IsClose = d.IsClose,
                                      IsLocked = d.IsLocked,
+                                     IsCancelled = d.IsCancelled,
                                      CreatedBy = d.MstUser2.FullName,
                                      CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
                                      UpdatedBy = d.MstUser5.FullName,

@@ -58,6 +58,7 @@ namespace easyfis.ApiControllers
                                         && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(branchId)
                                         && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(startDate)
                                         && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(endDate)
+                                        && (d.TrnReceivingReceipt.IsLocked==true && d.TrnReceivingReceipt.IsCancelled==false)
                                         select new Entities.RepBIRCASPurchaseJournal
                                         {
                                             Date = d.TrnReceivingReceipt.RRDate.ToShortDateString(),

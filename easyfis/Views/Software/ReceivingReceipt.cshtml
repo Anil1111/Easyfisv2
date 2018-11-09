@@ -280,6 +280,7 @@
                                 PaidAmount: results[i]["PaidAmount"],
                                 PaidAmountDisplay: parseFloat(results[i]["PaidAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                 IsLocked: results[i]["IsLocked"],
+                                IsCancelled: results[i]["IsCancelled"],
                                 CreatedBy: results[i]["CreatedBy"],
                                 CreatedDateTime: results[i]["CreatedDateTime"],
                                 UpdatedBy: results[i]["UpdatedBy"],
@@ -419,6 +420,16 @@
             });
 
             receivingReceiptFlexGrid.trackChanges = true;
+            receivingReceiptFlexGrid.itemFormatter = function (panel, r, c, cell) {
+                var flex = panel.grid;
+
+                if (wijmo.grid.CellType.Cell === panel.cellType) {
+                    if (flex.rows[r]._data.IsCancelled == true) {
+                        cell.style.backgroundColor = 'rgb(255, 230, 230)';
+                        cell.style.color = "Black";
+                    }
+                }
+            }
 
             btnReceivingReceiptMoveToFirstPageGrid = document.getElementById('btnReceivingReceiptMoveToFirstPageGrid');
             btnReceivingReceiptMoveToPreviousPageGrid = document.getElementById('btnReceivingReceiptMoveToPreviousPageGrid');

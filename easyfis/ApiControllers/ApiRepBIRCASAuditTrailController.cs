@@ -56,7 +56,7 @@ namespace easyfis.ApiControllers
         {
             var auditTrails = from d in db.SysAuditTrails
                               where d.AuditDate >= Convert.ToDateTime(startDate)
-                              && d.AuditDate <= Convert.ToDateTime(endDate)
+                              && d.AuditDate <= Convert.ToDateTime(endDate).AddHours(24)
                               select new Entities.RepBIRCASAuditTrail
                               {
                                   TimeStamp = d.AuditDate.ToString("MM-dd-yyyy hh:mm:ss tt", CultureInfo.InvariantCulture),

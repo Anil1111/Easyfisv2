@@ -51,6 +51,7 @@ namespace easyfis.ModifiedApiControllers
                                     CheckNumber = d.CheckNumber,
                                     Amount = d.Amount,
                                     IsLocked = d.IsLocked,
+                                    IsCancelled = d.IsCancelled,
                                     CreatedBy = d.MstUser2.FullName,
                                     CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
                                     UpdatedBy = d.MstUser4.FullName,

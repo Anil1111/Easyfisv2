@@ -52,6 +52,7 @@ namespace easyfis.ModifiedApiControllers
                                         Amount = d.Amount,
                                         PaidAmount = d.PaidAmount,
                                         IsLocked = d.IsLocked,
+                                        IsCancelled = d.IsCancelled,
                                         CreatedById = d.CreatedById,
                                         CreatedBy = d.MstUser2.FullName,
                                         CreatedDateTime = d.CreatedDateTime.ToShortDateString(),

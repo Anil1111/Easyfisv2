@@ -52,6 +52,7 @@ namespace easyfis.ModifiedApiControllers
                                     DocumentReference = d.DocumentReference,
                                     Amount = d.Amount,
                                     IsLocked = d.IsLocked,
+                                    IsCancelled = d.IsCancelled,
                                     CreatedBy = d.MstUser2.FullName,
                                     CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
                                     UpdatedBy = d.MstUser5.FullName,

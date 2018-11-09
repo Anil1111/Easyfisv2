@@ -57,7 +57,8 @@ namespace easyfis.ApiControllers
                                     where d.TrnSalesInvoice.MstBranch.CompanyId == Convert.ToInt32(companyId)
                                     && d.TrnSalesInvoice.BranchId == Convert.ToInt32(branchId)
                                     && d.TrnSalesInvoice.SIDate >= Convert.ToDateTime(startDate)
-                                    && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate)
+                                    && d.TrnSalesInvoice.SIDate <= Convert.ToDateTime(endDate) 
+                                    && (d.TrnSalesInvoice.IsLocked==true && d.TrnSalesInvoice.IsCancelled==false)
                                     select new Entities.RepBIRCASSalesJournal
                                     {
                                         Date = d.TrnSalesInvoice.SIDate.ToShortDateString(),
