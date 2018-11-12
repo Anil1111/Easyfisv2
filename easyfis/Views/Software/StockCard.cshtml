@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Stock Card</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,107 +26,143 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ========================================
+                        Input Filters and Display Number of Rows
+                        ========================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpStockCardSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboStockCardReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboStockCardShowNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnStockCardReportCSVOnclick()" id="btnStockCardReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnStockCardReportPrintPDFOnclick()" id="btnStockCardReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <button onclick="btnStockCardDownloadCSVOnclick()" id="btnStockCardDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnStockCardPrintPDFOnclick()" id="btnStockCardPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
                                     <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ================================
+                        Date, Company and Branch Filters
+                        ================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboStockCardStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboStockCardEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboStockCardCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboStockCardBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ===========
+                        Item Filter
+                        ===========
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Manual Code</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardItemCode"></div>
+                                        <div class="comboBox-wide" id="cboStockCardItemCodeFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Item Description</b></span>
-                                        <div class="comboBox-wide" id="cboStockCardItem"></div>
+                                        <div class="comboBox-wide" id="cboStockCardItemDescriptionFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 25.5%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="stockCardReportGrid" class="grid" style="font-size: 12.5px;"></div>
+                        <div id="stockCardFlexGrid" class="grid" style="font-size: 12.5px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="stockCardNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockCardMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockCardMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnStockCardCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnStockCardMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockCardMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -140,25 +173,25 @@
                                         <b>Total In</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalIn" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalIn" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Out</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalOut" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalOut" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Balance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalBalance" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalBalance" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -166,6 +199,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -173,33 +207,49 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboStockCardReportStartDate = new wijmo.input.InputDate('#cboStockCardReportStartDate');
-        var cboStockCardReportEndDate = new wijmo.input.InputDate('#cboStockCardReportEndDate');
-        var isStockCardReportStartDateSelected = false;
-        var isStockCardReportEndDateSelected = false;
-        var cboStockCardReportCompany = new wijmo.input.ComboBox('#cboStockCardReportCompany');
-        var cboStockCardReportBranch = new wijmo.input.ComboBox('#cboStockCardReportBranch');
-        var stockCardReportCollections;
-        var stockCardReportGrid;
-        var isStockCardReportCompanySelected = false;
-        var cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode');
-        var cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem');
-        var isStockCardReportBranchSelected = false;
-        var cboStockCardReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStockCardReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        // ============
+        // Date Filters
+        // ============
+        var cboStockCardStartDateFilter = new wijmo.input.InputDate('#cboStockCardStartDateFilter');
+        var cboStockCardEndDateFilter = new wijmo.input.InputDate('#cboStockCardEndDateFilter');
+        var isCboStockCardStartDateSelected = false;
+        var isCboStockCardEndDateSelected = false;
+
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboStockCardCompanyFilter = new wijmo.input.ComboBox('#cboStockCardCompanyFilter');
+        var cboStockCardBranchFilter = new wijmo.input.ComboBox('#cboStockCardBranchFilter');
+        var isCboStockCardCompanySelected = false;
+        var isCboStockCardBranchSelected = false;
+
+        // ===========
+        // Item Filter
+        // ===========
+        var cboStockCardItemCodeFilter = new wijmo.input.ComboBox('#cboStockCardItemCodeFilter');
+        var cboStockCardItemDescriptionFilter = new wijmo.input.ComboBox('#cboStockCardItemDescriptionFilter');
+
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var stockCardCollectionView;
+        var stockCardFlexGrid;
+        var cboStockCardShowNumberOfRows = new wijmo.input.ComboBox('#cboStockCardShowNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnStockCardMoveToFirstPageGrid = document.getElementById('btnStockCardMoveToFirstPageGrid');
+        var btnStockCardMoveToPreviousPageGrid = document.getElementById('btnStockCardMoveToPreviousPageGrid');
+        var btnStockCardMoveToNextPageGrid = document.getElementById('btnStockCardMoveToNextPageGrid');
+        var btnStockCardMoveToLastPageGrid = document.getElementById('btnStockCardMoveToLastPageGrid');
+        var btnStockCardCurrentPageGrid = document.getElementById('btnStockCardCurrentPageGrid');
         var currentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -213,46 +263,46 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function stockCardReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
-            cboStockCardReportStartDate.dispose();
-            cboStockCardReportStartDate = new wijmo.input.InputDate('#cboStockCardReportStartDate', {
+            cboStockCardStartDateFilter.dispose();
+            cboStockCardStartDateFilter = new wijmo.input.InputDate('#cboStockCardStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isStockCardReportStartDateSelected) {
+                    if (!isCboStockCardStartDateSelected) {
                         NProgress.start();
-                        refreshStockCardReportFlexGrid();
+                        refreshStockCardFlexGrid();
                     } else {
-                        isStockCardReportStartDateSelected = false;
+                        isCboStockCardStartDateSelected = false;
                     }
                 }
             });
 
-            cboStockCardReportEndDate.dispose();
-            cboStockCardReportEndDate = new wijmo.input.InputDate('#cboStockCardReportEndDate', {
+            cboStockCardEndDateFilter.dispose();
+            cboStockCardEndDateFilter = new wijmo.input.InputDate('#cboStockCardEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isStockCardReportEndDateSelected) {
+                    if (!isCboStockCardEndDateSelected) {
                         NProgress.start();
-                        refreshStockCardReportFlexGrid();
+                        refreshStockCardFlexGrid();
                     } else {
-                        isStockCardReportEndDateSelected = false;
+                        isCboStockCardEndDateSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockCard/dropdown/list/company',
@@ -276,41 +326,41 @@
                     if (companyResults.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnStockCardReportCSV").prop("disabled", true);
-                        $("#btnStockCardReportPrintPDF").prop("disabled", true);
+                        $("#btnStockCardDownloadCSV").prop("disabled", true);
+                        $("#btnStockCardPrintPDF").prop("disabled", true);
                     }
 
-                    cboStockCardReportCompany.dispose();
-                    cboStockCardReportCompany = new wijmo.input.ComboBox('#cboStockCardReportCompany', {
+                    cboStockCardCompanyFilter.dispose();
+                    cboStockCardCompanyFilter = new wijmo.input.ComboBox('#cboStockCardCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnStockCardReportCSV").prop("disabled", false);
-                            $("#btnStockCardReportPrintPDF").prop("disabled", false);
-                            isStockCardReportCompanySelected = true;
-                            isStockCardReportBranchSelected = true;
-                            createCboBranch();
+                            $("#btnStockCardDownloadCSV").prop("disabled", false);
+                            $("#btnStockCardPrintPDF").prop("disabled", false);
+                            isCboStockCardCompanySelected = true;
+                            isCboStockCardBranchSelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboStockCardReportCompany.selectedValue != null) {
+            if (cboStockCardCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/stockCard/dropdown/list/branch/' + cboStockCardReportCompany.selectedValue,
+                    url: '/api/stockCard/dropdown/list/branch/' + cboStockCardCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -332,39 +382,39 @@
                         if (branchResults.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnStockCardReportCSV").prop("disabled", true);
-                            $("#btnStockCardReportPrintPDF").prop("disabled", true);
+                            $("#btnStockCardDownloadCSV").prop("disabled", true);
+                            $("#btnStockCardPrintPDF").prop("disabled", true);
                         }
 
-                        cboStockCardReportBranch.dispose();
-                        cboStockCardReportBranch = new wijmo.input.ComboBox('#cboStockCardReportBranch', {
+                        cboStockCardBranchFilter.dispose();
+                        cboStockCardBranchFilter = new wijmo.input.ComboBox('#cboStockCardBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
-                                isStockCardReportBranchSelected = true;
-                                refreshStockCardReportFlexGrid();
+                                isCboStockCardBranchSelected = true;
+                                refreshStockCardFlexGrid();
                             }
                         });
 
-                        if (!isStockCardReportBranchSelected) {
-                            createCboItemFilters();
+                        if (!isCboStockCardBranchSelected) {
+                            createCboItemFilter();
                         } else {
-                            refreshStockCardReportFlexGrid();
+                            refreshStockCardFlexGrid();
                         }
                     }
                 });
             }
         }
 
-        // ============
-        // Item Filters
-        // ============
-        function createCboItemFilters() {
+        // ========================
+        // Create Combo Item Filter
+        // ========================
+        function createCboItemFilter() {
             var itemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockCard/dropdown/list/item',
@@ -389,31 +439,31 @@
 
                     }
 
-                    cboStockCardItemCode.dispose();
-                    cboStockCardItemCode = new wijmo.input.ComboBox('#cboStockCardItemCode', {
+                    cboStockCardItemCodeFilter.dispose();
+                    cboStockCardItemCodeFilter = new wijmo.input.ComboBox('#cboStockCardItemCodeFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: itemsObservableArray,
                         displayMemberPath: "ManualArticleCode",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("ItemId"),
+                        selectedValue: getURLParameterValue("ItemId"),
                         onSelectedIndexChanged: function () {
-                            cboStockCardItem.selectedValue = this.selectedValue;
+                            cboStockCardItemDescriptionFilter.selectedValue = this.selectedValue;
                         }
                     });
 
-                    cboStockCardItem.dispose();
-                    cboStockCardItem = new wijmo.input.ComboBox('#cboStockCardItem', {
+                    cboStockCardItemDescriptionFilter.dispose();
+                    cboStockCardItemDescriptionFilter = new wijmo.input.ComboBox('#cboStockCardItemDescriptionFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: itemsObservableArray,
                         displayMemberPath: "Article",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("ItemId"),
+                        selectedValue: getURLParameterValue("ItemId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            cboStockCardItemCode.selectedValue = this.selectedValue;
-                            refreshStockCardReportFlexGrid();
+                            cboStockCardItemCodeFilter.selectedValue = this.selectedValue;
+                            refreshStockCardFlexGrid();
                         }
                     });
 
@@ -422,9 +472,9 @@
             });
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
         function createCboShowRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
@@ -455,8 +505,8 @@
                 });
             }
 
-            cboStockCardReportShowNumberOfRows.dispose();
-            cboStockCardReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStockCardReportShowNumberOfRows', {
+            cboStockCardShowNumberOfRows.dispose();
+            cboStockCardShowNumberOfRows = new wijmo.input.ComboBox('#cboStockCardShowNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -466,233 +516,177 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboStockCardReportShowNumberOfRows.selectedValue;
-                        stockCardReportCollections.pageSize = parseInt(numberOfRows);
-                        stockCardReportCollections.refresh();
-                        stockCardReportGrid.refresh();
+                        var numberOfRows = cboStockCardShowNumberOfRows.selectedValue;
+                        stockCardCollectionView.pageSize = parseInt(numberOfRows);
+                        stockCardCollectionView.refresh();
+                        stockCardFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isStockCardReportCompanySelected) {
-                createStockCardReportFlexGrid();
+            if (!isCboStockCardCompanySelected) {
+                createStockCardFlexGrid();
             } else {
-                refreshStockCardReportFlexGrid();
+                refreshStockCardFlexGrid();
             }
         }
 
-        // ===============================
-        // Get Sales Order Summary Data
-        // ===============================
-        function getStockCardReport() {
-            var stockCardReports = new wijmo.collections.ObservableArray;
-            if (cboStockCardReportCompany.selectedValue != null) {
-                if (cboStockCardReportBranch.selectedValue != null) {
-                    if (cboStockCardItem.selectedValue != null) {
-                        var startDate = cboStockCardReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                        var endDate = cboStockCardReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboStockCardReportCompany.selectedValue;
-                        var branchId = cboStockCardReportBranch.selectedValue;
-                        var itemId = cboStockCardItem.selectedValue;
+        // ====================
+        // Get Stock Card  Data
+        // ====================
+        function getStockCardData() {
+            var stockCards = new wijmo.collections.ObservableArray;
+            if (cboStockCardCompanyFilter.selectedValue != null) {
+                if (cboStockCardBranchFilter.selectedValue != null) {
+                    if (cboStockCardItemDescriptionFilter.selectedValue != null) {
+                        var startDate = cboStockCardStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var endDate = cboStockCardEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboStockCardCompanyFilter.selectedValue;
+                        var branchId = cboStockCardBranchFilter.selectedValue;
+                        var itemId = cboStockCardItemDescriptionFilter.selectedValue;
 
                         $.ajax({
                             url: '/api/stockCard/list/' + startDate + '/' + endDate + '/' + + companyId + '/' + branchId + '/' + itemId,
                             cache: false,
                             type: 'GET',
                             contentType: 'application/json; charset=utf-8',
-                            success: function (stockCardReportResult) {
-                                var totalIn = 0;
-                                var totalOut = 0;
-                                var totalBalance = 0;
-                                var totalAmount = 0;
+                            success: function (stockCardResult) {
+                                var inpTotalIn = 0;
+                                var inpTotalOut = 0;
+                                var inpTotalBalance = 0;
+                                var inpTotalAmount = 0;
 
-                                if (stockCardReportResult != null) {
-                                    if (stockCardReportResult.length > 0) {
-                                        for (i = 0; i < stockCardReportResult.length; i++) {
+                                if (stockCardResult != null) {
+                                    if (stockCardResult.length > 0) {
+                                        for (i = 0; i < stockCardResult.length; i++) {
                                             var docRef = "";
                                             var docRefLink = "";
 
-                                            if (stockCardReportResult[i]["RRId"] != null) {
-                                                docRef = "RR-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["RRNumber"];
-                                                docRefLink = "/Software/ReceivingReceiptDetail?id=" + stockCardReportResult[i]["RRId"];
-                                            } else if (stockCardReportResult[i]["SIId"] != null) {
-                                                docRef = "SI-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["SINumber"];
-                                                docRefLink = "/Software/SalesDetail?id=" + stockCardReportResult[i]["SIId"];
-                                            } else if (stockCardReportResult[i]["INId"] != null) {
-                                                docRef = "IN-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["INNumber"];
-                                                docRefLink = "/Software/StockInDetail?id=" + stockCardReportResult[i]["INId"];
-                                            } else if (stockCardReportResult[i]["OTId"] != null) {
-                                                docRef = "OT-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["OTNumber"];
-                                                docRefLink = "/Software/StockOutDetail?id=" + stockCardReportResult[i]["OTId"];
-                                            } else if (stockCardReportResult[i]["STId"] != null) {
-                                                docRef = "ST-" + stockCardReportResult[i]["BranchCode"] + "-" + stockCardReportResult[i]["STNumber"];
-                                                docRefLink = "/Software/StockTransferDetail?id=" + stockCardReportResult[i]["STId"];
+                                            if (stockCardResult[i]["RRId"] != null) {
+                                                docRef = "RR-" + stockCardResult[i]["BranchCode"] + "-" + stockCardResult[i]["RRNumber"];
+                                                docRefLink = "/Software/ReceivingReceiptDetail?id=" + stockCardResult[i]["RRId"];
+                                            } else if (stockCardResult[i]["SIId"] != null) {
+                                                docRef = "SI-" + stockCardResult[i]["BranchCode"] + "-" + stockCardResult[i]["SINumber"];
+                                                docRefLink = "/Software/SalesDetail?id=" + stockCardResult[i]["SIId"];
+                                            } else if (stockCardResult[i]["INId"] != null) {
+                                                docRef = "IN-" + stockCardResult[i]["BranchCode"] + "-" + stockCardResult[i]["INNumber"];
+                                                docRefLink = "/Software/StockInDetail?id=" + stockCardResult[i]["INId"];
+                                            } else if (stockCardResult[i]["OTId"] != null) {
+                                                docRef = "OT-" + stockCardResult[i]["BranchCode"] + "-" + stockCardResult[i]["OTNumber"];
+                                                docRefLink = "/Software/StockOutDetail?id=" + stockCardResult[i]["OTId"];
+                                            } else if (stockCardResult[i]["STId"] != null) {
+                                                docRef = "ST-" + stockCardResult[i]["BranchCode"] + "-" + stockCardResult[i]["STNumber"];
+                                                docRefLink = "/Software/StockTransferDetail?id=" + stockCardResult[i]["STId"];
                                             } else {
                                                 docRef = "Beginning Balance";
                                                 docRefLink = "#";
                                             }
 
-                                            var InventoryDateResult = new Date(stockCardReportResult[i]["InventoryDate"]);
+                                            var InventoryDateResult = new Date(stockCardResult[i]["InventoryDate"]);
                                             var InventoryDate = ('0' + (InventoryDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + InventoryDateResult.getDate()).slice(-2) + '-' + InventoryDateResult.getFullYear();
 
-                                            stockCardReports.push({
-                                                Id: stockCardReportResult[i]["Id"],
+                                            stockCards.push({
+                                                Id: stockCardResult[i]["Id"],
                                                 BtnDetail: "<a href='" + docRefLink + "' class='btn btn-primary btn-xs btn-block' style='font-size: 9.5px;'><i class='fa fa-edit'></i> Detail</a>",
                                                 Document: docRef,
-                                                Branch: stockCardReportResult[i]["Branch"],
+                                                Branch: stockCardResult[i]["Branch"],
                                                 InventoryDate: InventoryDate,
-                                                ManualNumber: stockCardReportResult[i]["ManualNumber"],
-                                                Cost: stockCardReportResult[i]["Cost"],
-                                                CostDisplay: parseFloat(stockCardReportResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                Unit: stockCardReportResult[i]["Unit"],
-                                                InQuantity: stockCardReportResult[i]["InQuantity"],
-                                                InQuantityDisplay: parseFloat(stockCardReportResult[i]["InQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                OutQuantity: stockCardReportResult[i]["OutQuantity"],
-                                                OutQuantityDisplay: parseFloat(stockCardReportResult[i]["OutQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                BalanceQuantity: stockCardReportResult[i]["BalanceQuantity"],
-                                                BalanceQuantityDisplay: parseFloat(stockCardReportResult[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                RunningQuantity: stockCardReportResult[i]["RunningQuantity"],
-                                                RunningQuantityDisplay: parseFloat(stockCardReportResult[i]["RunningQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                                Amount: stockCardReportResult[i]["Amount"],
-                                                AmountDisplay: parseFloat(stockCardReportResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                ManualNumber: stockCardResult[i]["ManualNumber"],
+                                                Cost: stockCardResult[i]["Cost"],
+                                                CostDisplay: parseFloat(stockCardResult[i]["Cost"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                Unit: stockCardResult[i]["Unit"],
+                                                InQuantity: stockCardResult[i]["InQuantity"],
+                                                InQuantityDisplay: parseFloat(stockCardResult[i]["InQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                OutQuantity: stockCardResult[i]["OutQuantity"],
+                                                OutQuantityDisplay: parseFloat(stockCardResult[i]["OutQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                BalanceQuantity: stockCardResult[i]["BalanceQuantity"],
+                                                BalanceQuantityDisplay: parseFloat(stockCardResult[i]["BalanceQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                RunningQuantity: stockCardResult[i]["RunningQuantity"],
+                                                RunningQuantityDisplay: parseFloat(stockCardResult[i]["RunningQuantity"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                                Amount: stockCardResult[i]["Amount"],
+                                                AmountDisplay: parseFloat(stockCardResult[i]["Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                             });
 
-                                            totalIn += stockCardReportResult[i]["InQuantity"];
-                                            totalOut += stockCardReportResult[i]["OutQuantity"];
-                                            totalBalance += stockCardReportResult[i]["BalanceQuantity"];
-                                            totalAmount = totalAmount + stockCardReportResult[i]["Amount"];
+                                            inpTotalIn += stockCardResult[i]["InQuantity"];
+                                            inpTotalOut += stockCardResult[i]["OutQuantity"];
+                                            inpTotalBalance += stockCardResult[i]["BalanceQuantity"];
+                                            inpTotalAmount = inpTotalAmount + stockCardResult[i]["Amount"];
                                         }
 
-                                        document.getElementById("totalIn").value = parseFloat(totalIn).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalOut").value = parseFloat(totalOut).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalIn").value = parseFloat(inpTotalIn).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalOut").value = parseFloat(inpTotalOut).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalBalance").value = parseFloat(inpTotalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalAmount").value = parseFloat(inpTotalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                         NProgress.done();
                                     } else {
-                                        document.getElementById("totalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                        document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                         NProgress.done();
                                     }
                                 } else {
-                                    document.getElementById("totalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    document.getElementById("totalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    document.getElementById("inpTotalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    document.getElementById("inpTotalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                     NProgress.done();
                                 }
                             }
                         });
                     } else {
-                        document.getElementById("totalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
                     }
                 } else {
-                    document.getElementById("totalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalIn").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalOut").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
-            return stockCardReports;
+            return stockCards;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (stockCardReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (stockCardReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (stockCardReportCollections.pageIndex === (stockCardReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (stockCardReportCollections.pageIndex + 1) + ' / ' + stockCardReportCollections.pageCount;
-        }
-
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshStockCardReportFlexGrid() {
-            stockCardReportCollections = new wijmo.collections.CollectionView(getStockCardReport());
-            stockCardReportCollections.canFilter = true;
-            stockCardReportCollections.pageSize = cboStockCardReportShowNumberOfRows.selectedValue;
+        // ==================================
+        // Create Stock Card  Flex Grid
+        // ==================================
+        function createStockCardFlexGrid() {
+            stockCardCollectionView = new wijmo.collections.CollectionView(getStockCardData());
+            stockCardCollectionView.canFilter = true;
+            stockCardCollectionView.pageSize = cboStockCardShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpStockCardSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                stockCardReportCollections.refresh();
+                stockCardCollectionView.refresh();
             });
 
-            stockCardReportCollections.filter = function (item) {
+            stockCardCollectionView.filter = function (item) {
                 return !filterText || (item.Document.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ManualNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            stockCardReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            stockCardCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockCardNavigationButtons();
             });
 
-            stockCardReportGrid.itemsSource = stockCardReportCollections;
-            stockCardReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
-        function createStockCardReportFlexGrid() {
-            stockCardReportCollections = new wijmo.collections.CollectionView(getStockCardReport());
-            stockCardReportCollections.canFilter = true;
-            stockCardReportCollections.pageSize = cboStockCardReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                stockCardReportCollections.refresh();
-            });
-
-            stockCardReportCollections.filter = function (item) {
-                return !filterText || (item.Document.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            stockCardReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            stockCardReportGrid = new wijmo.grid.FlexGrid('#stockCardReportGrid');
-            stockCardReportGrid.initialize({
+            stockCardFlexGrid = new wijmo.grid.FlexGrid('#stockCardFlexGrid');
+            stockCardFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -769,102 +763,158 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: stockCardReportCollections,
+                itemsSource: stockCardCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            stockCardReportGrid.trackChanges = true;
+            stockCardFlexGrid.trackChanges = true;
 
             var hr = new wijmo.grid.Row();
-            stockCardReportGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
-            stockCardReportGrid.columnHeaders.rows.push(hr);
-            stockCardReportGrid.columnHeaders.rows[0].allowMerging = true;
+            stockCardFlexGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            stockCardFlexGrid.columnHeaders.rows.push(hr);
+            stockCardFlexGrid.columnHeaders.rows[0].allowMerging = true;
 
-            stockCardReportGrid.columnHeaders.columns[0].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 0, 'Detail');
+            stockCardFlexGrid.columnHeaders.columns[0].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 0, 'Detail');
 
-            stockCardReportGrid.columnHeaders.columns[1].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 1, 'Document');
+            stockCardFlexGrid.columnHeaders.columns[1].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 1, 'Document');
 
-            stockCardReportGrid.columnHeaders.columns[2].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 2, 'Date');
+            stockCardFlexGrid.columnHeaders.columns[2].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 2, 'Date');
 
-            stockCardReportGrid.columnHeaders.columns[3].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 3, 'Manual No.');
+            stockCardFlexGrid.columnHeaders.columns[3].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 3, 'Manual No.');
 
             for (var columnBasicUnitConversion = 4; columnBasicUnitConversion <= 7; columnBasicUnitConversion++) {
-                stockCardReportGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
+                stockCardFlexGrid.columnHeaders.setCellData(0, columnBasicUnitConversion, 'Quantity');
             }
 
-            stockCardReportGrid.columnHeaders.columns[8].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 8, 'Unit');
+            stockCardFlexGrid.columnHeaders.columns[8].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 8, 'Unit');
 
-            stockCardReportGrid.columnHeaders.columns[9].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 9, 'Cost');
+            stockCardFlexGrid.columnHeaders.columns[9].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 9, 'Cost');
 
-            stockCardReportGrid.columnHeaders.columns[10].allowMerging = true;
-            stockCardReportGrid.columnHeaders.setCellData(0, 10, 'Amount');
+            stockCardFlexGrid.columnHeaders.columns[10].allowMerging = true;
+            stockCardFlexGrid.columnHeaders.setCellData(0, 10, 'Amount');
 
-            updateNavigateButtonsItems();
+            updateStockCardNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                stockCardReportCollections.moveToFirstPage();
-                currentPageIndex = stockCardReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockCardMoveToFirstPageGrid.addEventListener('click', function () {
+                stockCardCollectionView.moveToFirstPage();
+                currentPageIndex = stockCardCollectionView.pageIndex + 1;
+                updateStockCardNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                stockCardReportCollections.moveToPreviousPage();
-                currentPageIndex = stockCardReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockCardMoveToPreviousPageGrid.addEventListener('click', function () {
+                stockCardCollectionView.moveToPreviousPage();
+                currentPageIndex = stockCardCollectionView.pageIndex + 1;
+                updateStockCardNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                stockCardReportCollections.moveToNextPage();
-                currentPageIndex = stockCardReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockCardMoveToNextPageGrid.addEventListener('click', function () {
+                stockCardCollectionView.moveToNextPage();
+                currentPageIndex = stockCardCollectionView.pageIndex + 1;
+                updateStockCardNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                stockCardReportCollections.moveToLastPage();
-                currentPageIndex = stockCardReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockCardMoveToLastPageGrid.addEventListener('click', function () {
+                stockCardCollectionView.moveToLastPage();
+                currentPageIndex = stockCardCollectionView.pageIndex + 1;
+                updateStockCardNavigationButtons();
             });
+        }
+
+        // =====================================
+        // Update Stock Card  Navigation Buttons
+        // =====================================
+        function updateStockCardNavigationButtons() {
+            if (stockCardCollectionView.pageSize <= 0) {
+                document.getElementById('stockCardNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('stockCardNavigationPageGrid').style.display = 'block';
+            if (stockCardCollectionView.pageIndex === 0) {
+                btnStockCardMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnStockCardMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnStockCardMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (stockCardCollectionView.pageIndex === (stockCardCollectionView.pageCount - 1)) {
+                btnStockCardMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnStockCardMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnStockCardMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockCardMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnStockCardCurrentPageGrid.innerHTML = (stockCardCollectionView.pageIndex + 1) + ' / ' + stockCardCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshStockCardFlexGrid() {
+            stockCardCollectionView = new wijmo.collections.CollectionView(getStockCardData());
+            stockCardCollectionView.canFilter = true;
+            stockCardCollectionView.pageSize = cboStockCardShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpStockCardSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockCardCollectionView.refresh();
+            });
+
+            stockCardCollectionView.filter = function (item) {
+                return !filterText || (item.Document.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ManualNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockCardCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockCardNavigationButtons();
+            });
+
+            stockCardFlexGrid.itemsSource = stockCardCollectionView;
+            stockCardFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnStockCardReportCSVOnclick() {
+        function btnStockCardDownloadCSVOnclick() {
             var CSV = '';
-            var stockCardReport = [];
-            var fileName = 'StockCardReport.CSV';
+            var stockCard = [];
+            var fileName = 'StockCard.CSV';
 
-            stockCardReportCollections.moveToFirstPage();
+            stockCardCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= stockCardReportCollections.pageCount; p++) {
-                for (i = 0; i < stockCardReportCollections.items.length; i++) {
-                    stockCardReport.push({
-                        Branch: stockCardReportCollections.items[i].Branch,
-                        Document: stockCardReportCollections.items[i].Document,
-                        InventoryDate: stockCardReportCollections.items[i].InventoryDate,
-                        ManualNumber: stockCardReportCollections.items[i].ManualNumber,
-                        InQuantity: stockCardReportCollections.items[i].InQuantity,
-                        OutQuantity: stockCardReportCollections.items[i].OutQuantity,
-                        BalanceQuantity: stockCardReportCollections.items[i].BalanceQuantity,
-                        RunningQuantity: stockCardReportCollections.items[i].RunningQuantity,
-                        Unit: stockCardReportCollections.items[i].Unit,
-                        Cost: stockCardReportCollections.items[i].Cost,
-                        Amount: stockCardReportCollections.items[i].Amount
+            for (var p = 1; p <= stockCardCollectionView.pageCount; p++) {
+                for (i = 0; i < stockCardCollectionView.items.length; i++) {
+                    stockCard.push({
+                        Branch: stockCardCollectionView.items[i].Branch,
+                        Document: stockCardCollectionView.items[i].Document,
+                        InventoryDate: stockCardCollectionView.items[i].InventoryDate,
+                        ManualNumber: stockCardCollectionView.items[i].ManualNumber,
+                        InQuantity: stockCardCollectionView.items[i].InQuantity,
+                        OutQuantity: stockCardCollectionView.items[i].OutQuantity,
+                        BalanceQuantity: stockCardCollectionView.items[i].BalanceQuantity,
+                        RunningQuantity: stockCardCollectionView.items[i].RunningQuantity,
+                        Unit: stockCardCollectionView.items[i].Unit,
+                        Cost: stockCardCollectionView.items[i].Cost,
+                        Amount: stockCardCollectionView.items[i].Amount
                     });
                 }
 
-                stockCardReportCollections.moveToNextPage();
-                if (p == stockCardReportCollections.pageCount) {
-                    stockCardReportCollections.moveToPage(currentPageIndex - 1);
+                stockCardCollectionView.moveToNextPage();
+                if (p == stockCardCollectionView.pageCount) {
+                    stockCardCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
@@ -889,10 +939,10 @@
             }
 
             CSV = header + '\r\n';
-            for (var i = 0; i < stockCardReport.length; i++) {
+            for (var i = 0; i < stockCard.length; i++) {
                 var row = '';
-                for (var a in stockCardReport[i]) {
-                    row += '"' + stockCardReport[i][a] + '",';
+                for (var a in stockCard[i]) {
+                    row += '"' + stockCard[i][a] + '",';
                 }
 
                 row.slice(0, row.length - 1);
@@ -931,15 +981,15 @@
         // =====================
         // Preview and Print PDF
         // =====================
-        function btnStockCardReportPrintPDFOnclick() {
-            if (cboStockCardReportCompany.selectedValue != null) {
-                if (cboStockCardReportBranch.selectedValue != null) {
-                    if (cboStockCardItem.selectedValue != null) {
-                        var startDate = cboStockCardReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                        var endDate = cboStockCardReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboStockCardReportCompany.selectedValue;
-                        var branchId = cboStockCardReportBranch.selectedValue;
-                        var itemId = cboStockCardItem.selectedValue;
+        function btnStockCardPrintPDFOnclick() {
+            if (cboStockCardCompanyFilter.selectedValue != null) {
+                if (cboStockCardBranchFilter.selectedValue != null) {
+                    if (cboStockCardItemDescriptionFilter.selectedValue != null) {
+                        var startDate = cboStockCardStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var endDate = cboStockCardEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboStockCardCompanyFilter.selectedValue;
+                        var branchId = cboStockCardBranchFilter.selectedValue;
+                        var itemId = cboStockCardItemDescriptionFilter.selectedValue;
 
                         window.location.href = '/RepStockCard/StockCard?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&ItemId=' + itemId;
                     } else {
@@ -957,11 +1007,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            stockCardReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -1008,6 +1065,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -1047,6 +1107,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

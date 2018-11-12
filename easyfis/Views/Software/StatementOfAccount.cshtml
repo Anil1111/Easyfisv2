@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Statement of Account</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,87 +26,117 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ========================================
+                        Input Filters and Display Number of Rows
+                        ========================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpStatementOfAccountSeachFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboStatementOfAccountReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboStatementOfAccountDisplayNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="statementOfAccountReportCSVOnclick()" id="btnCSV" class="btn btn-success "><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="statementOfAccountReportPDFOnclick()" id="btnPrintPDF" class="btn btn-primary "><i class="fa fa-print"></i> Print</button>
-                                    <a href="/Software/AccountsReceivable" class="btn btn-danger "><i class="fa fa-close"></i> Close</a>
+                                    <button onclick="btnStatementOfAccountDownloadCSVOnclick()" id="btnStatementOfAccountDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnStatementOfAccountPrintPDFOnclick()" id="btnStatementOfAccountPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========================================
+                        Date, Company, Branch amd Account Filters
+                        =========================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Date as of</b></span>
-                                        <div class="comboBox-wide" id="cboStatementOfAccountReportDateAsOf" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboStatementOfAccountDateAsOfFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboStatementOfAccountReportComapny" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboStatementOfAccountCompanyFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboStatementOfAccountReportBranch" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboStatementOfAccountBranchFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Customer</b></span>
-                                        <div class="comboBox-wide" id="cboARStatementOfAccountCustomer" style="font-size: 12.5px;"></div>
+                                        <div class="comboBox-wide" id="cboStatementOfAccountCustomerFilter" style="font-size: 12.5px;"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="statementOfAccountGrid" style="font-size: 12.5px;"></div>
+                        <div id="statementOfAccountFlexGrid" style="font-size: 11.5px;"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="statementOfAccountNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStatementOfAccountMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStatementOfAccountMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnStatementOfAccountCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnStatementOfAccountMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStatementOfAccountMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========================================
+                    Statement Of Account Report Totals (Aging)
+                    ==========================================
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -120,37 +147,37 @@
                                         <b>Total Balance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalBalance" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalBalance" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Current Amount</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalCurrentAmount" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalCurrentAmount" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 30 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount30Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount30Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 60 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount60Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount60Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount in 90 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmount90Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmount90Days" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Amount Over 120 Days</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control numberField" id="totalAmountOver120Days" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpTotalAmountOver120Days" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -158,6 +185,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -165,35 +193,57 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboStatementOfAccountReportDateAsOf = new wijmo.input.InputDate('#cboStatementOfAccountReportDateAsOf');
-        var isDateAsOfSelected = true;
-        var cboStatementOfAccountReportComapny = new wijmo.input.ComboBox('#cboStatementOfAccountReportComapny');
-        var cboStatementOfAccountReportBranch = new wijmo.input.ComboBox('#cboStatementOfAccountReportBranch');
-        var cboARStatementOfAccountCustomer = new wijmo.input.ComboBox('#cboARStatementOfAccountCustomer');
-        var statementOfAccountCollections;
-        var statementOfAccountGrid;
-        var accountHasData = false;
-        var cboStatementOfAccountReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStatementOfAccountReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-        var currentPageIndex = 0;
+        // ===========
+        // Filter Date
+        // ===========
+        var cboStatementOfAccountDateAsOfFilter = new wijmo.input.InputDate('#cboStatementOfAccountDateAsOfFilter');
+        var isCboDateAsOfFilterSelected = true;
 
-        // ====================
-        // Get Parameter Values
-        // ====================
-        function getParam(name) {
+        // ==============
+        // Filter Company
+        // ==============
+        var cboStatementOfAccountCompanyFilter = new wijmo.input.ComboBox('#cboStatementOfAccountCompanyFilter');
+        var isCboCompanyFilterSelected = false;
+
+        // =============
+        // Filter Branch
+        // =============
+        var cboStatementOfAccountBranchFilter = new wijmo.input.ComboBox('#cboStatementOfAccountBranchFilter');
+
+        // ==============
+        // Filter Account
+        // ==============
+        var cboStatementOfAccountCustomerFilter = new wijmo.input.ComboBox('#cboStatementOfAccountCustomerFilter');
+
+        // ==================================================
+        // Statement Of Account Collection View and Flex Grid
+        // ==================================================
+        var statementOfAccountCollectionView;
+        var statementOfAccountFlexGrid;
+        var cboStatementOfAccountDisplayNumberOfRows = new wijmo.input.ComboBox('#cboStatementOfAccountDisplayNumberOfRows');
+        var ifStatementOfAccountHasData = false;
+
+        // =================
+        // Navigation Button
+        // =================
+        var btnStatementOfAccountMoveToFirstPageGrid = document.getElementById('btnStatementOfAccountMoveToFirstPageGrid');
+        var btnStatementOfAccountMoveToPreviousPageGrid = document.getElementById('btnStatementOfAccountMoveToPreviousPageGrid');
+        var btnStatementOfAccountMoveToNextPageGrid = document.getElementById('btnStatementOfAccountMoveToNextPageGrid');
+        var btnStatementOfAccountMoveToLastPageGrid = document.getElementById('btnStatementOfAccountMoveToLastPageGrid');
+        var btnStatementOfAccountCurrentPageGrid = document.getElementById('btnStatementOfAccountCurrentPageGrid');
+        var statementOfAccountCurrentPageIndex = 0;
+
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
             var regex = new RegExp(regexS);
 
             var results = regex.exec(window.location.href);
+
             if (results == null) {
                 return "";
             } else {
@@ -201,76 +251,75 @@
             }
         }
 
-        // ==============
-        // StatementOfAccount Filter Date
-        // ==============
-        function createCboStatementOfAccountAllDateFilters() {
+        // ==============================
+        // Create Combo Date As of Filter
+        // ==============================
+        function createCboStatementOfAccountDateAsOfFilter() {
             NProgress.start();
-            cboStatementOfAccountReportDateAsOf.dispose();
-            cboStatementOfAccountReportDateAsOf = new wijmo.input.InputDate('#cboStatementOfAccountReportDateAsOf', {
+
+            cboStatementOfAccountDateAsOfFilter.dispose();
+            cboStatementOfAccountDateAsOfFilter = new wijmo.input.InputDate('#cboStatementOfAccountDateAsOfFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("DateAsOf")),
+                value: new Date(getURLParameterValue("DateAsOf")),
                 onValueChanged: function () {
-                    if (isDateAsOfSelected) {
+                    if (isCboDateAsOfFilterSelected) {
                         NProgress.start();
                         refreshStatementOfAccountFlexGrid();
                     } else {
-                        isDateAsOfSelected = false;
+                        isCboDateAsOfFilterSelected = false;
                     }
                 }
             });
 
-            createCboStatementOfAccountAllCompanyFilter();
+            createCboStatementOfAccountCompanyFilter();
         }
 
-        var isCompanySelected = false;
-
-        // ======================
-        // StatementOfAccount All Company Filters
-        // ======================
-        function createCboStatementOfAccountAllCompanyFilter() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboStatementOfAccountCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
+
             $.ajax({
                 url: '/api/statementOfAccount/dropdown/list/company',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (companyResults) {
-                    if (companyResults.length > 0) {
-                        for (i = 0; i < companyResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             companyObservableArray.push({
-                                Id: companyResults[i]["Id"],
-                                Company: companyResults[i]["Company"],
-                                Address: companyResults[i]["Address"],
-                                ContactNumber: companyResults[i]["ContactNumber"],
-                                TaxNumber: companyResults[i]["TaxNumber"],
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (companyResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnCSV").prop("disabled", true);
-                        $("#btnPrintPDF").prop("disabled", true);
+                        $("#btnStatementOfAccountDownloadCSV").prop("disabled", true);
+                        $("#btnStatementOfAccountPrintPDF").prop("disabled", true);
                     }
 
-                    cboStatementOfAccountReportComapny.dispose();
-                    cboStatementOfAccountReportComapny = new wijmo.input.ComboBox('#cboStatementOfAccountReportComapny', {
+                    cboStatementOfAccountCompanyFilter.dispose();
+                    cboStatementOfAccountCompanyFilter = new wijmo.input.ComboBox('#cboStatementOfAccountCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            if (accountHasData) {
-                                $("#btnCSV").prop("disabled", false);
-                                $("#btnPrintPDF").prop("disabled", false);
+
+                            if (ifStatementOfAccountHasData) {
+                                $("#btnStatementOfAccountDownloadCSV").prop("disabled", false);
+                                $("#btnStatementOfAccountPrintPDF").prop("disabled", false);
                             }
-                            isCompanySelected = true;
+
+                            isCboCompanyFilterSelected = true;
                             createCboStatementOfAccountBranchFilter();
                         }
                     });
@@ -280,67 +329,63 @@
             });
         }
 
-        // ================
-        // StatementOfAccount Branch Filter
-        // ================
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
         function createCboStatementOfAccountBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboStatementOfAccountReportComapny.selectedValue != null) {
-                var companyId = cboStatementOfAccountReportComapny.selectedValue;
+
+            if (cboStatementOfAccountCompanyFilter.selectedValue != null) {
+                var companyId = cboStatementOfAccountCompanyFilter.selectedValue;
 
                 $.ajax({
                     url: '/api/statementOfAccount/dropdown/list/branch/' + companyId,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
-                    success: function (branchResults) {
-                        if (branchResults.length > 0) {
-                            for (i = 0; i < branchResults.length; i++) {
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
                                 branchObservableArray.push({
-                                    Id: branchResults[i]["Id"],
-                                    CompanyId: branchResults[i]["CompanyId"],
-                                    Branch: branchResults[i]["Branch"],
-                                    Address: branchResults[i]["Address"],
-                                    ContactNumber: branchResults[i]["ContactNumber"],
-                                    TaxNumber: branchResults[i]["TaxNumber"]
+                                    Id: results[i]["Id"],
+                                    Branch: results[i]["Branch"]
                                 });
                             }
                         }
 
                         var disabled = true;
-                        if (branchResults.length > 0) {
+                        if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnCSV").prop("disabled", true);
-                            $("#btnPrintPDF").prop("disabled", true);
+                            $("#btnStatementOfAccountDownloadCSV").prop("disabled", true);
+                            $("#btnStatementOfAccountPrintPDF").prop("disabled", true);
                         }
 
-                        cboStatementOfAccountReportBranch.dispose();
-                        cboStatementOfAccountReportBranch = new wijmo.input.ComboBox('#cboStatementOfAccountReportBranch', {
+                        cboStatementOfAccountBranchFilter.dispose();
+                        cboStatementOfAccountBranchFilter = new wijmo.input.ComboBox('#cboStatementOfAccountBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshStatementOfAccountFlexGrid();
                             }
                         });
 
-                        if (!isCompanySelected) {
-                            createCboStatementOfAccountAccountFilter();
+                        if (!isCboCompanyFilterSelected) {
+                            createCboStatementOfAccountCustomerFilter();
                         } else {
                             refreshStatementOfAccountFlexGrid();
                         }
                     }
                 });
             } else {
-                cboStatementOfAccountReportBranch.dispose();
-                cboStatementOfAccountReportBranch = new wijmo.input.ComboBox('#cboStatementOfAccountReportBranch', {
+                cboStatementOfAccountBranchFilter.dispose();
+                cboStatementOfAccountBranchFilter = new wijmo.input.ComboBox('#cboStatementOfAccountBranchFilter', {
                     disabled: true,
-                    isEditable: false,
                     itemsSource: branchObservableArray
                 });
 
@@ -348,57 +393,59 @@
             }
         }
 
-        // =================================
-        // StatementOfAccount Account Filter
-        // =================================
-        function createCboStatementOfAccountAccountFilter() {
-            var customersObservableArray = new wijmo.collections.ObservableArray();
+        // ============================
+        // Create Combo Customer Filter
+        // ============================
+        function createCboStatementOfAccountCustomerFilter() {
+            var customerObservableArray = new wijmo.collections.ObservableArray();
+
             $.ajax({
                 url: '/api/statementOfAccount/dropdown/list/customer',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (customerListResults) {
-                    if (customerListResults.length > 0) {
-                        for (i = 0; i < customerListResults.length; i++) {
-                            customersObservableArray.push({
-                                Id: customerListResults[i]["Id"],
-                                Customer: customerListResults[i]["Article"]
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
+                            customerObservableArray.push({
+                                Id: results[i]["Id"],
+                                Article: results[i]["Article"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (customerListResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
-
+                        ifStatementOfAccountHasData = true;
                     } else {
-
+                        $("#btnStatementOfAccountDownloadCSV").prop("disabled", true);
+                        $("#btnStatementOfAccountPrintPDF").prop("disabled", true);
                     }
 
-                    cboARStatementOfAccountCustomer.dispose();
-                    cboARStatementOfAccountCustomer = new wijmo.input.ComboBox('#cboARStatementOfAccountCustomer', {
+                    cboStatementOfAccountCustomerFilter.dispose();
+                    cboStatementOfAccountCustomerFilter = new wijmo.input.ComboBox('#cboStatementOfAccountCustomerFilter', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: customersObservableArray,
-                        displayMemberPath: "Customer",
+                        itemsSource: customerObservableArray,
+                        displayMemberPath: "Article",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CustomerId"),
+                        selectedValue: getURLParameterValue("CustomerId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
                             refreshStatementOfAccountFlexGrid();
                         }
                     });
 
-                    createCboShowRows();
+                    createCboStatementOfAccountDisplayNumberOfRows();
                 }
             });
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
+        // =============================
+        // Create Display Number of Rows
+        // =============================
+        function createCboStatementOfAccountDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -428,8 +475,8 @@
                 });
             }
 
-            cboStatementOfAccountReportShowNumberOfRows.dispose();
-            cboStatementOfAccountReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStatementOfAccountReportShowNumberOfRows', {
+            cboStatementOfAccountDisplayNumberOfRows.dispose();
+            cboStatementOfAccountDisplayNumberOfRows = new wijmo.input.ComboBox('#cboStatementOfAccountDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -439,239 +486,174 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboStatementOfAccountReportShowNumberOfRows.selectedValue;
-                        statementOfAccountCollections.pageSize = parseInt(numberOfRows);
-                        statementOfAccountCollections.refresh();
-                        statementOfAccountGrid.refresh();
+                        var numberOfRows = cboStatementOfAccountDisplayNumberOfRows.selectedValue;
+                        statementOfAccountCollectionView.pageSize = parseInt(numberOfRows);
+                        statementOfAccountCollectionView.refresh();
+                        statementOfAccountFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            createAccounstReceivableFlexGrid();
+            createAccounstPayableReportFlexGrid();
         }
 
-        // ===================
-        // Statement Of Account
-        // ===================
-        function getStatementOfAccount() {
+        // ====================================
+        // Get Statement Of Account Report Data
+        // ====================================
+        function getStatementOfAccountData() {
             var statementOfAccountObservableArray = new wijmo.collections.ObservableArray;
-            if (cboStatementOfAccountReportComapny.selectedValue != null) {
-                if (cboStatementOfAccountReportBranch.selectedValue != null) {
-                    if (cboARStatementOfAccountCustomer.selectedValue != null) {
 
-                        var dateAsOf = cboStatementOfAccountReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboStatementOfAccountReportComapny.selectedValue;
-                        var branchId = cboStatementOfAccountReportBranch.selectedValue;
-                        var accountId = cboARStatementOfAccountCustomer.selectedValue;
+            if (cboStatementOfAccountCompanyFilter.selectedValue != null) {
+                if (cboStatementOfAccountBranchFilter.selectedValue != null) {
+                    if (cboStatementOfAccountCustomerFilter.selectedValue != null) {
+
+                        var dateAsOf = cboStatementOfAccountDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboStatementOfAccountCompanyFilter.selectedValue;
+                        var branchId = cboStatementOfAccountBranchFilter.selectedValue;
+                        var customerId = cboStatementOfAccountCustomerFilter.selectedValue;
 
                         $.ajax({
-                            url: '/api/statementOfAccount/list/' + dateAsOf + "/" + companyId + "/" + branchId + "/" + accountId,
+                            url: '/api/statementOfAccount/list/' + dateAsOf + "/" + companyId + "/" + branchId + "/" + customerId,
                             cache: false,
                             type: 'GET',
                             contentType: 'application/json; charset=utf-8',
-                            success: function (statementOfAccountResults) {
-                                var totalBalance = 0;
-                                var totalCurrentAmount = 0;
+                            success: function (results) {
+                                var inpTotalBalance = 0;
+                                var inpTotalCurrentAmount = 0;
                                 var totalAge30Amount = 0;
                                 var totalAge60Amount = 0;
                                 var totalAge90Amount = 0;
                                 var totalAge120Amount = 0;
 
-                                if (statementOfAccountResults.length > 0) {
-                                    for (i = 0; i < statementOfAccountResults.length; i++) {
-                                        var docLink = "/Software/SalesDetail?id=" + statementOfAccountResults[i]["Id"];
+                                if (results.length > 0) {
+                                    for (i = 0; i < results.length; i++) {
+                                        var docLink = "/Software/SalesDetail?id=" + results[i]["Id"];
 
-                                        totalBalance = totalBalance + statementOfAccountResults[i]["BalanceAmount"];
-                                        totalCurrentAmount = totalCurrentAmount + statementOfAccountResults[i]["CurrentAmount"];
-                                        totalAge30Amount = totalAge30Amount + statementOfAccountResults[i]["Age30Amount"];
-                                        totalAge60Amount = totalAge60Amount + statementOfAccountResults[i]["Age60Amount"];
-                                        totalAge90Amount = totalAge90Amount + statementOfAccountResults[i]["Age90Amount"];
-                                        totalAge120Amount = totalAge120Amount + statementOfAccountResults[i]["Age120Amount"];
+                                        inpTotalBalance = inpTotalBalance + results[i]["BalanceAmount"];
+                                        inpTotalCurrentAmount = inpTotalCurrentAmount + results[i]["CurrentAmount"];
+                                        totalAge30Amount = totalAge30Amount + results[i]["Age30Amount"];
+                                        totalAge60Amount = totalAge60Amount + results[i]["Age60Amount"];
+                                        totalAge90Amount = totalAge90Amount + results[i]["Age90Amount"];
+                                        totalAge120Amount = totalAge120Amount + results[i]["Age120Amount"];
 
-                                        var SIDateResult = new Date(statementOfAccountResults[i]["SIDate"])
+                                        var SIDateResult = new Date(results[i]["SIDate"])
                                         var SIDate = ('0' + (SIDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + SIDateResult.getDate()).slice(-2) + '-' + SIDateResult.getFullYear();
 
-                                        var DueDateResult = new Date(statementOfAccountResults[i]["DueDate"])
+                                        var DueDateResult = new Date(results[i]["DueDate"])
                                         var DueDate = ('0' + (DueDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + DueDateResult.getDate()).slice(-2) + '-' + DueDateResult.getFullYear();
 
                                         statementOfAccountObservableArray.push({
-                                            Id: statementOfAccountResults[i]["Id"],
-                                            Branch: statementOfAccountResults[i]["Branch"],
-                                            AccountId: statementOfAccountResults[i]["AccountId"],
-                                            AccountCode: statementOfAccountResults[i]["AccountCode"],
-                                            Account: statementOfAccountResults[i]["Account"],
-                                            CustomerId: statementOfAccountResults[i]["CustomerId"],
-                                            Customer: statementOfAccountResults[i]["Customer"],
-                                            SINumber: "<a href='" + docLink + "' style='font-size: 10px;' class='btn btn-primary btn-xs btn-block'>" + statementOfAccountResults[i]["SINumber"] + "</a>",
-                                            SINumberValue: statementOfAccountResults[i]["SINumber"],
-                                            SINumberCSVValue: "SI-" + statementOfAccountResults[i]["SINumber"],
+                                            BtnDetail: "<a href='" + docLink + "' style='font-size: 9px;' class='btn btn-primary btn-xs btn-block'><i class='fa fa-edit'></i> Detail</a>",
+                                            Id: results[i]["Id"],
+                                            Branch: results[i]["Branch"],
+                                            Account: results[i]["Account"],
+                                            SINumber: results[i]["SINumber"],
+                                            Customer: results[i]["Customer"],
                                             SIDate: SIDate,
-                                            DocumentReference: statementOfAccountResults[i]["DocumentReference"],
-                                            BalanceAmount: statementOfAccountResults[i]["BalanceAmount"],
-                                            BalanceAmountDisplay: parseFloat(statementOfAccountResults[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            DocumentReference: results[i]["DocumentReference"],
                                             DueDate: DueDate,
-                                            NumberOfDaysFromDueDate: statementOfAccountResults[i]["NumberOfDaysFromDueDate"],
-                                            CurrentAmount: statementOfAccountResults[i]["CurrentAmount"],
-                                            CurrentAmountDisplay: parseFloat(statementOfAccountResults[i]["CurrentAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age30Amount: statementOfAccountResults[i]["Age30Amount"],
-                                            Age30AmountDisplay: parseFloat(statementOfAccountResults[i]["Age30Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age60Amount: statementOfAccountResults[i]["Age60Amount"],
-                                            Age60AmountDisplay: parseFloat(statementOfAccountResults[i]["Age60Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age90Amount: statementOfAccountResults[i]["Age90Amount"],
-                                            Age90AmountDisplay: parseFloat(statementOfAccountResults[i]["Age90Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                            Age120Amount: statementOfAccountResults[i]["Age120Amount"],
-                                            Age120AmountDisplay: parseFloat(statementOfAccountResults[i]["Age120Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            BalanceAmount: results[i]["BalanceAmount"],
+                                            BalanceAmountDisplay: parseFloat(results[i]["BalanceAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            CurrentAmount: results[i]["CurrentAmount"],
+                                            CurrentAmountDisplay: parseFloat(results[i]["CurrentAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age30Amount: results[i]["Age30Amount"],
+                                            Age30AmountDisplay: parseFloat(results[i]["Age30Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age60Amount: results[i]["Age60Amount"],
+                                            Age60AmountDisplay: parseFloat(results[i]["Age60Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age90Amount: results[i]["Age90Amount"],
+                                            Age90AmountDisplay: parseFloat(results[i]["Age90Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                                            Age120Amount: results[i]["Age120Amount"],
+                                            Age120AmountDisplay: parseFloat(results[i]["Age120Amount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                         });
                                     }
                                 }
 
-                                document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+                                document.getElementById("inpTotalBalance").value = parseFloat(inpTotalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalCurrentAmount").value = parseFloat(inpTotalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                document.getElementById("inpTotalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 NProgress.done();
                             }
                         });
                     } else {
-                        document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+                        document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
                     }
                 } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+                    document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                     NProgress.done();
                 }
             } else {
-                document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+                document.getElementById("inpTotalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                document.getElementById("inpTotalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 NProgress.done();
             }
 
             return statementOfAccountObservableArray;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (statementOfAccountCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (statementOfAccountCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (statementOfAccountCollections.pageIndex === (statementOfAccountCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (statementOfAccountCollections.pageIndex + 1) + ' / ' + statementOfAccountCollections.pageCount;
-        }
-
-        // =============================
-        // Statement Of Account Flex Grid
-        // =============================
-        function createAccounstReceivableFlexGrid() {
-            statementOfAccountCollections = new wijmo.collections.CollectionView(getStatementOfAccount());
-            statementOfAccountCollections.canFilter = true;
-            statementOfAccountCollections.pageSize = cboStatementOfAccountReportShowNumberOfRows.selectedValue;
+        // ============================================
+        // Create Statement Of Account Report Flex Grid
+        // ============================================
+        function createAccounstPayableReportFlexGrid() {
+            statementOfAccountCollectionView = new wijmo.collections.CollectionView(getStatementOfAccountData());
+            statementOfAccountCollectionView.canFilter = true;
+            statementOfAccountCollectionView.pageSize = cboStatementOfAccountDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpStatementOfAccountSeachFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                statementOfAccountCollections.refresh();
-
-                if (statementOfAccountCollections.items.length > 0) {
-                    var totalBalance = 0;
-                    var totalCurrentAmount = 0;
-                    var totalAge30Amount = 0;
-                    var totalAge60Amount = 0;
-                    var totalAge90Amount = 0;
-                    var totalAge120Amount = 0;
-
-                    for (var i = 0; i < statementOfAccountCollections.items.length; i++) {
-                        totalBalance = totalBalance + statementOfAccountCollections.items[i]["BalanceAmount"];
-                        totalCurrentAmount = totalCurrentAmount + statementOfAccountCollections.items[i]["CurrentAmount"];
-                        totalAge30Amount = totalAge30Amount + statementOfAccountCollections.items[i]["Age30Amount"];
-                        totalAge60Amount = totalAge60Amount + statementOfAccountCollections.items[i]["Age60Amount"];
-                        totalAge90Amount = totalAge90Amount + statementOfAccountCollections.items[i]["Age90Amount"];
-                        totalAge120Amount = totalAge120Amount + statementOfAccountCollections.items[i]["Age120Amount"];
-                    }
-
-                    document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                statementOfAccountCollectionView.refresh();
             });
 
-            statementOfAccountCollections.filter = function (item) {
-                return !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SINumberValue.toLowerCase().indexOf(filterText) > -1)
+            statementOfAccountCollectionView.filter = function (item) {
+                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            statementOfAccountCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            statementOfAccountCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStatementOfAccountNavigateButtons();
             });
 
-            statementOfAccountGrid = new wijmo.grid.FlexGrid('#statementOfAccountGrid');
-            statementOfAccountGrid.initialize({
+            statementOfAccountFlexGrid = new wijmo.grid.FlexGrid('#statementOfAccountFlexGrid');
+            statementOfAccountFlexGrid.initialize({
                 columns: [
+                    {
+                        "header": "Detail",
+                        "binding": "BtnDetail",
+                        "width": 70,
+                        "isContentHtml": true
+                    },
                     {
                         "header": "SI No.",
                         "binding": "SINumber",
                         "allowSorting": true,
-                        "width": 80,
-                        "isContentHtml": true
+                        "width": 80
                     },
                     {
                         "header": "Account",
                         "binding": "Account",
                         "allowSorting": true,
-                        "width": "1.3*",
-
+                        "width": "1.2*",
                     },
                     {
                         "header": "SI Date",
@@ -735,145 +717,143 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: statementOfAccountCollections,
+                itemsSource: statementOfAccountCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            statementOfAccountGrid.trackChanges = true;
+            statementOfAccountFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateStatementOfAccountNavigateButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                statementOfAccountCollections.moveToFirstPage();
-                currentPageIndex = statementOfAccountCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStatementOfAccountMoveToFirstPageGrid.addEventListener('click', function () {
+                statementOfAccountCollectionView.moveToFirstPage();
+                statementOfAccountCurrentPageIndex = statementOfAccountCollectionView.pageIndex + 1;
+                updateStatementOfAccountNavigateButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                statementOfAccountCollections.moveToPreviousPage();
-                currentPageIndex = statementOfAccountCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStatementOfAccountMoveToPreviousPageGrid.addEventListener('click', function () {
+                statementOfAccountCollectionView.moveToPreviousPage();
+                statementOfAccountCurrentPageIndex = statementOfAccountCollectionView.pageIndex + 1;
+                updateStatementOfAccountNavigateButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                statementOfAccountCollections.moveToNextPage();
-                currentPageIndex = statementOfAccountCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStatementOfAccountMoveToNextPageGrid.addEventListener('click', function () {
+                statementOfAccountCollectionView.moveToNextPage();
+                statementOfAccountCurrentPageIndex = statementOfAccountCollectionView.pageIndex + 1;
+                updateStatementOfAccountNavigateButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                statementOfAccountCollections.moveToLastPage();
-                currentPageIndex = statementOfAccountCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStatementOfAccountMoveToLastPageGrid.addEventListener('click', function () {
+                statementOfAccountCollectionView.moveToLastPage();
+                statementOfAccountCurrentPageIndex = statementOfAccountCollectionView.pageIndex + 1;
+                updateStatementOfAccountNavigateButtons();
             });
         }
 
-        // =====================================
-        // Refresh Statement Of Account Flex Grid
-        // =====================================
+        // =============================================
+        // Refresh Statement Of Account Report Flex Grid
+        // =============================================
         function refreshStatementOfAccountFlexGrid() {
-            statementOfAccountCollections = new wijmo.collections.CollectionView(getStatementOfAccount());
-            statementOfAccountCollections.canFilter = true;
-            statementOfAccountCollections.pageSize = cboStatementOfAccountReportShowNumberOfRows.selectedValue;
+            statementOfAccountCollectionView = new wijmo.collections.CollectionView(getStatementOfAccountData());
+            statementOfAccountCollectionView.canFilter = true;
+            statementOfAccountCollectionView.pageSize = cboStatementOfAccountDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpStatementOfAccountSeachFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                statementOfAccountCollections.refresh();
-
-                if (statementOfAccountCollections.items.length > 0) {
-                    var totalBalance = 0;
-                    var totalCurrentAmount = 0;
-                    var totalAge30Amount = 0;
-                    var totalAge60Amount = 0;
-                    var totalAge90Amount = 0;
-                    var totalAge120Amount = 0;
-
-                    for (var i = 0; i < statementOfAccountCollections.items.length; i++) {
-                        totalBalance = totalBalance + statementOfAccountCollections.items[i]["BalanceAmount"];
-                        totalCurrentAmount = totalCurrentAmount + statementOfAccountCollections.items[i]["CurrentAmount"];
-                        totalAge30Amount = totalAge30Amount + statementOfAccountCollections.items[i]["Age30Amount"];
-                        totalAge60Amount = totalAge60Amount + statementOfAccountCollections.items[i]["Age60Amount"];
-                        totalAge90Amount = totalAge90Amount + statementOfAccountCollections.items[i]["Age90Amount"];
-                        totalAge120Amount = totalAge120Amount + statementOfAccountCollections.items[i]["Age120Amount"];
-                    }
-
-                    document.getElementById("totalBalance").value = parseFloat(totalBalance).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(totalCurrentAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(totalAge30Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(totalAge60Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(totalAge90Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(totalAge120Amount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalBalance").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalCurrentAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount30Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount60Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmount90Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                    document.getElementById("totalAmountOver120Days").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                statementOfAccountCollectionView.refresh();
             });
 
-            statementOfAccountCollections.filter = function (item) {
-                return !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Customer.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.SINumberValue.toLowerCase().indexOf(filterText) > -1)
+            statementOfAccountCollectionView.filter = function (item) {
+                return !filterText || (item.SINumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Account.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1);
             }
 
-            statementOfAccountCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            statementOfAccountCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStatementOfAccountNavigateButtons();
             });
 
-            statementOfAccountGrid.itemsSource = statementOfAccountCollections;
-            statementOfAccountGrid.trackChanges = true;
+            statementOfAccountFlexGrid.itemsSource = statementOfAccountCollectionView;
+            statementOfAccountFlexGrid.trackChanges = true;
         }
 
-        // ============
-        // Download CSV
-        // ============
-        function statementOfAccountReportCSVOnclick() {
+        // =================================================
+        // Update Accounst Payable Report Navigation Buttons
+        // =================================================
+        function updateStatementOfAccountNavigateButtons() {
+            if (statementOfAccountCollectionView.pageSize <= 0) {
+                document.getElementById('statementOfAccountNavigationPageGrid').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('statementOfAccountNavigationPageGrid').style.display = 'block';
+
+            if (statementOfAccountCollectionView.pageIndex === 0) {
+                btnStatementOfAccountMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnStatementOfAccountMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnStatementOfAccountMoveToNextPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (statementOfAccountCollectionView.pageIndex === (statementOfAccountCollectionView.pageCount - 1)) {
+                btnStatementOfAccountMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnStatementOfAccountMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnStatementOfAccountMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToNextPageGrid.removeAttribute('disabled');
+                btnStatementOfAccountMoveToLastPageGrid.removeAttribute('disabled');
+            }
+
+            btnStatementOfAccountCurrentPageGrid.innerHTML = (statementOfAccountCollectionView.pageIndex + 1) + ' / ' + statementOfAccountCollectionView.pageCount;
+        }
+
+        // ========================================
+        // Download Statement Of Account Report CSV
+        // ========================================
+        function btnStatementOfAccountDownloadCSVOnclick() {
             var CSV = '';
-            var accountReceivables = [];
-            var fileName = 'StatementOfAccountReport.CSV';
+            var accountPayables = [];
+            var fileName = 'StatementOfAccount.CSV';
 
-            statementOfAccountCollections.moveToFirstPage();
+            statementOfAccountCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= statementOfAccountCollections.pageCount; p++) {
-                for (i = 0; i < statementOfAccountCollections.items.length; i++) {
-                    accountReceivables.push({
-                        Branch: statementOfAccountCollections.items[i].Branch,
-                        SINumber: statementOfAccountCollections.items[i].SINumberCSVValue,
-                        Account: statementOfAccountCollections.items[i].Account,
-                        Customer: statementOfAccountCollections.items[i].Customer,
-                        SIDate: statementOfAccountCollections.items[i].SIDate,
-                        DocumentReference: statementOfAccountCollections.items[i].DocumentReference,
-                        DueDate: statementOfAccountCollections.items[i].DueDate,
-                        BalanceAmount: statementOfAccountCollections.items[i].BalanceAmount,
-                        CurrentAmount: statementOfAccountCollections.items[i].CurrentAmount,
-                        Age30Amount: statementOfAccountCollections.items[i].Age30Amount,
-                        Age60Amount: statementOfAccountCollections.items[i].Age60Amount,
-                        Age90Amount: statementOfAccountCollections.items[i].Age90Amount,
-                        Age120Amount: statementOfAccountCollections.items[i].Age120Amount
+            for (var p = 1; p <= statementOfAccountCollectionView.pageCount; p++) {
+                for (i = 0; i < statementOfAccountCollectionView.items.length; i++) {
+                    accountPayables.push({
+                        Branch: statementOfAccountCollectionView.items[i].Branch,
+                        Account: statementOfAccountCollectionView.items[i].Account,
+                        SINumber: "SI-" + statementOfAccountCollectionView.items[i].SINumber,
+                        SIDate: statementOfAccountCollectionView.items[i].SIDate,
+                        Customer: statementOfAccountCollectionView.items[i].Customer,
+                        DocumentReference: statementOfAccountCollectionView.items[i].DocumentReference,
+                        DueDate: statementOfAccountCollectionView.items[i].DueDate,
+                        BalanceAmount: statementOfAccountCollectionView.items[i].BalanceAmount,
+                        CurrentAmount: statementOfAccountCollectionView.items[i].CurrentAmount,
+                        Age30Amount: statementOfAccountCollectionView.items[i].Age30Amount,
+                        Age60Amount: statementOfAccountCollectionView.items[i].Age60Amount,
+                        Age90Amount: statementOfAccountCollectionView.items[i].Age90Amount,
+                        Age120Amount: statementOfAccountCollectionView.items[i].Age120Amount
                     });
                 }
 
-                statementOfAccountCollections.moveToNextPage();
-                if (p == statementOfAccountCollections.pageCount) {
-                    statementOfAccountCollections.moveToPage(currentPageIndex - 1);
+                statementOfAccountCollectionView.moveToNextPage();
+                if (p == statementOfAccountCollectionView.pageCount) {
+                    statementOfAccountCollectionView.moveToPage(statementOfAccountCurrentPageIndex - 1);
                 }
             }
 
             var Headers = [];
             Headers.push({
                 Branch: "Branch",
-                SINumber: "SI Number",
                 Account: "Account",
-                Customer: "Customer",
+                SINumber: "SI Number",
                 SIDate: "SI Date",
+                Customer: "Customer",
                 DocumentReference: "Doc Reference",
                 DueDate: "Due Date",
                 BalanceAmount: "Balance",
@@ -890,10 +870,10 @@
             }
 
             CSV = header + '\r\n';
-            for (var i = 0; i < accountReceivables.length; i++) {
+            for (var i = 0; i < accountPayables.length; i++) {
                 var row = '';
-                for (var a in accountReceivables[i]) {
-                    row += '"' + accountReceivables[i][a] + '",';
+                for (var a in accountPayables[i]) {
+                    row += '"' + accountPayables[i][a] + '",';
                 }
 
                 row.slice(0, row.length - 1);
@@ -928,17 +908,17 @@
             }
         }
 
-        // =========
-        // Print PDF
-        // =========
-        function statementOfAccountReportPDFOnclick() {
-            if (cboStatementOfAccountReportComapny.selectedValue != null) {
-                if (cboStatementOfAccountReportBranch.selectedValue != null) {
-                    if (cboARStatementOfAccountCustomer.selectedValue != null) {
-                        var dateAsOf = cboStatementOfAccountReportDateAsOf.value.toLocaleDateString().replace(/\//g, '-');
-                        var companyId = cboStatementOfAccountReportComapny.selectedValue;
-                        var branchId = cboStatementOfAccountReportBranch.selectedValue;
-                        var customerId = cboARStatementOfAccountCustomer.selectedValue;
+        // =====================================
+        // Print Statement Of Account Report PDF
+        // =====================================
+        function btnStatementOfAccountPrintPDFOnclick() {
+            if (cboStatementOfAccountCompanyFilter.selectedValue != null) {
+                if (cboStatementOfAccountBranchFilter.selectedValue != null) {
+                    if (cboStatementOfAccountCustomerFilter.selectedValue != null) {
+                        var dateAsOf = cboStatementOfAccountDateAsOfFilter.value.toLocaleDateString().replace(/\//g, '-');
+                        var companyId = cboStatementOfAccountCompanyFilter.selectedValue;
+                        var branchId = cboStatementOfAccountBranchFilter.selectedValue;
+                        var customerId = cboStatementOfAccountCustomerFilter.selectedValue;
 
                         window.location.href = '/RepStatementOfAccount/StatementOfAccount?DateAsOf=' + dateAsOf + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&CustomerId=' + customerId;
                     } else {
@@ -952,15 +932,22 @@
             }
         }
 
-        // ============
-        // On load Page
-        // ============
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
-            createCboStatementOfAccountAllDateFilters();
+            createCboStatementOfAccountDateAsOfFilter();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -1007,6 +994,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -1046,6 +1036,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

@@ -649,7 +649,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 if (purchaseOrder.FirstOrDefault().IsLocked)
                                 {
-                                    var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.POId == Convert.ToInt32(id) && (d.TrnReceivingReceipt.IsLocked == true  && d.TrnReceivingReceipt.IsCancelled == false) select d;
+                                    var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.POId == Convert.ToInt32(id) && (d.TrnReceivingReceipt.IsLocked == true && d.TrnReceivingReceipt.IsCancelled == false) select d;
                                     if (!receivingReceiptItems.Any())
                                     {
                                         String oldObject = at.GetObjectString(purchaseOrder.FirstOrDefault());
@@ -821,6 +821,7 @@ namespace easyfis.ModifiedApiControllers
                                    where d.BranchId == Convert.ToInt32(branchId)
                                    && d.PRDate >= Convert.ToDateTime(startDate)
                                    && d.PRDate <= Convert.ToDateTime(endDate)
+                                   && d.IsLocked == true
                                    select new Entities.TrnPurchaseRequest
                                    {
                                        Id = d.Id,

@@ -4,6 +4,7 @@ using easyfis.Models;
 
 namespace easyfis.Controllers
 {
+    [Authorize]
     public class UserAccountController : Controller
     {
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
@@ -36,10 +37,7 @@ namespace easyfis.Controllers
                     // =======
                     Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
-                    var currentUser = from d in db.MstUsers
-                                      where d.UserId == aspNetUserId
-                                      select d;
-
+                    var currentUser = from d in db.MstUsers where d.UserId == aspNetUserId select d;
                     if (currentUser.Any())
                     {
                         // ==========================
