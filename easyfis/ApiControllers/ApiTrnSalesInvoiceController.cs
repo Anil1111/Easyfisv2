@@ -354,6 +354,73 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ==================
+        // Save Sales Invoice
+        // ==================
+        [Authorize, HttpPut, Route("api/salesInvoice/save/{id}")]
+        public HttpResponseMessage SaveSalesInvoice(Entities.TrnSalesInvoice objSalesInvoice, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var salesInvoice = from d in db.TrnSalesInvoices where d.Id == Convert.ToInt32(id) select d;
+                    if (salesInvoice.Any())
+                    {
+                        if (!salesInvoice.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+
+                            Decimal amount = 0;
+                            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems where d.SIId == Convert.ToInt32(id) select d;
+                            if (salesInvoiceItems.Any()) { amount = salesInvoiceItems.Sum(d => d.Amount); }
+
+                            var saveSalesInvoice = salesInvoice.FirstOrDefault();
+                            saveSalesInvoice.SIDate = Convert.ToDateTime(objSalesInvoice.SIDate);
+                            saveSalesInvoice.CustomerId = objSalesInvoice.CustomerId;
+                            saveSalesInvoice.TermId = objSalesInvoice.TermId;
+                            saveSalesInvoice.DocumentReference = objSalesInvoice.DocumentReference;
+                            saveSalesInvoice.ManualSINumber = objSalesInvoice.ManualSINumber;
+                            saveSalesInvoice.Remarks = objSalesInvoice.Remarks;
+                            saveSalesInvoice.Amount = amount;
+                            saveSalesInvoice.SoldById = objSalesInvoice.SoldById;
+                            saveSalesInvoice.CheckedById = objSalesInvoice.CheckedById;
+                            saveSalesInvoice.ApprovedById = objSalesInvoice.ApprovedById;
+                            saveSalesInvoice.Status = objSalesInvoice.Status;
+                            saveSalesInvoice.UpdatedById = currentUserId;
+                            saveSalesInvoice.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(salesInvoice.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These sales invoice details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These sales invoice details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ==================
         // Lock Sales Invoice
         // ==================
         [Authorize, HttpPut, Route("api/salesInvoice/lock/{id}")]

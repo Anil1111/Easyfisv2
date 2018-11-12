@@ -402,6 +402,76 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ======================
+        // Save Receiving Receipt
+        // ======================
+        [Authorize, HttpPut, Route("api/receivingReceipt/save/{id}")]
+        public HttpResponseMessage SaveReceivingReceipt(Entities.TrnReceivingReceipt objReceivingReceipt, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers
+                                  where d.UserId == User.Identity.GetUserId()
+                                  select d;
+
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var receivingReceipt = from d in db.TrnReceivingReceipts where d.Id == Convert.ToInt32(id) select d;
+                    if (receivingReceipt.Any())
+                    {
+                        if (!receivingReceipt.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+
+                            Decimal amount = 0;
+                            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == Convert.ToInt32(id) select d;
+                            if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); }
+
+                            var saveReceivingReceipt = receivingReceipt.FirstOrDefault();
+                            saveReceivingReceipt.RRDate = Convert.ToDateTime(objReceivingReceipt.RRDate);
+                            saveReceivingReceipt.DocumentReference = objReceivingReceipt.DocumentReference;
+                            saveReceivingReceipt.SupplierId = objReceivingReceipt.SupplierId;
+                            saveReceivingReceipt.TermId = objReceivingReceipt.TermId;
+                            saveReceivingReceipt.Remarks = objReceivingReceipt.Remarks;
+                            saveReceivingReceipt.ManualRRNumber = objReceivingReceipt.ManualRRNumber;
+                            saveReceivingReceipt.Amount = amount;
+                            saveReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
+                            saveReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
+                            saveReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;
+                            saveReceivingReceipt.Status = objReceivingReceipt.Status;
+                            saveReceivingReceipt.UpdatedById = currentUserId;
+                            saveReceivingReceipt.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These receiving receipt details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These receiving receipt details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ======================
         // Lock Receiving Receipt
         // ======================
         [Authorize, HttpPut, Route("api/receivingReceipt/lock/{id}")]

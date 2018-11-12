@@ -382,6 +382,68 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =============
+        // Save Stock In
+        // =============
+        [Authorize, HttpPut, Route("api/stockIn/save/{id}")]
+        public HttpResponseMessage SaveStockIn(Entities.TrnStockIn objStockIn, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var stockIn = from d in db.TrnStockIns where d.Id == Convert.ToInt32(id) select d;
+                    if (stockIn.Any())
+                    {
+                        if (!stockIn.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(stockIn.FirstOrDefault());
+
+                            var saveStockIn = stockIn.FirstOrDefault();
+                            saveStockIn.INDate = Convert.ToDateTime(objStockIn.INDate);
+                            saveStockIn.AccountId = objStockIn.AccountId;
+                            saveStockIn.ArticleId = objStockIn.ArticleId;
+                            saveStockIn.Particulars = objStockIn.Particulars;
+                            saveStockIn.ManualINNumber = objStockIn.ManualINNumber;
+                            saveStockIn.IsProduced = objStockIn.IsProduced;
+                            saveStockIn.CheckedById = objStockIn.CheckedById;
+                            saveStockIn.ApprovedById = objStockIn.ApprovedById;
+                            saveStockIn.Status = objStockIn.Status;
+                            saveStockIn.UpdatedById = currentUserId;
+                            saveStockIn.UpdatedDateTime = DateTime.Now;
+
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(stockIn.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These stock in details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock in details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =============
         // Lock Stock In
         // =============
         [Authorize, HttpPut, Route("api/stockIn/lock/{id}")]

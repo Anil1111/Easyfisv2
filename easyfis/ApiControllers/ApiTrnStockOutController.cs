@@ -379,6 +379,67 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ==============
+        // Save Stock Out
+        // ==============
+        [Authorize, HttpPut, Route("api/stockOut/save/{id}")]
+        public HttpResponseMessage SaveStockOut(Entities.TrnStockOut objStockOut, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var stockOut = from d in db.TrnStockOuts where d.Id == Convert.ToInt32(id) select d;
+                    if (stockOut.Any())
+                    {
+                        if (!stockOut.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(stockOut.FirstOrDefault());
+
+                            var saveStockOut = stockOut.FirstOrDefault();
+                            saveStockOut.OTDate = Convert.ToDateTime(objStockOut.OTDate);
+                            saveStockOut.AccountId = objStockOut.AccountId;
+                            saveStockOut.ArticleId = objStockOut.ArticleId;
+                            saveStockOut.Particulars = objStockOut.Particulars;
+                            saveStockOut.ManualOTNumber = objStockOut.ManualOTNumber;
+                            saveStockOut.CheckedById = objStockOut.CheckedById;
+                            saveStockOut.ApprovedById = objStockOut.ApprovedById;
+                            saveStockOut.Status = objStockOut.Status;
+                            saveStockOut.UpdatedById = currentUserId;
+                            saveStockOut.UpdatedDateTime = DateTime.Now;
+
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(stockOut.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These stock out details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock out details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ==============
         // Lock Stock Out
         // ==============
         [Authorize, HttpPut, Route("api/stockOut/lock/{id}")]

@@ -147,6 +147,63 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ============
+        // Save Company
+        // ============
+        [Authorize, HttpPut, Route("api/company/save/{id}")]
+        public HttpResponseMessage SaveCompany(Entities.MstCompany objCompany, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var company = from d in db.MstCompanies where d.Id == Convert.ToInt32(id) select d;
+                    if (company.Any())
+                    {
+                        if (!company.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(company.FirstOrDefault());
+
+                            var saveCompany = company.FirstOrDefault();
+                            saveCompany.Company = objCompany.Company;
+                            saveCompany.Address = objCompany.Address;
+                            saveCompany.ContactNumber = objCompany.ContactNumber;
+                            saveCompany.TaxNumber = objCompany.TaxNumber;
+                            saveCompany.UpdatedById = currentUserId;
+                            saveCompany.UpdatedDateTime = DateTime.Now;
+
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(company.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These company details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These company details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ============
         // Lock Company
         // ============
         [Authorize, HttpPut, Route("api/company/lock/{id}")]

@@ -304,6 +304,65 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ===============
+        // Save Collection
+        // ===============
+        [Authorize, HttpPut, Route("api/collection/save/{id}")]
+        public HttpResponseMessage SaveCollection(Entities.TrnCollection objCollection, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var collection = from d in db.TrnCollections where d.Id == Convert.ToInt32(id) select d;
+                    if (collection.Any())
+                    {
+                        if (!collection.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+
+                            var saveCollection = collection.FirstOrDefault();
+                            saveCollection.ORDate = Convert.ToDateTime(objCollection.ORDate);
+                            saveCollection.ManualORNumber = objCollection.ManualORNumber;
+                            saveCollection.CustomerId = objCollection.CustomerId;
+                            saveCollection.Particulars = objCollection.Particulars;
+                            saveCollection.CheckedById = objCollection.CheckedById;
+                            saveCollection.ApprovedById = objCollection.ApprovedById;
+                            saveCollection.Status = objCollection.Status;
+                            saveCollection.UpdatedById = currentUserId;
+                            saveCollection.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(collection.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These collection details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These collection details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===============
         // Lock Collection
         // ===============
         [Authorize, HttpPut, Route("api/collection/lock/{id}")]

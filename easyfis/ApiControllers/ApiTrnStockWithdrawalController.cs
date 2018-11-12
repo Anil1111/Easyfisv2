@@ -353,6 +353,94 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =====================
+        // Save Stock Withdrawal
+        // =====================
+        [Authorize, HttpPut, Route("api/stockWithdrawal/save/{id}")]
+        public HttpResponseMessage SaveStockWithdrawal(Entities.TrnStockWithdrawal objStockWithdrawal, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    Int32 currentUserId = currentUser.FirstOrDefault().Id;
+                    Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
+
+                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.IsSaveed == true select d;
+                    IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
+                    IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(id) select d;
+
+                    Boolean isValid = false;
+                    String returnMessage = "";
+
+                    if (!salesInvoice.Any())
+                    {
+                        returnMessage = "No sales invoice found. Please setup more sales invoices.";
+                    }
+                    else if (!users.Any())
+                    {
+                        returnMessage = "No user found. Please setup more users.";
+                    }
+                    else if (!stockWithdrawal.Any())
+                    {
+                        returnMessage = "Data not found. These stock withdrawal details are not found in the server.";
+                    }
+                    else if (stockWithdrawal.FirstOrDefault().IsLocked)
+                    {
+                        returnMessage = "Saving Error. These stock withdrawal details are already locked.";
+                    }
+                    else
+                    {
+                        isValid = true;
+                    }
+
+                    if (isValid)
+                    {
+                        String oldObject = at.GetObjectString(stockWithdrawal.FirstOrDefault());
+
+                        var saveStockWithdrawal = stockWithdrawal.FirstOrDefault();
+                        saveStockWithdrawal.SWDate = Convert.ToDateTime(objStockWithdrawal.SWDate);
+                        saveStockWithdrawal.CustomerId = objStockWithdrawal.CustomerId;
+                        saveStockWithdrawal.SIBranchId = objStockWithdrawal.SIBranchId;
+                        saveStockWithdrawal.SIId = objStockWithdrawal.SIId;
+                        saveStockWithdrawal.Remarks = objStockWithdrawal.Remarks;
+                        saveStockWithdrawal.DocumentReference = objStockWithdrawal.DocumentReference;
+                        saveStockWithdrawal.ManualSWNumber = objStockWithdrawal.ManualSWNumber;
+                        saveStockWithdrawal.ContactPerson = objStockWithdrawal.ContactPerson;
+                        saveStockWithdrawal.ContactNumber = objStockWithdrawal.ContactNumber;
+                        saveStockWithdrawal.Address = objStockWithdrawal.Address;
+                        saveStockWithdrawal.ReceivedById = objStockWithdrawal.ReceivedById;
+                        saveStockWithdrawal.PreparedById = objStockWithdrawal.PreparedById;
+                        saveStockWithdrawal.CheckedById = objStockWithdrawal.CheckedById;
+                        saveStockWithdrawal.ApprovedById = objStockWithdrawal.ApprovedById;
+                        saveStockWithdrawal.Status = objStockWithdrawal.Status;
+                        saveStockWithdrawal.UpdatedById = currentUserId;
+                        saveStockWithdrawal.UpdatedDateTime = DateTime.Now;
+                        db.SubmitChanges();
+
+                        String newObject = at.GetObjectString(stockWithdrawal.FirstOrDefault());
+                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, returnMessage);
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =====================
         // Lock Stock Withdrawal
         // =====================
         [Authorize, HttpPut, Route("api/stockWithdrawal/lock/{id}")]

@@ -432,6 +432,64 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ================
+        // Save Stock Count
+        // ================
+        [Authorize, HttpPut, Route("api/stockCount/save/{id}")]
+        public HttpResponseMessage SaveStockCount(Entities.TrnStockCount objStockCount, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var stockCount = from d in db.TrnStockCounts where d.Id == Convert.ToInt32(id) select d;
+                    if (stockCount.Any())
+                    {
+                        if (!stockCount.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(stockCount.FirstOrDefault());
+
+                            var saveStockCount = stockCount.FirstOrDefault();
+                            saveStockCount.SCDate = Convert.ToDateTime(objStockCount.SCDate);
+                            saveStockCount.Particulars = objStockCount.Particulars;
+                            saveStockCount.CheckedById = objStockCount.CheckedById;
+                            saveStockCount.ApprovedById = objStockCount.ApprovedById;
+                            saveStockCount.Status = objStockCount.Status;
+                            saveStockCount.UpdatedById = currentUserId;
+                            saveStockCount.UpdatedDateTime = DateTime.Now;
+
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(stockCount.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These stock count details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock count details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ================
         // Lock Stock Count
         // ================
         [Authorize, HttpPut, Route("api/stockCount/lock/{id}")]

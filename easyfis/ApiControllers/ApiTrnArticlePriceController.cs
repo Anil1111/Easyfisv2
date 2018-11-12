@@ -269,6 +269,64 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ==================
+        // Save Article Price
+        // ==================
+        [Authorize, HttpPut, Route("api/articlePrice/save/{id}")]
+        public HttpResponseMessage SaveArticlePrice(Entities.TrnArticlePrice objArticlePrice, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var articlePrice = from d in db.TrnArticlePrices where d.Id == Convert.ToInt32(id) select d;
+                    if (articlePrice.Any())
+                    {
+                        if (!articlePrice.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(articlePrice.FirstOrDefault());
+
+                            var saveArticlePrice = articlePrice.FirstOrDefault();
+                            saveArticlePrice.IPDate = Convert.ToDateTime(objArticlePrice.IPDate);
+                            saveArticlePrice.ManualIPNumber = objArticlePrice.ManualIPNumber;
+                            saveArticlePrice.Particulars = objArticlePrice.Particulars;
+                            saveArticlePrice.CheckedById = objArticlePrice.CheckedById;
+                            saveArticlePrice.ApprovedById = objArticlePrice.ApprovedById;
+                            saveArticlePrice.Status = objArticlePrice.Status;
+                            saveArticlePrice.UpdatedById = currentUserId;
+                            saveArticlePrice.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(articlePrice.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These item price details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These item price details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ==================
         // Lock Article Price
         // ==================
         [Authorize, HttpPut, Route("api/articlePrice/lock/{id}")]

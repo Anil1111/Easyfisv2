@@ -270,6 +270,64 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ====================
+        // Save Journal Voucher
+        // ====================
+        [Authorize, HttpPut, Route("api/journalVoucher/save/{id}")]
+        public HttpResponseMessage SaveJournalVoucher(Entities.TrnJournalVoucher objJournalVoucher, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var journalVoucher = from d in db.TrnJournalVouchers where d.Id == Convert.ToInt32(id) select d;
+                    if (journalVoucher.Any())
+                    {
+                        if (!journalVoucher.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+
+                            var saveJournalVoucher = journalVoucher.FirstOrDefault();
+                            saveJournalVoucher.JVDate = Convert.ToDateTime(objJournalVoucher.JVDate);
+                            saveJournalVoucher.ManualJVNumber = objJournalVoucher.ManualJVNumber;
+                            saveJournalVoucher.Particulars = objJournalVoucher.Particulars;
+                            saveJournalVoucher.CheckedById = objJournalVoucher.CheckedById;
+                            saveJournalVoucher.ApprovedById = objJournalVoucher.ApprovedById;
+                            saveJournalVoucher.Status = objJournalVoucher.Status;
+                            saveJournalVoucher.UpdatedById = currentUserId;
+                            saveJournalVoucher.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(journalVoucher.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These journal voucher details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These journal voucher details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ====================
         // Lock Journal Voucher
         // ====================
         [Authorize, HttpPut, Route("api/journalVoucher/lock/{id}")]

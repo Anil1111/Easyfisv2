@@ -256,6 +256,96 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =========
+        // Save User
+        // =========
+        [Authorize, HttpPut, Route("api/user/save/{id}")]
+        public HttpResponseMessage SaveUser(Entities.MstUser objUser, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var user = from d in db.MstUsers where d.Id == Convert.ToInt32(id) select d;
+                    if (user.Any())
+                    {
+                        if (!user.FirstOrDefault().IsLocked)
+                        {
+                            var branch = from d in db.MstBranches where d.Id == objUser.BranchId select d;
+                            if (branch.Any())
+                            {
+                                var account = from d in db.MstAccounts select d;
+                                if (account.Any())
+                                {
+                                    var discounts = from d in db.MstDiscounts where d.Id == objUser.DefaultSalesInvoiceDiscountId select d;
+                                    if (discounts.Any())
+                                    {
+                                        String oldObject = at.GetObjectString(user.FirstOrDefault());
+
+                                        var saveUser = user.FirstOrDefault();
+                                        saveUser.FullName = objUser.FullName;
+                                        saveUser.CompanyId = objUser.CompanyId;
+                                        saveUser.BranchId = objUser.BranchId;
+                                        saveUser.IncomeAccountId = objUser.IncomeAccountId;
+                                        saveUser.SupplierAdvancesAccountId = objUser.SupplierAdvancesAccountId;
+                                        saveUser.CustomerAdvancesAccountId = objUser.CustomerAdvancesAccountId;
+                                        saveUser.InventoryType = objUser.InventoryType;
+                                        saveUser.DefaultSalesInvoiceDiscountId = objUser.DefaultSalesInvoiceDiscountId;
+                                        saveUser.SalesInvoiceName = objUser.SalesInvoiceName;
+                                        saveUser.SalesInvoiceCheckedById = objUser.SalesInvoiceCheckedById;
+                                        saveUser.SalesInvoiceApprovedById = objUser.SalesInvoiceApprovedById;
+                                        saveUser.OfficialReceiptName = objUser.OfficialReceiptName;
+                                        saveUser.IsIncludeCostStockReports = objUser.IsIncludeCostStockReports;
+                                        saveUser.ActivateAuditTrail = objUser.ActivateAuditTrail;
+                                        saveUser.UpdatedById = currentUserId;
+                                        saveUser.UpdatedDateTime = DateTime.Now;
+                                        db.SubmitChanges();
+
+                                        String newObject = at.GetObjectString(user.FirstOrDefault());
+                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                        return Request.CreateResponse(HttpStatusCode.OK);
+                                    }
+                                    else
+                                    {
+                                        return Request.CreateResponse(HttpStatusCode.NotFound, "Sales Invoice Discount not found.");
+                                    }
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.NotFound, "Some Account data not found.");
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateResponse(HttpStatusCode.NotFound, "Branch not found.");
+                            }
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These user details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These user details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =========
         // Lock User
         // =========
         [Authorize, HttpPut, Route("api/user/lock/{id}")]

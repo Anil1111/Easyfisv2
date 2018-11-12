@@ -334,6 +334,67 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // ===================
+        // Save Stock Transfer
+        // ===================
+        [Authorize, HttpPut, Route("api/stockTransfer/save/{id}")]
+        public HttpResponseMessage SaveStockTransfer(Entities.TrnStockTransfer objStockTransfer, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var stockTransfer = from d in db.TrnStockTransfers where d.Id == Convert.ToInt32(id) select d;
+                    if (stockTransfer.Any())
+                    {
+                        if (!stockTransfer.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = at.GetObjectString(stockTransfer.FirstOrDefault());
+
+                            var saveStockTransfer = stockTransfer.FirstOrDefault();
+                            saveStockTransfer.STDate = Convert.ToDateTime(objStockTransfer.STDate);
+                            saveStockTransfer.ToBranchId = objStockTransfer.ToBranchId;
+                            saveStockTransfer.ArticleId = objStockTransfer.ArticleId;
+                            saveStockTransfer.Particulars = objStockTransfer.Particulars;
+                            saveStockTransfer.ManualSTNumber = objStockTransfer.ManualSTNumber;
+                            saveStockTransfer.CheckedById = objStockTransfer.CheckedById;
+                            saveStockTransfer.ApprovedById = objStockTransfer.ApprovedById;
+                            saveStockTransfer.Status = objStockTransfer.Status;
+                            saveStockTransfer.UpdatedById = currentUserId;
+                            saveStockTransfer.UpdatedDateTime = DateTime.Now;
+
+                            db.SubmitChanges();
+
+                            String newObject = at.GetObjectString(stockTransfer.FirstOrDefault());
+                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These stock transfer details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These stock transfer details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // ===================
         // Lock Stock Transfer
         // ===================
         [Authorize, HttpPut, Route("api/stockTransfer/lock/{id}")]

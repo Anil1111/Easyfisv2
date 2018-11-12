@@ -377,6 +377,77 @@ namespace easyfis.ModifiedApiControllers
         }
 
         // =================
+        // Save Disbursement
+        // =================
+        [Authorize, HttpPut, Route("api/disbursement/save/{id}")]
+        public HttpResponseMessage SaveDisbursement(Entities.TrnDisbursement objDisbursement, String id)
+        {
+            try
+            {
+                var currentUser = from d in db.MstUsers where d.UserId == User.Identity.GetUserId() select d;
+                if (currentUser.Any())
+                {
+                    var currentUserId = currentUser.FirstOrDefault().Id;
+
+                    var disbursement = from d in db.TrnDisbursements where d.Id == Convert.ToInt32(id) select d;
+                    if (disbursement.Any())
+                    {
+                        if (!disbursement.FirstOrDefault().IsLocked)
+                        {
+                            String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+
+                            Decimal amount = 0;
+                            var disbursementLines = from d in db.TrnDisbursementLines where d.CVId == Convert.ToInt32(id) select d;
+                            if (disbursementLines.Any()) { amount = disbursementLines.Sum(d => d.Amount); }
+
+                            var saveDisbursement = disbursement.FirstOrDefault();
+                            saveDisbursement.CVDate = Convert.ToDateTime(objDisbursement.CVDate);
+                            saveDisbursement.SupplierId = objDisbursement.SupplierId;
+                            saveDisbursement.ManualCVNumber = objDisbursement.ManualCVNumber;
+                            saveDisbursement.Payee = objDisbursement.Payee;
+                            saveDisbursement.PayTypeId = objDisbursement.PayTypeId;
+                            saveDisbursement.Particulars = objDisbursement.Particulars;
+                            saveDisbursement.BankId = objDisbursement.BankId;
+                            saveDisbursement.CheckNumber = objDisbursement.CheckNumber;
+                            saveDisbursement.CheckDate = Convert.ToDateTime(objDisbursement.CheckDate);
+                            saveDisbursement.Amount = amount;
+                            saveDisbursement.IsCrossCheck = objDisbursement.IsCrossCheck;
+                            saveDisbursement.CheckedById = objDisbursement.CheckedById;
+                            saveDisbursement.ApprovedById = objDisbursement.ApprovedById;
+                            saveDisbursement.Status = objDisbursement.Status;
+                            saveDisbursement.IsClear = objDisbursement.IsClear;
+                            saveDisbursement.UpdatedById = currentUserId;
+                            saveDisbursement.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
+
+                            String newObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                            return Request.CreateResponse(HttpStatusCode.OK);
+                        }
+                        else
+                        {
+                            return Request.CreateResponse(HttpStatusCode.BadRequest, "Saving Error. These disbursement details are already locked.");
+                        }
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "Data not found. These disbursement details are not found in the server.");
+                    }
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Theres no current user logged in.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Something's went wrong from the server.");
+            }
+        }
+
+        // =================
         // Lock Disbursement
         // =================
         [Authorize, HttpPut, Route("api/disbursement/lock/{id}")]
