@@ -366,7 +366,7 @@ namespace easyfis.ModifiedApiControllers
                     Int32 currentUserId = currentUser.FirstOrDefault().Id;
                     Int32 currentBranchId = currentUser.FirstOrDefault().BranchId;
 
-                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.IsSaveed == true select d;
+                    IQueryable<Data.TrnSalesInvoice> salesInvoice = from d in db.TrnSalesInvoices where d.Id == objStockWithdrawal.SIId && d.BranchId == objStockWithdrawal.SIBranchId && d.IsLocked == true select d;
                     IQueryable<Data.MstUser> users = from d in db.MstUsers.OrderBy(d => d.FullName) where d.IsLocked == true select d;
                     IQueryable<Data.TrnStockWithdrawal> stockWithdrawal = from d in db.TrnStockWithdrawals where d.Id == Convert.ToInt32(id) select d;
 
