@@ -13,25 +13,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Stock In Detail</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
-                        Stock In Detail 
+                        Stock In Detail
                     </h3>
                     <p>
                         <i class="fa fa-building-o fa-fw"></i> &nbsp; @ViewData["Company"] <br />
@@ -41,31 +38,43 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        =============================================
+                        Options: Lock, Unlock, Print and Close Button
+                        =============================================
+                    -->
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-2">
-                                <button class="btn btn-primary" id="cmdStockInSave" onclick="stockInSave_OnClick()"><i class="fa fa-save"></i> Save</button>
+                                <button class="btn btn-primary" id="btnStockInSave" onclick="btnStockInSaveOnclick()"><i class="fa fa-save"></i> Save</button>
                             </div>
                             <div class="col-md-10" align="right">
-                                <button class="btn btn-primary " id="cmdStockInJournal" onclick="stockInJournal_OnClick()"><i class="fa fa-book"></i> Journal</button>
+                                <button class="btn btn-primary" id="btnStockInJournal" onclick="btnStockInJournalOnclick()"><i class="fa fa-book"></i> Journal</button>
                                 @{
                                     if (canLock)
                                     {
-                                        <button class="btn btn-primary " id="cmdStockInSaveLock" onclick="btnStockInSaveLock_OnClick()"><i class=" fa fa-lock"></i> Lock</button>
+                                        <button class="btn btn-primary" id="btnStockInLock" onclick="btnStockInLockOnclick()"><i class=" fa fa-lock"></i> Lock</button>
                                     }
                                     if (canUnlock)
                                     {
-                                        <button class="btn btn-primary " id="cmdStockInEdit" onclick="btnStockInEdit_OnClick()"><i class=" fa fa-unlock"></i> Unlock</button>
+                                        <button class="btn btn-primary" id="btnStockInUnlock" onclick="btnStockInUnlockOnclick()"><i class=" fa fa-unlock"></i> Unlock</button>
                                     }
                                     if (canPrint)
                                     {
-                                        <button class="btn btn-primary " id="cmdStockInPrint" onclick="btnStockInPrint_OnClick()"><i class="fa fa-print"></i> Print</button>
+                                        <button class="btn btn-primary" id="btnStockInPrint" onclick="btnStockInPrintOnclick()"><i class="fa fa-print"></i> Print</button>
                                     }
                                 }
-                                <button onclick="window.location.href = '/Software/StockIn'" class="btn btn-danger " id="cmdStockInClose"><i class=" fa fa-times"></i> Close</button>
+                                <button class="btn btn-danger" id="btnStockInClose" onclick="window.location.href='/Software/StockIn'"><i class=" fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
+
+                    <!--
+                        ======================================
+                        Details, Fields and Other Informations
+                        ======================================
+                    -->
                     <div class="panel-body">
                         <form class="form-horizontal" role="form">
                             <div class="row">
@@ -73,19 +82,19 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Branch</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINBranch"></div>
+                                            <div class="comboBox-wide" id="cboStockInBranch"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">IN Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredStockIn" id="StockIn_INnumber" placeholder="IN Number" disabled />
+                                            <input type="text" class="form-control requiredStockIn" id="inpStockInINNumber" placeholder="IN Number" disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">IN Date</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="INDate"></div>
+                                            <div class="comboBox-wide" id="cboStockInINDate"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -94,11 +103,11 @@
                                             <table style="width: 100%" border="0">
                                                 <tr>
                                                     <td style="width: 30%">
-                                                        <div class="" id="cboINAccountCode"></div>
+                                                        <div class="" id="cboStockInAccountCode"></div>
                                                     </td>
                                                     <td style="width: 1%"></td>
                                                     <td style="width: 69%">
-                                                        <div class="" id="cboINAccount"></div>
+                                                        <div class="" id="cboStockInAccount"></div>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -107,19 +116,19 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Article</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINArticle"></div>
+                                            <div class="comboBox-wide" id="cboStockInArticle"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Particulars</label>
                                         <div class="col-sm-8">
-                                            <textarea rows="5" class="form-control textarea-custom requiredStockIn" id="StockIn_Particulars" placeholder="Particulars"></textarea>
+                                            <textarea rows="5" class="form-control textarea-custom requiredStockIn" id="inpStockInParticulars" placeholder="Particulars"></textarea>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Status</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINStatus"></div>
+                                            <div class="comboBox-wide" id="cboStockInStatus"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -127,31 +136,31 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Manual IN Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control  requiredStockIn" id="StockIn_ManualINNumber" placeholder="Manual IN Number">
+                                            <input type="text" class="form-control  requiredStockIn" id="cboStockInManualINNumber" placeholder="Manual IN Number">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Is Produce</label>
                                         <div class="col-sm-8">
-                                            <input type="checkbox" id="StockIn_Produce">
+                                            <input type="checkbox" id="inpStockInIsProduce">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Prepared by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINPreparedBy"></div>
+                                            <div class="comboBox-wide" id="cboStockInPreparedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Checked by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINCheckedBy"></div>
+                                            <div class="comboBox-wide" id="cboStockInCheckedBy"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Approved by</label>
                                         <div class="col-sm-8">
-                                            <div class="comboBox-wide" id="cboINApprovedBy"></div>
+                                            <div class="comboBox-wide" id="cboStockInApprovedBy"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -159,22 +168,39 @@
                         </form>
                     </div>
                 </div>
-                <!-- Stock In line -->
+
+                <!--
+                    ====================================
+                    Stock In Items and Inventory Entries
+                    ====================================
+                -->
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
-                    <li role="presentation" class="active"><a data-toggle="tab" href="#Items" id="itemTabId">Items</a></li>
-                    <li role="presentation"><a data-toggle="tab" href="#InventoryEntries" id="inventoryEntryTabId">Inventory Entries</a></li>
+                    <li role="presentation" class="active"><a data-toggle="tab" href="#tabPaneStockInItems" id="tabStockInItems">Items</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#tabPaneInventoryEntries" id="tabInventoryEntries">Inventory Entries</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
-                    <div id="Items" class="tab-pane active">
+
+                    <!--
+                        =================
+                        Stock In Item Tab
+                        =================
+                    -->
+                    <div id="tabPaneStockInItems" class="tab-pane active">
                         <div class="panel panel-default">
+
+                            <!--
+                                ==================================================================
+                                Stock In Item: Search, Filter, Display Number of Rows and  Buttons
+                                ===================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="StockInInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpStockInItemsSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -189,50 +215,66 @@
                                             @{
                                                 if (canAdd)
                                                 {
-                                                    <button class="btn btn-primary " id="btnAddStockInItem" onclick="cmdAddStockInItem_OnClick()"><i class="fa fa-plus"></i> Add</button>
-                                                    <button class="btn btn-primary " id="cmdINLineItemQueryButton" onclick="cmdINLineItemQueryButton_OnClick()"><i class="fa fa-search-plus"></i> Item Query</button>
+                                                    <button class="btn btn-primary" id="btnStockInItemsAdd" onclick="btnStockInItemsAddOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnItemQuery" onclick="btnItemQueryOnclick()"><i class="fa fa-search-plus"></i> Item Query</button>
                                                 }
                                             }
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ========================
+                                Stock In Item: Flex Grid
+                                ========================
+                            -->
                             <div class="panel-body">
-                                <div id="ItemGrid" class="grid"></div>
+                                <div id="stockInItemsFlexGrid" class="grid"></div>
                             </div>
+
+                            <!--
+                                =================================
+                                Stock In Item: Navigation Buttons
+                                =================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridItem">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItem">
+                                    <div class="btn-group col-md-7" id="stockInItemsNavigationPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" id="btnStockInItemsMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" id="btnStockInItemsMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItem"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnStockInItemsCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnStockInItemsMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItem">
+                                        <button type="button" class="btn btn-default border-custom" id="btnStockInItemsMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!--
+                            =====================
+                            Stock In Item: Totals
+                            =====================
+                        -->
                         <div class="panel panel-default">
                             <div class="panel-body" style="padding-bottom: 0px;">
                                 <div class="row">
-                                    <div class="col-md-6">
-
-                                    </div>
+                                    <div class="col-md-6"></div>
                                     <div class="col-md-6">
                                         <dl class="dl-horizontal">
                                             <dt>
                                                 <b>Total Amount</b>
                                             </dt>
                                             <dd>
-                                                <input type="text" class="form-control numberField" id="totalINAmount" placeholder="0.00" disabled />
+                                                <input type="text" class="form-control numberField" id="inpTotalStockInAmount" placeholder="0.00" disabled />
                                             </dd>
                                         </dl>
                                     </div>
@@ -240,22 +282,34 @@
                             </div>
                         </div>
                     </div>
-                    <div id="InventoryEntries" class="tab-pane">
+
+                    <!--
+                        =====================
+                        Inventory Entries Tab
+                        =====================
+                    -->
+                    <div id="tabPaneInventoryEntries" class="tab-pane">
                         <div class="panel panel-default">
+
+                            <!--
+                                ======================================================================
+                                Inventory Entries: Search, Filter, Display Number of Rows and  Buttons
+                                ======================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="InventoryEntryInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpInventoryEntriesSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboInventoryEntryShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboInventoryEntriesShowNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -263,23 +317,35 @@
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ============================
+                                Inventory Entries: Flex Grid
+                                ============================
+                            -->
                             <div class="panel-body">
-                                <div id="InventoryEntryGrid" class="grid"></div>
+                                <div id="inventoryEntriesFlexGrid" class="grid"></div>
                             </div>
+
+                            <!--
+                                =====================================
+                                Inventory Entries: Navigation Buttons
+                                =====================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridInventoryEntry">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridInventoryEntry">
+                                    <div class="btn-group col-md-7" id="inventoryEntriesNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnInventoryEntriesMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridInventoryEntry">
+                                        <button type="button" class="btn btn-default border-custom" id="btnInventoryEntriesMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridInventoryEntry"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridInventoryEntry">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnInventoryEntriesCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnInventoryEntriesMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridInventoryEntry">
+                                        <button type="button" class="btn btn-default border-custom" id="btnInventoryEntriesMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -288,6 +354,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -322,69 +394,106 @@
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- ==================== -->
-    <!-- Stock In Item Detail -->
-    <!-- ==================== -->
-    <div class="modal fade" id="stockInItemsEdit" role="dialog">
+    <!--
+        ===========================
+        Stock In Item: Detail Modal
+        ===========================
+    -->
+    <div class="modal fade" id="stockInItemsDetailModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="stockInItemsModalLabel">Stock-In Item</h4>
+                    <h4 class="modal-title" id="stockInItemsModalLabel">Stock In Item</h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingModalItem"></span>
+                        <span id="stockInItemLoading"></span>
                     </center>
-                    <div id="stockInItemsDetailForm">
+                    <div id="stockInItemContent">
                         <dl class="dl-horizontal">
                             <dt>Item</dt>
                             <dd>
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 30%">
-                                            <div class="comboBox-wide" id="cboINItemCode"></div>
+                                            <div class="comboBox-wide" id="cboStockInItemCode"></div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 69%">
-                                            <div class="comboBox-wide" id="cboINItemDescription"></div>
+                                            <div class="comboBox-wide" id="cboStockInItemDescription"></div>
                                         </td>
                                     </tr>
                                 </table>
                             </dd>
                             <dt>Particulars</dt>
-                            <dd><textarea rows="5" class="form-control textarea-custom requiredStockInItem" id="stockInItem_Particulars"></textarea></dd>
+                            <dd>
+                                <textarea rows="5" class="form-control textarea-custom requiredStockInItem" id="inpStockInItemParticulars"></textarea>
+                            </dd>
                             <dt>Quantity</dt>
-                            <dd><input type="text" class="form-control  numberField  requiredStockInItem" id="stockInItem_Quantity" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control  numberField  requiredStockInItem" id="inpStockInItemQuantity" placeholder="0.00" />
+                            </dd>
                             <dt>Unit</dt>
-                            <dd><div class="comboBox-wide" id="cboINItemUnit"></div></dd>
+                            <dd>
+                                <div class="comboBox-wide" id="cboStockInItemUnit"></div>
+                            </dd>
                             <dt>Cost</dt>
-                            <dd><input type="text" class="form-control  numberField  requiredStockInItem" id="stockInItem_Cost" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control  numberField  requiredStockInItem" id="inpStockInItemCost" placeholder="0.00" />
+                            </dd>
                             <dt>Amount</dt>
-                            <dd><input type="text" class="form-control  numberField  requiredStockInItem" id="stockInItem_Amount" placeholder="0.00" disabled /></dd>
+                            <dd>
+                                <input type="text" class="form-control  numberField  requiredStockInItem" id="inpStockInItemAmount" placeholder="0.00" disabled />
+                            </dd>
                         </dl>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdSaveStockInItemButton" class="btn btn-primary" onclick="cmdStockInItemSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
-                    <button id="cmdStockInItemDetailCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button id="btnStockInItemSave" class="btn btn-primary" onclick="btnStockInItemSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="btnStockInItemCloseDetailModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Journal -->
-    <div class="modal fade" id="journalDetail" role="dialog">
+    <!--
+        ===================================
+        Stock In Item: Delete Confirm Modal
+        ===================================
+    -->
+    <div class="modal fade" id="stockInItemsConfirmDeleteModal" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete</h4>
+                </div>
+                <div class="modal-body">
+                    Delete Stock In Item?
+                </div>
+                <div class="modal-footer">
+                    <button id="btnStockInItemsConfirmDelete" class="btn btn-danger" onclick="btnStockInItemsConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnStockInItemsConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        =====================
+        Journal Entries Modal
+        =====================
+    -->
+    <div class="modal fade" id="journalEntryModal" role="dialog">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title" id="journalModalLabel"> Journal</h4>
+                    <h4 class="modal-title"> Journal </h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingJournalGridList"></span>
+                        <span id="journalLoading"></span>
                     </center>
-                    <div id="journal_Content">
+                    <div id="journalContent">
                         <div id="journalFlexGrid" style="max-height: 250px;"></div>
                         <br /><br />
                         <div class="row">
@@ -395,19 +504,19 @@
                                         <b>Total Debit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="totalDebitInJournal" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalTotalDebit" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Total Credit</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="totalCreditInJournal" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalTotalCredit" placeholder="0.00" disabled />
                                     </dd>
                                     <dt>
                                         <b>Variance</b>
                                     </dt>
                                     <dd>
-                                        <input type="text" class="form-control  numberField  requiredStockTransferItem" id="variance" placeholder="0.00" disabled />
+                                        <input type="text" class="form-control numberField" id="inpJournalVariance" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -415,35 +524,18 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdJournalDetailCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ======================================== -->
-    <!-- Stock-In Items Delete Modal Confirmation -->
-    <!-- ======================================== -->
-    <div class="modal fade" id="deletStockInItemsConfirm" role="dialog">
-        <div class="modal-dialog modal-sm">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete</h4>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this stock in item?
-                </div>
-                <div class="modal-footer">
-                    <button id="cmdConfirmDeleteStockInItems"  class="btn btn-danger" onclick="cmdStockInItemsConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteStockInItemsCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Item Query -->
-    <div class="modal fade" id="INLinesItemQuery" role="dialog">
+    <!--
+        ================
+        Item Query Modal
+        ================
+    -->
+    <div class="modal fade" id="itemQueryModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -451,33 +543,51 @@
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingItemQuery"></span>
+                        <span id="itemQueryLoading"></span>
                     </center>
-                    <div id="itemQueryPanel">
+                    <div id="itemQueryContent">
                         <div class="panel panel-default">
+
+                            <!--
+                                =========================
+                                Item Query: Search Filter
+                                =========================
+                            -->
                             <div class="panel-heading">
-                                <div class="input-group  ">
+                                <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                    <input type="text" class="form-control" id="itemQueryFilter" placeholder="Search">
+                                    <input type="text" class="form-control" id="inpItemQuerySearchFilter" placeholder="Search">
                                 </div>
                             </div>
+
+                            <!--
+                                =====================
+                                Item Query: Flex Grid
+                                =====================
+                            -->
                             <div class="panel-body">
-                                <div id="itemQueryGrid"></div>
+                                <div id="itemQueryFlexGrid"></div>
                             </div>
+
+                            <!--
+                                ==============================
+                                Item Query: Navigation Buttons
+                                ==============================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridItemQuery">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridItemQuery">
+                                    <div class="btn-group col-md-7" id="stockCountItemNavigationPageGridQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridItemQuery"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnItemQueryCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridItemQuery">
+                                        <button type="button" class="btn btn-default border-custom" id="btnItemQueryMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -495,55 +605,75 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboINBranch = new wijmo.input.ComboBox('#cboINBranch');
-        var cboINAccountCode = new wijmo.input.ComboBox('#cboINAccountCode');
-        var cboINAccount = new wijmo.input.ComboBox('#cboINAccount');
-        var cboINArticle = new wijmo.input.ComboBox('#cboINArticle');
-        var cboINPreparedBy = new wijmo.input.ComboBox('#cboINPreparedBy');
-        var cboINCheckedBy = new wijmo.input.ComboBox('#cboINCheckedBy');
-        var cboINApprovedBy = new wijmo.input.ComboBox('#cboINApprovedBy');
-        var cboINStatus = new wijmo.input.ComboBox('#cboINStatus');
-        var INDate = new wijmo.input.InputDate('#INDate');
+        // =====================================
+        // Stock In Detail Combo Data and Fields
+        // =====================================
+        var cboStockInBranch = new wijmo.input.ComboBox('#cboStockInBranch');
+        var cboStockInAccountCode = new wijmo.input.ComboBox('#cboStockInAccountCode');
+        var cboStockInAccount = new wijmo.input.ComboBox('#cboStockInAccount');
         var isAccountChanged = false;
-        var isLocked = false;
+        var cboStockInArticle = new wijmo.input.ComboBox('#cboStockInArticle');
         var articleIdSelectedId = 0;
-        var cboINItemCode = new wijmo.input.ComboBox('#cboINItemCode');
-        var cboINItemDescription = new wijmo.input.ComboBox('#cboINItemDescription');
-        var cboINItemUnit = new wijmo.input.ComboBox('#cboINItemUnit');
-        var items;
-        var itemGrid;
+        var cboStockInPreparedBy = new wijmo.input.ComboBox('#cboStockInPreparedBy');
+        var cboStockInCheckedBy = new wijmo.input.ComboBox('#cboStockInCheckedBy');
+        var cboStockInApprovedBy = new wijmo.input.ComboBox('#cboStockInApprovedBy');
+        var cboStockInStatus = new wijmo.input.ComboBox('#cboStockInStatus');
+        var cboStockInINDate = new wijmo.input.InputDate('#cboStockInINDate');
+        var isLocked = false;
+
+        // ===============================================================
+        // Stock In Item Collection View, Flex Grid and Navigation Buttons
+        // ===============================================================
+        var stockInItemsCollectionView;
+        var stockInItemsFlexGrid;
+        var cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows');
+        var btnStockInItemsMoveToFirstPageGrid = document.getElementById('btnStockInItemsMoveToFirstPageGrid');
+        var btnStockInItemsMoveToPreviousPageGrid = document.getElementById('btnStockInItemsMoveToPreviousPageGrid');
+        var btnStockInItemsMoveToNextPageGrid = document.getElementById('btnStockInItemsMoveToNextPageGrid');
+        var btnStockInItemsMoveToLastPageGrid = document.getElementById('btnStockInItemsMoveToLastPageGrid');
+        var btnStockInItemsCurrentPageGrid = document.getElementById('btnStockInItemsCurrentPageGrid');
+
+        // ===================================
+        // Stock In Item Combo Data and Fields
+        // ===================================
         var stockInItemId = 0;
-        var inventoryCollectionView;
-        var inventoryFlexGrid;
+        var cboStockInItemCode = new wijmo.input.ComboBox('#cboStockInItemCode');
+        var cboStockInItemDescription = new wijmo.input.ComboBox('#cboStockInItemDescription');
+        var cboStockInItemUnit = new wijmo.input.ComboBox('#cboStockInItemUnit');
+
+        // =============================================
+        // Journal Entries Collection View and Flex Grid
+        // =============================================
         var journalCollectionView;
         var journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
-        var itemQueryItemsCollection;
-        var itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
-        var cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows');
-        var btnMoveToFirstPageGridItem = document.getElementById('btnMoveToFirstPageGridItem');
-        var btnMoveToPreviousPageGridItem = document.getElementById('btnMoveToPreviousPageGridItem');
-        var btnMoveToNextPageGridItem = document.getElementById('btnMoveToNextPageGridItem');
-        var btnMoveToLastPageGridItem = document.getElementById('btnMoveToLastPageGridItem');
-        var btnCurrentPageGridItem = document.getElementById('btnCurrentPageGridItem');
-        var btnMoveToFirstPageGridItemQuery = document.getElementById('btnMoveToFirstPageGridItemQuery');
-        var btnMoveToPreviousPageGridItemQuery = document.getElementById('btnMoveToPreviousPageGridItemQuery');
-        var btnMoveToNextPageGridItemQuery = document.getElementById('btnMoveToNextPageGridItemQuery');
-        var btnMoveToLastPageGridItemQuery = document.getElementById('btnMoveToLastPageGridItemQuery');
-        var btnCurrentPageGridItemQuery = document.getElementById('btnCurrentPageGridItemQuery');
-        var cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows');
-        var btnMoveToFirstPageGridInventoryEntry = document.getElementById('btnMoveToFirstPageGridInventoryEntry');
-        var btnMoveToPreviousPageGridInventoryEntry = document.getElementById('btnMoveToPreviousPageGridInventoryEntry');
-        var btnMoveToNextPageGridInventoryEntry = document.getElementById('btnMoveToNextPageGridInventoryEntry');
-        var btnMoveToLastPageGridInventoryEntry = document.getElementById('btnMoveToLastPageGridInventoryEntry');
-        var isItemQueryClicked = false;
+
+        // ===================================================================
+        // Inventory Entries Collection View, Flex Grid and Navigation Buttons
+        // ===================================================================
+        var inventoryCollectionView;
+        var inventoryFlexGrid;
+        var cboInventoryEntriesShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntriesShowNumberOfRows');
+        var btnInventoryEntriesMoveToFirstPageGrid = document.getElementById('btnInventoryEntriesMoveToFirstPageGrid');
+        var btnInventoryEntriesMoveToPreviousPageGrid = document.getElementById('btnInventoryEntriesMoveToPreviousPageGrid');
+        var btnInventoryEntriesMoveToNextPageGrid = document.getElementById('btnInventoryEntriesMoveToNextPageGrid');
+        var btnInventoryEntriesMoveToLastPageGrid = document.getElementById('btnInventoryEntriesMoveToLastPageGrid');
+
+        // ============================================================
+        // Item Query Collection View, Flex Grid and Navigation Buttons
+        // ============================================================
+        var itemQueryCollectionView;
+        var itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+        var btnItemQueryMoveToFirstPageGrid = document.getElementById('btnItemQueryMoveToFirstPageGrid');
+        var btnItemQueryMoveToPreviousPageGrid = document.getElementById('btnItemQueryMoveToPreviousPageGrid');
+        var btnItemQueryMoveToNextPageGrid = document.getElementById('btnItemQueryMoveToNextPageGrid');
+        var btnItemQueryMoveToLastPageGrid = document.getElementById('btnItemQueryMoveToLastPageGrid');
+        var btnItemQueryCurrentPageGrid = document.getElementById('btnItemQueryCurrentPageGrid');
+        var isBtnItemQueryClicked = false;
 
         // =======================
         // Get URL Parameter Value
         // =======================
-        function getParam(name) {
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -557,10 +687,10 @@
             }
         }
 
-        // ========================
-        // GET Branch for Combo Box
-        // ========================
-        function getBranchesForComboBox() {
+        // ===================================
+        // Create Stock In Detail Combo Branch
+        // ===================================
+        function createCboStockInDetailBranch() {
             NProgress.start();
             var branchesObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
@@ -578,8 +708,8 @@
                         }
                     }
 
-                    cboINBranch.dispose();
-                    cboINBranch = new wijmo.input.ComboBox('#cboINBranch', {
+                    cboStockInBranch.dispose();
+                    cboStockInBranch = new wijmo.input.ComboBox('#cboStockInBranch', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select Branch",
@@ -588,15 +718,15 @@
                         selectedValuePath: "Id"
                     });
 
-                    getAccountForComboBox();
+                    createCboStockInDetailAccount();
                 }
             });
         }
 
-        // ====================
-        // Get Stock In Account
-        // ====================
-        function getAccountForComboBox() {
+        // ====================================
+        // Create Stock In Detail Combo Account
+        // ====================================
+        function createCboStockInDetailAccount() {
             var accountsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockIn/dropdown/list/account',
@@ -614,46 +744,46 @@
                         }
                     }
 
-                    cboINAccountCode.dispose();
-                    cboINAccountCode = new wijmo.input.ComboBox('#cboINAccountCode', {
+                    cboStockInAccountCode.dispose();
+                    cboStockInAccountCode = new wijmo.input.ComboBox('#cboStockInAccountCode', {
                         isEditable: false,
                         placeholder: "Select Code",
                         itemsSource: accountsObservableArray,
                         displayMemberPath: "AccountCode",
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
-                            cboINAccount.selectedValue = this.selectedValue;
+                            cboStockInAccount.selectedValue = this.selectedValue;
                         }
                     });
 
-                    cboINAccount.dispose();
-                    cboINAccount = new wijmo.input.ComboBox('#cboINAccount', {
+                    cboStockInAccount.dispose();
+                    cboStockInAccount = new wijmo.input.ComboBox('#cboStockInAccount', {
                         isEditable: false,
                         placeholder: "Select Account",
                         itemsSource: accountsObservableArray,
                         displayMemberPath: "Account",
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
-                            cboINAccountCode.selectedValue = this.selectedValue;
+                            cboStockInAccountCode.selectedValue = this.selectedValue;
                             isAccountChanged = true;
 
-                            getArticlesForComboBox();
+                            createCboStockInDetailArticle();
                         }
                     });
 
-                    getArticlesForComboBox();
+                    createCboStockInDetailArticle();
                 }
             });
         }
 
-        // ==========================
-        // GET Articles for Combo Box
-        // ==========================
-        function getArticlesForComboBox() {
+        // ====================================
+        // Create Stock In Detail Combo Article
+        // ====================================
+        function createCboStockInDetailArticle() {
             var articlesObservableArray = new wijmo.collections.ObservableArray();
-            if (cboINAccount.selectedValue != null) {
+            if (cboStockInAccount.selectedValue != null) {
                 $.ajax({
-                    url: '/api/stockIn/dropdown/list/article/' + cboINAccount.selectedValue,
+                    url: '/api/stockIn/dropdown/list/article/' + cboStockInAccount.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -674,8 +804,8 @@
                             }
                         }
 
-                        cboINArticle.dispose();
-                        cboINArticle = new wijmo.input.ComboBox('#cboINArticle', {
+                        cboStockInArticle.dispose();
+                        cboStockInArticle = new wijmo.input.ComboBox('#cboStockInArticle', {
                             disabled: disabled,
                             isEditable: false,
                             placeholder: "Select Article",
@@ -686,28 +816,28 @@
                         });
 
                         if (!isAccountChanged) {
-                            getUsersForComboBox();
+                            createCboStockInDetailUsers();
                         }
                     }
                 });
             } else {
-                cboINArticle.dispose();
-                cboINArticle = new wijmo.input.ComboBox('#cboINArticle', {
+                cboStockInArticle.dispose();
+                cboStockInArticle = new wijmo.input.ComboBox('#cboStockInArticle', {
                     disabled: true,
                     isEditable: false,
                     itemsSource: articlesObservableArray,
                 });
 
                 if (!isAccountChanged) {
-                    getUsersForComboBox();
+                    createCboStockInDetailUsers();
                 }
             }
         }
 
-        // =======================
-        // GET Users for Combo Box
-        // =======================
-        function getUsersForComboBox() {
+        // ==================================
+        // Create Stock In Detail Combo Users
+        // ==================================
+        function createCboStockInDetailUsers() {
             var usersObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockIn/dropdown/list/users',
@@ -724,8 +854,8 @@
                         }
                     }
 
-                    cboINPreparedBy.dispose();
-                    cboINPreparedBy = new wijmo.input.ComboBox('#cboINPreparedBy', {
+                    cboStockInPreparedBy.dispose();
+                    cboStockInPreparedBy = new wijmo.input.ComboBox('#cboStockInPreparedBy', {
                         disabled: true,
                         isEditable: false,
                         placeholder: "Select User",
@@ -734,8 +864,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboINCheckedBy.dispose();
-                    cboINCheckedBy = new wijmo.input.ComboBox('#cboINCheckedBy', {
+                    cboStockInCheckedBy.dispose();
+                    cboStockInCheckedBy = new wijmo.input.ComboBox('#cboStockInCheckedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -743,8 +873,8 @@
                         selectedValuePath: "Id"
                     });
 
-                    cboINApprovedBy.dispose();
-                    cboINApprovedBy = new wijmo.input.ComboBox('#cboINApprovedBy', {
+                    cboStockInApprovedBy.dispose();
+                    cboStockInApprovedBy = new wijmo.input.ComboBox('#cboStockInApprovedBy', {
                         isEditable: false,
                         placeholder: "Select User",
                         itemsSource: usersObservableArray,
@@ -782,27 +912,26 @@
                         disabled = true;
                     }
 
-                    cboINStatus.dispose();
-                    cboINStatus = new wijmo.input.ComboBox('#cboINStatus', {
+                    cboStockInStatus.dispose();
+                    cboStockInStatus = new wijmo.input.ComboBox('#cboStockInStatus', {
                         disabled: disabled,
                         isEditable: false,
-                        //placeholder: "Select Status",
                         itemsSource: statusObservableArray,
                         displayMemberPath: "Status",
                         selectedValuePath: "Status"
                     });
 
-                    getStockInById();
+                    getStockInData();
                 }
             });
         }
 
-        // ================
-        // GET Stock In List
-        // ================
-        function getStockInById() {
+        // ========================
+        // Get Stock In Detail Data
+        // ========================
+        function getStockInData() {
             if (document.location.search.length > 0) {
-                var stockInId = getParam("id");
+                var stockInId = getURLParameterValue("id");
                 $.ajax({
                     url: '/api/stockIn/detail/' + stockInId,
                     cache: false,
@@ -810,24 +939,24 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
                         if (results != null) {
-                            cboINBranch.selectedValue = results.BranchId;
-                            document.getElementById('StockIn_INnumber').value = results.INNumber;
-                            INDate.dispose();
-                            INDate = new wijmo.input.InputDate('#INDate', {
+                            cboStockInBranch.selectedValue = results.BranchId;
+                            document.getElementById('inpStockInINNumber').value = results.INNumber;
+                            cboStockInINDate.dispose();
+                            cboStockInINDate = new wijmo.input.InputDate('#cboStockInINDate', {
                                 format: 'MM-dd-yyyy',
-                                value: new Date(results.INDate),
+                                value: new Date(results.cboStockInINDate),
                             });
-                            cboINAccountCode.selectedValue = results.AccountId;
-                            cboINAccount.selectedValue = results.AccountId;
-                            cboINArticle.selectedValue = results.ArticleId;
+                            cboStockInAccountCode.selectedValue = results.AccountId;
+                            cboStockInAccount.selectedValue = results.AccountId;
+                            cboStockInArticle.selectedValue = results.ArticleId;
                             articleIdSelectedId = results.ArticleId;
-                            document.getElementById('StockIn_Particulars').value = results.Particulars;
-                            document.getElementById('StockIn_ManualINNumber').value = results.ManualINNumber
-                            document.getElementById('StockIn_Produce').checked = results.IsProduced;
-                            cboINPreparedBy.selectedValue = results.PreparedById;
-                            cboINCheckedBy.selectedValue = results.CheckedById;
-                            cboINApprovedBy.selectedValue = results.ApprovedById;
-                            cboINStatus.selectedValue = results.Status;
+                            document.getElementById('inpStockInParticulars').value = results.Particulars;
+                            document.getElementById('cboStockInManualINNumber').value = results.ManualINNumber
+                            document.getElementById('inpStockInIsProduce').checked = results.IsProduced;
+                            cboStockInPreparedBy.selectedValue = results.PreparedById;
+                            cboStockInCheckedBy.selectedValue = results.CheckedById;
+                            cboStockInApprovedBy.selectedValue = results.ApprovedById;
+                            cboStockInStatus.selectedValue = results.Status;
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -835,33 +964,34 @@
                             document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
                             if (results.IsLocked) {
-                                cboINBranch.disabled = true;
-                                INDate.disabled = true;
-                                cboINAccountCode.disabled = true;
-                                cboINAccount.disabled = true;
-                                cboINArticle.disabled = true;
-                                document.getElementById('StockIn_Particulars').disabled = true;
-                                document.getElementById('StockIn_ManualINNumber').disabled = true;
-                                document.getElementById('StockIn_Produce').disabled = true;
-                                cboINPreparedBy.disabled = true;
-                                cboINCheckedBy.disabled = true;
-                                cboINApprovedBy.disabled = true;
-                                cboINStatus.disabled = true;
+                                cboStockInBranch.disabled = true;
+                                cboStockInINDate.disabled = true;
+                                cboStockInAccountCode.disabled = true;
+                                cboStockInAccount.disabled = true;
+                                cboStockInArticle.disabled = true;
+                                document.getElementById('inpStockInParticulars').disabled = true;
+                                document.getElementById('cboStockInManualINNumber').disabled = true;
+                                document.getElementById('inpStockInIsProduce').disabled = true;
+                                cboStockInPreparedBy.disabled = true;
+                                cboStockInCheckedBy.disabled = true;
+                                cboStockInApprovedBy.disabled = true;
+                                cboStockInStatus.disabled = true;
 
-                                $("#cmdStockInSaveLock").prop("disabled", true);
-                                $("#btnAddStockInItem").prop("disabled", true);
-                                $("#cmdINLineItemQueryButton").prop("disabled", true);
+                                $("#btnStockInSave").prop("disabled", true);
+                                $("#btnStockInLock").prop("disabled", true);
+                                $("#btnStockInItemsAdd").prop("disabled", true);
+                                $("#btnItemQuery").prop("disabled", true);
 
                                 isLocked = true;
                             } else {
-                                $("#cmdStockInJournal").prop("disabled", true);
-                                $("#cmdStockInEdit").prop("disabled", true);
-                                $("#cmdStockInPrint").prop("disabled", true);
+                                $("#btnStockInJournal").prop("disabled", true);
+                                $("#btnStockInUnlock").prop("disabled", true);
+                                $("#btnStockInPrint").prop("disabled", true);
                             }
 
                             createCboShowRows();
                             createStockInItemsFlexGrid();
-                            createInventoryFlexGrid();
+                            createInventoryEntriesFlexGrid();
                         } else {
                             alert("No Data");
                             window.location = "/Software/StockIn";
@@ -874,23 +1004,132 @@
             }
         }
 
-        // ====================
-        // Stock IN Save - Lock
-        // ====================
-        function btnStockInSaveLock_OnClick() {
+        // =============
+        // Save Stock In
+        // =============
+        function btnStockInSaveOnclick() {
             var stockInObject = new Object();
-            stockInObject.BranchId = cboINBranch.selectedValue;
-            stockInObject.INNumber = document.getElementById('StockIn_INnumber').value;
-            stockInObject.INDate = INDate.value.toLocaleDateString();
-            stockInObject.AccountId = cboINAccount.selectedValue;
-            stockInObject.ArticleId = cboINArticle.selectedValue;
-            stockInObject.Particulars = document.getElementById('StockIn_Particulars').value;
-            stockInObject.ManualINNumber = document.getElementById('StockIn_ManualINNumber').value;
-            stockInObject.IsProduced = document.getElementById('StockIn_Produce').checked;
-            stockInObject.PreparedById = cboINPreparedBy.selectedValue;
-            stockInObject.CheckedById = cboINCheckedBy.selectedValue;
-            stockInObject.ApprovedById = cboINApprovedBy.selectedValue;
-            stockInObject.Status = cboINStatus.selectedValue;
+            stockInObject.BranchId = cboStockInBranch.selectedValue;
+            stockInObject.INNumber = document.getElementById('inpStockInINNumber').value;
+            stockInObject.INDate = cboStockInINDate.value.toLocaleDateString();
+            stockInObject.AccountId = cboStockInAccount.selectedValue;
+            stockInObject.ArticleId = cboStockInArticle.selectedValue;
+            stockInObject.Particulars = document.getElementById('inpStockInParticulars').value;
+            stockInObject.ManualINNumber = document.getElementById('cboStockInManualINNumber').value;
+            stockInObject.IsProduced = document.getElementById('inpStockInIsProduce').checked;
+            stockInObject.PreparedById = cboStockInPreparedBy.selectedValue;
+            stockInObject.CheckedById = cboStockInCheckedBy.selectedValue;
+            stockInObject.ApprovedById = cboStockInApprovedBy.selectedValue;
+            stockInObject.Status = cboStockInStatus.selectedValue;
+            var data = JSON.stringify(stockInObject);
+
+            var isValid = true;
+            $('.requiredStockIn').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                var id = getURLParameterValue("id");
+
+                document.getElementById('btnStockInSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnStockInSave").prop("disabled", true);
+                $("#btnStockInJournal").prop("disabled", true);
+                $("#btnStockInLock").prop("disabled", true);
+                $("#btnStockInUnlock").prop("disabled", true);
+                $("#btnStockInPrint").prop("disabled", true);
+                $("#btnStockInClose").prop("disabled", true);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockIn/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnStockInSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockInSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockInJournal").prop("disabled", false);
+                                $("#btnStockInUnlock").prop("disabled", false);
+                                $("#btnStockInPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockInLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockInClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnStockInSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockInSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockInJournal").prop("disabled", false);
+                                $("#btnStockInUnlock").prop("disabled", false);
+                                $("#btnStockInPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockInLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockInClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnStockInSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockInSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockInJournal").prop("disabled", false);
+                                $("#btnStockInUnlock").prop("disabled", false);
+                                $("#btnStockInPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockInLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockInClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =============
+        // Lock Stock In
+        // =============
+        function btnStockInLockOnclick() {
+            var stockInObject = new Object();
+            stockInObject.BranchId = cboStockInBranch.selectedValue;
+            stockInObject.INNumber = document.getElementById('inpStockInINNumber').value;
+            stockInObject.INDate = cboStockInINDate.value.toLocaleDateString();
+            stockInObject.AccountId = cboStockInAccount.selectedValue;
+            stockInObject.ArticleId = cboStockInArticle.selectedValue;
+            stockInObject.Particulars = document.getElementById('inpStockInParticulars').value;
+            stockInObject.ManualINNumber = document.getElementById('cboStockInManualINNumber').value;
+            stockInObject.IsProduced = document.getElementById('inpStockInIsProduce').checked;
+            stockInObject.PreparedById = cboStockInPreparedBy.selectedValue;
+            stockInObject.CheckedById = cboStockInCheckedBy.selectedValue;
+            stockInObject.ApprovedById = cboStockInApprovedBy.selectedValue;
+            stockInObject.Status = cboStockInStatus.selectedValue;
             var data = JSON.stringify(stockInObject);
 
             var isValid = true;
@@ -909,14 +1148,15 @@
 
             if (isValid) {
 
-                var id = getParam("id");
+                var id = getURLParameterValue("id");
 
-                document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
-                $("#cmdStockInJournal").prop("disabled", true);
-                $("#cmdStockInSaveLock").prop("disabled", true);
-                $("#cmdStockInEdit").prop("disabled", true);
-                $("#cmdStockInPrint").prop("disabled", true);
-                $("#cmdStockInClose").prop("disabled", true);
+                document.getElementById('btnStockInLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $("#btnStockInSave").prop("disabled", true);
+                $("#btnStockInJournal").prop("disabled", true);
+                $("#btnStockInLock").prop("disabled", true);
+                $("#btnStockInUnlock").prop("disabled", true);
+                $("#btnStockInPrint").prop("disabled", true);
+                $("#btnStockInClose").prop("disabled", true);
 
                 $.ajax({
                     type: "PUT",
@@ -933,21 +1173,24 @@
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#cmdStockInSaveLock").prop("disabled", false);
-                            $("#cmdStockInClose").prop("disabled", false);
+                            document.getElementById('btnStockInLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockInSave").prop("disabled", false);
+                            $("#btnStockInLock").prop("disabled", false);
+                            $("#btnStockInClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#cmdStockInSaveLock").prop("disabled", false);
-                            $("#cmdStockInClose").prop("disabled", false);
+                            document.getElementById('btnStockInLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockInSave").prop("disabled", false);
+                            $("#btnStockInLock").prop("disabled", false);
+                            $("#btnStockInClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('cmdStockInSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $("#cmdStockInSaveLock").prop("disabled", false);
-                            $("#cmdStockInClose").prop("disabled", false);
+                            document.getElementById('btnStockInLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockInSave").prop("disabled", false);
+                            $("#btnStockInLock").prop("disabled", false);
+                            $("#btnStockInClose").prop("disabled", false);
                         }
                     },
                 });
@@ -956,18 +1199,18 @@
             }
         }
 
-        // ======================
-        // Stock IN Edit - UnLock
-        // ======================
-        function btnStockInEdit_OnClick() {
-            document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
-            $("#cmdStockInJournal").prop("disabled", true);
-            $("#cmdStockInSaveLock").prop("disabled", true);
-            $("#cmdStockInEdit").prop("disabled", true);
-            $("#cmdStockInPrint").prop("disabled", true);
-            $("#cmdStockInClose").prop("disabled", true);
+        // ===============
+        // Unlock Stock In
+        // ===============
+        function btnStockInUnlockOnclick() {
+            document.getElementById('btnStockInUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $("#btnStockInJournal").prop("disabled", true);
+            $("#btnStockInLock").prop("disabled", true);
+            $("#btnStockInUnlock").prop("disabled", true);
+            $("#btnStockInPrint").prop("disabled", true);
+            $("#btnStockInClose").prop("disabled", true);
 
-            var id = getParam("id");
+            var id = getURLParameterValue("id");
 
             $.ajax({
                 type: "PUT",
@@ -983,63 +1226,48 @@
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#cmdStockInJournal").prop("disabled", false);
-                        $("#cmdStockInEdit").prop("disabled", false);
-                        $("#cmdStockInPrint").prop("disabled", false);
-                        $("#cmdStockInClose").prop("disabled", false);
+                        document.getElementById('btnStockInUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnStockInJournal").prop("disabled", false);
+                        $("#btnStockInUnlock").prop("disabled", false);
+                        $("#btnStockInPrint").prop("disabled", false);
+                        $("#btnStockInClose").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#cmdStockInJournal").prop("disabled", false);
-                        $("#cmdStockInEdit").prop("disabled", false);
-                        $("#cmdStockInPrint").prop("disabled", false);
-                        $("#cmdStockInClose").prop("disabled", false);
+                        document.getElementById('btnStockInUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnStockInJournal").prop("disabled", false);
+                        $("#btnStockInUnlock").prop("disabled", false);
+                        $("#btnStockInPrint").prop("disabled", false);
+                        $("#btnStockInClose").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdStockInEdit').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $("#cmdStockInJournal").prop("disabled", false);
-                        $("#cmdStockInEdit").prop("disabled", false);
-                        $("#cmdStockInPrint").prop("disabled", false);
-                        $("#cmdStockInClose").prop("disabled", false);
+                        document.getElementById('btnStockInUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnStockInJournal").prop("disabled", false);
+                        $("#btnStockInUnlock").prop("disabled", false);
+                        $("#btnStockInPrint").prop("disabled", false);
+                        $("#btnStockInClose").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // ========
-        // Print IN
-        // ========
-        function btnStockInPrint_OnClick() {
-            var stockInId = getParam("id");
+        // ==============
+        // Print Stock In
+        // ==============
+        function btnStockInPrintOnclick() {
+            var stockInId = getURLParameterValue("id");
             var pirntLink = "/RepStockIn/StockIn?StockInId=" + stockInId;
             window.open(pirntLink, '_blank');
         }
 
-        function computeAmount() {
-            var stockIn_Quantity = document.getElementById('stockInItem_Quantity').value.replace(/\,/g, '');
-            var stockIn_Cost = document.getElementById('stockInItem_Cost').value.replace(/\,/g, '');
-            var stockInItemAmount = stockIn_Quantity * stockIn_Cost;
-            document.getElementById('stockInItem_Amount').value = formatDecimalValues(stockInItemAmount);
-        }
-
-        $('#stockInItem_Quantity').keyup(function () {
-            computeAmount();
-        });
-
-        $('#stockInItem_Cost').keyup(function () {
-            computeAmount();
-        });
-
-        // ======================
-        // GET Stock IN Item List
-        // ======================
-        function getItem() {
+        // =======================
+        // Get Stock In Items Data
+        // =======================
+        function getStockInItemsData() {
             var itemsObservableArray = new wijmo.collections.ObservableArray;
             if (document.location.search.length > 0) {
-                var INId = getParam("id");
+                var INId = getURLParameterValue("id");
                 NProgress.start();
                 $.ajax({
                     url: '/api/stockInItem/list/' + INId,
@@ -1049,11 +1277,11 @@
                     success: function (results) {
                         var totalAmount = 0;
                         if (results.length > 0) {
-                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockInItem_Onclick()'><i class='fa fa-edit'></i> Edit</button>";
-                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockInItem_Onclick()'><i class='fa fa-trash'></i> Delete</button>";
+                            var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnStockInItemEditOnclick()'><i class='fa fa-edit'></i> Edit</button>";
+                            var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnStockInItemDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>";
                             if (isLocked) {
-                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockInItem_Onclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
-                                btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockInItem_Onclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                                btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnStockInItemEditOnclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                btnDeleteId =  "<button class='btn btn-danger btn-xs btn-block' onclick='btnStockInItemDeleteOnclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
                             }
 
                             for (i = 0; i < results.length; i++) {
@@ -1087,8 +1315,7 @@
                             }
                         }
 
-                        document.getElementById('totalINAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+                        document.getElementById('inpTotalStockInAmount').value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         NProgress.done();
                     }
                 });
@@ -1097,156 +1324,21 @@
             return itemsObservableArray;
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRows() {
-            var rowsObservableArray = new wijmo.collections.ObservableArray();
-
-            for (var i = 0; i <= 4; i++) {
-                var rows = 0;
-                var rowsString = "";
-
-                if (i == 0) {
-                    rows = 15;
-                    rowsString = "Show 15 Rows";
-                } else if (i == 1) {
-                    rows = 50;
-                    rowsString = "Show 50 Rows";
-                } else if (i == 2) {
-                    rows = 100;
-                    rowsString = "Show 100 Rows";
-                } else if (i == 3) {
-                    rows = 150;
-                    rowsString = "Show 150 Rows";
-                } else {
-                    rows = 200;
-                    rowsString = "Show 200 Rows";
-                }
-
-                rowsObservableArray.push({
-                    rowNumber: rows,
-                    rowString: rowsString
-                });
-            }
-
-            cboStockInItemsShowNumberOfRows.dispose();
-            cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows', {
-                isEditable: false,
-                itemsSource: rowsObservableArray,
-                displayMemberPath: "rowString",
-                selectedValuePath: "rowNumber",
-                selectedValue: 50,
-                onSelectedIndexChanged: function () {
-                    NProgress.start();
-
-                    setTimeout(function () {
-                        var numberOfRows = cboStockInItemsShowNumberOfRows.selectedValue;
-                        items.pageSize = parseInt(numberOfRows);
-                        items.refresh();
-                        itemGrid.refresh();
-
-                        NProgress.done();
-                    }, 300);
-                }
-            });
-
-            cboInventoryEntryShowNumberOfRows.dispose();
-            cboInventoryEntryShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntryShowNumberOfRows', {
-                isEditable: false,
-                itemsSource: rowsObservableArray,
-                displayMemberPath: "rowString",
-                selectedValuePath: "rowNumber",
-                selectedValue: 50,
-                onSelectedIndexChanged: function () {
-                    NProgress.start();
-
-                    setTimeout(function () {
-                        var numberOfRows = cboInventoryEntryShowNumberOfRows.selectedValue;
-                        inventoryCollectionView.pageSize = parseInt(numberOfRows);
-                        inventoryCollectionView.refresh();
-                        inventoryFlexGrid.refresh();
-
-                        NProgress.done();
-                    }, 300);
-                }
-            });
-        }
-
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (items.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridItem').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridItem').style.display = 'block';
-            if (items.pageIndex === 0) {
-                btnMoveToFirstPageGridItem.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridItem.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridItem.removeAttribute('disabled');
-                btnMoveToLastPageGridItem.removeAttribute('disabled');
-            } else if (items.pageIndex === (items.pageCount - 1)) {
-                btnMoveToFirstPageGridItem.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
-                btnMoveToNextPageGridItem.setAttribute('disabled', 'disabled');
-                btnMoveToLastPageGridItem.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridItem.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItem.removeAttribute('disabled');
-                btnMoveToNextPageGridItem.removeAttribute('disabled');
-                btnMoveToLastPageGridItem.removeAttribute('disabled');
-            }
-            btnCurrentPageGridItem.innerHTML = (items.pageIndex + 1) + ' / ' + items.pageCount;
-        }
-
-        // =============
-        // Refresh Items
-        // =============
-        function refreshStockInItemsFlexGrid() {
-            items = new wijmo.collections.CollectionView(getItem());
-            items.canFilter = true;
-            items.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#StockInInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                items.refresh();
-            });
-
-            items.filter = function (item) {
-                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            items.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            itemGrid.itemsSource = items;
-            itemGrid.trackChanges = true;
-        }
-
-        // ======
-        //  Items
-        // ======
+        // ===============================
+        // Create Stock In Items Flex Grid
+        // ===============================
         function createStockInItemsFlexGrid() {
-            items = new wijmo.collections.CollectionView(getItem());
-            items.canFilter = true;
-            items.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
+            stockInItemsCollectionView = new wijmo.collections.CollectionView(getStockInItemsData());
+            stockInItemsCollectionView.canFilter = true;
+            stockInItemsCollectionView.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#StockInInputFilter').keyup(function () {
+            $('#inpStockInItemsSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                items.refresh();
+                stockInItemsCollectionView.refresh();
             });
 
-            items.filter = function (item) {
+            stockInItemsCollectionView.filter = function (item) {
                 return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
@@ -1255,12 +1347,12 @@
                     || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
-            items.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            stockInItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockInItemsNavigationButtons();
             });
 
-            itemGrid = new wijmo.grid.FlexGrid('#ItemGrid');
-            itemGrid.initialize({
+            stockInItemsFlexGrid = new wijmo.grid.FlexGrid('#stockInItemsFlexGrid');
+            stockInItemsFlexGrid.initialize({
                 columns: [
                     @{
                         if (canEdit)
@@ -1365,7 +1457,7 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: items,
+                itemsSource: stockInItemsCollectionView,
                 isReadOnly: true,
                 @{
                     if (canEdit)
@@ -1404,12 +1496,12 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            itemGrid.trackChanges = true;
+            stockInItemsFlexGrid.trackChanges = true;
 
             var hr = new wijmo.grid.Row();
-            itemGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
-            itemGrid.columnHeaders.rows.push(hr);
-            itemGrid.columnHeaders.rows[0].allowMerging = true;
+            stockInItemsFlexGrid.allowMerging = wijmo.grid.AllowMerging.AllHeaders;
+            stockInItemsFlexGrid.columnHeaders.rows.push(hr);
+            stockInItemsFlexGrid.columnHeaders.rows[0].allowMerging = true;
 
             @{
                 if (canEdit)
@@ -1443,8 +1535,8 @@
                                     columnName = "Basic Unit Conversion";
                                 }
 
-                                itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                stockInItemsFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                stockInItemsFlexGrid.columnHeaders.setCellData(0, i, columnName);
                             }
                         </text>
                     }
@@ -1475,8 +1567,8 @@
                                     columnName = "Basic Unit Conversion";
                                 }
 
-                                itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                stockInItemsFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                stockInItemsFlexGrid.columnHeaders.setCellData(0, i, columnName);
                             }
                         </text>
                     }
@@ -1510,8 +1602,8 @@
                                     columnName = "Basic Unit Conversion";
                                 }
 
-                                itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                stockInItemsFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                stockInItemsFlexGrid.columnHeaders.setCellData(0, i, columnName);
                             }
                         </text>
                     }
@@ -1540,41 +1632,176 @@
                                     columnName = "Basic Unit Conversion";
                                 }
 
-                                itemGrid.columnHeaders.columns[i].allowMerging = true;
-                                itemGrid.columnHeaders.setCellData(0, i, columnName);
+                                stockInItemsFlexGrid.columnHeaders.columns[i].allowMerging = true;
+                                stockInItemsFlexGrid.columnHeaders.setCellData(0, i, columnName);
                             }
                         </text>
                     }
                 }
             }
 
-            updateNavigateButtonsItems();
+            updateStockInItemsNavigationButtons();
 
-            btnMoveToFirstPageGridItem.addEventListener('click', function () {
-                items.moveToFirstPage();
-                updateNavigateButtonsItems();
+            btnStockInItemsMoveToFirstPageGrid.addEventListener('click', function () {
+                stockInItemsCollectionView.moveToFirstPage();
+                updateStockInItemsNavigationButtons();
             });
 
-            btnMoveToPreviousPageGridItem.addEventListener('click', function () {
-                items.moveToPreviousPage();
-                updateNavigateButtonsItems();
+            btnStockInItemsMoveToPreviousPageGrid.addEventListener('click', function () {
+                stockInItemsCollectionView.moveToPreviousPage();
+                updateStockInItemsNavigationButtons();
             });
 
-            btnMoveToNextPageGridItem.addEventListener('click', function () {
-                items.moveToNextPage();
-                updateNavigateButtonsItems();
+            btnStockInItemsMoveToNextPageGrid.addEventListener('click', function () {
+                stockInItemsCollectionView.moveToNextPage();
+                updateStockInItemsNavigationButtons();
             });
 
-            btnMoveToLastPageGridItem.addEventListener('click', function () {
-                items.moveToLastPage();
-                updateNavigateButtonsItems();
+            btnStockInItemsMoveToLastPageGrid.addEventListener('click', function () {
+                stockInItemsCollectionView.moveToLastPage();
+                updateStockInItemsNavigationButtons();
             });
         }
 
-        // ======================================
-        // GET Item Id, Manual Code and Component
-        // ======================================
-        function getArticleItemForManualCodeAndComponent(itemId, unitId) {
+        // ========================================
+        // Update Stock In Items Navigation Buttons
+        // ========================================
+        function updateStockInItemsNavigationButtons() {
+            if (stockInItemsCollectionView.pageSize <= 0) {
+                document.getElementById('stockInItemsNavigationPageGridItem').style.display = 'none';
+                return;
+            }
+            document.getElementById('stockInItemsNavigationPageGridItem').style.display = 'block';
+            if (stockInItemsCollectionView.pageIndex === 0) {
+                btnStockInItemsMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnStockInItemsMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnStockInItemsMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (stockInItemsCollectionView.pageIndex === (stockInItemsCollectionView.pageCount - 1)) {
+                btnStockInItemsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnStockInItemsMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnStockInItemsMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockInItemsMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnStockInItemsCurrentPageGrid.innerHTML = (stockInItemsCollectionView.pageIndex + 1) + ' / ' + stockInItemsCollectionView.pageCount;
+        }
+
+        // ================================
+        // Refresh Stock In Items Flex Grid
+        // ================================
+        function refreshStockInItemsFlexGrid() {
+            stockInItemsCollectionView = new wijmo.collections.CollectionView(getStockInItemsData());
+            stockInItemsCollectionView.canFilter = true;
+            stockInItemsCollectionView.pageSize = cboStockInItemsShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpStockInItemsSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockInItemsCollectionView.refresh();
+            });
+
+            stockInItemsCollectionView.filter = function (item) {
+                return !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemDescription.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.BaseUnit.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockInItemsCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockInItemsNavigationButtons();
+            });
+
+            stockInItemsFlexGrid.itemsSource = stockInItemsCollectionView;
+            stockInItemsFlexGrid.trackChanges = true;
+        }
+
+        // ===============
+        // Show Rows Table
+        // ===============
+        function createCboShowRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+
+            cboStockInItemsShowNumberOfRows.dispose();
+            cboStockInItemsShowNumberOfRows = new wijmo.input.ComboBox('#cboStockInItemsShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboStockInItemsShowNumberOfRows.selectedValue;
+                        stockInItemsCollectionView.pageSize = parseInt(numberOfRows);
+                        stockInItemsCollectionView.refresh();
+                        stockInItemsFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+
+            cboInventoryEntriesShowNumberOfRows.dispose();
+            cboInventoryEntriesShowNumberOfRows = new wijmo.input.ComboBox('#cboInventoryEntriesShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboInventoryEntriesShowNumberOfRows.selectedValue;
+                        inventoryCollectionView.pageSize = parseInt(numberOfRows);
+                        inventoryCollectionView.refresh();
+                        inventoryFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
+        // =============================
+        // Create Combobox Stock In Item
+        // =============================
+        function createCboStockInItem(itemId, unitId) {
             var articleItemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockInItem/dropdown/list/item',
@@ -1595,13 +1822,13 @@
                     var disabled = true;
                     if (results.length > 0) {
                         disabled = false;
-                        $("#cmdSaveStockInItemButton").prop("disabled", false);
+                        $("#btnStockInItemSave").prop("disabled", false);
                     } else {
-                        $("#cmdSaveStockInItemButton").prop("disabled", true);
+                        $("#btnStockInItemSave").prop("disabled", true);
                     }
 
-                    cboINItemCode.dispose();
-                    cboINItemCode = new wijmo.input.ComboBox('#cboINItemCode', {
+                    cboStockInItemCode.dispose();
+                    cboStockInItemCode = new wijmo.input.ComboBox('#cboStockInItemCode', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: articleItemsObservableArray,
@@ -1609,12 +1836,12 @@
                         selectedValuePath: "Id",
                         selectedValue: itemId,
                         onSelectedIndexChanged: function () {
-                            cboINItemDescription.selectedValue = this.selectedValue;
+                            cboStockInItemDescription.selectedValue = this.selectedValue;
                         }
                     });
 
-                    cboINItemDescription.dispose();
-                    cboINItemDescription = new wijmo.input.ComboBox('#cboINItemDescription', {
+                    cboStockInItemDescription.dispose();
+                    cboStockInItemDescription = new wijmo.input.ComboBox('#cboStockInItemDescription', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: articleItemsObservableArray,
@@ -1622,20 +1849,20 @@
                         selectedValuePath: "Id",
                         selectedValue: itemId,
                         onSelectedIndexChanged: function () {
-                            cboINItemCode.selectedValue = this.selectedValue;
-                            getStockInItemUnitForComboBox(unitId);
+                            cboStockInItemCode.selectedValue = this.selectedValue;
+                            createCboStockInItemUnit(unitId);
 
-                            if (document.getElementById("StockIn_Produce").checked) {
+                            if (document.getElementById("inpStockInIsProduce").checked) {
                                 getProducedItemInventoryCost(this.selectedItem["Id"]);
                             }
                         }
                     });
 
-                    if (document.getElementById("StockIn_Produce").checked) {
-                        getProducedItemInventoryCost(cboINItemDescription.selectedItem["Id"]);
+                    if (document.getElementById("inpStockInIsProduce").checked) {
+                        getProducedItemInventoryCost(cboStockInItemDescription.selectedItem["Id"]);
                     }
 
-                    getStockInItemUnitForComboBox(unitId);
+                    createCboStockInItemUnit(unitId);
                 }
             });
         }
@@ -1645,15 +1872,15 @@
         // ================================================
         function getProducedItemInventoryCost(itemId) {
             $.ajax({
-                url: '/api/stockInItem/getItemInventoryCost/' + itemId,
+                url: '/api/stockInItem/getStockInItemsDataInventoryCost/' + itemId,
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
                     if (results > 0) {
-                        document.getElementById('stockInItem_Cost').value = formatDecimalValues(results);
+                        document.getElementById('inpStockInItemCost').value = formatDecimalValues(results);
                     } else {
-                        document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
+                        document.getElementById('inpStockInItemCost').value = formatDecimalValues(0);
                     }
 
                     computeAmount();
@@ -1661,14 +1888,14 @@
             });
         }
 
-        // =============
-        // Get Item Unit
-        // =============
-        function getStockInItemUnitForComboBox(unitId) {
+        // ==================================
+        // Create Combobox Stock In Item Unit
+        // ==================================
+        function createCboStockInItemUnit(unitId) {
             var stockInUnits = new wijmo.collections.ObservableArray();
-            if (cboINItemDescription.selectedValue != null) {
+            if (cboStockInItemDescription.selectedValue != null) {
                 $.ajax({
-                    url: '/api/stockInItem/dropdown/list/itemUnit/' + cboINItemDescription.selectedValue,
+                    url: '/api/stockInItem/dropdown/list/itemUnit/' + cboStockInItemDescription.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -1686,11 +1913,11 @@
                         if (results.length > 0) {
                             disabled = false;
                         } else {
-                            $("#cmdSaveStockInItemButton").prop("disabled", true);
+                            $("#btnStockInItemSave").prop("disabled", true);
                         }
 
-                        cboINItemUnit.dispose();
-                        cboINItemUnit = new wijmo.input.ComboBox('#cboINItemUnit', {
+                        cboStockInItemUnit.dispose();
+                        cboStockInItemUnit = new wijmo.input.ComboBox('#cboStockInItemUnit', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: stockInUnits,
@@ -1699,27 +1926,40 @@
                             selectedValue: unitId,
                         });
 
-                        $("#loadingModalItem").hide();
-                        $("#stockInItemsDetailForm").show();
+                        $("#stockInItemLoading").hide();
+                        $("#stockInItemContent").show();
                     }
                 });
             } else {
-                cboINItemUnit.dispose();
-                cboINItemUnit = new wijmo.input.ComboBox('#cboINItemUnit', {
+                cboStockInItemUnit.dispose();
+                cboStockInItemUnit = new wijmo.input.ComboBox('#cboStockInItemUnit', {
                     disabled: true,
                     isEditable: false,
                     itemsSource: stockInUnits
                 });
 
-                $("#cmdSaveStockInItemButton").prop("disabled", true);
+                $("#btnStockInItemSave").prop("disabled", true);
             }
         }
 
+        // ==============
+        // Compute Amount
+        // ==============
+        $('#inpStockInItemQuantity').keyup(function () { computeAmount(); });
+        $('#inpStockInItemCost').keyup(function () { computeAmount(); });
+        function computeAmount() {
+            var stockInQuantity = document.getElementById('inpStockInItemQuantity').value.replace(/\,/g, '');
+            var stockInCost = document.getElementById('inpStockInItemCost').value.replace(/\,/g, '');
+
+            var stockInItemAmount = stockInQuantity * stockInCost;
+            document.getElementById('inpStockInItemAmount').value = formatDecimalValues(stockInItemAmount);
+        }
+
         // =================
-        // ADD Stock In Item
+        // Add Stock In Item
         // =================
-        function cmdAddStockInItem_OnClick() {
-            $('#stockInItemsEdit').modal({
+        function btnStockInItemsAddOnclick() {
+            $('#stockInItemsDetailModal').modal({
                 show: true,
                 backdrop: 'static'
             });
@@ -1730,33 +1970,70 @@
                 });
             });
 
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#stockInItemsDetailForm").hide();
+            $("#stockInItemLoading").show();
+            document.getElementById("stockInItemLoading").innerHTML = 'Loading...';
+            $("#stockInItemContent").hide();
 
-            document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSaveStockInItemButton").prop("disabled", true);
-            $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+            document.getElementById('stockInItemsModalLabel').innerHTML = "Add Stock In Item";
+
+            document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnStockInItemSave").prop("disabled", true);
+            $("#btnStockInItemCloseDetailModal").prop("disabled", false);
 
             stockInItemId = 0;
-            getArticleItemForManualCodeAndComponent(0,0);
-            document.getElementById('stockInItem_Particulars').value = 'NA';
-            document.getElementById('stockInItem_Quantity').value = formatDecimalValues(1);
-            document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
-            document.getElementById('stockInItem_Amount').value = formatDecimalValues(0);
+            createCboStockInItem(0,0);
+            document.getElementById('inpStockInItemParticulars').value = 'NA';
+            document.getElementById('inpStockInItemQuantity').value = formatDecimalValues(1);
+            document.getElementById('inpStockInItemCost').value = formatDecimalValues(0);
+            document.getElementById('inpStockInItemAmount').value = formatDecimalValues(0);
         }
 
         // ==================
-        // SAVE Stock In Item
+        // Edit Stock In Item
         // ==================
-        function cmdStockInItemSaveButton_OnClick() {
+        function btnStockInItemEditOnclick() {
+            $('#stockInItemsDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredStockInItem').each(function () {
+                $(this).css({
+                    "border": "",
+                });
+            });
+
+            $("#stockInItemLoading").show();
+            document.getElementById("stockInItemLoading").innerHTML = 'Loading...';
+            $("#stockInItemContent").hide();
+
+            document.getElementById('stockInItemsModalLabel').innerHTML = "Edit Stock In Item";
+
+            document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnStockInItemSave").prop("disabled", true);
+            $("#btnStockInItemCloseDetailModal").prop("disabled", false);
+
+            stockInItemsCollectionView.editItem(stockInItemsCollectionView.currentItem);
+            var item = stockInItemsCollectionView.currentEditItem;
+            stockInItemId = item.Id;
+            createCboStockInItem(item.ItemId, item.UnitId);
+            document.getElementById('inpStockInItemParticulars').value = item.Particulars;
+            document.getElementById('inpStockInItemQuantity').value = formatDecimalValues(item.Quantity);
+            document.getElementById('inpStockInItemCost').value = formatDecimalValues(item.Cost);
+            document.getElementById('inpStockInItemAmount').value = formatDecimalValues(item.Amount);
+        }
+
+        // ==================
+        // Save Stock In Item
+        // ==================
+        function btnStockInItemSaveOnclick() {
             var stockInItmeObject = new Object();
-            stockInItmeObject.ItemId = cboINItemDescription.selectedValue;
-            stockInItmeObject.Particulars = document.getElementById('stockInItem_Particulars').value;
-            stockInItmeObject.UnitId = cboINItemUnit.selectedValue;
-            stockInItmeObject.Quantity = document.getElementById('stockInItem_Quantity').value;
-            stockInItmeObject.Cost = document.getElementById('stockInItem_Cost').value;
-            stockInItmeObject.Amount = document.getElementById('stockInItem_Amount').value;
+            stockInItmeObject.ItemId = cboStockInItemDescription.selectedValue;
+            stockInItmeObject.Particulars = document.getElementById('inpStockInItemParticulars').value;
+            stockInItmeObject.UnitId = cboStockInItemUnit.selectedValue;
+            stockInItmeObject.Quantity = document.getElementById('inpStockInItemQuantity').value;
+            stockInItmeObject.Cost = document.getElementById('inpStockInItemCost').value;
+            stockInItmeObject.Amount = document.getElementById('inpStockInItemAmount').value;
             var stockInItemData = JSON.stringify(stockInItmeObject);
 
             var isValid = true;
@@ -1774,11 +2051,11 @@
             });
 
             if (isValid) {
-                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $("#cmdSaveStockInItemButton").prop("disabled", true);
-                $("#cmdStockInItemDetailCloseButton").prop("disabled", true);
+                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnStockInItemSave").prop("disabled", true);
+                $("#btnStockInItemCloseDetailModal").prop("disabled", true);
 
-                var INId = getParam("id");
+                var INId = getURLParameterValue("id");
 
                 if (stockInItemId == 0) {
                     $.ajax({
@@ -1790,26 +2067,26 @@
                         statusCode: {
                             200: function () {
                                 toastr.success("Save Successful");
-                                $('#stockInItemsEdit').modal('hide');
+                                $('#stockInItemsDetailModal').modal('hide');
                                 refreshStockInItemsFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             }
                         }
                     });
@@ -1823,29 +2100,29 @@
                         statusCode: {
                             200: function () {
                                 toastr.success("Update Successful");
-                                $('#stockInItemsEdit').modal('hide');
+                                $('#stockInItemsDetailModal').modal('hide');
                                 refreshStockInItemsFlexGrid();
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#stockInItemsEdit').modal('hide');
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                $('#stockInItemsDetailModal').modal('hide');
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#stockInItemsEdit').modal('hide');
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                $('#stockInItemsDetailModal').modal('hide');
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#stockInItemsEdit').modal('hide');
-                                document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $("#cmdSaveStockInItemButton").prop("disabled", false);
-                                $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+                                $('#stockInItemsDetailModal').modal('hide');
+                                document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $("#btnStockInItemSave").prop("disabled", false);
+                                $("#btnStockInItemCloseDetailModal").prop("disabled", false);
                             }
                         }
                     });
@@ -1855,62 +2132,31 @@
             }
         }
 
-        // ==================
-        // Edit Stock In Item
-        // ==================
-        function btnEditStockInItem_Onclick() {
-            $('#stockInItemsEdit').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('.requiredStockInItem').each(function () {
-                $(this).css({
-                    "border": "",
-                });
-            });
-
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#stockInItemsDetailForm").hide();
-
-            document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSaveStockInItemButton").prop("disabled", true);
-            $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
-
-            items.editItem(items.currentItem);
-            var item = items.currentEditItem;
-            stockInItemId = item.Id;
-            getArticleItemForManualCodeAndComponent(item.ItemId, item.UnitId);
-            document.getElementById('stockInItem_Particulars').value = item.Particulars;
-            document.getElementById('stockInItem_Quantity').value = formatDecimalValues(item.Quantity);
-            document.getElementById('stockInItem_Cost').value = formatDecimalValues(item.Cost);
-            document.getElementById('stockInItem_Amount').value = formatDecimalValues(item.Amount);
-        }
-
         // ====================
         // Delete Stock In Item
         // ====================
-        function btnDeleteStockInItem_Onclick() {
-            $('#deletStockInItemsConfirm').modal({
+        function btnStockInItemDeleteOnclick() {
+            $('#stockInItemsConfirmDeleteModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
-            $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
+            document.getElementById('btnStockInItemsConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $("#btnStockInItemsConfirmDelete").prop("disabled", false);
+            $("#btnStockInItemsConfirmDeleteCloseModal").prop("disabled", false);
         }
 
-        // confirm delete stock in items
-        function cmdStockInItemsConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteStockInItems").prop("disabled", true);
-            $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", true);
+        // ============================
+        // Confirm Delete Stock In Item
+        // ============================
+        function btnStockInItemsConfirmDeleteOnclick() {
+            document.getElementById('btnStockInItemsConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnStockInItemsConfirmDelete").prop("disabled", true);
+            $("#btnStockInItemsConfirmDeleteCloseModal").prop("disabled", true);
 
-            items.editItem(items.currentItem);
-            var id = items.currentEditItem.Id;
-            var INId = getParam("id");
+            stockInItemsCollectionView.editItem(stockInItemsCollectionView.currentItem);
+            var id = stockInItemsCollectionView.currentEditItem.Id;
+            var INId = getURLParameterValue("id");
 
             $.ajax({
                 url: '/api/stockInItem/delete/' + id + '/' + INId,
@@ -1920,39 +2166,39 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Delete Successful");
-                        $('#deletStockInItemsConfirm').modal('hide');
+                        $('#stockInItemsConfirmDeleteModal').modal('hide');
                         refreshStockInItemsFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deletStockInItemsConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
-                        $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
+                        $('#stockInItemsConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockInItemsConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockInItemsConfirmDelete").prop("disabled", false);
+                        $("#btnStockInItemsConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deletStockInItemsConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
-                        $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
+                        $('#stockInItemsConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockInItemsConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockInItemsConfirmDelete").prop("disabled", false);
+                        $("#btnStockInItemsConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deletStockInItemsConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockInItems').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockInItems").prop("disabled", false);
-                        $("#cmdConfirmDeleteStockInItemsCloseButton").prop("disabled", false);
+                        $('#stockInItemsConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockInItemsConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockInItemsConfirmDelete").prop("disabled", false);
+                        $("#btnStockInItemsConfirmDeleteCloseModal").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // =====================
-        // GET Inventory Entries
-        // =====================
-        function getInventoryEntries() {
-            var INId = getParam('id');
+        // ==========================
+        // Get Inventory Entries Data
+        // ==========================
+        function getInventoryEntriesData() {
+            var INId = getURLParameterValue('id');
             var inventoryObservableArray = new wijmo.collections.ObservableArray;
 
             $.ajax({
@@ -1991,44 +2237,16 @@
             return inventoryObservableArray;
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsInventoryEntry() {
-            if (inventoryCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridInventoryEntry').style.display = 'block';
-            if (inventoryCollectionView.pageIndex === 0) {
-                btnMoveToFirstPageGridInventoryEntry.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridInventoryEntry.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
-            } else if (inventoryCollectionView.pageIndex === (inventoryCollectionView.pageCount - 1)) {
-                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToNextPageGridInventoryEntry.setAttribute('disabled', 'disabled');
-                btnMoveToLastPageGridInventoryEntry.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToPreviousPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToNextPageGridInventoryEntry.removeAttribute('disabled');
-                btnMoveToLastPageGridInventoryEntry.removeAttribute('disabled');
-            }
-            btnCurrentPageGridInventoryEntry.innerHTML = (inventoryCollectionView.pageIndex + 1) + ' / ' + inventoryCollectionView.pageCount;
-        }
-
-        // ===========================
-        // Refresh Inventory Flex Grid
-        // ===========================
-        function refreshInventoryFlexGrid() {
-            inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntries());
+        // ==================================
+        // Create Inventory Entries Flex Grid
+        // ==================================
+        function createInventoryEntriesFlexGrid() {
+            inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntriesData());
             inventoryCollectionView.canFilter = true;
-            inventoryCollectionView.pageSize = cboInventoryEntryShowNumberOfRows.selectedValue;
+            inventoryCollectionView.pageSize = cboInventoryEntriesShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InventoryEntryInputFilter').keyup(function () {
+            $('#inpInventoryEntriesSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 inventoryCollectionView.refresh();
             });
@@ -2045,38 +2263,8 @@
                 updateNavigateButtonsInventoryEntry();
             });
 
-            inventoryFlexGrid.itemsSource = inventoryCollectionView;
-            inventoryFlexGrid.trackChanges = true;
-        }
-
-        // ================================
-        // On Page Load for Inventory Entry
-        // ================================
-        function createInventoryFlexGrid() {
-            inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntries());
-            inventoryCollectionView.canFilter = true;
-            inventoryCollectionView.pageSize = cboInventoryEntryShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InventoryEntryInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                inventoryCollectionView.refresh();
-            });
-
-            inventoryCollectionView.filter = function (item) {
-                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ArticleInventoryCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ArticleUnit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            inventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsInventoryEntry();
-            });
-
-            inventoryFlexGrid = new wijmo.grid.FlexGrid('#InventoryEntryGrid');
-            inventoryFlexGrid.initialize({
+            inventoryEntriesFlexGrid = new wijmo.grid.FlexGrid('#inventoryEntriesFlexGrid');
+            inventoryEntriesFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Date",
@@ -2139,37 +2327,96 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            inventoryFlexGrid.trackChanges = true;
+            inventoryEntriesFlexGrid.trackChanges = true;
 
             updateNavigateButtonsInventoryEntry();
 
-            btnMoveToFirstPageGridInventoryEntry.addEventListener('click', function () {
+            btnInventoryEntriesMoveToFirstPageGrid.addEventListener('click', function () {
                 inventoryCollectionView.moveToFirstPage();
                 updateNavigateButtonsInventoryEntry();
             });
 
-            btnMoveToPreviousPageGridInventoryEntry.addEventListener('click', function () {
+            btnInventoryEntriesMoveToPreviousPageGrid.addEventListener('click', function () {
                 inventoryCollectionView.moveToPreviousPage();
                 updateNavigateButtonsInventoryEntry();
             });
 
-            btnMoveToNextPageGridInventoryEntry.addEventListener('click', function () {
+            btnInventoryEntriesMoveToNextPageGrid.addEventListener('click', function () {
                 inventoryCollectionView.moveToNextPage();
                 updateNavigateButtonsInventoryEntry();
             });
 
-            btnMoveToLastPageGridInventoryEntry.addEventListener('click', function () {
+            btnInventoryEntriesMoveToLastPageGrid.addEventListener('click', function () {
                 inventoryCollectionView.moveToLastPage();
                 updateNavigateButtonsInventoryEntry();
             });
         }
 
-        // ===========
-        // Get Journal
-        // ===========
-        function getJournalListForRR() {
+        // ===========================================
+        // Update Enventory Entries Navigation Buttons
+        // ===========================================
+        function updateNavigateButtonsInventoryEntry() {
+            if (inventoryCollectionView.pageSize <= 0) {
+                document.getElementById('inventoryEntriesNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('inventoryEntriesNavigationPageGrid').style.display = 'block';
+            if (inventoryCollectionView.pageIndex === 0) {
+                btnInventoryEntriesMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnInventoryEntriesMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnInventoryEntriesMoveToNextPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (inventoryCollectionView.pageIndex === (inventoryCollectionView.pageCount - 1)) {
+                btnInventoryEntriesMoveToFirstPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnInventoryEntriesMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnInventoryEntriesMoveToFirstPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToNextPageGrid.removeAttribute('disabled');
+                btnInventoryEntriesMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnInventoryEntriesCurrentPageGrid.innerHTML = (inventoryCollectionView.pageIndex + 1) + ' / ' + inventoryCollectionView.pageCount;
+        }
+
+        // ===================================
+        // Refresh Enventory Entries Flex Grid
+        // ===================================
+        function refreshInventoryEntriesFlexGrid() {
+            inventoryCollectionView = new wijmo.collections.CollectionView(getInventoryEntriesData());
+            inventoryCollectionView.canFilter = true;
+            inventoryCollectionView.pageSize = cboInventoryEntriesShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpInventoryEntriesSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                inventoryCollectionView.refresh();
+            });
+
+            inventoryCollectionView.filter = function (item) {
+                return !filterText || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleInventoryCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ArticleUnit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            inventoryCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateNavigateButtonsInventoryEntry();
+            });
+
+            inventoryEntriesFlexGrid.itemsSource = inventoryCollectionView;
+            inventoryEntriesFlexGrid.trackChanges = true;
+        }
+
+        // ================
+        // Get Journal Data
+        // ================
+        function getJournalData() {
             var journalsObservableArray = new wijmo.collections.ObservableArray;
-            var INId = getParam('id');
+            var INId = getURLParameterValue('id');
+
             $.ajax({
                 url: '/api/jounal/stockIn/list/' + INId,
                 cache: false,
@@ -2177,6 +2424,11 @@
                 contentType: 'application/json; charset=utf-8',
                 data: {},
                 success: function (results) {
+                    var totalDebitAmount = 0;
+                    var totalCreditAmount = 0;
+
+                    var variance = 0;
+
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
 
@@ -2193,51 +2445,51 @@
                                 CreditAmountDisplay: parseFloat(results[i]["CreditAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                             });
 
-                            var debitAmountTotal = 0;
-                            var creditAmountTotal = 0;
+                            var debit = parseFloat(Math.round(results[i]["DebitAmount"] * 100) / 100);
+                            var credit = parseFloat(Math.round(results[i]["CreditAmount"] * 100) / 100);
 
-                            var a = 0;
-                            while (a < results.length) {
-                                debitAmountTotal += results[a]["DebitAmount"];
-                                creditAmountTotal += results[a]["CreditAmount"];
-                                a++;
-                            }
+                            totalDebitAmount += debit;
+                            totalCreditAmount += credit;
                         }
 
-                        document.getElementById('totalDebitInJournal').value = debitAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        document.getElementById('totalCreditInJournal').value = creditAmountTotal.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                        var variance = debitAmountTotal - creditAmountTotal;
-                        document.getElementById('variance').value = variance.toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                        variance = totalDebitAmount - totalCreditAmount;
                     }
 
-                    $("#loadingJournalGridList").hide();
-                    $("#journal_Content").show();
+                    document.getElementById('inpJournalTotalDebit').value = parseFloat(Math.round(totalDebitAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalTotalCredit').value = parseFloat(Math.round(totalCreditAmount * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    document.getElementById('inpJournalVariance').value = parseFloat(Math.round(variance * 100) / 100).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                    $("#journalLoading").hide();
+                    $("#journalContent").show();
                 }
             });
 
             return journalsObservableArray;
         }
 
-        // ============
-        // Journal List
-        // ============
-        function stockInJournal_OnClick() {
-            $('#journalDetail').modal({
+        // ===============
+        // Display Journal
+        // ===============
+        function btnStockInJournalOnclick() {
+            $('#journalEntryModal').modal({
                 show: true,
                 backdrop: 'static'
             });
 
-            $("#loadingJournalGridList").show();
-            document.getElementById("loadingJournalGridList").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#journal_Content").hide();
+            $("#journalLoading").show();
+            document.getElementById("journalLoading").innerHTML = 'Loading...';
+            $("#journalContent").hide();
 
             setTimeout(function () {
                 createJournalFlexGrid();
             }, 500)
         }
 
+        // ========================
+        // Create Journal Flex Grid
+        // ========================
         function createJournalFlexGrid() {
-            journalCollectionView = new wijmo.collections.CollectionView(getJournalListForRR());
+            journalCollectionView = new wijmo.collections.CollectionView(getJournalData());
 
             journalFlexGrid.dispose();
             journalFlexGrid = new wijmo.grid.FlexGrid('#journalFlexGrid');
@@ -2299,9 +2551,10 @@
             journalFlexGrid.trackChanges = true;
         }
 
-        // get Items for Item Query
-        function getArticleItemForItemQuery() {
-            var branchId = cboINBranch.selectedValue;
+        // ===================
+        // Get Item Query Data
+        // ===================
+        function getItemQueryData() {
             var items = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockInItem/popUp/list/itemQuery',
@@ -2319,163 +2572,170 @@
                                 Particulars: results[i]["Particulars"],
                                 Price: results[i]["Price"],
                                 PriceDisplay: parseFloat(results[i]["Price"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='pickToApplyOnClick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
+                                Pick: "<button class='btn btn-primary btn-xs btn-block' onclick='btnItemQueryPickOnclick()'><i class='fa fa-hand-o-right'></i> Pick</button>",
                             });
                         }
                     }
 
-                    $("#itemQueryPanel").show();
-                    $("#loadingItemQuery").hide();
+                    $("#itemQueryContent").show();
+                    $("#itemQueryLoading").hide();
                 }
             });
 
             return items;
         }
 
-        // item query
-        function cmdINLineItemQueryButton_OnClick() {
-            $('#INLinesItemQuery').modal({
-                show: true,
-                backdrop: 'static'
-            });
-            $("#loadingItemQuery").show();
-            document.getElementById("loadingItemQuery").innerHTML = "<b><i class='fa fa-spinner fa-spin'></i></b>";
-            $("#itemQueryPanel").hide();
-
-            setTimeout(function() {
-                createItemQueryFlexGrid();
-            }, 500)
-        }
-
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItemQuery() {
-            if (itemQueryItemsCollection.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridItemQuery').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridItemQuery').style.display = 'block';
-            if (itemQueryItemsCollection.pageIndex === 0) {
-                btnMoveToFirstPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
-            } else if (itemQueryItemsCollection.pageIndex === (itemQueryItemsCollection.pageCount - 1)) {
-                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToNextPageGridItemQuery.setAttribute('disabled', 'disabled');
-                btnMoveToLastPageGridItemQuery.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToPreviousPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToNextPageGridItemQuery.removeAttribute('disabled');
-                btnMoveToLastPageGridItemQuery.removeAttribute('disabled');
-            }
-            btnCurrentPageGridItemQuery.innerHTML = (itemQueryItemsCollection.pageIndex + 1) + ' / ' + itemQueryItemsCollection.pageCount;
-        }
-
+        // ===========================
+        // Create Item Query Flex Grid
+        // ===========================
         function createItemQueryFlexGrid() {
-            itemQueryItemsCollection = new wijmo.collections.CollectionView(getArticleItemForItemQuery());
-            itemQueryItemsCollection.canFilter = true;
-            itemQueryItemsCollection.pageSize = 10;
+            itemQueryCollectionView = new wijmo.collections.CollectionView(getItemQueryData());
+            itemQueryCollectionView.canFilter = true;
+            itemQueryCollectionView.pageSize = 10;
 
             var filterText = '';
-            $('#itemQueryFilter').keyup(function () {
+            $('#inpItemQuerySearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                itemQueryItemsCollection.refresh();
+                itemQueryCollectionView.refresh();
             });
 
-            itemQueryItemsCollection.filter = function (item) {
+            itemQueryCollectionView.filter = function (item) {
                 return !filterText || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1)
                     || (item.ManualArticleOldCode.toLowerCase().indexOf(filterText) > -1);
             }
 
-            itemQueryItemsCollection.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemQuery();
+            itemQueryCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateItemQueryNavigationButtons();
             });
 
-            // Flex Grid for Purchase Order Line
-            itemQueryGrid.dispose();
-            itemQueryGrid = new wijmo.grid.FlexGrid('#itemQueryGrid');
-            itemQueryGrid.initialize({
+            itemQueryFlexGrid.dispose();
+            itemQueryFlexGrid = new wijmo.grid.FlexGrid('#itemQueryFlexGrid');
+            itemQueryFlexGrid.initialize({
                 columns: [
-                            {
-                                "header": "Barcode",
-                                "binding": "ManualArticleCode",
-                                "allowSorting": true,
-                                "width": "2*"
-                            },
-                            {
-                                "header": "SKU Code",
-                                "binding": "ManualArticleOldCode",
-                                "allowSorting": true,
-                                "width": "2*"
-                            },
-                            {
-                                "header": "Item",
-                                "binding": "Article",
-                                "allowSorting": true,
-                                "width": "4*"
-                            },
-                            {
-                                "header": "Price",
-                                "binding": "PriceDisplay",
-                                "allowSorting": true,
-                                "align": "right",
-                                "width": "2*"
-                            },
-                            {
-                                "header": "Pick",
-                                "binding": "Pick",
-                                "width": "1*",
-                                "align": "center",
-                                "allowResizing": false,
-                                "allowSorting": false,
-                                "isContentHtml": true
-                            },
+                    {
+                        "header": "Barcode",
+                        "binding": "ManualArticleCode",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "SKU Code",
+                        "binding": "ManualArticleOldCode",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Item",
+                        "binding": "Article",
+                        "allowSorting": true,
+                        "width": "4*"
+                    },
+                    {
+                        "header": "Price",
+                        "binding": "PriceDisplay",
+                        "allowSorting": true,
+                        "align": "right",
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Pick",
+                        "binding": "Pick",
+                        "width": "1*",
+                        "align": "center",
+                        "allowResizing": false,
+                        "allowSorting": false,
+                        "isContentHtml": true
+                    },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: itemQueryItemsCollection,
+                itemsSource: itemQueryCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            itemQueryGrid.trackChanges = true;
+            itemQueryFlexGrid.trackChanges = true;
 
-            if (!isItemQueryClicked) {
-                updateNavigateButtonsItemQuery();
+            if (!isBtnItemQueryClicked) {
+                updateItemQueryNavigationButtons();
 
-                btnMoveToFirstPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToFirstPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToFirstPageGrid.addEventListener('click', function () {
+                    itemQueryCollectionView.moveToFirstPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToPreviousPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToPreviousPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToPreviousPageGrid.addEventListener('click', function () {
+                    itemQueryCollectionView.moveToPreviousPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToNextPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToNextPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToNextPageGrid.addEventListener('click', function () {
+                    itemQueryCollectionView.moveToNextPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                btnMoveToLastPageGridItemQuery.addEventListener('click', function () {
-                    itemQueryItemsCollection.moveToLastPage();
-                    updateNavigateButtonsItemQuery();
+                btnItemQueryMoveToLastPageGrid.addEventListener('click', function () {
+                    itemQueryCollectionView.moveToLastPage();
+                    updateItemQueryNavigationButtons();
                 });
 
-                isItemQueryClicked = true;
+                isBtnItemQueryClicked = true;
             }
-
         }
 
-        function pickToApplyOnClick() {
-            $('#stockInItemsEdit').modal({
+        // ====================================
+        // Update Item Query Navigation Buttons
+        // ====================================
+        function updateItemQueryNavigationButtons() {
+            if (itemQueryCollectionView.pageSize <= 0) {
+                document.getElementById('stockCountItemNavigationPageGridQuery').style.display = 'none';
+                return;
+            }
+            document.getElementById('stockCountItemNavigationPageGridQuery').style.display = 'block';
+            if (itemQueryCollectionView.pageIndex === 0) {
+                btnItemQueryMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (itemQueryCollectionView.pageIndex === (itemQueryCollectionView.pageCount - 1)) {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+                btnItemQueryMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnItemQueryMoveToFirstPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToNextPageGrid.removeAttribute('disabled');
+                btnItemQueryMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnItemQueryCurrentPageGrid.innerHTML = (itemQueryCollectionView.pageIndex + 1) + ' / ' + itemQueryCollectionView.pageCount;
+        }
+
+        // =======================
+        // Launch Item Query Modal
+        // =======================
+        function btnItemQueryOnclick() {
+            $('#itemQueryModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $("#itemQueryLoading").show();
+            document.getElementById("itemQueryLoading").innerHTML = "Loading...";
+            $("#itemQueryContent").hide();
+
+            setTimeout(function() {
+                createItemQueryFlexGrid();
+            }, 500)
+        }
+
+        // ===============
+        // Pick Item Query
+        // ===============
+        function btnItemQueryPickOnclick() {
+            $('#stockInItemsDetailModal').modal({
                 show: true,
                 backdrop: 'static'
             });
@@ -2486,26 +2746,28 @@
                 });
             });
 
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#stockInItemsDetailForm").hide();
+            $("#stockInItemLoading").show();
+            document.getElementById("stockInItemLoading").innerHTML = 'Loading...';
+            $("#stockInItemContent").hide();
 
-            document.getElementById('cmdSaveStockInItemButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $("#cmdSaveStockInItemButton").prop("disabled", true);
-            $("#cmdStockInItemDetailCloseButton").prop("disabled", false);
+            document.getElementById('stockInItemsModalLabel').innerHTML = "Add Stock In Item";
 
-            itemQueryItemsCollection.editItem(itemQueryItemsCollection.currentItem);
-            var item = itemQueryItemsCollection.currentEditItem;
+            document.getElementById('btnStockInItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $("#btnStockInItemSave").prop("disabled", true);
+            $("#btnStockInItemCloseDetailModal").prop("disabled", false);
+
+            itemQueryCollectionView.editItem(itemQueryCollectionView.currentItem);
+            var item = itemQueryCollectionView.currentEditItem;
             stockInItemId = 0;
-            getArticleItemForManualCodeAndComponent(item.Id, 0);
-            document.getElementById('stockInItem_Particulars').value = "NA";
-            document.getElementById('stockInItem_Quantity').value = formatDecimalValues(1);
+            createCboStockInItem(item.Id, 0);
+            document.getElementById('inpStockInItemParticulars').value = "NA";
+            document.getElementById('inpStockInItemQuantity').value = formatDecimalValues(1);
 
-            if (document.getElementById("StockIn_Produce").checked) {
-                document.getElementById('stockInItem_Cost').value = formatDecimalValues(item.Cost);
+            if (document.getElementById("inpStockInIsProduce").checked) {
+                document.getElementById('inpStockInItemCost').value = formatDecimalValues(item.Cost);
                 computeAmount();
             } else {
-                document.getElementById('stockInItem_Cost').value = formatDecimalValues(0);
+                document.getElementById('inpStockInItemCost').value = formatDecimalValues(0);
                 computeAmount();
             }
         }
@@ -2513,39 +2775,50 @@
         // ====
         // TABS
         // ====
-        $('#itemTabId').click(function () {
-            $('#Items').show();
-            $('#InventoryEntries').hide();
+        $('#tabStockInItems').click(function () {
+            $('#tabPaneStockInItems').show();
+            $('#tabPaneInventoryEntries').hide();
             NProgress.start();
             refreshStockInItemsFlexGrid();
         });
-
-        $('#inventoryEntryTabId').click(function () {
-            $('#Items').hide();
-            $('#InventoryEntries').show();
+        $('#tabInventoryEntries').click(function () {
+            $('#tabPaneStockInItems').hide();
+            $('#tabPaneInventoryEntries').show();
             NProgress.start();
-            refreshInventoryFlexGrid();
+            refreshInventoryEntriesFlexGrid();
         });
 
-        // On load page
+        // ======================
+        // Launch Multiple Modals
+        // ======================
+        $(document).on('show.bs.modal', '.modal', function (event) {
+            var zIndex = 1040 + (10 * $('.modal:visible').length);
+            $(this).css('z-index', zIndex);
+            setTimeout(function () {
+                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            }, 0);
+        });
+
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            $('.modal:visible').length && $(document.body).addClass('modal-open');
+        });
+
+        // ============
+        // On Load Page
+        // ============
         $(document).ready(function () {
-            getBranchesForComboBox();
-
-            $(document).on('show.bs.modal', '.modal', function (event) {
-                var zIndex = 1040 + (10 * $('.modal:visible').length);
-                $(this).css('z-index', zIndex);
-                setTimeout(function () {
-                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-                }, 0);
-            });
-
-            $(document).on('hidden.bs.modal', '.modal', function () {
-                $('.modal:visible').length && $(document.body).addClass('modal-open');
-            });
+            createCboStockInDetailBranch();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -2563,12 +2836,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -2592,6 +2865,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -2631,6 +2907,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
@@ -2645,6 +2924,5 @@
             slideLeft.open();
         });
     </script>
-
 </body>
 </html>
