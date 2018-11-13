@@ -1244,6 +1244,7 @@
                                 cboCollectionDetailApprovedBy.disabled = true;
                                 cboCollectionDetailStatus.disabled = true;
 
+                                $("#btnCollectionDetailSave").prop("disabled", true);
                                 $("#btnCollectionDetailLock").prop("disabled", true);
                                 $("#btnCollectionLineAdd").prop("disabled", true);
                                 $("#cmdAR").prop("disabled", true);
@@ -1279,10 +1280,121 @@
         }
 
         // ===============
+        // Save Collection
+        // ===============
+        function btnCollectionDetailSaveOnclick() {
+            document.getElementById('btnCollectionDetailSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+            $("#btnCollectionDetailSave").prop("disabled", true);
+            $("#btnCollectionDetailJournal").prop("disabled", true);
+            $("#btnCollectionDetailLock").prop("disabled", true);
+            $("#btnCollectionDetailUnlock").prop("disabled", true);
+            $("#btnCollectionDetailCancel").prop("disabled", true);
+            $("#btnCollectionDetailPrint").prop("disabled", true);
+            $("#btnCloseCollection").prop("disabled", true);
+
+            var collectionObject = new Object();
+            collectionObject.BranchId = cboCollectionDetailBranch.selectedValue;
+            collectionObject.ORNumber = document.getElementById('inpCollectionDetailORNumber').value;
+            collectionObject.ORDate = cboCollectionDetailORDate.value.toLocaleDateString();
+            collectionObject.CustomerId = cboCollectionDetailCustomer.selectedValue;
+            collectionObject.Particulars = document.getElementById('inpCollectionDetailParticulars').value;
+            collectionObject.ManualORNumber = document.getElementById('inpCollectionDetailManualORNumber').value;
+            collectionObject.CheckedById = cboCollectionDetailCheckedBy.selectedValue;
+            collectionObject.ApprovedById = cboCollectionDetailApprovedBy.selectedValue;
+            collectionObject.Status = cboCollectionDetailStatus.selectedValue;
+            var data = JSON.stringify(collectionObject);
+
+            var isValid = true;
+            $('.requiredCollection').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                var id = getURLParameterValue("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/collection/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnCollectionDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCollectionDetailJournal").prop("disabled", false);
+                                $("#btnCollectionDetailUnlock").prop("disabled", false);
+                                $("#btnCollectionDetailCancel").prop("disabled", false);
+                                $("#btnCollectionDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnCollectionDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCloseCollection").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnCollectionDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCollectionDetailJournal").prop("disabled", false);
+                                $("#btnCollectionDetailUnlock").prop("disabled", false);
+                                $("#btnCollectionDetailCancel").prop("disabled", false);
+                                $("#btnCollectionDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnCollectionDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCloseCollection").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnCollectionDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCollectionDetailJournal").prop("disabled", false);
+                                $("#btnCollectionDetailUnlock").prop("disabled", false);
+                                $("#btnCollectionDetailCancel").prop("disabled", false);
+                                $("#btnCollectionDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnCollectionDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCloseCollection").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ===============
         // Lock Collection
         // ===============
         function btnCollectionDetailLockOnclick() {
             document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnCollectionDetailSave").prop("disabled", true);
             $("#btnCollectionDetailJournal").prop("disabled", true);
             $("#btnCollectionDetailLock").prop("disabled", true);
             $("#btnCollectionDetailUnlock").prop("disabled", true);
@@ -1335,18 +1447,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
                             $("#btnCollectionDetailLock").prop("disabled", false);
                             $("#btnCloseCollection").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
                             $("#btnCollectionDetailLock").prop("disabled", false);
                             $("#btnCloseCollection").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnCollectionDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCollectionDetailSave").prop("disabled", false);
                             $("#btnCollectionDetailLock").prop("disabled", false);
                             $("#btnCloseCollection").prop("disabled", false);
                         }

@@ -372,6 +372,7 @@
                                 document.getElementById('inpComapanyDetailContactNumber').disabled = true;
                                 document.getElementById('inpComapanyDetailTaxNumber').disabled = true;
 
+                                $("#btnCompanyDetailSave").prop("disabled", true);
                                 $("#btnCompanyDetailLock").prop("disabled", true);
                                 $("#btnBranchAdd").prop("disabled", true);
 
@@ -396,10 +397,103 @@
         }
 
         // =============
+        // Save Comapany
+        // =============
+        function btnCompanyDetailSaveOnclick() {
+            document.getElementById('btnCompanyDetailSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+            $("#btnCompanyDetailSave").prop("disabled", true);
+            $("#btnCompanyDetailLock").prop("disabled", true);
+            $("#btnCompanyDetailUnlock").prop("disabled", true);
+            $("#btnCompanyDetailClose").prop("disabled", true);
+
+            var companyObject = new Object();
+            var companyId = getURLParameterValue("id");
+            companyObject.Company = document.getElementById('inpComapanyDetailCompany').value;
+            companyObject.Address = document.getElementById('inpComapanyDetailAddress').value;
+            companyObject.ContactNumber = document.getElementById('inpComapanyDetailContactNumber').value;
+            companyObject.TaxNumber = document.getElementById('inpComapanyDetailTaxNumber').value;
+            var dataUpdate = JSON.stringify(companyObject);
+
+            var isValid = true;
+            $('.requiredCompany').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/company/save/' + companyId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: dataUpdate,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnCompanyDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCompanyDetailUnlock").prop("disabled", false);
+                            } else {
+                                $("#btnCompanyDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCompanyDetailClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnCompanyDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCompanyDetailUnlock").prop("disabled", false);
+                            } else {
+                                $("#btnCompanyDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCompanyDetailClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnCompanyDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnCompanyDetailUnlock").prop("disabled", false);
+                            } else {
+                                $("#btnCompanyDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnCompanyDetailClose").prop("disabled", false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =============
         // Lock Comapany
         // =============
         function btnCompanyDetailLockOnclick() {
             document.getElementById('btnCompanyDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnCompanyDetailSave").prop("disabled", true);
             $("#btnCompanyDetailLock").prop("disabled", true);
             $("#btnCompanyDetailUnlock").prop("disabled", true);
             $("#btnCompanyDetailClose").prop("disabled", true);
@@ -443,18 +537,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnCompanyDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
                             $("#btnCompanyDetailLock").prop("disabled", false);
                             $("#btnCompanyDetailClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnCompanyDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
                             $("#btnCompanyDetailLock").prop("disabled", false);
                             $("#btnCompanyDetailClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnCompanyDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnCompanyDetailSave").prop("disabled", false);
                             $("#btnCompanyDetailLock").prop("disabled", false);
                             $("#btnCompanyDetailClose").prop("disabled", false);
                         }

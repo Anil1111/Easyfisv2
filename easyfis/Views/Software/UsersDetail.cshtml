@@ -879,6 +879,7 @@
                                 document.getElementById("defaultIncludeCostInStockReport").disabled = true;
                                 document.getElementById("defaultActivateAuditTrail").disabled = true;
 
+                                $("#btnUserDetailSave").prop("disabled", true);
                                 $("#btnUserDetailLock").prop("disabled", true);
                                 $("#btnAddUserForm").prop("disabled", true);
                                 $("#btnCopyUserRights").prop("disabled", true);
@@ -988,6 +989,107 @@
         }
 
         // ===========
+        // Save button
+        // ===========
+        function btnUserDetailSave_OnClick() {
+            var isValid = true;
+            $('.requiredUser').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('btnUserDetailSave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                $('#btnUserDetailSave').prop('disabled', true);
+                $('#btnUserDetailLock').prop('disabled', true);
+                $('#btnUserDetailUnLock').prop('disabled', true);
+                $('#btnUserDetailClose').prop('disabled', true);
+
+                var userObject = new Object();
+                userObject.FullName = document.getElementById('userDetail_Fullname').value;
+                userObject.CompanyId = cboCompany.selectedValue;
+                userObject.BranchId = cboBranch.selectedValue;
+                userObject.IncomeAccountId = cboIncomeAccount.selectedValue;
+                userObject.SupplierAdvancesAccountId = cboSupplierAvancesAccount.selectedValue;
+                userObject.CustomerAdvancesAccountId = cboCustomerAdvancesAccount.selectedValue;
+                userObject.InventoryType = cboInventoryType.selectedValue;
+                userObject.DefaultSalesInvoiceDiscountId = cboDiscounts.selectedValue;
+                userObject.SalesInvoiceName = document.getElementById("defaultSalesInvoiceName").value;
+                userObject.SalesInvoiceCheckedById = cboSalesInvoiceCheckedBy.selectedValue;
+                userObject.SalesInvoiceApprovedById = cboSalesInvoiceApprovedBy.selectedValue;
+                userObject.OfficialReceiptName = document.getElementById("defaultOfficialReceiptName").value;
+                userObject.IsIncludeCostStockReports = document.getElementById("defaultIncludeCostInStockReport").checked;
+                userObject.ActivateAuditTrail = document.getElementById("defaultActivateAuditTrail").checked;
+                var data = JSON.stringify(userObject);
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/user/save/' + userId,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnUserDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnUserDetailSave").prop("disabled", false);
+
+                            if (IsLocked) {
+                                $("#btnUserDetailUnLock").prop("disabled", false);
+                            } else {
+                                $("#btnUserDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnUserDetailClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnUserDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnUserDetailSave").prop("disabled", false);
+
+                            if (IsLocked) {
+                                $("#btnUserDetailUnLock").prop("disabled", false);
+                            } else {
+                                $("#btnUserDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnUserDetailClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnUserDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnUserDetailSave").prop("disabled", false);
+
+                            if (IsLocked) {
+                                $("#btnUserDetailUnLock").prop("disabled", false);
+                            } else {
+                                $("#btnUserDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnUserDetailClose").prop("disabled", false);
+                        }
+                    }
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ===========
         // Lock button
         // ===========
         function btnUserDetailLock_OnClick() {
@@ -1007,6 +1109,7 @@
 
             if (isValid) {
                 document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $("#btnUserDetailSave").prop("disabled", true);
                 $('#btnUserDetailLock').prop('disabled', true);
                 $('#btnUserDetailUnLock').prop('disabled', true);
                 $('#btnUserDetailClose').prop('disabled', true);
@@ -1044,18 +1147,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnUserDetailSave").prop("disabled", false);
                             $('#btnUserDetailLock').prop('disabled', false);
                             $('#btnUserDetailClose').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnUserDetailSave").prop("disabled", false);
                             $('#btnUserDetailLock').prop('disabled', false);
                             $('#btnUserDetailClose').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnUserDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnUserDetailSave").prop("disabled", false);
                             $('#btnUserDetailLock').prop('disabled', false);
                             $('#btnUserDetailClose').prop('disabled', false);
                         }

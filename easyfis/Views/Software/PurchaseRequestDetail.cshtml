@@ -952,6 +952,7 @@
                                 cboPurchaseRequestStatus.disabled = true;
                                 document.getElementById('inpPurchaseRequestIsClose').disabled = true;
 
+                                $("#btnPurchaseRequestSave").prop("disabled", true);
                                 $("#btnPurchaseRequestLock").prop("disabled", true);
                                 $("#btnPurchaseRequestItemAdd").prop("disabled", true);
                                 $("#btnPurchaseRequestItemItemQuery").prop("disabled", true);
@@ -974,6 +975,111 @@
             } else {
                 alert("No Id Parameter Value");
                 window.location = "/Software/PurchaseRequest";
+            }
+        }
+
+        // =====================
+        // Save Purchase Request
+        // =====================
+        function btnPurchaseRequestSaveOnclick() {
+            var purchaseRequestObject = new Object();
+            purchaseRequestObject.PRDate = cboPurchaseRequestPRDate.value.toLocaleDateString();
+            purchaseRequestObject.SupplierId = cboPurchaseRequestSupplier.selectedValue;
+            purchaseRequestObject.TermId = cboPurchaseRequestTerm.selectedValue;
+            purchaseRequestObject.ManualPRNumber = document.getElementById('inpPurchaseRequestManualPRNumber').value;
+            purchaseRequestObject.DateNeeded = cboPurchaseRequestDateNeeded.value.toLocaleDateString();
+            purchaseRequestObject.Remarks = document.getElementById('inpPurchaseRequestRemarks').value;
+            purchaseRequestObject.IsClose = document.getElementById('inpPurchaseRequestIsClose').checked;
+            purchaseRequestObject.RequestedById = cboPurchaseRequestRequestedBy.selectedValue;
+            purchaseRequestObject.CheckedById = cboPurchaseRequestCheckedBy.selectedValue;
+            purchaseRequestObject.ApprovedById = cboPurchaseRequestApprovedBy.selectedValue;
+            purchaseRequestObject.Status = cboPurchaseRequestStatus.selectedValue;
+            var purchaseRequestData = JSON.stringify(purchaseRequestObject);
+
+            var isValid = true;
+            $('.requiredPR').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                }
+                else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('btnPurchaseRequestSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnPurchaseRequestSave").prop("disabled", true);
+                $("#btnPurchaseRequestLock").prop("disabled", true);
+                $("#btnPurchaseRequestUnlock").prop("disabled", true);
+                $("#btnPurchaseRequestPrint").prop("disabled", true);
+                $("#btnPurchaseRequestClose").prop("disabled", true);
+
+                var id = getURLParameterValue('id');
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/purchaseRequest/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: purchaseRequestData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnPurchaseRequestSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnPurchaseRequestUnlock").prop("disabled", false);
+                                $("#btnPurchaseRequestPrint").prop("disabled", false);
+                            } else {
+                                $("#btnPurchaseRequestLock").prop("disabled", false);
+                            }
+
+                            $("#btnPurchaseRequestClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnPurchaseRequestSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnPurchaseRequestUnlock").prop("disabled", false);
+                                $("#btnPurchaseRequestPrint").prop("disabled", false);
+                            } else {
+                                $("#btnPurchaseRequestLock").prop("disabled", false);
+                            }
+
+                            $("#btnPurchaseRequestClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnPurchaseRequestSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnPurchaseRequestUnlock").prop("disabled", false);
+                                $("#btnPurchaseRequestPrint").prop("disabled", false);
+                            } else {
+                                $("#btnPurchaseRequestLock").prop("disabled", false);
+                            }
+
+                            $("#btnPurchaseRequestClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
             }
         }
 
@@ -1012,6 +1118,7 @@
 
             if (isValid) {
                 document.getElementById('btnPurchaseRequestLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $("#btnPurchaseRequestSave").prop("disabled", true);
                 $("#btnPurchaseRequestLock").prop("disabled", true);
                 $("#btnPurchaseRequestUnlock").prop("disabled", true);
                 $("#btnPurchaseRequestPrint").prop("disabled", true);
@@ -1035,18 +1142,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnPurchaseRequestLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
                             $("#btnPurchaseRequestLock").prop("disabled", false);
                             $("#btnPurchaseRequestClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnPurchaseRequestLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
                             $("#btnPurchaseRequestLock").prop("disabled", false);
                             $("#btnPurchaseRequestClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnPurchaseRequestLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnPurchaseRequestSave").prop("disabled", false);
                             $("#btnPurchaseRequestLock").prop("disabled", false);
                             $("#btnPurchaseRequestClose").prop("disabled", false);
                         }

@@ -1112,6 +1112,7 @@
 
                                 isLocked = true;
 
+                                $("#btnReceivingReceiptSave").prop("disabled", true);
                                 $("#btnReceivingReceiptLock").prop("disabled", true);
                                 $("#btnReceivingReceiptPO").prop("disabled", true);
                                 $("#btnReceivingReceiptItemAdd").prop("disabled", true);
@@ -1143,10 +1144,126 @@
         }
 
         // ======================
+        // Save Receiving Receipt
+        // ======================
+        function btnReceivingReceiptSaveOnclick() {
+            document.getElementById('btnReceivingReceiptSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+            $("#btnReceivingReceiptSave").prop("disabled", true);
+            $("#btnReceivingReceiptJournal").prop("disabled", true);
+            $("#btnReceivingReceiptLock").prop("disabled", true);
+            $("#btnReceivingReceiptUnlock").prop("disabled", true);
+            $("#btnReceivingReceiptCancel").prop("disabled", true);
+            $("#btnReceivingReceiptPrint").prop("disabled", true);
+            $("#btnReceivingReceiptClose").prop("disabled", true);
+
+            var receivingReceiptObject = new Object();
+            receivingReceiptObject.BranchId = cboReceivingReceiptBranch.selectedValue;
+            receivingReceiptObject.RRDate = cboReceivingReceiptRRDate.value.toLocaleDateString();
+            receivingReceiptObject.RRNumber = document.getElementById('inpReceivingReceiptRRNumber').value;
+            receivingReceiptObject.SupplierId = cboReceivingReceiptSupplier.selectedValue;
+            receivingReceiptObject.TermId = cboReceivingReceiptTerm.selectedValue;
+            receivingReceiptObject.DocumentReference = document.getElementById('inpReceivingReceiptDocumentReference').value;
+            receivingReceiptObject.ManualRRNumber = document.getElementById('inpReceivingReceiptManualRRNumber').value;
+            receivingReceiptObject.Remarks = document.getElementById('inpReceivingReceiptRemarks').value;
+            receivingReceiptObject.ReceivedById = cboReceivingReceiptReceivedBy.selectedValue;
+            receivingReceiptObject.PreparedById = cboReceivingReceiptPreparedBy.selectedValue;
+            receivingReceiptObject.CheckedById = cboReceivingReceiptCheckedBy.selectedValue;
+            receivingReceiptObject.ApprovedById = cboReceivingReceiptApprovedBy.selectedValue;
+            receivingReceiptObject.Status = cboReceivingReceiptStatus.selectedValue;
+            var receivingReceiptData = JSON.stringify(receivingReceiptObject);
+
+            var isValid = true;
+            $('.requiredRR').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                }
+                else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                var id = getURLParameterValue('id');
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/receivingReceipt/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: receivingReceiptData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnReceivingReceiptSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnReceivingReceiptJournal").prop("disabled", false);
+                                $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                                $("#btnReceivingReceiptCancel").prop("disabled", false);
+                                $("#btnReceivingReceiptPrint").prop("disabled", false);
+                            } else {
+                                $("#btnReceivingReceiptLock").prop("disabled", false);
+                            }
+
+                            $("#btnReceivingReceiptClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnReceivingReceiptSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnReceivingReceiptJournal").prop("disabled", false);
+                                $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                                $("#btnReceivingReceiptCancel").prop("disabled", false);
+                                $("#btnReceivingReceiptPrint").prop("disabled", false);
+                            } else {
+                                $("#btnReceivingReceiptLock").prop("disabled", false);
+                            }
+
+                            $("#btnReceivingReceiptClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnReceivingReceiptSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnReceivingReceiptJournal").prop("disabled", false);
+                                $("#btnReceivingReceiptUnlock").prop("disabled", false);
+                                $("#btnReceivingReceiptCancel").prop("disabled", false);
+                                $("#btnReceivingReceiptPrint").prop("disabled", false);
+                            } else {
+                                $("#btnReceivingReceiptLock").prop("disabled", false);
+                            }
+
+                            $("#btnReceivingReceiptClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ======================
         // Lock Receiving Receipt
         // ======================
         function btnReceivingReceiptLockOnclick() {
             document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnReceivingReceiptSave").prop("disabled", true);
             $("#btnReceivingReceiptJournal").prop("disabled", true);
             $("#btnReceivingReceiptLock").prop("disabled", true);
             $("#btnReceivingReceiptUnlock").prop("disabled", true);
@@ -1204,18 +1321,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
                             $("#btnReceivingReceiptLock").prop("disabled", false);
                             $("#btnReceivingReceiptClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
                             $("#btnReceivingReceiptLock").prop("disabled", false);
                             $("#btnReceivingReceiptClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnReceivingReceiptLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnReceivingReceiptSave").prop("disabled", false);
                             $("#btnReceivingReceiptLock").prop("disabled", false);
                             $("#btnReceivingReceiptClose").prop("disabled", false);
                         }
@@ -1273,6 +1393,7 @@
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                         document.getElementById('btnReceivingReceiptUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $("#btnReceivingReceiptSave").prop("disabled", false);
                         $("#btnReceivingReceiptJournal").prop("disabled", false);
                         $("#btnReceivingReceiptUnlock").prop("disabled", false);
                         $("#btnReceivingReceiptCancel").prop("disabled", false);

@@ -1142,6 +1142,7 @@
                                 cboDisbursementDetailStatus.disabled = true;
                                 document.getElementById('inpDisbursementDetailIsClear').disabled = true;
 
+                                $("#btnDisbursementDetailSave").prop("disabled", true);
                                 $("#btnDisbursementDetailLock").prop("disabled", true);
                                 $("#btnDisbursementDetailAP").prop("disabled", true);
                                 $("#btnDisbursementDetailAdvances").prop("disabled", true);
@@ -1175,10 +1176,126 @@
         }
 
         // =================
+        // Save Disbursement
+        // =================
+        function btnDisbursementDetailSaveOnclick() {
+            document.getElementById('btnDisbursementDetailSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+            $("#btnDisbursementDetailSave").prop("disabled", true);
+            $("#btnDisbursementDetailJournal").prop("disabled", true);
+            $("#btnDisbursementDetailLock").prop("disabled", true);
+            $("#btnDisbursementDetailUnlock").prop("disabled", true);
+            $("#btnDisbursementDetailCancel").prop("disabled", true);
+            $("#btnDisbursementDetailPrint").prop("disabled", true);
+            $("#btnDisbursementDetailClose").prop("disabled", true);
+
+            var disbursementObject = new Object();
+            disbursementObject.CVDate = cboDisbursementDetailCVDate.value.toLocaleDateString();
+            disbursementObject.SupplierId = cboDisbursementDetailSupplier.selectedValue;
+            disbursementObject.Payee = document.getElementById('inpDisbursementDetailPayee').value;
+            disbursementObject.PayTypeId = cboDisbursementDetailPayType.selectedValue;
+            disbursementObject.BankId = cboDisbursementDetailBank.selectedValue;
+            disbursementObject.ManualCVNumber = document.getElementById('inpDisbursementDetailManualCVNumber').value;
+            disbursementObject.Particulars = document.getElementById('inpDisbursementDetailParticulars').value;
+            disbursementObject.CheckNumber = document.getElementById('inpDisbursementDetailCheckNumber').value;
+            disbursementObject.CheckDate = cboDisbursementDetailCheckDate.value.toLocaleDateString();
+            disbursementObject.IsCrossCheck = document.getElementById('inpDisbursementDetailIsCrossCheck').checked;
+            disbursementObject.CheckedById = cboDisbursementDetailCheckedBy.selectedValue;
+            disbursementObject.ApprovedById = cboDisbursementDetailApprovedBy.selectedValue;
+            disbursementObject.Status = cboDisbursementDetailStatus.selectedValue;
+            disbursementObject.IsClear = document.getElementById('inpDisbursementDetailIsClear').checked;
+            var data = JSON.stringify(disbursementObject);
+
+            var isValid = true;
+            $('.requiredDisbursement').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                var id = getURLParameterValue('id');
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/disbursement/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnDisbursementDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnDisbursementDetailJournal").prop("disabled", false);
+                                $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                                $("#btnDisbursementDetailCancel").prop("disabled", false);
+                                $("#btnDisbursementDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnDisbursementDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnDisbursementDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnDisbursementDetailJournal").prop("disabled", false);
+                                $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                                $("#btnDisbursementDetailCancel").prop("disabled", false);
+                                $("#btnDisbursementDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnDisbursementDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnDisbursementDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnDisbursementDetailJournal").prop("disabled", false);
+                                $("#btnDisbursementDetailUnlock").prop("disabled", false);
+                                $("#btnDisbursementDetailCancel").prop("disabled", false);
+                                $("#btnDisbursementDetailPrint").prop("disabled", false);
+                            } else {
+                                $("#btnDisbursementDetailLock").prop("disabled", false);
+                            }
+
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =================
         // Lock Disbursement
         // =================
         function btnDisbursementDetailLockOnclick() {
             document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnDisbursementDetailSave").prop("disabled", true);
             $("#btnDisbursementDetailJournal").prop("disabled", true);
             $("#btnDisbursementDetailLock").prop("disabled", true);
             $("#btnDisbursementDetailUnlock").prop("disabled", true);
@@ -1236,20 +1353,23 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
                             $("#btnDisbursementDetailLock").prop("disabled", false);
-                            $("#btnDisbursementDetailClose").prop("disabled", true);
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
                             $("#btnDisbursementDetailLock").prop("disabled", false);
-                            $("#btnDisbursementDetailClose").prop("disabled", true);
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnDisbursementDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnDisbursementDetailSave").prop("disabled", false);
                             $("#btnDisbursementDetailLock").prop("disabled", false);
-                            $("#btnDisbursementDetailClose").prop("disabled", true);
+                            $("#btnDisbursementDetailClose").prop("disabled", false);
                         }
                     },
                 });

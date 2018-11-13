@@ -1190,6 +1190,7 @@
                                 cboSalesInvoiceApprovedBy.disabled = true;
                                 cboSalesInvoiceStatus.disabled = true;
 
+                                $("#btnSalesInvoiceSave").prop("disabled", true);
                                 $("#btnLockSalesInvoice").prop("disabled", true);
                                 $("#btnSalesInvoiceItemAdd").prop("disabled", true);
                                 $("#btnSalesInvoiceItemItemQuery").prop("disabled", true);
@@ -1223,10 +1224,122 @@
         }
 
         // ==================
+        // Save Sales Invoice
+        // ==================
+        function btnSalesInvoiceSaveOnclick() {
+            document.getElementById('btnSalesInvoiceSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+            $("#btnSalesInvoiceSave").prop("disabled", true);
+            $("#btnJournalSalesInvoice").prop("disabled", true);
+            $("#btnLockSalesInvoice").prop("disabled", true);
+            $("#btnUnlockSalesInvoice").prop("disabled", true);
+            $("#btnCancelSalesInvoice").prop("disabled", true);
+            $("#btnPrintSalesInvoice").prop("disabled", true);
+            $("#btnCloseSalesInvoice").prop("disabled", true);
+
+            var salesObject = new Object();
+            salesObject.SIDate = cboSalesInvoiceSIDate.value.toLocaleDateString();
+            salesObject.CustomerId = cboSalesInvoiceCustomer.selectedValue;
+            salesObject.TermId = cboSalesInvoiceTerm.selectedValue;
+            salesObject.DocumentReference = document.getElementById('inpSalesInvoiceDocumentReference').value;
+            salesObject.ManualSINumber = document.getElementById('inpSalesInvoiceManualSINumber').value;
+            salesObject.Remarks = document.getElementById('inpSalesInvoiceRemarks').value;
+            salesObject.SoldById = cboSalesInvoiceSoldBy.selectedValue;
+            salesObject.CheckedById = cboSalesInvoiceCheckedBy.selectedValue;
+            salesObject.ApprovedById = cboSalesInvoiceApprovedBy.selectedValue;
+            salesObject.Status = cboSalesInvoiceStatus.selectedValue;
+            var salesData = JSON.stringify(salesObject);
+
+            var isValid = true;
+            $('.requiredSales').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                var id = getURLParameterValue('id');
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/salesInvoice/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: salesData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnSalesInvoiceSave').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnSalesInvoiceSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnJournalSalesInvoice").prop("disabled", false);
+                                $("#btnUnlockSalesInvoice").prop("disabled", false);
+                                $("#btnCancelSalesInvoice").prop("disabled", false);
+                                $("#btnPrintSalesInvoice").prop("disabled", false);
+                            } else {
+                                $("#btnLockSalesInvoice").prop("disabled", false);
+                            }
+
+                            $("#btnCloseSalesInvoice").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnSalesInvoiceSave').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnSalesInvoiceSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnJournalSalesInvoice").prop("disabled", false);
+                                $("#btnUnlockSalesInvoice").prop("disabled", false);
+                                $("#btnCancelSalesInvoice").prop("disabled", false);
+                                $("#btnPrintSalesInvoice").prop("disabled", false);
+                            } else {
+                                $("#btnLockSalesInvoice").prop("disabled", false);
+                            }
+
+                            $("#btnCloseSalesInvoice").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnSalesInvoiceSave').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnSalesInvoiceSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnJournalSalesInvoice").prop("disabled", false);
+                                $("#btnUnlockSalesInvoice").prop("disabled", false);
+                                $("#btnCancelSalesInvoice").prop("disabled", false);
+                                $("#btnPrintSalesInvoice").prop("disabled", false);
+                            } else {
+                                $("#btnLockSalesInvoice").prop("disabled", false);
+                            }
+
+                            $("#btnCloseSalesInvoice").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ==================
         // Lock Sales Invoice
         // ==================
         function btnSalesInvoiceLockOnclick() {
             document.getElementById('btnLockSalesInvoice').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+            $("#btnSalesInvoiceSave").prop("disabled", true);
             $("#btnJournalSalesInvoice").prop("disabled", true);
             $("#btnLockSalesInvoice").prop("disabled", true);
             $("#btnUnlockSalesInvoice").prop("disabled", true);
