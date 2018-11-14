@@ -1,21 +1,18 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Stock Out Detail Report</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -29,87 +26,117 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 49.5%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpStockOutDetailReportFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                        <div class="comboBox-wide" id="cboAPStockOutDetailReportShowNumberOfRows"></div>
+                                        <div class="comboBox-wide" id="cboStockOutDetailReportShowNumberOfRows"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24.5%" align="right">
-                                    <button onclick="btnStockOutDetailReportCSVOnclick()" id="btnStockOutDetailReportCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
-                                    <button onclick="btnStockOutDetailReportPrintPDFOnclick()" id="btnStockOutDetailReportPrintPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
-                                    <a href="/Software/Inventory" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
+                                    <button onclick="btnStockOutDetailReportDownloadCSVOnclick()" id="btnStockOutDetailReportDownloadCSV" class="btn btn-success"><i class="fa fa-file-excel-o" aria-hidden="true"></i> CSV</button>
+                                    <button onclick="btnStockOutDetailReportPDFOnclick()" id="btnStockOutDetailReportPDF" class="btn btn-primary"><i class="fa fa-print"></i> Print</button>
+                                    <a href="/Software/AccountsReceivable" class="btn btn-danger"><i class="fa fa-close"></i> Close</a>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ======================================
+                        Date Range, Company and Branch Filters
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div class="comboBox-wide" id="cboAPStockOutDetailReportStartDate"></div>
+                                        <div class="comboBox-wide" id="cboStockOutDetailReportStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%" align="right">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div class="comboBox-wide" id="cboAPStockOutDetailReportEndDate"></div>
+                                        <div class="comboBox-wide" id="cboStockOutDetailReportEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Company</b></span>
-                                        <div class="comboBox-wide" id="cboAPStockOutDetailReportCompany"></div>
+                                        <div class="comboBox-wide" id="cboStockOutDetailReportCompanyFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 24%">
                                     <div class="input-group ">
                                         <span class="input-group-addon"><b>Branch</b></span>
-                                        <div class="comboBox-wide" id="cboAPStockOutDetailReportBranch"></div>
+                                        <div class="comboBox-wide" id="cboStockOutDetailReportBranchFilter"></div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="stockOutDetailReportGrid"></div>
+                        <div id="stockOutDetailReportFlexGrid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="stockOutDetailReportNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockOutDetailReportMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockOutDetailReportMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnStockOutDetailReportCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnStockOutDetailReportMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockOutDetailReportMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ======
+                    Totals
+                    ======
+                -->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -128,6 +155,7 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
@@ -135,30 +163,42 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboAPStockOutDetailReportStartDate = new wijmo.input.InputDate('#cboAPStockOutDetailReportStartDate');
-        var cboAPStockOutDetailReportEndDate = new wijmo.input.InputDate('#cboAPStockOutDetailReportEndDate');
-        var isAPStockOutDetailReportStartDateSelected = false;
-        var isAPStockOutDetailReportEndDateSelected = false;
-        var cboAPStockOutDetailReportCompany = new wijmo.input.ComboBox('#cboAPStockOutDetailReportCompany');
-        var cboAPStockOutDetailReportBranch = new wijmo.input.ComboBox('#cboAPStockOutDetailReportBranch');
-        var stockOutDetailReportCollections;
-        var stockOutDetailReportGrid;
-        var isAPStockOutDetailReportCompanySelected = false;
-        var cboAPStockOutDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPStockOutDetailReportShowNumberOfRows');
-        var btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-        var btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-        var btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-        var btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-        var btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+        // ============
+        // Date Filters
+        // ============
+        var cboStockOutDetailReportStartDateFilter = new wijmo.input.InputDate('#cboStockOutDetailReportStartDateFilter');
+        var cboStockOutDetailReportEndDateFilter = new wijmo.input.InputDate('#cboStockOutDetailReportEndDateFilter');
+        var isStockOutDetailReportStartDateSelected = false;
+        var isStockOutDetailReportEndDateSelected = false;
+
+        // =========================
+        // Company and Branch Filter
+        // =========================
+        var cboStockOutDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboStockOutDetailReportCompanyFilter');
+        var cboStockOutDetailReportBranchFilter = new wijmo.input.ComboBox('#cboStockOutDetailReportBranchFilter');
+        var isCboStockOutDetailReportCompanySelected = false;
+
+        // =============================
+        // Collection View and Flex Grid
+        // =============================
+        var stockOutDetailReportCollectionView;
+        var stockOutDetailReportFlexGrid;
+        var cboStockOutDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStockOutDetailReportShowNumberOfRows');
+
+        // ==================
+        // Navigation Buttons
+        // ==================
+        var btnStockOutDetailReportMoveToFirstPageGrid = document.getElementById('btnStockOutDetailReportMoveToFirstPageGrid');
+        var btnStockOutDetailReportMoveToPreviousPageGrid = document.getElementById('btnStockOutDetailReportMoveToPreviousPageGrid');
+        var btnStockOutDetailReportMoveToNextPageGrid = document.getElementById('btnStockOutDetailReportMoveToNextPageGrid');
+        var btnStockOutDetailReportMoveToLastPageGrid = document.getElementById('btnStockOutDetailReportMoveToLastPageGrid');
+        var btnStockOutDetailReportCurrentPageGrid = document.getElementById('btnStockOutDetailReportCurrentPageGrid');
         var currentPageIndex = 0;
 
-        // ===================
-        // Get Parameter Value
-        // ===================
-        function getParam(name) {
+        // =======================
+        // Get URL Parameter Value
+        // =======================
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -172,100 +212,101 @@
             }
         }
 
-        // ============
-        // Date Filters
-        // ============
-        function stockOutDetailReportDateFilters() {
+        // ================================
+        // Create Combo Date Ranged Filters
+        // ================================
+        function createCboDateRangeFilters() {
             NProgress.start();
-            cboAPStockOutDetailReportStartDate.dispose();
-            cboAPStockOutDetailReportStartDate = new wijmo.input.InputDate('#cboAPStockOutDetailReportStartDate', {
+
+            cboStockOutDetailReportStartDateFilter.dispose();
+            cboStockOutDetailReportStartDateFilter = new wijmo.input.InputDate('#cboStockOutDetailReportStartDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("StartDate")),
+                value: new Date(getURLParameterValue("StartDate")),
                 onValueChanged: function () {
-                    if (!isAPStockOutDetailReportStartDateSelected) {
+                    if (!isStockOutDetailReportStartDateSelected) {
                         NProgress.start();
                         refreshStockOutDetailReportFlexGrid();
                     } else {
-                        isAPStockOutDetailReportStartDateSelected = false;
+                        isStockOutDetailReportStartDateSelected = false;
                     }
                 }
             });
 
-            cboAPStockOutDetailReportEndDate.dispose();
-            cboAPStockOutDetailReportEndDate = new wijmo.input.InputDate('#cboAPStockOutDetailReportEndDate', {
+            cboStockOutDetailReportEndDateFilter.dispose();
+            cboStockOutDetailReportEndDateFilter = new wijmo.input.InputDate('#cboStockOutDetailReportEndDateFilter', {
                 format: 'MM-dd-yyyy',
-                value: new Date(getParam("EndDate")),
+                value: new Date(getURLParameterValue("EndDate")),
                 onValueChanged: function () {
-                    if (!isAPStockOutDetailReportEndDateSelected) {
+                    if (!isStockOutDetailReportEndDateSelected) {
                         NProgress.start();
                         refreshStockOutDetailReportFlexGrid();
                     } else {
-                        isAPStockOutDetailReportEndDateSelected = false;
+                        isStockOutDetailReportEndDateSelected = false;
                     }
                 }
             });
 
-            createCboCompany();
+            createCboCompanyFilter();
         }
 
-        // ==============
-        // Company Filter
-        // ==============
-        function createCboCompany() {
+        // ===========================
+        // Create Combo Company Filter
+        // ===========================
+        function createCboCompanyFilter() {
             var companyObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/stockOutDetailReport/dropdown/list/company',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (companyResults) {
-                    if (companyResults.length > 0) {
-                        for (i = 0; i < companyResults.length; i++) {
+                success: function (results) {
+                    if (results.length > 0) {
+                        for (i = 0; i < results.length; i++) {
                             companyObservableArray.push({
-                                Id: companyResults[i]["Id"],
-                                Company: companyResults[i]["Company"]
+                                Id: results[i]["Id"],
+                                Company: results[i]["Company"]
                             });
                         }
                     }
 
                     var disabled = true;
-                    if (companyResults.length > 0) {
+                    if (results.length > 0) {
                         disabled = false;
                     } else {
-                        $("#btnStockOutDetailReportCSV").prop("disabled", true);
-                        $("#btnStockOutDetailReportPrintPDF").prop("disabled", true);
+                        $("#btnStockOutDetailReportDownloadCSV").prop("disabled", true);
+                        $("#btnStockOutDetailReportPDF").prop("disabled", true);
                     }
 
-                    cboAPStockOutDetailReportCompany.dispose();
-                    cboAPStockOutDetailReportCompany = new wijmo.input.ComboBox('#cboAPStockOutDetailReportCompany', {
+                    cboStockOutDetailReportCompanyFilter.dispose();
+                    cboStockOutDetailReportCompanyFilter = new wijmo.input.ComboBox('#cboStockOutDetailReportCompanyFilter', {
                         disabled: disabled,
                         isEditable: false,
                         itemsSource: companyObservableArray,
                         displayMemberPath: "Company",
                         selectedValuePath: "Id",
-                        selectedValue: getParam("CompanyId"),
+                        selectedValue: getURLParameterValue("CompanyId"),
                         onSelectedIndexChanged: function () {
                             NProgress.start();
-                            $("#btnStockOutDetailReportCSV").prop("disabled", false);
-                            $("#btnStockOutDetailReportPrintPDF").prop("disabled", false);
-                            isAPStockOutDetailReportCompanySelected = true;
-                            createCboBranch();
+                            $("#btnStockOutDetailReportDownloadCSV").prop("disabled", false);
+                            $("#btnStockOutDetailReportPDF").prop("disabled", false);
+                            isCboStockOutDetailReportCompanySelected = true;
+                            createCboBranchFilter();
                         }
                     });
 
-                    createCboBranch();
+                    createCboBranchFilter();
                 }
             });
         }
 
-        // =============
-        // Branch Filter
-        // =============
-        function createCboBranch() {
+        // ==========================
+        // Create Combo Branch Filter
+        // ==========================
+        function createCboBranchFilter() {
             var branchObservableArray = new wijmo.collections.ObservableArray();
-            if (cboAPStockOutDetailReportCompany.selectedValue != null) {
+            if (cboStockOutDetailReportCompanyFilter.selectedValue != null) {
                 $.ajax({
-                    url: '/api/stockOutDetailReport/dropdown/list/branch/' + cboAPStockOutDetailReportCompany.selectedValue,
+                    url: '/api/stockOutDetailReport/dropdown/list/branch/' + cboStockOutDetailReportCompanyFilter.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
@@ -283,18 +324,18 @@
                         if (branchResults.length > 0) {
                             disabled = false;
                         } else {
-                            $("#btnStockOutDetailReportCSV").prop("disabled", true);
-                            $("#btnStockOutDetailReportPrintPDF").prop("disabled", true);
+                            $("#btnStockOutDetailReportDownloadCSV").prop("disabled", true);
+                            $("#btnStockOutDetailReportPDF").prop("disabled", true);
                         }
 
-                        cboAPStockOutDetailReportBranch.dispose();
-                        cboAPStockOutDetailReportBranch = new wijmo.input.ComboBox('#cboAPStockOutDetailReportBranch', {
+                        cboStockOutDetailReportBranchFilter.dispose();
+                        cboStockOutDetailReportBranchFilter = new wijmo.input.ComboBox('#cboStockOutDetailReportBranchFilter', {
                             disabled: disabled,
                             isEditable: false,
                             itemsSource: branchObservableArray,
                             displayMemberPath: "Branch",
                             selectedValuePath: "Id",
-                            selectedValue: getParam("BranchId"),
+                            selectedValue: getURLParameterValue("BranchId"),
                             onSelectedIndexChanged: function () {
                                 NProgress.start();
                                 refreshStockOutDetailReportFlexGrid();
@@ -307,9 +348,9 @@
             }
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
+        // ===================================
+        // Create Combo Display Number of Rows
+        // ===================================
         function createCboShowRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
@@ -340,8 +381,8 @@
                 });
             }
 
-            cboAPStockOutDetailReportShowNumberOfRows.dispose();
-            cboAPStockOutDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboAPStockOutDetailReportShowNumberOfRows', {
+            cboStockOutDetailReportShowNumberOfRows.dispose();
+            cboStockOutDetailReportShowNumberOfRows = new wijmo.input.ComboBox('#cboStockOutDetailReportShowNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -351,62 +392,35 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboAPStockOutDetailReportShowNumberOfRows.selectedValue;
-                        stockOutDetailReportCollections.pageSize = parseInt(numberOfRows);
-                        stockOutDetailReportCollections.refresh();
-                        stockOutDetailReportGrid.refresh();
+                        var numberOfRows = cboStockOutDetailReportShowNumberOfRows.selectedValue;
+                        stockOutDetailReportCollectionView.pageSize = parseInt(numberOfRows);
+                        stockOutDetailReportCollectionView.refresh();
+                        stockOutDetailReportFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
                 }
             });
 
-            if (!isAPStockOutDetailReportCompanySelected) {
+            if (!isCboStockOutDetailReportCompanySelected) {
                 createStockOutDetailReportFlexGrid();
             } else {
                 refreshStockOutDetailReportFlexGrid();
             }
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItems() {
-            if (stockOutDetailReportCollections.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (stockOutDetailReportCollections.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (stockOutDetailReportCollections.pageIndex === (stockOutDetailReportCollections.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (stockOutDetailReportCollections.pageIndex + 1) + ' / ' + stockOutDetailReportCollections.pageCount;
-        }
-
-        // ==================================
-        // Get StockOut Order Detail Data
-        // ==================================
-        function getStockOutDetailReport() {
+        // ================================
+        // Get Stock Out Detail Report Data
+        // ================================
+        function getStockOutDetailReportData() {
             var stockOutDetailReports = new wijmo.collections.ObservableArray;
-            if (cboAPStockOutDetailReportCompany.selectedValue != null) {
-                if (cboAPStockOutDetailReportBranch.selectedValue != null) {
-                    var startDate = cboAPStockOutDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboAPStockOutDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboAPStockOutDetailReportCompany.selectedValue;
-                    var branchId = cboAPStockOutDetailReportBranch.selectedValue;
+            if (cboStockOutDetailReportCompanyFilter.selectedValue != null) {
+                if (cboStockOutDetailReportBranchFilter.selectedValue != null) {
+
+                    var startDate = cboStockOutDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboStockOutDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboStockOutDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboStockOutDetailReportBranchFilter.selectedValue;
 
                     $.ajax({
                         url: '/api/stockOutDetailReport/list/' + startDate + '/' + endDate + '/' + +companyId + '/' + branchId,
@@ -429,14 +443,10 @@
                                         OTForCSV: "OT-" + stockOutDetailReportResults[i]["OT"],
                                         OTButton: "<a href='" + docLink + "' class='btn btn-primary btn-xs btn-block'>" + stockOutDetailReportResults[i]["OT"],
                                         OTDate: OTDate,
-                                        ExpenseAccountId: stockOutDetailReportResults[i]["ExpenseAccountId"],
-                                        ExpenseAccount: stockOutDetailReportResults[i]["ExpenseAccount"],
                                         ItemId: stockOutDetailReportResults[i]["ItemId"],
                                         ItemCode: stockOutDetailReportResults[i]["ItemCode"],
                                         ItemManualArticleOldCode: stockOutDetailReportResults[i]["ItemManualArticleOldCode"],
                                         Item: stockOutDetailReportResults[i]["Item"],
-                                        ItemInventoryId: stockOutDetailReportResults[i]["ItemInventoryId"],
-                                        ItemInventory: stockOutDetailReportResults[i]["ItemInventory"],
                                         Particulars: stockOutDetailReportResults[i]["Particulars"],
                                         UnitId: stockOutDetailReportResults[i]["UnitId"],
                                         Unit: stockOutDetailReportResults[i]["Unit"],
@@ -471,73 +481,21 @@
             return stockOutDetailReports;
         }
 
-        // =================
-        // Refresh Flex Grid
-        // =================
-        function refreshStockOutDetailReportFlexGrid() {
-            stockOutDetailReportCollections = new wijmo.collections.CollectionView(getStockOutDetailReport());
-            stockOutDetailReportCollections.canFilter = true;
-            stockOutDetailReportCollections.pageSize = cboAPStockOutDetailReportShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                stockOutDetailReportCollections.refresh();
-
-                if (stockOutDetailReportCollections.items.length > 0) {
-                    var totalAmount = 0;
-                    for (var i = 0; i < stockOutDetailReportCollections.items.length; i++) {
-                        totalAmount += stockOutDetailReportCollections.items[i].Amount;
-                    }
-
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
-            });
-
-            stockOutDetailReportCollections.filter = function (item) {
-                return !filterText || (item.OT.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Item.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            stockOutDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
-            });
-
-            stockOutDetailReportGrid.itemsSource = stockOutDetailReportCollections;
-            stockOutDetailReportGrid.trackChanges = true;
-        }
-
-        // =========
-        // Flex Grid
-        // =========
+        // ========================================
+        // Create Stock Out Detail Report Flex Grid
+        // ========================================
         function createStockOutDetailReportFlexGrid() {
-            stockOutDetailReportCollections = new wijmo.collections.CollectionView(getStockOutDetailReport());
-            stockOutDetailReportCollections.canFilter = true;
-            stockOutDetailReportCollections.pageSize = cboAPStockOutDetailReportShowNumberOfRows.selectedValue;
+            stockOutDetailReportCollectionView = new wijmo.collections.CollectionView(getStockOutDetailReportData());
+            stockOutDetailReportCollectionView.canFilter = true;
+            stockOutDetailReportCollectionView.pageSize = cboStockOutDetailReportShowNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpStockOutDetailReportFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                stockOutDetailReportCollections.refresh();
-
-                if (stockOutDetailReportCollections.items.length > 0) {
-                    var totalAmount = 0;
-                    for (var i = 0; i < stockOutDetailReportCollections.items.length; i++) {
-                        totalAmount += stockOutDetailReportCollections.items[i].Amount;
-                    }
-
-                    document.getElementById("totalAmount").value = parseFloat(totalAmount).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                } else {
-                    document.getElementById("totalAmount").value = parseFloat(0).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                }
+                stockOutDetailReportCollectionView.refresh();
             });
 
-            stockOutDetailReportCollections.filter = function (item) {
+            stockOutDetailReportCollectionView.filter = function (item) {
                 return !filterText || (item.OT.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
@@ -545,12 +503,12 @@
                     || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
             }
 
-            stockOutDetailReportCollections.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItems();
+            stockOutDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockOutDetailReportNavigationButtons();
             });
 
-            stockOutDetailReportGrid = new wijmo.grid.FlexGrid('#stockOutDetailReportGrid');
-            stockOutDetailReportGrid.initialize({
+            stockOutDetailReportFlexGrid = new wijmo.grid.FlexGrid('#stockOutDetailReportFlexGrid');
+            stockOutDetailReportFlexGrid.initialize({
                 columns: [
                     {
                         "header": "OT Number  ",
@@ -612,76 +570,134 @@
                     }
                 ],
                 autoGenerateColumns: false,
-                itemsSource: stockOutDetailReportCollections,
+                itemsSource: stockOutDetailReportCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            stockOutDetailReportGrid.trackChanges = true;
+            stockOutDetailReportFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItems();
+            updateStockOutDetailReportNavigationButtons();
 
-            btnFirstPageGrid.addEventListener('click', function () {
-                stockOutDetailReportCollections.moveToFirstPage();
-                currentPageIndex = stockOutDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockOutDetailReportMoveToFirstPageGrid.addEventListener('click', function () {
+                stockOutDetailReportCollectionView.moveToFirstPage();
+                currentPageIndex = stockOutDetailReportCollectionView.pageIndex + 1;
+                updateStockOutDetailReportNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
-                stockOutDetailReportCollections.moveToPreviousPage();
-                currentPageIndex = stockOutDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockOutDetailReportMoveToPreviousPageGrid.addEventListener('click', function () {
+                stockOutDetailReportCollectionView.moveToPreviousPage();
+                currentPageIndex = stockOutDetailReportCollectionView.pageIndex + 1;
+                updateStockOutDetailReportNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
-                stockOutDetailReportCollections.moveToNextPage();
-                currentPageIndex = stockOutDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockOutDetailReportMoveToNextPageGrid.addEventListener('click', function () {
+                stockOutDetailReportCollectionView.moveToNextPage();
+                currentPageIndex = stockOutDetailReportCollectionView.pageIndex + 1;
+                updateStockOutDetailReportNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
-                stockOutDetailReportCollections.moveToLastPage();
-                currentPageIndex = stockOutDetailReportCollections.pageIndex + 1;
-                updateNavigateButtonsItems();
+            btnStockOutDetailReportMoveToLastPageGrid.addEventListener('click', function () {
+                stockOutDetailReportCollectionView.moveToLastPage();
+                currentPageIndex = stockOutDetailReportCollectionView.pageIndex + 1;
+                updateStockOutDetailReportNavigationButtons();
             });
+        }
+
+        // =================================================
+        // Update Stock Out Detail Report Navigation Buttons
+        // =================================================
+        function updateStockOutDetailReportNavigationButtons() {
+            if (stockOutDetailReportCollectionView.pageSize <= 0) {
+                document.getElementById('stockOutDetailReportNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('stockOutDetailReportNavigationPageGrid').style.display = 'block';
+            if (stockOutDetailReportCollectionView.pageIndex === 0) {
+                btnStockOutDetailReportMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnStockOutDetailReportMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnStockOutDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (stockOutDetailReportCollectionView.pageIndex === (stockOutDetailReportCollectionView.pageCount - 1)) {
+                btnStockOutDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnStockOutDetailReportMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnStockOutDetailReportMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockOutDetailReportMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnStockOutDetailReportCurrentPageGrid.innerHTML = (stockOutDetailReportCollectionView.pageIndex + 1) + ' / ' + stockOutDetailReportCollectionView.pageCount;
+        }
+
+        // =================
+        // Refresh Flex Grid
+        // =================
+        function refreshStockOutDetailReportFlexGrid() {
+            stockOutDetailReportCollectionView = new wijmo.collections.CollectionView(getStockOutDetailReportData());
+            stockOutDetailReportCollectionView.canFilter = true;
+            stockOutDetailReportCollectionView.pageSize = cboStockOutDetailReportShowNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpStockOutDetailReportFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockOutDetailReportCollectionView.refresh();
+            });
+
+            stockOutDetailReportCollectionView.filter = function (item) {
+                return !filterText || (item.OT.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemManualArticleOldCode.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Item.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Unit.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockOutDetailReportCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockOutDetailReportNavigationButtons();
+            });
+
+            stockOutDetailReportFlexGrid.itemsSource = stockOutDetailReportCollectionView;
+            stockOutDetailReportFlexGrid.trackChanges = true;
         }
 
         // ============
         // Download CSV
         // ============
-        function btnStockOutDetailReportCSVOnclick() {
+        function btnStockOutDetailReportDownloadCSVOnclick() {
             var CSV = '';
             var stockOutDetailReport = [];
             var fileName = 'StockOutDetailReport.CSV';
 
-            stockOutDetailReportCollections.moveToFirstPage();
+            stockOutDetailReportCollectionView.moveToFirstPage();
 
-            for (var p = 1; p <= stockOutDetailReportCollections.pageCount; p++) {
-                for (i = 0; i < stockOutDetailReportCollections.items.length; i++) {
-                    var IsClose = stockOutDetailReportCollections.items[i].IsClose;
+            for (var p = 1; p <= stockOutDetailReportCollectionView.pageCount; p++) {
+                for (i = 0; i < stockOutDetailReportCollectionView.items.length; i++) {
+                    var IsClose = stockOutDetailReportCollectionView.items[i].IsClose;
                     var isPOClose = "Not Closed";
                     if (IsClose) {
                         isPOClose = "Closed"
                     }
 
                     stockOutDetailReport.push({
-                        OTNumber: stockOutDetailReportCollections.items[i].OTForCSV,
-                        OTDate: stockOutDetailReportCollections.items[i].OTDate,
-                        Barcode: stockOutDetailReportCollections.items[i].ItemCode,
-                        SKUCode: stockOutDetailReportCollections.items[i].ItemManualArticleOldCode,
-                        Item: stockOutDetailReportCollections.items[i].Item,
-                        Quantity: stockOutDetailReportCollections.items[i].Quantity,
-                        Unit: stockOutDetailReportCollections.items[i].Unit,
-                        Cost: stockOutDetailReportCollections.items[i].Cost,
-                        Amount: stockOutDetailReportCollections.items[i].Amount,
+                        OTNumber: stockOutDetailReportCollectionView.items[i].OTForCSV,
+                        OTDate: stockOutDetailReportCollectionView.items[i].OTDate,
+                        Item: stockOutDetailReportCollectionView.items[i].Item,
+                        Quantity: stockOutDetailReportCollectionView.items[i].Quantity,
+                        Barcode: stockOutDetailReportCollectionView.items[i].ItemCode,
+                        SKUCode: stockOutDetailReportCollectionView.items[i].ItemManualArticleOldCode,
+                        Unit: stockOutDetailReportCollectionView.items[i].Unit,
+                        Cost: stockOutDetailReportCollectionView.items[i].Cost,
+                        Amount: stockOutDetailReportCollectionView.items[i].Amount,
                     });
                 }
 
-                stockOutDetailReportCollections.moveToNextPage();
-                if (p == stockOutDetailReportCollections.pageCount) {
-                    stockOutDetailReportCollections.moveToPage(currentPageIndex - 1);
+                stockOutDetailReportCollectionView.moveToNextPage();
+                if (p == stockOutDetailReportCollectionView.pageCount) {
+                    stockOutDetailReportCollectionView.moveToPage(currentPageIndex - 1);
                 }
             }
 
@@ -689,10 +705,10 @@
             Headers.push({
                 OTNumber: "OT Number",
                 OTDate: "OT Date",
-                Barcode: "Barcode",
-                SKUCode: "SKU Code",
                 Item: "Item",
                 Quantity: "Quantity",
+                Barcode: "Barcode",
+                SKUCode: "SKU Code",
                 Unit: "Unit",
                 Cost: "Cost",
                 Amount: "Amount"
@@ -743,16 +759,16 @@
             }
         }
 
-        // =====================
-        // Preview and Print PDF
-        // =====================
-        function btnStockOutDetailReportPrintPDFOnclick() {
-            if (cboAPStockOutDetailReportCompany.selectedValue != null) {
-                if (cboAPStockOutDetailReportBranch.selectedValue != null) {
-                    var startDate = cboAPStockOutDetailReportStartDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var endDate = cboAPStockOutDetailReportEndDate.value.toLocaleDateString().replace(/\//g, '-');
-                    var companyId = cboAPStockOutDetailReportCompany.selectedValue;
-                    var branchId = cboAPStockOutDetailReportBranch.selectedValue;
+        // =========
+        // Print PDF
+        // =========
+        function btnStockOutDetailReportPDFOnclick() {
+            if (cboStockOutDetailReportCompanyFilter.selectedValue != null) {
+                if (cboStockOutDetailReportBranchFilter.selectedValue != null) {
+                    var startDate = cboStockOutDetailReportStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var endDate = cboStockOutDetailReportEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+                    var companyId = cboStockOutDetailReportCompanyFilter.selectedValue;
+                    var branchId = cboStockOutDetailReportBranchFilter.selectedValue;
 
                     window.location.href = '/RepStockOutDetailReport/StockOutDetailReport?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
                 } else {
@@ -767,11 +783,18 @@
         // On Load Page
         // ============
         $(document).ready(function () {
-            stockOutDetailReportDateFilters();
+            createCboDateRangeFilters();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -818,6 +841,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -857,6 +883,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
