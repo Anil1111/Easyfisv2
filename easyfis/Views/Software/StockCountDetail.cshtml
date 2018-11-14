@@ -797,11 +797,88 @@
         }
 
         // ================
+        // Save Stock Count
+        // ================
+        function btnStockCountSaveOnclick() {
+            if (stockCountValidation()) {
+                document.getElementById("btnStockCountSave").innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $("#btnStockCountSave").prop("disabled", true);
+                $("#btnStockCountLock").prop("disabled", true);
+                $("#btnStockCountUnlock").prop("disabled", true);
+                $("#btnStockCountPrint").prop("disabled", true);
+                $("#btnStockCountClose").prop("disabled", true);
+
+                var id = getURLParameterValue("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockCount/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: stockCountObjects(),
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnStockCountSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockCountSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockCountUnlock").prop("disabled", false);
+                                $("#btnStockCountPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockCountLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockCountClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnStockCountSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockCountSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockCountUnlock").prop("disabled", false);
+                                $("#btnStockCountPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockCountLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockCountClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnStockCountSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockCountSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockCountUnlock").prop("disabled", false);
+                                $("#btnStockCountPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockCountLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockCountClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ================
         // Lock Stock Count
         // ================
         function btnStockCountLockOnclick() {
             if (stockCountValidation()) {
                 document.getElementById("btnStockCountLock").innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $("#btnStockCountSave").prop("disabled", true);
                 $("#btnStockCountLock").prop("disabled", true);
                 $("#btnStockCountUnlock").prop("disabled", true);
                 $("#btnStockCountPrint").prop("disabled", true);
@@ -825,18 +902,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById("btnStockCountLock").innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockCountSave").prop("disabled", false);
                             $("#btnStockCountLock").prop("disabled", false);
                             $("#btnStockCountClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById("btnStockCountLock").innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockCountSave").prop("disabled", false);
                             $("#btnStockCountLock").prop("disabled", false);
                             $("#btnStockCountClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById("btnStockCountLock").innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockCountSave").prop("disabled", false);
                             $("#btnStockCountLock").prop("disabled", false);
                             $("#btnStockCountClose").prop("disabled", false);
                         }

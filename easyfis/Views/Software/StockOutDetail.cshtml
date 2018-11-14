@@ -876,6 +876,7 @@
                                 cboOUTApprovedBy.disabled = true;
                                 cboOUTStatus.disabled = true;
 
+                                $("#cmdStockOutSave").prop("disabled", true);
                                 $("#cmdStockOutSaveLock").prop("disabled", true);
                                 $('#btnStockOutAddItem').prop("disabled", true);
                                 $('#btnItemQueryStockOutItem').prop("disabled", true);
@@ -899,6 +900,112 @@
             } else {
                 alert("No Id Parameter Value");
                 window.location = "/Software/StockOut";
+            }
+        }
+
+        // ======================
+        // Save Stock Out
+        // =====================
+        function stockOutSave_OnClick() {
+            var stockOutObject = new Object();
+            stockOutObject.OTDate = cboOUTDate.value.toLocaleDateString();
+            stockOutObject.AccountId = cboOUTAccount.selectedValue;
+            stockOutObject.ArticleId = cboOUTArticle.selectedValue;
+            stockOutObject.Particulars = document.getElementById('StockOut_Particulars').value;
+            stockOutObject.ManualOTNumber = document.getElementById('StockOUt_ManualOTNumber').value;
+            stockOutObject.PreparedById = cboOUTPreparedBy.selectedValue;
+            stockOutObject.CheckedById = cboOUTCheckedBy.selectedValue;
+            stockOutObject.ApprovedById = cboOUTApprovedBy.selectedValue;
+            stockOutObject.Status = cboOUTStatus.selectedValue;
+            var data = JSON.stringify(stockOutObject);
+
+            var isValid = true;
+            $('.requiredStockOut').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('cmdStockOutSave').innerHTML = "<i class='fa fa-save'></i> Saving";
+                $("#cmdStockOutSave").prop("disabled", true);
+                $("#cmdStockOutJournal").prop("disabled", true);
+                $("#cmdStockOutSaveLock").prop("disabled", true);
+                $("#cmdStockOutEdit").prop("disabled", true);
+                $("#cmdStockOutPrint").prop("disabled", true);
+                $("#cmdStockOutClose").prop("disabled", true);
+
+                var id = getParam("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockOut/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: data,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('cmdStockOutSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockOutSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockOutJournal").prop("disabled", false);
+                                $("#cmdStockOutEdit").prop("disabled", false);
+                                $("#cmdStockOutPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockOutSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockOutClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('cmdStockOutSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockOutSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockOutJournal").prop("disabled", false);
+                                $("#cmdStockOutEdit").prop("disabled", false);
+                                $("#cmdStockOutPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockOutSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockOutClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('cmdStockOutSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockOutSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockOutJournal").prop("disabled", false);
+                                $("#cmdStockOutEdit").prop("disabled", false);
+                                $("#cmdStockOutPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockOutSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockOutClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
             }
         }
 
@@ -934,6 +1041,7 @@
 
             if (isValid) {
                 document.getElementById('cmdStockOutSaveLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $("#cmdStockOutSave").prop("disabled", true);
                 $("#cmdStockOutJournal").prop("disabled", true);
                 $("#cmdStockOutSaveLock").prop("disabled", true);
                 $("#cmdStockOutEdit").prop("disabled", true);
@@ -958,18 +1066,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('cmdStockOutSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockOutSave").prop("disabled", false);
                             $("#cmdStockOutSaveLock").prop("disabled", false);
                             $("#cmdStockOutClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('cmdStockOutSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockOutSave").prop("disabled", false);
                             $("#cmdStockOutSaveLock").prop("disabled", false);
                             $("#cmdStockOutClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('cmdStockOutSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockOutSave").prop("disabled", false);
                             $("#cmdStockOutSaveLock").prop("disabled", false);
                             $("#cmdStockOutClose").prop("disabled", false);
                         }

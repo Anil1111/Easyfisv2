@@ -792,6 +792,7 @@
                                 cboStockTransferApprovedBy.disabled = true;
                                 cboStockTransferStatus.disabled = true;
 
+                                $("#cmdStockTransferSave").prop("disabled", true);
                                 $("#cmdStockTransferSaveLock").prop("disabled", true);
                                 $('#btnAddStockTransferItem').prop('disabled', true);
                                 $('#btnItemQueryStockTransferItem').prop('disabled', true);
@@ -1538,6 +1539,112 @@
         }
 
         // ==========================
+        // Stock Transfer Save
+        // ==========================
+        function stockTransferSave_OnClick() {
+            var stockTransferObject = new Object();
+            stockTransferObject.STDate = cboStockTransferSTDate.value.toLocaleDateString();
+            stockTransferObject.ToBranchId = cboStockTransferToBranch.selectedValue;
+            stockTransferObject.ArticleId = cboStockTransferArticle.selectedValue;
+            stockTransferObject.Particulars = document.getElementById('stockTransfer_Particulars').value;
+            stockTransferObject.ManualSTNumber = document.getElementById('stockTransfer_ManualSTNumber').value;
+            stockTransferObject.PreparedById = cboStockTransferPreparedBy.selectedValue;
+            stockTransferObject.CheckedById = cboStockTransferCheckedBy.selectedValue;
+            stockTransferObject.ApprovedById = cboStockTransferApprovedBy.selectedValue;
+            stockTransferObject.Status = cboStockTransferStatus.selectedValue;
+            var stockTransferData = JSON.stringify(stockTransferObject);
+
+            var isValid = true;
+            $('.requiredStockTransfer').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('cmdStockTransferSave').innerHTML = "<i class='fa fa-save'></i> Saving";
+                $("#cmdStockTransferSave").prop("disabled", true);
+                $("#cmdStockTransferJournal").prop("disabled", true);
+                $("#cmdStockTransferSaveLock").prop("disabled", true);
+                $("#cmdStockTransferEdit").prop("disabled", true);
+                $("#cmdStockTransferPrint").prop("disabled", true);
+                $("#cmdStockTransferClose").prop("disabled", true);
+
+                var id = getParam("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockTransfer/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: stockTransferData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('cmdStockTransferSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockTransferSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockTransferJournal").prop("disabled", false);
+                                $("#cmdStockTransferEdit").prop("disabled", false);
+                                $("#cmdStockTransferPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockTransferSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockTransferClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('cmdStockTransferSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockTransferSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockTransferJournal").prop("disabled", false);
+                                $("#cmdStockTransferEdit").prop("disabled", false);
+                                $("#cmdStockTransferPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockTransferSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockTransferClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('cmdStockTransferSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#cmdStockTransferSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#cmdStockTransferJournal").prop("disabled", false);
+                                $("#cmdStockTransferEdit").prop("disabled", false);
+                                $("#cmdStockTransferPrint").prop("disabled", false);
+                            } else {
+                                $("#cmdStockTransferSaveLock").prop("disabled", false);
+                            }
+
+                            $("#cmdStockTransferClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ==========================
         // Stock Transfer Save - Lock
         // ==========================
         function btnStockTransferSaveLock_OnClick() {
@@ -1569,6 +1676,7 @@
 
             if (isValid) {
                 document.getElementById('cmdStockTransferSaveLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $("#cmdStockTransferSave").prop("disabled", true);
                 $("#cmdStockTransferJournal").prop("disabled", true);
                 $("#cmdStockTransferSaveLock").prop("disabled", true);
                 $("#cmdStockTransferEdit").prop("disabled", true);
@@ -1593,18 +1701,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('cmdStockTransferSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockTransferSave").prop("disabled", false);
                             $("#cmdStockTransferSaveLock").prop("disabled", false);
                             $("#cmdStockTransferClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('cmdStockTransferSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockTransferSave").prop("disabled", false);
                             $("#cmdStockTransferSaveLock").prop("disabled", false);
                             $("#cmdStockTransferClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('cmdStockTransferSaveLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#cmdStockTransferSave").prop("disabled", false);
                             $("#cmdStockTransferSaveLock").prop("disabled", false);
                             $("#cmdStockTransferClose").prop("disabled", false);
                         }

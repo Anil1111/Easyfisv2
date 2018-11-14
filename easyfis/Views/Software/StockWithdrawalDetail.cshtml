@@ -1082,6 +1082,118 @@
         }
 
         // =====================
+        // Save Stock Withdrawal
+        // =====================
+        function btnStockWithdrawalSaveOnclick() {
+            var stockWithdrawalObject = new Object();
+            stockWithdrawalObject.SWDate = cboStockWithdrawalSWDate.value.toLocaleDateString();
+            stockWithdrawalObject.CustomerId = cboStockWithdrawalCustomer.selectedValue;
+            stockWithdrawalObject.SIBranchId = SIBranchIdSelectedValue;
+            stockWithdrawalObject.SIId = SIIdSelectedValue;
+            stockWithdrawalObject.Remarks = document.getElementById('inpStockWithdrawalRemarks').value;
+            stockWithdrawalObject.DocumentReference = document.getElementById('inpStockWithdrawalDocumentReference').value;
+            stockWithdrawalObject.ManualSWNumber = document.getElementById('inpStockWithdrawalManualSWNumber').value;
+            stockWithdrawalObject.ContactPerson = document.getElementById('inpStockWithdrawalContactPerson').value;
+            stockWithdrawalObject.ContactNumber = document.getElementById('inpStockWithdrawalContactNumber').value;
+            stockWithdrawalObject.Address = document.getElementById('inpStockWithdrawalAddress').value;
+            stockWithdrawalObject.ReceivedById = cboStockWithdrawalReceivedBy.selectedValue;
+            stockWithdrawalObject.PreparedById = cboStockWithdrawalPreparedBy.selectedValue;
+            stockWithdrawalObject.CheckedById = cboStockWithdrawalCheckedBy.selectedValue;
+            stockWithdrawalObject.ApprovedById = cboStockWithdrawalApprovedBy.selectedValue;
+            stockWithdrawalObject.Status = cboStockWithdrawalStatus.selectedValue;
+            var stockWithdrawalData = JSON.stringify(stockWithdrawalObject);
+
+            var isValid = true;
+            $('.requiredStockWithdrawal').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": "",
+                    });
+                }
+            });
+
+            if (isValid) {
+                document.getElementById('btnStockWithdrawalSave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                $("#btnStockWithdrawalSave").prop("disabled", true);
+                $("#btnStockWithdrawalJournal").prop("disabled", true);
+                $("#btnStockWithdrawalLock").prop("disabled", true);
+                $("#btnStockWithdrawalUnlock").prop("disabled", true);
+                $("#btnStockWithdrawalPrint").prop("disabled", true);
+                $("#btnStockWithdrawalClose").prop("disabled", true);
+
+                var id = getURLParameterValue("id");
+
+                $.ajax({
+                    type: "PUT",
+                    url: '/api/stockWithdrawal/save/' + id,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: stockWithdrawalData,
+                    statusCode: {
+                        200: function () {
+                            toastr.success("Save Successful");
+                            window.setTimeout(function () {
+                                location.reload()
+                            }, 1000);
+                        },
+                        404: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                            document.getElementById('btnStockWithdrawalSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockWithdrawalJournal").prop("disabled", false);
+                                $("#btnStockWithdrawalUnlock").prop("disabled", false);
+                                $("#btnStockWithdrawalPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockWithdrawalLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockWithdrawalClose").prop("disabled", false);
+                        },
+                        400: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                            document.getElementById('btnStockWithdrawalSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockWithdrawalJournal").prop("disabled", false);
+                                $("#btnStockWithdrawalUnlock").prop("disabled", false);
+                                $("#btnStockWithdrawalPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockWithdrawalLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockWithdrawalClose").prop("disabled", false);
+                        },
+                        500: function (message) {
+                            toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                            document.getElementById('btnStockWithdrawalSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
+
+                            if (isLocked) {
+                                $("#btnStockWithdrawalJournal").prop("disabled", false);
+                                $("#btnStockWithdrawalUnlock").prop("disabled", false);
+                                $("#btnStockWithdrawalPrint").prop("disabled", false);
+                            } else {
+                                $("#btnStockWithdrawalLock").prop("disabled", false);
+                            }
+
+                            $("#btnStockWithdrawalClose").prop("disabled", false);
+                        }
+                    },
+                });
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // =====================
         // Lock Stock Withdrawal
         // =====================
         function btnStockWithdrawalLockOnclick() {
@@ -1119,6 +1231,7 @@
 
             if (isValid) {
                 document.getElementById('btnStockWithdrawalLock').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
+                $("#btnStockWithdrawalSave").prop("disabled", true);
                 $("#btnStockWithdrawalJournal").prop("disabled", true);
                 $("#btnStockWithdrawalLock").prop("disabled", true);
                 $("#btnStockWithdrawalUnlock").prop("disabled", true);
@@ -1143,18 +1256,21 @@
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
                             document.getElementById('btnStockWithdrawalLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
                             $("#btnStockWithdrawalLock").prop("disabled", false);
                             $("#btnStockWithdrawalClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
                             document.getElementById('btnStockWithdrawalLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
                             $("#btnStockWithdrawalLock").prop("disabled", false);
                             $("#btnStockWithdrawalClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
                             document.getElementById('btnStockWithdrawalLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $("#btnStockWithdrawalSave").prop("disabled", false);
                             $("#btnStockWithdrawalLock").prop("disabled", false);
                             $("#btnStockWithdrawalClose").prop("disabled", false);
                         }
