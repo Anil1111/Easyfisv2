@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
-    <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Stock Withdrawal</title>
+    <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control " id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpStockWithdrawalFilterSearch" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,57 +58,81 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddStockWithdrawal" onclick="btnAddStockWithdrawal_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnAddStockWithdrawal" onclick="btnStockWithdrawalAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseStockWithdrawal" onclick="btnCloseStockWithdrawal_OnClick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnCloseStockWithdrawal" onclick="btnStockWithdrawalCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        ==================
+                        Date Range Filters
+                        ==================
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 29%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>Start Date</b></span>
-                                        <div id="cboStartDateFilter"></div>
+                                        <div id="cboStockWithdrawalStartDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
                                 <td style="width: 29%">
-                                    <div class="input-group ">
+                                    <div class="input-group">
                                         <span class="input-group-addon"><b>End Date</b></span>
-                                        <div id="cboEndDateFilter"></div>
+                                        <div id="cboStockWithdrawalEndDateFilter"></div>
                                     </div>
                                 </td>
                                 <td style="width: 41%"></td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="StockWithdrawalGrid"></div>
+                        <div id="stockWithdrawalFlexGrid" class="grid" align="left"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="stockWithdrawalNavigationPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockWithdrawalMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockWithdrawalMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnStockWithdrawalCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnStockWithdrawalMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnStockWithdrawalMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -134,24 +161,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- StockWithdrawal Delete -->
-    <div class="modal fade" id="deleteStockWithdrawalConfirm" role="dialog">
+    <!--
+        =======================================
+        Stock Withdrawal Confirm Delete (Modal)
+        =======================================
+    -->
+    <div class="modal fade" id="stockWithdrawalConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this stock transfer?
+                    Delete Stock Withdrawal?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteStockWithdrawal" class="btn btn-danger" onclick="cmdStockWithdrawalConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnStockWithdrawalConfirmDelete" class="btn btn-danger" onclick="btnStockWithdrawalConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnStockWithdrawalConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -159,61 +191,69 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var stockWithdrawals;
-        var stockWithdrawalGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
-        var cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter');
-        var cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter');
-        var isStartDateFirstSelect = true;
-        var isEndDateFirstSelect = true;
+        // ===================================
+        // Stock Withdrawal Date Range Filters
+        // ===================================
+        var cboStockWithdrawalStartDateFilter = new wijmo.input.InputDate('#cboStockWithdrawalStartDateFilter');
+        var cboStockWithdrawalEndDateFilter = new wijmo.input.InputDate('#cboStockWithdrawalEndDateFilter');
+        var isCboStockWithdrawalStartDateFilterSelected = true;
+        var isCboStockWithdrawalEndDateFilterSelected = true;
 
-        // ===========
-        // Date Filter
-        // ===========
-        function cboDateFilters() {
-            cboStartDateFilter.dispose();
-            cboStartDateFilter = new wijmo.input.InputDate('#cboStartDateFilter', {
+        // ==============================================
+        // Stock Withdrawal Collection View and Flex Grid
+        // ==============================================
+        var stockWithdrawalCollectionView;
+        var stockWithdrawalFlexGrid;
+
+        // ===================================
+        // Stock Withdrawal Navigation Buttons
+        // ===================================
+        var btnStockWithdrawalMoveToFirstPageGrid;
+        var btnStockWithdrawalMoveToPreviousPageGrid;
+        var btnStockWithdrawalMoveToNextPageGrid;
+        var btnStockWithdrawalMoveToLastPageGrid;
+        var btnStockWithdrawalCurrentPageGrid;
+
+        // ===============================
+        // Create Combo Date Range Filters
+        // ===============================
+        function createCboDateRangeFilters() {
+            cboStockWithdrawalStartDateFilter.dispose();
+            cboStockWithdrawalStartDateFilter = new wijmo.input.InputDate('#cboStockWithdrawalStartDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isStartDateFirstSelect) {
+                    if (!isCboStockWithdrawalStartDateFilterSelected) {
                         refreshStockWithdrawalFlexGrid();
                     } else {
-                        isStartDateFirstSelect = false;
+                        isCboStockWithdrawalStartDateFilterSelected = false;
                     }
                 }
             });
 
-            cboEndDateFilter.dispose();
-            cboEndDateFilter = new wijmo.input.InputDate('#cboEndDateFilter', {
+            cboStockWithdrawalEndDateFilter.dispose();
+            cboStockWithdrawalEndDateFilter = new wijmo.input.InputDate('#cboStockWithdrawalEndDateFilter', {
                 format: 'MM-dd-yyyy',
                 value: new Date(),
                 onValueChanged: function () {
-                    if (!isEndDateFirstSelect) {
+                    if (!isCboStockWithdrawalEndDateFilterSelected) {
                         refreshStockWithdrawalFlexGrid();
                     } else {
-                        isEndDateFirstSelect = false;
+                        isCboStockWithdrawalEndDateFilterSelected = false;
                     }
                 }
             });
         }
 
-        // =======================================
-        // GET Stock Withdrawal List Flter by SWDate
-        // =======================================
-        function getStockWithdrawalFilterBySWDate() {
+        // =========================
+        // Get Stock Withdrawal Data
+        // =========================
+        function getStockWithdrawalData() {
             NProgress.start();
-            var startDate = cboStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
-            var endDate = cboEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var startDate = cboStockWithdrawalStartDateFilter.value.toLocaleDateString().replace(/\//g, '-');
+            var endDate = cboStockWithdrawalEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
 
-            var stockWithdrawals = new wijmo.collections.ObservableArray;
+            var stockWithdrawalObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
                 url: '/api/stockWithdrawal/list/' + startDate + '/' + endDate,
                 cache: false,
@@ -226,9 +266,9 @@
                             var SWDateResult = new Date(results[i]["SWDate"])
                             var SWDate = ('0' + (SWDateResult.getMonth() + 1)).slice(-2) + '-' + ('0' + SWDateResult.getDate()).slice(-2) + '-' + SWDateResult.getFullYear();
 
-                            stockWithdrawals.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' id='StockWithdrawalEditButton' onclick='cmdStockWithdrawalEditButton_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='cmdStockWithdrawalDeleteButton_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
+                            stockWithdrawalObservableArray.push({
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditStockWithdrawalOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteStockWithdrawalOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 Branch: results[i]["Branch"],
                                 SWNumber: results[i]["SWNumber"],
@@ -251,14 +291,239 @@
                 }
             });
 
-            return stockWithdrawals;
+            return stockWithdrawalObservableArray;
         }
 
-        // =========================
-        // Stock Withdrawal Add Button
-        // =========================
-        function btnAddStockWithdrawal_OnClick() {
-            document.getElementById('btnAddStockWithdrawal').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
+        // ================================
+        // Create Stock Withdrawal FlexGrid
+        // ================================
+        function createStockWithdrawalFlexGrid() {
+            createCboDateRangeFilters();
+            stockWithdrawalCollectionView = new wijmo.collections.CollectionView(getStockWithdrawalData());
+            stockWithdrawalCollectionView.canFilter = true;
+            stockWithdrawalCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpStockWithdrawalFilterSearch').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockWithdrawalCollectionView.refresh();
+            });
+
+            stockWithdrawalCollectionView.filter = function (item) {
+                return !filterText || (item.SWNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualSWNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockWithdrawalCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockWithdrawalNavigationButtons();
+            });
+
+            stockWithdrawalCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateStockWithdrawalDetailsFlexGridSelection();
+            });
+
+            stockWithdrawalFlexGrid = new wijmo.grid.FlexGrid('#stockWithdrawalFlexGrid');
+            stockWithdrawalFlexGrid.initialize({
+                columns: [
+                    @{
+                        if (canEdit)
+                        {
+                            <text>
+                                {
+                                    "header": "Edit",
+                                    "binding": "EditId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                        if (canDelete)
+                        {
+                            <text>
+                                {
+                                    "header": "Delete",
+                                    "binding": "DeleteId",
+                                    "width": 70,
+                                    "align": "center",
+                                    "allowResizing": false,
+                                    "allowSorting": false,
+                                    "isContentHtml": true
+                                },
+                            </text>
+                        }
+                    }
+                    {
+                        "header": "SW Number",
+                        "binding": "SWNumber",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "SW Date",
+                        "binding": "SWDate",
+                        "allowSorting": true,
+                        "width": 90
+                    },
+                    {
+                        "header": "Manual SW No.",
+                        "binding": "ManualSWNumber",
+                        "allowSorting": true,
+                        "width": 120
+                    },
+                    {
+                        "header": "Doc. Reference",
+                        "binding": "DocumentReference",
+                        "allowSorting": true,
+                        "width": 130
+                    },
+                    {
+                        "header": "SI Branch",
+                        "binding": "SIBranch",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "SI Number",
+                        "binding": "SINumber",
+                        "allowSorting": true,
+                        "width": 100
+                    },
+                    {
+                        "header": "Remarks",
+                        "binding": "Remarks",
+                        "allowSorting": true,
+                        "width": "2.5*"
+                    },
+                    {
+                        "header": "L",
+                        "binding": "IsLocked",
+                        "allowSorting": true,
+                        "width": 50
+                    }
+                ],
+                autoGenerateColumns: false,
+                itemsSource: stockWithdrawalCollectionView,
+                isReadOnly: true,
+                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
+                allowDragging: wijmo.grid.AllowDragging.None,
+                selectionMode: wijmo.grid.SelectionMode.Row
+            });
+
+            stockWithdrawalFlexGrid.trackChanges = true;
+
+            btnStockWithdrawalMoveToFirstPageGrid = document.getElementById('btnStockWithdrawalMoveToFirstPageGrid');
+            btnStockWithdrawalMoveToPreviousPageGrid = document.getElementById('btnStockWithdrawalMoveToPreviousPageGrid');
+            btnStockWithdrawalMoveToNextPageGrid = document.getElementById('btnStockWithdrawalMoveToNextPageGrid');
+            btnStockWithdrawalMoveToLastPageGrid = document.getElementById('btnStockWithdrawalMoveToLastPageGrid');
+            btnStockWithdrawalCurrentPageGrid = document.getElementById('btnStockWithdrawalCurrentPageGrid');
+
+            updateStockWithdrawalNavigationButtons();
+
+            btnStockWithdrawalMoveToFirstPageGrid.addEventListener('click', function () {
+                stockWithdrawalCollectionView.moveToFirstPage();
+                updateStockWithdrawalNavigationButtons();
+            });
+
+            btnStockWithdrawalMoveToPreviousPageGrid.addEventListener('click', function () {
+                stockWithdrawalCollectionView.moveToPreviousPage();
+                updateStockWithdrawalNavigationButtons();
+            });
+
+            btnStockWithdrawalMoveToNextPageGrid.addEventListener('click', function () {
+                stockWithdrawalCollectionView.moveToNextPage();
+                updateStockWithdrawalNavigationButtons();
+            });
+
+            btnStockWithdrawalMoveToLastPageGrid.addEventListener('click', function () {
+                stockWithdrawalCollectionView.moveToLastPage();
+                updateStockWithdrawalNavigationButtons();
+            });
+        }
+
+        // ===================================================
+        // Update Stock Withdrawal Details Flex Grid Selection
+        // ===================================================
+        function updateStockWithdrawalDetailsFlexGridSelection() {
+            var item = stockWithdrawalCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = item.CreatedBy;
+            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        }
+
+        // ==========================================
+        // Update Stock Withdrawal Navigation Buttons
+        // ==========================================
+        function updateStockWithdrawalNavigationButtons() {
+            if (stockWithdrawalCollectionView.pageSize <= 0) {
+                document.getElementById('stockWithdrawalNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('stockWithdrawalNavigationPageGrid').style.display = 'block';
+            if (stockWithdrawalCollectionView.pageIndex === 0) {
+                btnStockWithdrawalMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnStockWithdrawalMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnStockWithdrawalMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (stockWithdrawalCollectionView.pageIndex === (stockWithdrawalCollectionView.pageCount - 1)) {
+                btnStockWithdrawalMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnStockWithdrawalMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnStockWithdrawalMoveToFirstPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToNextPageGrid.removeAttribute('disabled');
+                btnStockWithdrawalMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnStockWithdrawalCurrentPageGrid.innerHTML = (stockWithdrawalCollectionView.pageIndex + 1) + ' / ' + stockWithdrawalCollectionView.pageCount;
+        }
+
+        // =================================
+        // Refresh Stock Withdrawal FlexGrid
+        // =================================
+        function refreshStockWithdrawalFlexGrid() {
+            stockWithdrawalCollectionView = new wijmo.collections.CollectionView(getStockWithdrawalData());
+            stockWithdrawalCollectionView.canFilter = true;
+            stockWithdrawalCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpStockWithdrawalFilterSearch').keyup(function () {
+                filterText = this.value.toLowerCase();
+                stockWithdrawalCollectionView.refresh();
+            });
+
+            stockWithdrawalCollectionView.filter = function (item) {
+                return !filterText || (item.SWNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualSWNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Branch.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            stockWithdrawalCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateStockWithdrawalNavigationButtons();
+            });
+
+            stockWithdrawalCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateStockWithdrawalDetailsFlexGridSelection();
+            });
+
+            stockWithdrawalFlexGrid.itemsSource = stockWithdrawalCollectionView;
+            stockWithdrawalFlexGrid.trackChanges = true;
+        }
+
+        // ====================
+        // Add Stock Withdrawal
+        // ====================
+        function btnStockWithdrawalAddOnclick() {
+            document.getElementById('btnAddStockWithdrawal').innerHTML = "<i class='fa fa-plus'></i> Adding...";
             $('#btnAddStockWithdrawal').prop('disabled', true);
             $('#btnCloseStockWithdrawal').prop('disabled', true);
 
@@ -292,51 +557,46 @@
             });
         }
 
-        // ===========================
-        // Stock Withdrawal Close Button
-        // ===========================
-        function btnCloseStockWithdrawal_OnClick() {
-            window.location = '/Software';
+        // =====================
+        // Edit Stock Withdrawal
+        // =====================
+        function btnEditStockWithdrawalOnclick() {
+            stockWithdrawalCollectionView.editItem(stockWithdrawalCollectionView.currentItem);
+            var sale = stockWithdrawalCollectionView.currentEditItem;
+            var saleId = sale.Id;
+            window.location = '/Software/StockWithdrawalDetail?id=' + saleId;
         }
 
-        // ==========================
-        // Stock Withdrawal Edit Button
-        // ==========================
-        function cmdStockWithdrawalEditButton_OnClick() {
-            stockWithdrawals.editItem(stockWithdrawals.currentItem);
-            var stockWithdrawal = stockWithdrawals.currentEditItem;
-            var stockWithdrawalId = stockWithdrawal.Id;
-            window.location = '/Software/StockWithdrawalDetail?id=' + stockWithdrawalId;
-        }
-
-        // ============================
-        // Stock Withdrawal delete Button
-        // ============================
-        function cmdStockWithdrawalDeleteButton_OnClick() {
-            stockWithdrawals.editItem(stockWithdrawals.currentItem);
-            var stockWithdrawal = stockWithdrawals.currentEditItem;
-            if (stockWithdrawal.IsLocked) {
+        // =======================
+        // Delete Stock Withdrawal
+        // =======================
+        function btnDeleteStockWithdrawalOnclick() {
+            stockWithdrawalCollectionView.editItem(stockWithdrawalCollectionView.currentItem);
+            var sale = stockWithdrawalCollectionView.currentEditItem;
+            if (sale.IsLocked) {
                 toastr.error("Delete is not allowed when the selected record is locked!");
             } else {
-                $('#deleteStockWithdrawalConfirm').modal({
+                $('#stockWithdrawalConfirmDeleteModal').modal({
                     show: true,
                     backdrop: 'static'
                 });
 
-                document.getElementById('cmdConfirmDeleteStockWithdrawal').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $("#cmdConfirmDeleteStockWithdrawal").prop("disabled", false);
-                $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                document.getElementById('btnStockWithdrawalConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $("#btnStockWithdrawalConfirmDelete").prop("disabled", false);
+                $("#btnStockWithdrawalConfirmDeleteCloseModal").prop("disabled", false);
             }
         }
 
-        // Company Confirm Delete Button
-        function cmdStockWithdrawalConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteStockWithdrawal').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $("#cmdConfirmDeleteStockWithdrawal").prop("disabled", true);
-            $("#cmdConfirmDeleteCloseButton").prop("disabled", true);
+        // ===============================
+        // Confirm Delete Stock Withdrawal
+        // ===============================
+        function btnStockWithdrawalConfirmDeleteOnclick() {
+            document.getElementById('btnStockWithdrawalConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $("#btnStockWithdrawalConfirmDelete").prop("disabled", true);
+            $("#btnStockWithdrawalConfirmDeleteCloseModal").prop("disabled", true);
 
-            stockWithdrawals.editItem(stockWithdrawals.currentItem);
-            var id = stockWithdrawals.currentEditItem.Id;
+            stockWithdrawalCollectionView.editItem(stockWithdrawalCollectionView.currentItem);
+            var id = stockWithdrawalCollectionView.currentEditItem.Id;
 
             $.ajax({
                 url: '/api/stockWithdrawal/delete/' + id,
@@ -346,263 +606,57 @@
                 statusCode: {
                     200: function () {
                         toastr.success("Delete Successful");
-                        $('#deleteStockWithdrawalConfirm').modal('hide');
+                        $('#stockWithdrawalConfirmDeleteModal').modal('hide');
                         refreshStockWithdrawalFlexGrid();
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteStockWithdrawalConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockWithdrawal').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockWithdrawal").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#stockWithdrawalConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockWithdrawalConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockWithdrawalConfirmDelete").prop("disabled", false);
+                        $("#btnStockWithdrawalConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteStockWithdrawalConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockWithdrawal').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockWithdrawal").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#stockWithdrawalConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockWithdrawalConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockWithdrawalConfirmDelete").prop("disabled", false);
+                        $("#btnStockWithdrawalConfirmDeleteCloseModal").prop("disabled", false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteStockWithdrawalConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteStockWithdrawal').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $("#cmdConfirmDeleteStockWithdrawal").prop("disabled", false);
-                        $("#cmdConfirmDeleteCloseButton").prop("disabled", false);
+                        $('#stockWithdrawalConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnStockWithdrawalConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $("#btnStockWithdrawalConfirmDelete").prop("disabled", false);
+                        $("#btnStockWithdrawalConfirmDeleteCloseModal").prop("disabled", false);
                     }
                 }
             });
         }
 
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            var item = stockWithdrawals.currentItem;
-            document.getElementById('createdBy').innerHTML = item.CreatedBy;
-            document.getElementById('createdDate').innerHTML = item.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = item.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = item.UpdatedDateTime;
+        // ======================
+        // Close Stock Withdrawal
+        // ======================
+        function btnStockWithdrawalCloseOnclick() {
+            window.location = '/Software';
         }
 
-        // ===============================
-        // Navigation Buttons for Comapany
-        // ===============================
-        function updateNavigateButtonsStockWithdrawal() {
-            if (stockWithdrawals.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (stockWithdrawals.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (stockWithdrawals.pageIndex === (stockWithdrawals.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (stockWithdrawals.pageIndex + 1) + ' / ' + stockWithdrawals.pageCount;
-        }
-
-        // ===============================
-        // Refresh Stock Withdrawal FlexGrid
-        // ===============================
-        function refreshStockWithdrawalFlexGrid() {
-            stockWithdrawals = new wijmo.collections.CollectionView(getStockWithdrawalFilterBySWDate());
-            stockWithdrawals.canFilter = true;
-            stockWithdrawals.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                stockWithdrawals.refresh();
-            });
-            stockWithdrawals.filter = function (item) {
-                return !filterText || (item.SWNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualSWNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
-            }
-            stockWithdrawals.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsStockWithdrawal();
-            });
-            stockWithdrawals.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            stockWithdrawalGrid.itemsSource = stockWithdrawals;
-            stockWithdrawalGrid.trackChanges = true;
-        }
-
-        // =======================
-        // Stock Withdrawal FlexGrid
-        // =======================
-        function createStockWithdrawalFlexGrid() {
-            cboDateFilters();
-            stockWithdrawals = new wijmo.collections.CollectionView(getStockWithdrawalFilterBySWDate());
-            stockWithdrawals.canFilter = true;
-            stockWithdrawals.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                stockWithdrawals.refresh();
-            });
-            stockWithdrawals.filter = function (item) {
-                return !filterText || (item.SWNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualSWNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Branch.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ToBranch.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
-            }
-            stockWithdrawals.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsStockWithdrawal();
-            });
-            stockWithdrawals.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            // Flex Grid
-            stockWithdrawalGrid = new wijmo.grid.FlexGrid('#StockWithdrawalGrid');
-            stockWithdrawalGrid.initialize({
-                columns: [
-                            @{
-                                if (canEdit)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Edit",
-                                            "binding": "EditId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                                if (canDelete)
-                                {
-                                    <text>
-                                        {
-                                            "header": "Delete",
-                                            "binding": "DeleteId",
-                                            "width": 70,
-                                            "align": "center",
-                                            "allowResizing": false,
-                                            "allowSorting": false,
-                                            "isContentHtml": true
-                                        },
-                                    </text>
-                                }
-                            }
-                            {
-                                "header": "SW Number",
-                                "binding": "SWNumber",
-                                "allowSorting": true,
-                                "width": 100
-                            },
-                            {
-                                "header": "SW Date",
-                                "binding": "SWDate",
-                                "allowSorting": true,
-                                "width": 90
-                            },
-                            {
-                                "header": "Manual SW No.",
-                                "binding": "ManualSWNumber",
-                                "allowSorting": true,
-                                "width": 120
-                            },
-                            {
-                                "header": "Doc. Reference",
-                                "binding": "DocumentReference",
-                                "allowSorting": true,
-                                "width": 130
-                            },
-                            {
-                                "header": "SI Branch",
-                                "binding": "SIBranch",
-                                "allowSorting": true,
-                                "width": "2.5*"
-                            },
-                            {
-                                "header": "SI Number",
-                                "binding": "SINumber",
-                                "allowSorting": true,
-                                "width": 100
-                            },
-                            {
-                                "header": "Remarks",
-                                "binding": "Remarks",
-                                "allowSorting": true,
-                                "width": "2.5*"
-                            },
-                            {
-                                "header": "L",
-                                "binding": "IsLocked",
-                                "allowSorting": true,
-                                "width": 50
-                            }
-                ],
-                autoGenerateColumns: false,
-                itemsSource: stockWithdrawals,
-                isReadOnly: true,
-                autoSizeMode: wijmo.grid.AutoSizeMode.Both,
-                allowDragging: wijmo.grid.AllowDragging.None,
-                selectionMode: wijmo.grid.SelectionMode.Row
-            });
-
-            stockWithdrawalGrid.trackChanges = true;
-
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
-
-            updateNavigateButtonsStockWithdrawal();
-
-            btnFirstPageGrid.addEventListener('click', function () {
-                stockWithdrawals.moveToFirstPage();
-                updateNavigateButtonsStockWithdrawal();
-            });
-
-            btnPreviousPageGrid.addEventListener('click', function () {
-                stockWithdrawals.moveToPreviousPage();
-                updateNavigateButtonsStockWithdrawal();
-            });
-
-            btnNextPageGrid.addEventListener('click', function () {
-                stockWithdrawals.moveToNextPage();
-                updateNavigateButtonsStockWithdrawal();
-            });
-
-            btnLastPageGrid.addEventListener('click', function () {
-                stockWithdrawals.moveToLastPage();
-                updateNavigateButtonsStockWithdrawal();
-            });
-        }
-
-        // ===========
-        // OnLoad Page
-        // ===========
+        // ============
+        // On Load Page
+        // ============
         $(document).ready(function () {
             createStockWithdrawalFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -620,12 +674,12 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                success: function (userBranchesresults) {
-                    if (userBranchesresults.length > 0) {
-                        for (i = 0; i < userBranchesresults.length; i++) {
+                success: function (userBranchesResults) {
+                    if (userBranchesResults.length > 0) {
+                        for (i = 0; i < userBranchesResults.length; i++) {
                             userBranchesObservableArray.push({
-                                BranchId: userBranchesresults[i]["BranchId"],
-                                Branch: userBranchesresults[i]["Branch"]
+                                BranchId: userBranchesResults[i]["BranchId"],
+                                Branch: userBranchesResults[i]["Branch"]
                             });
                         }
                     }
@@ -649,6 +703,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -688,6 +745,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',
