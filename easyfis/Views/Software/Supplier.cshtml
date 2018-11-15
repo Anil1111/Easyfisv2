@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Supplier</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,13 +38,19 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ===============
+                        Search / Filter
+                        ===============
+                    -->
                     <div class="panel-heading">
                         <table style="width: 100%" border="0">
                             <tr>
                                 <td style="width: 59%">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                        <input type="text" class="form-control" id="InputFilter" placeholder="Search...">
+                                        <input type="text" class="form-control" id="inpSupplierSearchFilter" placeholder="Search...">
                                     </div>
                                 </td>
                                 <td style="width: 1%"></td>
@@ -55,37 +58,55 @@
                                     @{
                                         if (canAdd)
                                         {
-                                            <button class="btn btn-primary" id="btnAddSupplier" onclick="btnAddSupplierOnclick()"><i class="fa fa-plus"></i> Add</button>
+                                            <button class="btn btn-primary" id="btnSupplierAdd" onclick="btnSupplierAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                         }
                                     }
-                                    <button class="btn btn-danger" id="btnCloseSupplier" onclick="btnCloseSupplierOnclick()"><i class=" fa fa-times"></i> Close</button>
+                                    <button class="btn btn-danger" id="btnSupplierClose" onclick="btnSupplierCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                                 </td>
                             </tr>
                         </table>
                     </div>
+
+                    <!--
+                        =========
+                        Flex Grid
+                        =========
+                    -->
                     <div class="panel-body">
-                        <div id="SupplierGrid" class="grid"></div>
+                        <div id="supplierFlexGrid" class="grid"></div>
                     </div>
+
+                    <!--
+                        ==================
+                        Navigation Buttons
+                        ==================
+                    -->
                     <div class="panel-footer">
                         <div class="row">
-                            <div class="btn-group col-md-7" id="naviagtionPageGrid">
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGrid">
+                            <div class="btn-group col-md-7" id="supplierNavigationFlexGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSupplierMoveToFirstPageGrid">
                                     <span class="glyphicon glyphicon-fast-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSupplierMoveToPreviousPageGrid">
                                     <span class="glyphicon glyphicon-step-backward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGrid"></button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGrid">
+                                <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnSupplierCurrentPageGrid"></button>
+                                <button type="button" class="btn btn-default border-custom" id="btnSupplierMoveToNextPageGrid">
                                     <span class="glyphicon glyphicon-step-forward"></span>
                                 </button>
-                                <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGrid">
+                                <button type="button" class="btn btn-default border-custom" id="btnSupplierMoveToLastPageGrid">
                                     <span class="glyphicon glyphicon-fast-forward"></span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -114,24 +135,29 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Supplier Delete Modal -->
-    <div class="modal fade" id="deleteSupplierConfirm" role="dialog">
+    <!--
+        ===============================
+        Supplier Confirm Delete (Modal)
+        ===============================
+    -->
+    <div class="modal fade" id="supplierConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this supplier?
+                    Delete Supplier?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteSupplier" class="btn btn-danger" onclick="btnDeleteConfirmSupplierOnclick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnSupplierConfirmDelete" class="btn btn-danger" onclick="btnSupplierConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnSupplierConfirmDeleteCloseModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
@@ -139,21 +165,25 @@
 
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
+        // ======================================
+        // Supplier Collection View and Flex Grid
+        // ======================================
         var supplierCollectionView;
         var supplierFlexGrid;
-        var btnFirstPageGrid;
-        var btnPreviousPageGrid;
-        var btnNextPageGrid;
-        var btnLastPageGrid;
-        var btnCurrentPageGrid;
 
-        // ==============================
-        // Get Data from MstArtcile Table
-        // ==============================
-        function getArtcileForSuppliers() {
+        // ===========================
+        // Supplier Navigation Buttons
+        // ===========================
+        var btnSupplierMoveToFirstPageGrid = document.getElementById('btnSupplierMoveToFirstPageGrid');
+        var btnSupplierMoveToPreviousPageGrid = document.getElementById('btnSupplierMoveToPreviousPageGrid');
+        var btnSupplierMoveToNextPageGrid = document.getElementById('btnSupplierMoveToNextPageGrid');
+        var btnSupplierMoveToLastPageGrid = document.getElementById('btnSupplierMoveToLastPageGrid');
+        var btnSupplierCurrentPageGrid = document.getElementById('btnSupplierCurrentPageGrid');
+
+        // =================
+        // Get Supplier Data
+        // =================
+        function getSupplierData() {
             NProgress.start();
             var suppliersObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
@@ -165,8 +195,8 @@
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
                             suppliersObservableArray.push({
-                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditSupplierOnclick()'><i class='fa fa-edit'></i> Edit</button>",
-                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteSupplierOnclick()'><i class='fa fa-trash'></i> Delete</button>",
+                                EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnSupplierEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
+                                DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnSupplierDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 ManualArticleCode: results[i]["ManualArticleCode"],
@@ -192,209 +222,16 @@
             return suppliersObservableArray;
         }
 
-        // =========================
-        // Refresh Supplier Flexgrid
-        // =========================
-        function refreshSupplierFlexgrid() {
-            supplierCollectionView = new wijmo.collections.CollectionView(getArtcileForSuppliers());
-            supplierCollectionView.canFilter = true;
-            supplierCollectionView.pageSize = 15;
-
-            var filterText = '';
-            $('#InputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                supplierCollectionView.refresh();
-            });
-
-            supplierCollectionView.filter = function (item) {
-                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            supplierCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsSupplier();
-            });
-
-            supplierCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
-            });
-
-            supplierFlexGrid.itemsSource = supplierCollectionView;
-            supplierFlexGrid.trackChanges = true;
-        }
-
-        // ===================
-        // Supplier Add Button
-        // ===================
-        function btnAddSupplierOnclick() {
-            document.getElementById('btnAddSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Adding";
-            $('#btnAddSupplier').prop('disabled', true);
-            $('#btnCloseSupplier').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: '/api/supplier/add',
-                contentType: "application/json; charset=utf-8",
-                statusCode: {
-                    200: function (id) {
-                        window.location = '/Software/SupplierDetail?id=' + id;
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnAddSupplier').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnAddSupplier').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnAddSupplier').innerHTML = "<i class='fa fa-plus'></i> Add";
-                        $('#btnAddSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // =====================
-        // Supplier Close Button
-        // =====================
-        function btnCloseSupplierOnclick() {
-            window.location = '/Software';
-        }
-
-        // ====================
-        // Supplier Edit Button
-        // ====================
-        function btnEditSupplierOnclick() {
-            supplierCollectionView.editItem(supplierCollectionView.currentItem);
-            var supplier = supplierCollectionView.currentEditItem;
-            var supplierId = supplier.Id;
-
-            window.location = '/Software/SupplierDetail?id=' + supplierId;
-        }
-
-        // =====================
-        // Supplier delete Button
-        // =====================
-        function btnDeleteSupplierOnclick() {
-            supplierCollectionView.editItem(supplierCollectionView.currentItem);
-            var supplier = supplierCollectionView.currentEditItem;
-            if (supplier.IsLocked) {
-                toastr.error("Delete is not allowed when the selected record is locked!");
-            } else {
-                $('#deleteSupplierConfirm').modal({
-                    show: true,
-                    backdrop: 'static'
-                });
-
-                document.getElementById('cmdConfirmDeleteSupplier').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                $('#cmdConfirmDeleteSupplier').prop('disabled', false);
-                $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-            }
-        }
-
-        // ==============================
-        // Supplier Confirm Delete Button
-        // ==============================
-        function btnDeleteConfirmSupplierOnclick() {
-            document.getElementById('cmdConfirmDeleteSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $('#cmdConfirmDeleteSupplier').prop('disabled', true);
-            $('#cmdConfirmDeleteCloseButton').prop('disabled', true);
-
-            supplierCollectionView.editItem(supplierCollectionView.currentItem);
-            var supplierId = supplierCollectionView.currentEditItem.Id;
-            $.ajax({
-                url: '/api/supplier/delete/' + supplierId,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteSupplierConfirm').modal('hide');
-                        refreshSupplierFlexgrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('cmdConfirmDeleteSupplier').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteSupplier').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('cmdConfirmDeleteSupplier').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteSupplier').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('cmdConfirmDeleteSupplier').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteSupplier').prop('disabled', false);
-                        $('#cmdConfirmDeleteCloseButton').prop('disabled', false);
-                    }
-                }
-            });
-        }
-
-        // ===================
-        // FlexGrid Selection
-        // ===================
-        function updateDetails() {
-            supplierCollectionView.editItem(supplierCollectionView.currentItem);
-            var supplier = supplierCollectionView.currentItem;
-            document.getElementById('createdBy').innerHTML = supplier.CreatedBy;
-            document.getElementById('createdDate').innerHTML = supplier.CreatedDateTime;
-            document.getElementById('updatedBy').innerHTML = supplier.UpdatedBy;
-            document.getElementById('updatedDate').innerHTML = supplier.UpdatedDateTime;
-        }
-
-        // ===============================
-        // Navigation Buttons for Supplier
-        // ===============================
-        function updateNavigateButtonsSupplier() {
-            if (supplierCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGrid').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGrid').style.display = 'block';
-            if (supplierCollectionView.pageIndex === 0) {
-                btnFirstPageGrid.setAttribute('disabled', 'disabled');
-                btnPreviousPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            } else if (supplierCollectionView.pageIndex === (supplierCollectionView.pageCount - 1)) {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.setAttribute('disabled', 'disabled');
-                btnNextPageGrid.setAttribute('disabled', 'disabled');
-            } else {
-                btnFirstPageGrid.removeAttribute('disabled');
-                btnPreviousPageGrid.removeAttribute('disabled');
-                btnNextPageGrid.removeAttribute('disabled');
-                btnLastPageGrid.removeAttribute('disabled');
-            }
-            btnCurrentPageGrid.innerHTML = (supplierCollectionView.pageIndex + 1) + ' / ' + supplierCollectionView.pageCount;
-        }
-
         // =================
         // Supplier FlexGrid
         // =================
         function createSupplierFlexGrid() {
-            supplierCollectionView = new wijmo.collections.CollectionView(getArtcileForSuppliers());
+            supplierCollectionView = new wijmo.collections.CollectionView(getSupplierData());
             supplierCollectionView.canFilter = true;
             supplierCollectionView.pageSize = 15;
 
             var filterText = '';
-            $('#InputFilter').keyup(function () {
+            $('#inpSupplierSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 supplierCollectionView.refresh();
             });
@@ -408,14 +245,14 @@
             }
 
             supplierCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsSupplier();
+                updateSupplierNavigationButtons();
             });
 
             supplierCollectionView.currentChanged.addHandler(function (sender, args) {
-                updateDetails();
+                updateSupplierDetailsFlexGridSelection();
             });
 
-            supplierFlexGrid = new wijmo.grid.FlexGrid('#SupplierGrid');
+            supplierFlexGrid = new wijmo.grid.FlexGrid('#supplierFlexGrid');
             supplierFlexGrid.initialize({
                 columns: [
                             @{
@@ -495,44 +332,241 @@
 
             supplierFlexGrid.trackChanges = true;
 
-            btnFirstPageGrid = document.getElementById('btnMoveToFirstPageGrid');
-            btnPreviousPageGrid = document.getElementById('btnMoveToPreviousPageGrid');
-            btnNextPageGrid = document.getElementById('btnMoveToNextPageGrid');
-            btnLastPageGrid = document.getElementById('btnMoveToLastPageGrid');
-            btnCurrentPageGrid = document.getElementById('btnCurrentPageGrid');
+            updateSupplierNavigationButtons();
 
-            updateNavigateButtonsSupplier();
-
-            btnFirstPageGrid.addEventListener('click', function () {
+            btnSupplierMoveToFirstPageGrid.addEventListener('click', function () {
                 supplierCollectionView.moveToFirstPage();
-                updateNavigateButtonsSupplier();
+                updateSupplierNavigationButtons();
             });
 
-            btnPreviousPageGrid.addEventListener('click', function () {
+            btnSupplierMoveToPreviousPageGrid.addEventListener('click', function () {
                 supplierCollectionView.moveToPreviousPage();
-                updateNavigateButtonsSupplier();
+                updateSupplierNavigationButtons();
             });
 
-            btnNextPageGrid.addEventListener('click', function () {
+            btnSupplierMoveToNextPageGrid.addEventListener('click', function () {
                 supplierCollectionView.moveToNextPage();
-                updateNavigateButtonsSupplier();
+                updateSupplierNavigationButtons();
             });
 
-            btnLastPageGrid.addEventListener('click', function () {
+            btnSupplierMoveToLastPageGrid.addEventListener('click', function () {
                 supplierCollectionView.moveToLastPage();
-                updateNavigateButtonsSupplier();
+                updateSupplierNavigationButtons();
             });
         }
 
+        // ===========================================
+        // Update Supplier Details Flex Grid Selection
+        // ===========================================
+        function updateSupplierDetailsFlexGridSelection() {
+            supplierCollectionView.editItem(supplierCollectionView.currentItem);
+            var supplier = supplierCollectionView.currentItem;
+            document.getElementById('createdBy').innerHTML = supplier.CreatedBy;
+            document.getElementById('createdDate').innerHTML = supplier.CreatedDateTime;
+            document.getElementById('updatedBy').innerHTML = supplier.UpdatedBy;
+            document.getElementById('updatedDate').innerHTML = supplier.UpdatedDateTime;
+        }
+
+        // ==================================
+        // Update Supplier Navigation Buttons
+        // ==================================
+        function updateSupplierNavigationButtons() {
+            if (supplierCollectionView.pageSize <= 0) {
+                document.getElementById('supplierNavigationFlexGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('supplierNavigationFlexGrid').style.display = 'block';
+            if (supplierCollectionView.pageIndex === 0) {
+                btnSupplierMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierMoveToNextPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (supplierCollectionView.pageIndex === (supplierCollectionView.pageCount - 1)) {
+                btnSupplierMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnSupplierMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnSupplierMoveToFirstPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToNextPageGrid.removeAttribute('disabled');
+                btnSupplierMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnSupplierCurrentPageGrid.innerHTML = (supplierCollectionView.pageIndex + 1) + ' / ' + supplierCollectionView.pageCount;
+        }
+
+        // =========================
+        // Refresh Supplier Flexgrid
+        // =========================
+        function refreshSupplierFlexgrid() {
+            supplierCollectionView = new wijmo.collections.CollectionView(getSupplierData());
+            supplierCollectionView.canFilter = true;
+            supplierCollectionView.pageSize = 15;
+
+            var filterText = '';
+            $('#inpSupplierSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                supplierCollectionView.refresh();
+            });
+
+            supplierCollectionView.filter = function (item) {
+                return !filterText || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            supplierCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateSupplierNavigationButtons();
+            });
+
+            supplierCollectionView.currentChanged.addHandler(function (sender, args) {
+                updateSupplierDetailsFlexGridSelection();
+            });
+
+            supplierFlexGrid.itemsSource = supplierCollectionView;
+            supplierFlexGrid.trackChanges = true;
+        }
+
         // ============
-        // On Load Page
+        // Add Supplier
         // ============
+        function btnSupplierAddOnclick() {
+            document.getElementById('btnSupplierAdd').innerHTML = "<i class='fa fa-plus'></i> Adding...";
+            $('#btnSupplierAdd').prop('disabled', true);
+            $('#btnSupplierClose').prop('disabled', true);
+
+            $.ajax({
+                type: "POST",
+                url: '/api/supplier/add',
+                contentType: "application/json; charset=utf-8",
+                statusCode: {
+                    200: function (id) {
+                        window.location = '/Software/SupplierDetail?id=' + id;
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        document.getElementById('btnSupplierAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnSupplierAdd').prop('disabled', false);
+                        $('#btnSupplierClose').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        document.getElementById('btnSupplierAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnSupplierAdd').prop('disabled', false);
+                        $('#btnSupplierClose').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        document.getElementById('btnSupplierAdd').innerHTML = "<i class='fa fa-plus'></i> Add";
+                        $('#btnSupplierAdd').prop('disabled', false);
+                        $('#btnSupplierClose').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =============
+        // Edit Supplier
+        // =============
+        function btnSupplierEditOnclick() {
+            supplierCollectionView.editItem(supplierCollectionView.currentItem);
+            var supplier = supplierCollectionView.currentEditItem;
+            var supplierId = supplier.Id;
+
+            window.location = '/Software/SupplierDetail?id=' + supplierId;
+        }
+
+        // ==============
+        // Close Supplier
+        // ==============
+        function btnSupplierCloseOnclick() {
+            window.location = '/Software';
+        }
+
+        // ===============
+        // Delete Supplier
+        // ===============
+        function btnSupplierDeleteOnclick() {
+            supplierCollectionView.editItem(supplierCollectionView.currentItem);
+            var supplier = supplierCollectionView.currentEditItem;
+            if (supplier.IsLocked) {
+                toastr.error("Delete is not allowed when the selected record is locked!");
+            } else {
+                $('#supplierConfirmDeleteModal').modal({
+                    show: true,
+                    backdrop: 'static'
+                });
+
+                document.getElementById('btnSupplierConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                $('#btnSupplierConfirmDelete').prop('disabled', false);
+                $('#btnSupplierConfirmDeleteCloseModal').prop('disabled', false);
+            }
+        }
+
+        // =======================
+        // Confirm Delete Supplier
+        // =======================
+        function btnSupplierConfirmDeleteOnclick() {
+            document.getElementById('btnSupplierConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $('#btnSupplierConfirmDelete').prop('disabled', true);
+            $('#btnSupplierConfirmDeleteCloseModal').prop('disabled', true);
+
+            supplierCollectionView.editItem(supplierCollectionView.currentItem);
+            var supplierId = supplierCollectionView.currentEditItem.Id;
+            $.ajax({
+                url: '/api/supplier/delete/' + supplierId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#supplierConfirmDeleteModal').modal('hide');
+                        refreshSupplierFlexgrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#supplierConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSupplierConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnSupplierConfirmDelete').prop('disabled', false);
+                        $('#btnSupplierConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#supplierConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSupplierConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnSupplierConfirmDelete').prop('disabled', false);
+                        $('#btnSupplierConfirmDeleteCloseModal').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#supplierConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnSupplierConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnSupplierConfirmDelete').prop('disabled', false);
+                        $('#btnSupplierConfirmDeleteCloseModal').prop('disabled', false);
+                    }
+                }
+            });
+        }
+
+        // =============================
+        // Document Ready - On load Page
+        // =============================
         $(document).ready(function () {
             createSupplierFlexGrid();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -579,6 +613,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -618,6 +655,9 @@
         }
     </script>
     <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
         var slideLeft = new Menu({
             wrapper: '#o-wrapper',
             type: 'slide-left',

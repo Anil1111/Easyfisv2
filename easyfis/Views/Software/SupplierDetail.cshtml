@@ -13,21 +13,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Meta -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-    <!-- Title of the Page -->
     <link rel="shortcut icon" href="~/Images/icon/easyfislogomini.ico">
     <title>Supplier Detail</title>
 
-    <!-- CSS StyleSheets-->
     @Styles.Render("~/Content/Software-css")
 </head>
 <body>
     <div id="o-wrapper" class="o-wrapper">
         <main class="o-content">
             @Html.Partial("_SoftwareHeader")
+
             <section class="content-header">
                 <div class="container">
                     <h3>
@@ -41,26 +38,38 @@
             </section>
             <section class="container">
                 <div class="panel panel-default">
+
+                    <!--
+                        ======================================
+                        Options: Lock, Unlock and Close Button
+                        ======================================
+                    -->
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-md-2">
-                                <button class="btn btn-primary" id="btnSaveSupplier" onclick="btnSaveSupplierOnclick()"><i class="fa fa-save"></i> Save</button>
+                                <button class="btn btn-primary" id="btnSupplierDetailSave" onclick="btnSupplierDetailSaveOnclick()"><i class="fa fa-save"></i> Save</button>
                             </div>
                             <div class="col-md-10" align="right">
                                 @{
                                     if (canLock)
                                     {
-                                        <button class="btn btn-primary" id="btnLockSupplier" onclick="btnLockSupplierOnclick()"><i class="fa fa-lock"></i> Lock</button>
+                                        <button class="btn btn-primary" id="btnSupplierDetailLock" onclick="btnSupplierDetailLockOnclick()"><i class="fa fa-lock"></i> Lock</button>
                                     }
                                     if (canUnlock)
                                     {
-                                        <button class="btn btn-primary" id="btnUnlockSupplier" onclick="btnUnlockSupplierOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
+                                        <button class="btn btn-primary" id="btnSupplierDetailUnlock" onclick="btnSupplierDetailUnlockOnclick()"><i class="fa fa-unlock"></i> Unlock</button>
                                     }
                                 }
-                                <button class="btn btn-danger" id="btnCloseSupplier" onclick="btnCloseSupplierOnclick()"><i class=" fa fa-times"></i> Close</button>
+                                <button class="btn btn-danger" id="btnSupplierDetailClose" onclick="btnSupplierDetailCloseOnclick()"><i class=" fa fa-times"></i> Close</button>
                             </div>
                         </div>
                     </div>
+
+                    <!--
+                        ======================================
+                        Details, Fields and Other Informations
+                        ======================================
+                    -->
                     <div class="panel-body">
                         <form class="form-horizontal" role="form">
                             <div class="row">
@@ -68,25 +77,25 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Code</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierCode" placeholder="Code..." disabled />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailCode" placeholder="Code..." disabled />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Manual Code</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierManualCode" placeholder="Manual Code..." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailManualCode" placeholder="Manual Code..." />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Supplier</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control  requiredSupplier" id="inpSupplierName" placeholder="Supplier..." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailSupplier" placeholder="Supplier..." />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Supplier Group</label>
                                         <div class="col-sm-8">
-                                            <div class="" id="cboSupplierGroup"></div>
+                                            <div class="" id="cboSupplierDetailSupplierGroup"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -95,11 +104,11 @@
                                             <table style="width: 100%" border="0">
                                                 <tr>
                                                     <td style="width: 30%">
-                                                        <div class="comboBox-wide" id="cboAccountCode"></div>
+                                                        <div class="comboBox-wide" id="cboSupplierDetailAccountCode"></div>
                                                     </td>
                                                     <td style="width: 1%"></td>
                                                     <td style="width: 69%">
-                                                        <div class="comboBox-wide" id="cboAccount"></div>
+                                                        <div class="comboBox-wide" id="cboSupplierDetailAccount"></div>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -108,19 +117,19 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Term</label>
                                         <div class="col-sm-8">
-                                            <div class="" id="cboTerm"></div>
+                                            <div class="comboBox-wide" id="cboSupplierDetailTerm"></div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Address</label>
                                         <div class="col-sm-8">
-                                            <textarea rows="5" class="form-control textarea-custom requiredSupplier" id="inpSupplierAddress" placeholder="Address..."></textarea>
+                                            <textarea rows="5" class="form-control textarea-custom requiredSupplier" id="inpSupplierDetailAddress" placeholder="Address..."></textarea>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Credit Limit</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredCustomer numberField" id="inpSupplierCreditLimit" placeholder="Credit Limit..." />
+                                            <input type="text" class="form-control requiredSupplier numberField" id="inpSupplierDetailCreditLimit" placeholder="Credit Limit..." />
                                         </div>
                                     </div>
                                 </div>
@@ -128,31 +137,31 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Contact Number</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierContactNo" placeholder="Contact No...." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailSupplierContactNumber" placeholder="Contact No...." />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Contact Person</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control  requiredSupplier" id="inpSupplierContactPerson" placeholder="Contact Person..." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailSupplierContactPerson" placeholder="Contact Person..." />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">TIN</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierTIN" placeholder="TIN Number..." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailSupplierTIN" placeholder="TIN Number..." />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">Particulars</label>
                                         <div class="col-sm-8">
-                                            <textarea rows="5" class="form-control textarea-custom requiredsupplier" id="inpSupplierParticulars" placeholder="Particulars..."></textarea>
+                                            <textarea rows="5" class="form-control textarea-custom requiredsupplier" id="inpSupplierDetailSupplierParticulars" placeholder="Particulars..."></textarea>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-4">E-mail</label>
                                         <div class="col-sm-8">
-                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierEmail" placeholder="E-mail..." />
+                                            <input type="text" class="form-control requiredSupplier" id="inpSupplierDetailSupplierEmailAddress" placeholder="E-mail Address..." />
                                         </div>
                                     </div>
                                 </div>
@@ -160,6 +169,12 @@
                         </form>
                     </div>
                 </div>
+
+                <!--
+                    ========================================================
+                    Journal Ledger Contact Information and Consignment Items
+                    ========================================================
+                -->
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
                     <li role="presentation" class="active"><a data-toggle="tab" href="#JournalLedger" id="journalLedgerTab">Journal Ledger</a></li>
                     <li role="presentation"><a data-toggle="tab" href="#ContactInformation" id="contactInformationTab">More Contact Information</a></li>
@@ -169,20 +184,26 @@
                 <div class="tab-content">
                     <div id="JournalLedger" class="tab-pane active" style="margin-bottom: 15px;">
                         <div class="panel panel-default">
+
+                            <!--
+                                ===================================================================
+                                Journal Ledger: Search, Filter, Display Number of Rows and  Buttons
+                                ===================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="JournalLedgerInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpJournalLedgerSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboJournalLedgerShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboJournalLedgerDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -190,23 +211,35 @@
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                =========================
+                                Journal Ledger: Flex Grid
+                                =========================
+                            -->
                             <div class="panel-body">
-                                <div id="JournalLedgerGrid"></div>
+                                <div id="journalLedgerFlexGrid"></div>
                             </div>
+
+                            <!--
+                                ==================================
+                                Journal Ledger: Navigation Buttons
+                                ==================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridJournalLedger">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridJournalLedger">
+                                    <div class="btn-group col-md-7" id="journalLedgerNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalLedgerMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridJournalLedger">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalLedgerMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridJournalLedger"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridJournalLedger">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnJournalLedgerCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalLedgerMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridJournalLedger">
+                                        <button type="button" class="btn btn-default border-custom" id="btnJournalLedgerMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -214,22 +247,29 @@
                             </div>
                         </div>
                     </div>
+
                     <div id="ContactInformation" class="tab-pane">
                         <div class="panel panel-default">
+
+                            <!--
+                                ========================================================================
+                                Contact Information: Search, Filter, Display Number of Rows and  Buttons
+                                ========================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
                                         <td style="width: 49.5%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                                <input type="text" class="form-control " id="ContactInformationInputFilter" placeholder="Search...">
+                                                <input type="text" class="form-control" id="inpContactInformationSearchFilter" placeholder="Search...">
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
                                         <td style="width: 24%">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><b><i class="fa fa-table"></i></b></span>
-                                                <div class="comboBox-wide" id="cboContactInformationShowNumberOfRows"></div>
+                                                <div class="comboBox-wide" id="cboContactInformationDisplayNumberOfRows"></div>
                                             </div>
                                         </td>
                                         <td style="width: 1%"></td>
@@ -237,30 +277,42 @@
                                             @{
                                                 if (canAdd)
                                                 {
-                                                    <button class="btn btn-primary" id="btnAddMoreContactInformation" onclick="cmdAddContact_OnClick()"><i class="fa fa-plus"></i> Add</button>
+                                                    <button class="btn btn-primary" id="btnContactInformationAdd" onclick="btnContactInformationAddOnclick()"><i class="fa fa-plus"></i> Add</button>
                                                 }
                                             }
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ==============================
+                                Contact Information: Flex Grid
+                                ==============================
+                            -->
                             <div class="panel-body">
-                                <div id="ContactInformationGrid" class="grid"></div>
+                                <div id="contactInformationFlexGrid" class="grid"></div>
                             </div>
+
+                            <!--
+                                =======================================
+                                Contact Information: Navigation Buttons
+                                =======================================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
-                                    <div class="btn-group col-md-7" id="naviagtionPageGridContactInformation">
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToFirstPageGridContactInformation">
+                                    <div class="btn-group col-md-7" id="contactInformationNavigationPageGrid">
+                                        <button type="button" class="btn btn-default border-custom" id="btnContactInformationMoveToFirstPageGrid">
                                             <span class="glyphicon glyphicon-fast-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToPreviousPageGridContactInformation">
+                                        <button type="button" class="btn btn-default border-custom" id="btnContactInformationMoveToPreviousPageGrid">
                                             <span class="glyphicon glyphicon-step-backward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnCurrentPageGridContactInformation"></button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToNextPageGridContactInformation">
+                                        <button type="button" class="btn btn-default border-custom" disabled style="width: 100px" id="btnContactInformationCurrentPageGrid"></button>
+                                        <button type="button" class="btn btn-default border-custom" id="btnContactInformationMoveToNextPageGrid">
                                             <span class="glyphicon glyphicon-step-forward"></span>
                                         </button>
-                                        <button type="button" class="btn btn-default border-custom" id="btnMoveToLastPageGridContactInformation">
+                                        <button type="button" class="btn btn-default border-custom" id="btnContactInformationMoveToLastPageGrid">
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
@@ -268,8 +320,15 @@
                             </div>
                         </div>
                     </div>
+
                     <div id="Consignment" class="tab-pane">
                         <div class="panel panel-default">
+
+                            <!--
+                                ================================================================
+                                Consignment: Search, Filter, Display Number of Rows and  Buttons
+                                ================================================================
+                            -->
                             <div class="panel-heading">
                                 <table style="width: 100%" border="0">
                                     <tr>
@@ -298,9 +357,21 @@
                                     </tr>
                                 </table>
                             </div>
+
+                            <!--
+                                ======================
+                                Consignment: Flex Grid
+                                ======================
+                            -->
                             <div class="panel-body">
                                 <div id="ConsignmentGrid" class="grid"></div>
                             </div>
+
+                            <!--
+                                ===============================
+                                Consignment: Navigation Buttons
+                                ===============================
+                            -->
                             <div class="panel-footer">
                                 <div class="row">
                                     <div class="btn-group col-md-7" id="naviagtionPageGridConsignment">
@@ -323,6 +394,12 @@
                         </div>
                     </div>
                 </div>
+
+                <!--
+                    ==========
+                    User Stamp
+                    ==========
+                -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         User stamp
@@ -351,60 +428,79 @@
                     </div>
                 </div>
             </section>
+
             @Html.Partial("_SoftwareFooter")
         </main>
     </div>
     <div id="c-mask" class="c-mask"></div>
 
-    <!-- Contact Edit Detail -->
-    <div class="modal fade" id="contactEdit" role="dialog">
+    <!--
+        =================================
+        Contact Information: Detail Modal
+        =================================
+    -->
+    <div class="modal fade" id="contactInformationDetailModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="contactModalLabel">Contact Information</h4>
+                    <h4 class="modal-title" id="contactInformationModalTitle">Contact Information</h4>
                 </div>
                 <div class="modal-body">
                     <center>
-                        <span id="loadingModalItem"></span>
+                        <span id="contactInformationLoading"></span>
                     </center>
-                    <div id="contactDetailForm">
+                    <div id="contactInformationDetailForm">
                         <dl class="dl-horizontal">
                             <dt>Contact Person</dt>
-                            <dd><input type="text" class="form-control  requiredContact" id="contact_contactPerson" placeholder="Contact Person" /></dd>
+                            <dd>
+                                <input type="text" class="form-control  requiredContact" id="inpContactInformationContactPerson" placeholder="Contact Person" />
+                            </dd>
                             <dt>Contact Number</dt>
-                            <dd><input type="text" class="form-control requiredContact" id="contact_contactNumber" placeholder="Contact Number" /></dd>
+                            <dd>
+                                <input type="text" class="form-control requiredContact" id="inpContactInformationContactNumber" placeholder="Contact Number" />
+                            </dd>
                             <dt>Remarks</dt>
-                            <dd><textarea rows="5" class="form-control textarea-custom requiredContact" id="contact_Remarks" placeholder="Remarks"></textarea></dd>
+                            <dd>
+                                <textarea rows="5" class="form-control textarea-custom requiredContact" id="inpContactInformationRemarks" placeholder="Remarks"></textarea>
+                            </dd>
                         </dl>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdSaveContactButton" class="btn btn-primary" onclick="cmdContactSaveButton_OnClick()"><i class="fa fa-save"></i> Save</button>
-                    <button id="cmdContactDetailCloseButton" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+                    <button id="btnContactInformationSave" class="btn btn-primary" onclick="btnContactInformationSaveOnclick()"><i class="fa fa-save"></i> Save</button>
+                    <button id="btnContactInformationCloseDetailModal" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Contact Delete Modal Confirmation -->
-    <div class="modal fade" id="deleteContactConfirm" role="dialog">
+    <!--
+        =========================================
+        Contact Information: Confirm Delete Modal
+        =========================================
+    -->
+    <div class="modal fade" id="contactInformationConfirmDeleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Delete Contact</h4>
+                    <h4 class="modal-title">Delete</h4>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this contact information?
+                    Delete Contact Information?
                 </div>
                 <div class="modal-footer">
-                    <button id="cmdConfirmDeleteContact" class="btn btn-danger" onclick="cmdContactConfirmDeleteButton_OnClick()"><i class="fa fa-trash"></i> Delete</button>
-                    <button id="cmdConfirmDeleteContactCloseButton" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
+                    <button id="btnContactInformationConfirmDelete" class="btn btn-danger" onclick="btnContactInformationConfirmDeleteOnclick()"><i class="fa fa-trash"></i> Delete</button>
+                    <button id="btnContactInformationCloseConfirmDeleteModal" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-close"></i> Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Consignment Item Edit Detail -->
+    <!--
+        =========================
+        Consignment: Detail Modal
+        =========================
+    -->
     <div class="modal fade" id="consignmentModal" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -432,9 +528,13 @@
                                 </table>
                             </dd>
                             <dt>Cost Percentage</dt>
-                            <dd><input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostPercentage" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostPercentage" placeholder="0.00" />
+                            </dd>
                             <dt>Cost Value</dt>
-                            <dd><input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostValue" placeholder="0.00" /></dd>
+                            <dd>
+                                <input type="text" class="form-control requiredConsignmentItem numberField" id="inpConsignmentItemCostValue" placeholder="0.00" />
+                            </dd>
                         </dl>
                     </div>
                 </div>
@@ -446,7 +546,11 @@
         </div>
     </div>
 
-    <!-- Consignment Item Delete Modal Confirmation -->
+    <!--
+        =================================
+        Consignment: Confirm Delete Modal
+        =================================
+    -->
     <div class="modal fade" id="consignmentDeletModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -464,37 +568,48 @@
         </div>
     </div>
 
-
     @Scripts.Render("~/Scripts/Software-js")
     <script type="text/javascript">
-        // ================
-        // Global Variables
-        // ================
-        var cboSupplierGroup = new wijmo.input.ComboBox('#cboSupplierGroup');
-        var supplierId = getParam('id');
-        var Islocked = false;
-        var cboAccountCode = new wijmo.input.ComboBox('#cboAccountCode');
-        var cboAccount = new wijmo.input.ComboBox('#cboAccount');
-        var cboTerm = new wijmo.input.ComboBox('#cboTerm');
-        var journalLedgerCollectionView;
-        var journalLedgerGrid;
-        var contactInformations;
-        var contactInformationGrid;
-        var isSupplierGroupSelected = false;
+        // ==============================
+        // Company Detail Data and Fields
+        // ==============================
+        var supplierId = getURLParameterValue('id');
+        var cboSupplierDetailSupplierGroup = new wijmo.input.ComboBox('#cboSupplierDetailSupplierGroup');
+        var isCboSupplierDetailSupplierGroupSelected = false;
+        var cboSupplierDetailAccountCode = new wijmo.input.ComboBox('#cboSupplierDetailAccountCode');
+        var cboSupplierDetailAccount = new wijmo.input.ComboBox('#cboSupplierDetailAccount');
         var supplierAccountId = 0;
-        var cboJournalLedgerShowNumberOfRows = new wijmo.input.ComboBox('#cboJournalLedgerShowNumberOfRows');
-        var btnMoveToFirstPageGridJournalLedger = document.getElementById('btnMoveToFirstPageGridJournalLedger');
-        var btnMoveToPreviousPageGridJournalLedger = document.getElementById('btnMoveToPreviousPageGridJournalLedger');
-        var btnMoveToNextPageGridJournalLedger = document.getElementById('btnMoveToNextPageGridJournalLedger');
-        var btnMoveToLastPageGridJournalLedger = document.getElementById('btnMoveToLastPageGridJournalLedger');
-        var btnCurrentPageGridJournalLedger = document.getElementById('btnCurrentPageGridJournalLedger');
-        var cboContactInformationShowNumberOfRows = new wijmo.input.ComboBox('#cboContactInformationShowNumberOfRows');
-        var btnMoveToFirstPageGridContactInformation = document.getElementById('btnMoveToFirstPageGridContactInformation');
-        var btnMoveToPreviousPageGridContactInformation = document.getElementById('btnMoveToPreviousPageGridContactInformation');
-        var btnMoveToNextPageGridContactInformation = document.getElementById('btnMoveToNextPageGridContactInformation');
-        var btnMoveToLastPageGridContactInformation = document.getElementById('btnMoveToLastPageGridContactInformation');
-        var btnCurrentPageGridContactInformation = document.getElementById('btnCurrentPageGridContactInformation');
+        var cboSupplierDetailTerm = new wijmo.input.ComboBox('#cboSupplierDetailTerm');
+        var Islocked = false;
 
+        // ===========================================================================
+        // Contact Information Data, Collection View, Flex Grid and Navigation Buttons
+        // ===========================================================================
+        var journalLedgerCollectionView;
+        var journalLedgerFlexGrid;
+        var cboContactInformationDisplayNumberOfRows = new wijmo.input.ComboBox('#cboContactInformationDisplayNumberOfRows');
+        var btnContactInformationMoveToFirstPageGrid = document.getElementById('btnContactInformationMoveToFirstPageGrid');
+        var btnContactInformationMoveToPreviousPageGrid = document.getElementById('btnContactInformationMoveToPreviousPageGrid');
+        var btnContactInformationMoveToNextPageGrid = document.getElementById('btnContactInformationMoveToNextPageGrid');
+        var btnContactInformationMoveToLastPageGrid = document.getElementById('btnContactInformationMoveToLastPageGrid');
+        var btnContactInformationCurrentPageGrid = document.getElementById('btnContactInformationCurrentPageGrid');
+        var contactInformationId = 0;
+
+        // ======================================================================
+        // Journal Ledger Data, Collection View, Flex Grid and Navigation Buttons
+        // ======================================================================
+        var contactInformationCollectionView;
+        var contactInformationFlexGrid;
+        var cboJournalLedgerDisplayNumberOfRows = new wijmo.input.ComboBox('#cboJournalLedgerDisplayNumberOfRows');
+        var btnJournalLedgerMoveToFirstPageGrid = document.getElementById('btnJournalLedgerMoveToFirstPageGrid');
+        var btnJournalLedgerMoveToPreviousPageGrid = document.getElementById('btnJournalLedgerMoveToPreviousPageGrid');
+        var btnJournalLedgerMoveToNextPageGrid = document.getElementById('btnJournalLedgerMoveToNextPageGrid');
+        var btnJournalLedgerMoveToLastPageGrid = document.getElementById('btnJournalLedgerMoveToLastPageGrid');
+        var btnJournalLedgerCurrentPageGrid = document.getElementById('btnJournalLedgerCurrentPageGrid');
+
+        // ===================================================================
+        // Consignment Data, Collection View, Flex Grid and Navigation Buttons
+        // ===================================================================
         var consignmentItemCollectionView;
         var consignmentItemFlexGrid;
         var cboConsignmentShowNumberOfRows = new wijmo.input.ComboBox('#cboConsignmentShowNumberOfRows');
@@ -503,14 +618,13 @@
         var btnMoveToNextPageGridConsignment = document.getElementById('btnMoveToNextPageGridConsignment');
         var btnMoveToLastPageGridConsignment = document.getElementById('btnMoveToLastPageGridConsignment');
         var btnCurrentPageGridConsignment = document.getElementById('btnCurrentPageGridConsignment');
-
         var cboConsignmentItemCode = new wijmo.input.ComboBox('#cboConsignmentItemCode');
         var cboConsignmentItemDescription = new wijmo.input.ComboBox('#cboConsignmentItemDescription');
 
         // =======================
         // Get URL Parameter Value
         // =======================
-        function getParam(name) {
+        function getURLParameterValue(name) {
             name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 
             var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -524,11 +638,11 @@
             }
         }
 
-        // ==================
-        // Get Supplier Group
-        // ==================
-        function getSupplierGroup() {
-            var articleSupplierGroupsObservableArray = new wijmo.collections.ObservableArray();
+        // ===========================================
+        // Create Supplier Detail Combo Supplier Group
+        // ===========================================
+        function createCboSupplierDetailSupplierGroup() {
+            var supplierGroupObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/supplier/dropdown/list/supplierGroup',
                 cache: false,
@@ -537,7 +651,7 @@
                 success: function (results) {
                     if (results.length > 0) {
                         for (i = 0; i < results.length; i++) {
-                            articleSupplierGroupsObservableArray.push({
+                            supplierGroupObservableArray.push({
                                 Id: results[i]["Id"],
                                 ArticleGroup: results[i]["ArticleGroup"],
                                 AccountId: results[i]["AccountId"],
@@ -554,35 +668,35 @@
                         disabled = false;
                     }
 
-                    cboSupplierGroup.dispose();
-                    cboSupplierGroup = new wijmo.input.ComboBox('#cboSupplierGroup', {
+                    cboSupplierDetailSupplierGroup.dispose();
+                    cboSupplierDetailSupplierGroup = new wijmo.input.ComboBox('#cboSupplierDetailSupplierGroup', {
                         disabled: disabled,
                         isEditable: false,
-                        itemsSource: articleSupplierGroupsObservableArray,
+                        itemsSource: supplierGroupObservableArray,
                         displayMemberPath: "ArticleGroup",
                         selectedValuePath: "Id",
                         onSelectedIndexChanged: function () {
                             if (this.selectedValue != null) {
-                                isSupplierGroupSelected = true;
-                                getSupplierGroupAccount();
+                                isCboSupplierDetailSupplierGroupSelected = true;
+                                createCboSupplierDetailAccount();
                             }
                         }
                     });
 
-                    if (cboSupplierGroup.selectedValue != null) {
-                        getSupplierGroupAccount();
+                    if (cboSupplierDetailSupplierGroup.selectedValue != null) {
+                        createCboSupplierDetailAccount();
                     }
                 }
             });
         }
 
-        // ==========================
-        // Get Supplier Group Account
-        // ==========================
-        function getSupplierGroupAccount() {
+        // ====================================
+        // Create Supplier Detail Combo Account
+        // ====================================
+        function createCboSupplierDetailAccount() {
             var accountsObservableArray = new wijmo.collections.ObservableArray();
-            if (cboSupplierGroup.selectedValue != null) {
-                var accountSelectedValueFromArticleGroup = cboSupplierGroup.selectedItem["AccountId"];
+            if (cboSupplierDetailSupplierGroup.selectedValue != null) {
+                var accountSelectedValueFromArticleGroup = cboSupplierDetailSupplierGroup.selectedItem["AccountId"];
 
                 $.ajax({
                     url: '/api/supplier/dropdown/list/supplierGroup/account/' + accountSelectedValueFromArticleGroup,
@@ -600,8 +714,8 @@
                             }
                         }
 
-                        cboAccountCode.dispose();
-                        cboAccountCode = new wijmo.input.ComboBox('#cboAccountCode', {
+                        cboSupplierDetailAccountCode.dispose();
+                        cboSupplierDetailAccountCode = new wijmo.input.ComboBox('#cboSupplierDetailAccountCode', {
                             disabled: true,
                             isEditable: false,
                             itemsSource: accountsObservableArray,
@@ -609,12 +723,12 @@
                             selectedValuePath: "Id",
                             selectedValue: accountSelectedValueFromArticleGroup,
                             onSelectedIndexChanged: function () {
-                                cboAccount.selectedValue = this.selectedValue;
+                                cboSupplierDetailAccount.selectedValue = this.selectedValue;
                             }
                         });
 
-                        cboAccount.dispose();
-                        cboAccount = new wijmo.input.ComboBox('#cboAccount', {
+                        cboSupplierDetailAccount.dispose();
+                        cboSupplierDetailAccount = new wijmo.input.ComboBox('#cboSupplierDetailAccount', {
                             disabled: true,
                             isEditable: false,
                             itemsSource: accountsObservableArray,
@@ -622,40 +736,40 @@
                             selectedValuePath: "Id",
                             selectedValue: accountSelectedValueFromArticleGroup,
                             onSelectedIndexChanged: function () {
-                                cboAccountCode.selectedValue = this.selectedValue;
+                                cboSupplierDetailAccountCode.selectedValue = this.selectedValue;
                             }
                         });
 
-                        if (!isSupplierGroupSelected) {
-                            getSupplierTerm();
+                        if (!isCboSupplierDetailSupplierGroupSelected) {
+                            createCboSupplierDetailTerm();
                         }
                     }
                 });
             } else {
-                cboAccountCode.dispose();
-                cboAccountCode = new wijmo.input.ComboBox('#cboAccountCode', {
+                cboSupplierDetailAccountCode.dispose();
+                cboSupplierDetailAccountCode = new wijmo.input.ComboBox('#cboSupplierDetailAccountCode', {
                     disabled: true,
                     isEditable: false,
                     itemsSource: accountsObservableArray
                 });
 
-                cboAccount.dispose();
-                cboAccount = new wijmo.input.ComboBox('#cboAccount', {
+                cboSupplierDetailAccount.dispose();
+                cboSupplierDetailAccount = new wijmo.input.ComboBox('#cboSupplierDetailAccount', {
                     disabled: true,
                     isEditable: false,
                     itemsSource: accountsObservableArray
                 });
 
-                if (!isSupplierGroupSelected) {
-                    getSupplierTerm();
+                if (!isCboSupplierDetailSupplierGroupSelected) {
+                    createCboSupplierDetailTerm();
                 }
             }
         }
 
-        // =================
-        // Get Supplier Term
-        // =================
-        function getSupplierTerm() {
+        // =================================
+        // Create Supplier Detail Combo Term
+        // =================================
+        function createCboSupplierDetailTerm() {
             var termsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/supplier/dropdown/list/term',
@@ -672,23 +786,23 @@
                         }
                     }
 
-                    cboTerm.dispose();
-                    cboTerm = new wijmo.input.ComboBox('#cboTerm', {
+                    cboSupplierDetailTerm.dispose();
+                    cboSupplierDetailTerm = new wijmo.input.ComboBox('#cboSupplierDetailTerm', {
                         isEditable: false,
                         itemsSource: termsObservableArray,
                         displayMemberPath: "Term",
                         selectedValuePath: "Id"
                     });
 
-                    getSupplierDetail();
+                    getSupplierDetailData();
                 }
             });
         }
 
-        // ===================
-        // Get Supplier Detail
-        // ===================
-        function getSupplierDetail() {
+        // ========================
+        // Get Supplier Detail Data
+        // ========================
+        function getSupplierDetailData() {
             NProgress.start();
             if (document.location.search.length > 0) {
                 $.ajax({
@@ -698,21 +812,21 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
                         if (results != null) {
-                            document.getElementById('inpSupplierCode').value = results.ArticleCode;
-                            document.getElementById('inpSupplierManualCode').value = results.ManualArticleCode;
-                            document.getElementById('inpSupplierName').value = results.Article;
-                            cboSupplierGroup.selectedValue = results.ArticleGroupId;
-                            cboAccountCode.selectedValue = results.AccountId;
+                            document.getElementById('inpSupplierDetailCode').value = results.ArticleCode;
+                            document.getElementById('inpSupplierDetailManualCode').value = results.ManualArticleCode;
+                            document.getElementById('inpSupplierDetailSupplier').value = results.Article;
+                            cboSupplierDetailSupplierGroup.selectedValue = results.ArticleGroupId;
+                            cboSupplierDetailAccountCode.selectedValue = results.AccountId;
                             supplierAccountId = results.AccountId;
-                            cboAccount.selectedValue = results.AccountId;
-                            cboTerm.selectedValue = results.TermId;
-                            document.getElementById('inpSupplierAddress').value = results.Address;
-                            document.getElementById('inpSupplierParticulars').value = results.Particulars;
-                            document.getElementById('inpSupplierEmail').value = results.EmailAddress;
-                            document.getElementById('inpSupplierCreditLimit').value = formatDecimalValues(results.CreditLimit);
-                            document.getElementById('inpSupplierTIN').value = results.TaxNumber;
-                            document.getElementById('inpSupplierContactNo').value = results.ContactNumber;
-                            document.getElementById('inpSupplierContactPerson').value = results.ContactPerson;
+                            cboSupplierDetailAccount.selectedValue = results.AccountId;
+                            cboSupplierDetailTerm.selectedValue = results.TermId;
+                            document.getElementById('inpSupplierDetailAddress').value = results.Address;
+                            document.getElementById('inpSupplierDetailSupplierParticulars').value = results.Particulars;
+                            document.getElementById('inpSupplierDetailSupplierEmailAddress').value = results.EmailAddress;
+                            document.getElementById('inpSupplierDetailSupplierTIN').value = results.TaxNumber;
+                            document.getElementById('inpSupplierDetailSupplierContactNumber').value = results.ContactNumber;
+                            document.getElementById('inpSupplierDetailSupplierContactPerson').value = results.ContactPerson;
+                            document.getElementById('inpSupplierDetailCreditLimit').value = formatDecimalValues(results.CreditLimit);
 
                             document.getElementById('createdBy').innerHTML = results.CreatedBy;
                             document.getElementById('createdDate').innerHTML = results.CreatedDateTime;
@@ -720,28 +834,27 @@
                             document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
                             if (results.IsLocked) {
-                                document.getElementById('inpSupplierName').disabled = true;
-                                document.getElementById('inpSupplierManualCode').disabled = true;
-                                cboSupplierGroup.disabled = true;
-                                cboAccountCode.disabled = true;
-                                cboAccount.disabled = true;
-                                cboTerm.disabled = true;
-                                document.getElementById('inpSupplierAddress').disabled = true;
-                                document.getElementById('inpSupplierParticulars').disabled = true;
-                                document.getElementById('inpSupplierTIN').disabled = true;
-                                document.getElementById('inpSupplierContactNo').disabled = true;
-                                document.getElementById('inpSupplierContactPerson').disabled = true;
-                                document.getElementById('inpSupplierEmail').disabled = true;
-                                document.getElementById('inpSupplierCreditLimit').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplier').disabled = true;
+                                document.getElementById('inpSupplierDetailManualCode').disabled = true;
+                                cboSupplierDetailSupplierGroup.disabled = true;
+                                cboSupplierDetailAccountCode.disabled = true;
+                                cboSupplierDetailAccount.disabled = true;
+                                cboSupplierDetailTerm.disabled = true;
+                                document.getElementById('inpSupplierDetailAddress').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplierParticulars').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplierTIN').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplierContactNumber').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplierContactPerson').disabled = true;
+                                document.getElementById('inpSupplierDetailSupplierEmailAddress').disabled = true;
+                                document.getElementById('inpSupplierDetailCreditLimit').disabled = true;
 
-                                $('#btnSaveSupplier').prop('disabled', true);
-                                $('#btnLockSupplier').prop('disabled', true);
-                                $('#btnAddMoreContactInformation').prop('disabled', true);
-                                $('#btnAddConsignment').prop('disabled', true);
+                                $('#btnSupplierDetailSave').prop('disabled', true);
+                                $('#btnSupplierDetailLock').prop('disabled', true);
+                                $('#btnContactInformationAdd').prop('disabled', true);
 
                                 Islocked = true;
                             } else {
-                                $('#btnUnlockSupplier').prop('disabled', true);
+                                $('#btnSupplierDetailUnlock').prop('disabled', true);
                             }
                         } else {
                             alert("No Data");
@@ -785,36 +898,37 @@
         // ========================
         function getSupplierDataObject() {
             var supplierObject = new Object();
-            supplierObject.ManualArticleCode = document.getElementById('inpSupplierManualCode').value;
-            supplierObject.Article = document.getElementById('inpSupplierName').value;
-            supplierObject.ArticleGroupId = cboSupplierGroup.selectedValue;
-            supplierObject.AccountId = cboAccount.selectedValue;
-            supplierObject.SalesAccountId = cboSupplierGroup.selectedItem["SalesAccountId"];
-            supplierObject.CostAccountId = cboSupplierGroup.selectedItem["CostAccountId"];
-            supplierObject.AssetAccountId = cboSupplierGroup.selectedItem["AssetAccountId"];
-            supplierObject.ExpenseAccountId = cboSupplierGroup.selectedItem["ExpenseAccountId"];
-            supplierObject.TermId = cboTerm.selectedValue;
-            supplierObject.Address = document.getElementById('inpSupplierAddress').value;
-            supplierObject.ContactNumber = document.getElementById('inpSupplierContactNo').value;
-            supplierObject.ContactPerson = document.getElementById('inpSupplierContactPerson').value;
-            supplierObject.TaxNumber = document.getElementById('inpSupplierTIN').value;
-            supplierObject.Particulars = document.getElementById('inpSupplierParticulars').value;
-            supplierObject.EmailAddress = document.getElementById('inpSupplierEmail').value;
-            supplierObject.CreditLimit = document.getElementById('inpSupplierCreditLimit').value;
+            supplierObject.ManualArticleCode = document.getElementById('inpSupplierDetailManualCode').value;
+            supplierObject.Article = document.getElementById('inpSupplierDetailSupplier').value;
+            supplierObject.ArticleGroupId = cboSupplierDetailSupplierGroup.selectedValue;
+            supplierObject.AccountId = cboSupplierDetailAccount.selectedValue;
+            supplierObject.SalesAccountId = cboSupplierDetailSupplierGroup.selectedItem["SalesAccountId"];
+            supplierObject.CostAccountId = cboSupplierDetailSupplierGroup.selectedItem["CostAccountId"];
+            supplierObject.AssetAccountId = cboSupplierDetailSupplierGroup.selectedItem["AssetAccountId"];
+            supplierObject.ExpenseAccountId = cboSupplierDetailSupplierGroup.selectedItem["ExpenseAccountId"];
+            supplierObject.TermId = cboSupplierDetailTerm.selectedValue;
+            supplierObject.Address = document.getElementById('inpSupplierDetailAddress').value;
+            supplierObject.ContactNumber = document.getElementById('inpSupplierDetailSupplierContactNumber').value;
+            supplierObject.ContactPerson = document.getElementById('inpSupplierDetailSupplierContactPerson').value;
+            supplierObject.TaxNumber = document.getElementById('inpSupplierDetailSupplierTIN').value;
+            supplierObject.Particulars = document.getElementById('inpSupplierDetailSupplierParticulars').value;
+            supplierObject.EmailAddress = document.getElementById('inpSupplierDetailSupplierEmailAddress').value;
+            supplierObject.CreditLimit = document.getElementById('inpSupplierDetailCreditLimit').value;
             var supplierData = JSON.stringify(supplierObject);
+
             return supplierData;
         }
 
         // =============
         // Save Supplier
         // =============
-        function btnSaveSupplierOnclick() {
+        function btnSupplierDetailSaveOnclick() {
             if (supplierEntryValidation()) {
-                document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $('#btnSaveSupplier').prop('disabled', true);
-                $('#btnLockSupplier').prop('disabled', true);
-                $('#btnUnlockSupplier').prop('disabled', true);
-                $('#btnCloseSupplier').prop('disabled', true);
+                document.getElementById('btnSupplierDetailSave').innerHTML = "<i class='fa fa-lock'></i> Saving...";
+                $('#btnSupplierDetailSave').prop('disabled', true);
+                $('#btnSupplierDetailLock').prop('disabled', true);
+                $('#btnSupplierDetailUnlock').prop('disabled', true);
+                $('#btnSupplierDetailClose').prop('disabled', true);
 
                 $.ajax({
                     type: "PUT",
@@ -831,42 +945,42 @@
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $("#btnSaveSupplier").prop("disabled", false);
+                            document.getElementById('btnSupplierDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnSupplierDetailSave").prop("disabled", false);
 
                             if (isLocked) {
-                                $("#btnUnlockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailUnlock").prop("disabled", false);
                             } else {
-                                $("#btnLockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailLock").prop("disabled", false);
                             }
 
-                            $("#btnCloseSupplier").prop("disabled", false);
+                            $("#btnSupplierDetailClose").prop("disabled", false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $("#btnSaveSupplier").prop("disabled", false);
+                            document.getElementById('btnSupplierDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnSupplierDetailSave").prop("disabled", false);
 
                             if (isLocked) {
-                                $("#btnUnlockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailUnlock").prop("disabled", false);
                             } else {
-                                $("#btnLockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailLock").prop("disabled", false);
                             }
 
-                            $("#btnCloseSupplier").prop("disabled", false);
+                            $("#btnSupplierDetailClose").prop("disabled", false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('btnSaveSupplier').innerHTML = "<i class='fa fa-save'></i> Save";
-                            $("#btnSaveSupplier").prop("disabled", false);
+                            document.getElementById('btnSupplierDetailSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                            $("#btnSupplierDetailSave").prop("disabled", false);
 
                             if (isLocked) {
-                                $("#btnUnlockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailUnlock").prop("disabled", false);
                             } else {
-                                $("#btnLockSupplier").prop("disabled", false);
+                                $("#btnSupplierDetailLock").prop("disabled", false);
                             }
 
-                            $("#btnCloseSupplier").prop("disabled", false);
+                            $("#btnSupplierDetailClose").prop("disabled", false);
                         }
                     }
                 });
@@ -878,13 +992,13 @@
         // =============
         // Lock Supplier
         // =============
-        function btnLockSupplierOnclick() {
+        function btnSupplierDetailLockOnclick() {
             if (supplierEntryValidation()) {
-                document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Locking";
-                $('#btnSaveSupplier').prop('disabled', true);
-                $('#btnLockSupplier').prop('disabled', true);
-                $('#btnUnlockSupplier').prop('disabled', true);
-                $('#btnCloseSupplier').prop('disabled', true);
+                document.getElementById('btnSupplierDetailLock').innerHTML = "<i class='fa fa-lock'></i> Locking...";
+                $('#btnSupplierDetailSave').prop('disabled', true);
+                $('#btnSupplierDetailLock').prop('disabled', true);
+                $('#btnSupplierDetailUnlock').prop('disabled', true);
+                $('#btnSupplierDetailClose').prop('disabled', true);
 
                 $.ajax({
                     type: "PUT",
@@ -901,24 +1015,24 @@
                         },
                         404: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                            document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnSaveSupplier').prop('disabled', false);
-                            $('#btnLockSupplier').prop('disabled', false);
-                            $('#btnCloseSupplier').prop('disabled', false);
+                            document.getElementById('btnSupplierDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSupplierDetailSave').prop('disabled', false);
+                            $('#btnSupplierDetailLock').prop('disabled', false);
+                            $('#btnSupplierDetailClose').prop('disabled', false);
                         },
                         400: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                            document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnSaveSupplier').prop('disabled', false);
-                            $('#btnLockSupplier').prop('disabled', false);
-                            $('#btnCloseSupplier').prop('disabled', false);
+                            document.getElementById('btnSupplierDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSupplierDetailSave').prop('disabled', false);
+                            $('#btnSupplierDetailLock').prop('disabled', false);
+                            $('#btnSupplierDetailClose').prop('disabled', false);
                         },
                         500: function (message) {
                             toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                            document.getElementById('btnLockSupplier').innerHTML = "<i class='fa fa-lock'></i> Lock";
-                            $('#btnSaveSupplier').prop('disabled', false);
-                            $('#btnLockSupplier').prop('disabled', false);
-                            $('#btnCloseSupplier').prop('disabled', false);
+                            document.getElementById('btnSupplierDetailLock').innerHTML = "<i class='fa fa-lock'></i> Lock";
+                            $('#btnSupplierDetailSave').prop('disabled', false);
+                            $('#btnSupplierDetailLock').prop('disabled', false);
+                            $('#btnSupplierDetailClose').prop('disabled', false);
                         }
                     }
                 });
@@ -930,12 +1044,12 @@
         // ===============
         // Unlock Supplier
         // ===============
-        function btnUnlockSupplierOnclick() {
-            document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Unlocking";
-            $('#btnSaveSupplier').prop('disabled', true);
-            $('#btnLockSupplier').prop('disabled', true);
-            $('#btnUnlockSupplier').prop('disabled', true);
-            $('#btnCloseSupplier').prop('disabled', true);
+        function btnSupplierDetailUnlockOnclick() {
+            document.getElementById('btnSupplierDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlocking...";
+            $('#btnSupplierDetailSave').prop('disabled', true);
+            $('#btnSupplierDetailLock').prop('disabled', true);
+            $('#btnSupplierDetailUnlock').prop('disabled', true);
+            $('#btnSupplierDetailClose').prop('disabled', true);
 
             $.ajax({
                 type: "PUT",
@@ -951,24 +1065,24 @@
                     },
                     404: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $('#btnSaveSupplier').prop('disabled', false);
-                        $('#btnUnlockSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
+                        document.getElementById('btnSupplierDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSupplierDetailSave').prop('disabled', false);
+                        $('#btnSupplierDetailUnlock').prop('disabled', false);
+                        $('#btnSupplierDetailClose').prop('disabled', false);
                     },
                     400: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $('#btnSaveSupplier').prop('disabled', false);
-                        $('#btnUnlockSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
+                        document.getElementById('btnSupplierDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSupplierDetailSave').prop('disabled', false);
+                        $('#btnSupplierDetailUnlock').prop('disabled', false);
+                        $('#btnSupplierDetailClose').prop('disabled', false);
                     },
                     500: function (message) {
                         toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        document.getElementById('btnUnlockSupplier').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
-                        $('#btnSaveSupplier').prop('disabled', false);
-                        $('#btnUnlockSupplier').prop('disabled', false);
-                        $('#btnCloseSupplier').prop('disabled', false);
+                        document.getElementById('btnSupplierDetailUnlock').innerHTML = "<i class='fa fa-unlock'></i> Unlock";
+                        $('#btnSupplierDetailSave').prop('disabled', false);
+                        $('#btnSupplierDetailUnlock').prop('disabled', false);
+                        $('#btnSupplierDetailClose').prop('disabled', false);
                     }
                 }
             });
@@ -977,14 +1091,14 @@
         // ==============
         // Close Supplier
         // ==============
-        function btnCloseSupplierOnclick() {
+        function btnSupplierDetailCloseOnclick() {
             window.location = '/Software/Supplier';
         }
 
         // =======================
-        // GET Journal Ledger List
+        // Get Journal Ledger Data
         // =======================
-        function getJournalLedger() {
+        function getJournalLedgerData() {
             var journalLedgersObservableArray = new wijmo.collections.ObservableArray;
             $.ajax({
                 url: '/api/journalLedger/list/supplier/' + supplierId + '/' + supplierAccountId,
@@ -1044,128 +1158,18 @@
             return journalLedgersObservableArray;
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRowsJournalLedger() {
-            var rowsObservableArray = new wijmo.collections.ObservableArray();
-
-            for (var i = 0; i <= 4; i++) {
-                var rows = 0;
-                var rowsString = "";
-
-                if (i == 0) {
-                    rows = 15;
-                    rowsString = "Show 15 Rows";
-                } else if (i == 1) {
-                    rows = 50;
-                    rowsString = "Show 50 Rows";
-                } else if (i == 2) {
-                    rows = 100;
-                    rowsString = "Show 100 Rows";
-                } else if (i == 3) {
-                    rows = 150;
-                    rowsString = "Show 150 Rows";
-                } else {
-                    rows = 200;
-                    rowsString = "Show 200 Rows";
-                }
-
-                rowsObservableArray.push({
-                    rowNumber: rows,
-                    rowString: rowsString
-                });
-            }
-
-            cboJournalLedgerShowNumberOfRows.dispose();
-            cboJournalLedgerShowNumberOfRows = new wijmo.input.ComboBox('#cboJournalLedgerShowNumberOfRows', {
-                isEditable: false,
-                itemsSource: rowsObservableArray,
-                displayMemberPath: "rowString",
-                selectedValuePath: "rowNumber",
-                selectedValue: 50,
-                onSelectedIndexChanged: function () {
-                    NProgress.start();
-
-                    setTimeout(function () {
-                        var numberOfRows = cboJournalLedgerShowNumberOfRows.selectedValue;
-                        journalLedgerCollectionView.pageSize = parseInt(numberOfRows);
-                        journalLedgerCollectionView.refresh();
-                        journalLedgerGrid.refresh();
-
-                        NProgress.done();
-                    }, 300);
-                }
-            });
-        }
-
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItemsJournalLedger() {
-            if (journalLedgerCollectionView.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridJournalLedger').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridJournalLedger').style.display = 'block';
-            if (journalLedgerCollectionView.pageIndex === 0) {
-                btnMoveToFirstPageGridJournalLedger.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridJournalLedger.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToLastPageGridJournalLedger.removeAttribute('disabled');
-            } else if (journalLedgerCollectionView.pageIndex === (journalLedgerCollectionView.pageCount - 1)) {
-                btnMoveToFirstPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToPreviousPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToLastPageGridJournalLedger.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridJournalLedger.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToPreviousPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToNextPageGridJournalLedger.removeAttribute('disabled');
-                btnMoveToLastPageGridJournalLedger.removeAttribute('disabled');
-            }
-            btnCurrentPageGridJournalLedger.innerHTML = (journalLedgerCollectionView.pageIndex + 1) + ' / ' + journalLedgerCollectionView.pageCount;
-        }
-
-        // ======================
-        // Refresh Journal Ledger
-        // ======================
-        function refreshJournalLedgerFlexGrid() {
-            journalLedgerCollectionView = new wijmo.collections.CollectionView(getJournalLedger());
-            journalLedgerCollectionView.canFilter = true;
-            journalLedgerCollectionView.pageSize = cboJournalLedgerShowNumberOfRows.selectedValue;
-
-            var filterText = '';
-            $('#JournalLedgerInputFilter').keyup(function () {
-                filterText = this.value.toLowerCase();
-                journalLedgerCollectionView.refresh();
-            });
-
-            journalLedgerCollectionView.filter = function (item) {
-                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
-            }
-
-            journalLedgerCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemsJournalLedger();
-            });
-
-            journalLedgerGrid.itemsSource = journalLedgerCollectionView;
-            journalLedgerGrid.trackChanges = true;
-        }
-
-        // ===============
-        //  Journal Ledger
-        // ===============
+        // ===============================
+        // Create Journal Ledger Flex Grid
+        // ===============================
         function createJournalLedgerFlexGrid() {
-            createCboShowRowsJournalLedger();
+            createJournalLedgerCboDisplayNumberOfRows();
 
-            journalLedgerCollectionView = new wijmo.collections.CollectionView(getJournalLedger());
+            journalLedgerCollectionView = new wijmo.collections.CollectionView(getJournalLedgerData());
             journalLedgerCollectionView.canFilter = true;
-            journalLedgerCollectionView.pageSize = cboJournalLedgerShowNumberOfRows.selectedValue;
+            journalLedgerCollectionView.pageSize = cboJournalLedgerDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#JournalLedgerInputFilter').keyup(function () {
+            $('#inpJournalLedgerSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
                 journalLedgerCollectionView.refresh();
             });
@@ -1176,12 +1180,11 @@
             }
 
             journalLedgerCollectionView.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemsJournalLedger();
+                updateJournalLedgerNavigationButtons();
             });
 
-            // Flex Grid for Journal Ledger
-            journalLedgerGrid = new wijmo.grid.FlexGrid('#JournalLedgerGrid');
-            journalLedgerGrid.initialize({
+            journalLedgerFlexGrid = new wijmo.grid.FlexGrid('#journalLedgerFlexGrid');
+            journalLedgerFlexGrid.initialize({
                 columns: [
                     {
                         "header": "Detail",
@@ -1233,75 +1236,63 @@
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            journalLedgerGrid.trackChanges = true;
+            journalLedgerFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItemsJournalLedger();
+            updateJournalLedgerNavigationButtons();
 
-            btnMoveToFirstPageGridJournalLedger.addEventListener('click', function () {
+            btnJournalLedgerMoveToFirstPageGrid.addEventListener('click', function () {
                 journalLedgerCollectionView.moveToFirstPage();
-                updateNavigateButtonsItemsJournalLedger();
+                updateJournalLedgerNavigationButtons();
             });
 
-            btnMoveToPreviousPageGridJournalLedger.addEventListener('click', function () {
+            btnJournalLedgerMoveToPreviousPageGrid.addEventListener('click', function () {
                 journalLedgerCollectionView.moveToPreviousPage();
-                updateNavigateButtonsItemsJournalLedger();
+                updateJournalLedgerNavigationButtons();
             });
 
-            btnMoveToNextPageGridJournalLedger.addEventListener('click', function () {
+            btnJournalLedgerMoveToNextPageGrid.addEventListener('click', function () {
                 journalLedgerCollectionView.moveToNextPage();
-                updateNavigateButtonsItemsJournalLedger();
+                updateJournalLedgerNavigationButtons();
             });
 
-            btnMoveToLastPageGridJournalLedger.addEventListener('click', function () {
+            btnJournalLedgerMoveToLastPageGrid.addEventListener('click', function () {
                 journalLedgerCollectionView.moveToLastPage();
-                updateNavigateButtonsItemsJournalLedger();
+                updateJournalLedgerNavigationButtons();
             });
         }
 
-        // ============================
-        // GET Contact Information List
-        // ============================
-        function getContactInformation() {
-            var contactInformationsObservableArray = new wijmo.collections.ObservableArray;
-            if (document.location.search.length > 0) {
-                $.ajax({
-                    url: '/api/moreContactInformation/list/' + supplierId,
-                    cache: false,
-                    type: 'GET',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (results) {
-                        if (results.length > 0) {
-                            for (i = 0; i < results.length; i++) {
-                                var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditContactOnClick()'><i class='fa fa-edit'></i> Edit</button>";
-                                var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteContactOnClick()'><i class='fa fa-trash'></i> Delete</button>";
-                                if (Islocked) {
-                                    btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditContactOnClick()' disabled><i class='fa fa-edit'></i> Edit</button>";
-                                    btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteContactOnClick()' disabled><i class='fa fa-trash'></i> Delete</button>";
-                                }
-
-                                contactInformationsObservableArray.push({
-                                    EditId: btnEditId,
-                                    DeleteId: btnDeleteId,
-                                    Id: results[i]["Id"],
-                                    ContactPerson: results[i]["ContactPerson"],
-                                    ContactNumber: results[i]["ContactNumber"],
-                                    Remarks: results[i]["Remarks"]
-                                });
-                            }
-                        }
-
-                        NProgress.done();
-                    }
-                });
+        // ========================================
+        // Update Journal Ledger Navigation Buttons
+        // ========================================
+        function updateJournalLedgerNavigationButtons() {
+            if (journalLedgerCollectionView.pageSize <= 0) {
+                document.getElementById('journalLedgerNavigationPageGrid').style.display = 'none';
+                return;
             }
-
-            return contactInformationsObservableArray;
+            document.getElementById('journalLedgerNavigationPageGrid').style.display = 'block';
+            if (journalLedgerCollectionView.pageIndex === 0) {
+                btnJournalLedgerMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalLedgerMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalLedgerMoveToNextPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (journalLedgerCollectionView.pageIndex === (journalLedgerCollectionView.pageCount - 1)) {
+                btnJournalLedgerMoveToFirstPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnJournalLedgerMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnJournalLedgerMoveToFirstPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToNextPageGrid.removeAttribute('disabled');
+                btnJournalLedgerMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnJournalLedgerCurrentPageGrid.innerHTML = (journalLedgerCollectionView.pageIndex + 1) + ' / ' + journalLedgerCollectionView.pageCount;
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRowsContactInformation() {
+        // ==================================================
+        // Create Journal Ledger Combo Display Number of Rows
+        // ==================================================
+        function createJournalLedgerCboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -1331,8 +1322,8 @@
                 });
             }
 
-            cboContactInformationShowNumberOfRows.dispose();
-            cboContactInformationShowNumberOfRows = new wijmo.input.ComboBox('#cboContactInformationShowNumberOfRows', {
+            cboJournalLedgerDisplayNumberOfRows.dispose();
+            cboJournalLedgerDisplayNumberOfRows = new wijmo.input.ComboBox('#cboJournalLedgerDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -1342,10 +1333,10 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboContactInformationShowNumberOfRows.selectedValue;
-                        contactInformations.pageSize = parseInt(numberOfRows);
-                        contactInformations.refresh();
-                        contactInformationGrid.refresh();
+                        var numberOfRows = cboJournalLedgerDisplayNumberOfRows.selectedValue;
+                        journalLedgerCollectionView.pageSize = parseInt(numberOfRows);
+                        journalLedgerCollectionView.refresh();
+                        journalLedgerFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
@@ -1353,90 +1344,101 @@
             });
         }
 
-        // =========================
-        // Update Navigation Buttons
-        // =========================
-        function updateNavigateButtonsItemsContactInformation() {
-            if (contactInformations.pageSize <= 0) {
-                document.getElementById('naviagtionPageGridContactInformation').style.display = 'none';
-                return;
-            }
-            document.getElementById('naviagtionPageGridContactInformation').style.display = 'block';
-            if (contactInformations.pageIndex === 0) {
-                btnMoveToFirstPageGridContactInformation.setAttribute('disabled', 'disabled');
-                btnMoveToPreviousPageGridContactInformation.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToLastPageGridContactInformation.removeAttribute('disabled');
-            } else if (contactInformations.pageIndex === (contactInformations.pageCount - 1)) {
-                btnMoveToFirstPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToPreviousPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToLastPageGridContactInformation.setAttribute('disabled', 'disabled');
-                btnMoveToNextPageGridContactInformation.setAttribute('disabled', 'disabled');
-            } else {
-                btnMoveToFirstPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToPreviousPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToNextPageGridContactInformation.removeAttribute('disabled');
-                btnMoveToLastPageGridContactInformation.removeAttribute('disabled');
-            }
-            btnCurrentPageGridContactInformation.innerHTML = (contactInformations.pageIndex + 1) + ' / ' + contactInformations.pageCount;
-        }
-
-        // =====================================
-        // Refresh Contact Information Flex Grid
-        // =====================================
-        function refreshContactInformationFlexGrid() {
-            contactInformations = new wijmo.collections.CollectionView(getContactInformation());
-            contactInformations.canFilter = true;
-            contactInformations.pageSize = cboContactInformationShowNumberOfRows.selectedValue;
+        // ================================
+        // Refresh Journal Ledger Flex Grid
+        // ================================
+        function refreshJournalLedgerFlexGrid() {
+            journalLedgerCollectionView = new wijmo.collections.CollectionView(getJournalLedgerData());
+            journalLedgerCollectionView.canFilter = true;
+            journalLedgerCollectionView.pageSize = cboJournalLedgerDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#ContactInformationInputFilter').keyup(function () {
+            $('#inpJournalLedgerSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                contactInformations.refresh();
+                journalLedgerCollectionView.refresh();
             });
 
-            contactInformations.filter = function (item) {
-                return !filterText || (item.ContactPerson.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
+            journalLedgerCollectionView.filter = function (item) {
+                return !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Particulars.toLowerCase().indexOf(filterText) > -1);
             }
 
-            contactInformations.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemsContactInformation();
+            journalLedgerCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateJournalLedgerNavigationButtons();
             });
 
-            contactInformationGrid.itemsSource = contactInformations;
-            contactInformationGrid.trackChanges = true;
+            journalLedgerFlexGrid.itemsSource = journalLedgerCollectionView;
+            journalLedgerFlexGrid.trackChanges = true;
         }
 
-        // =============================
-        // Contact Information Flex Grid
-        // =============================
+        // ============================
+        // Get Contact Information Data
+        // ============================
+        function getContactInformationData() {
+            var contactInformationObservableArray = new wijmo.collections.ObservableArray;
+            if (document.location.search.length > 0) {
+                $.ajax({
+                    url: '/api/moreContactInformation/list/' + supplierId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        if (results.length > 0) {
+                            for (i = 0; i < results.length; i++) {
+                                var btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnContactInformationEditOnclick()'><i class='fa fa-edit'></i> Edit</button>";
+                                var btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnContactInformationDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>";
+                                if (Islocked) {
+                                    btnEditId = "<button class='btn btn-primary btn-xs btn-block' onclick='btnContactInformationEditOnclick()' disabled><i class='fa fa-edit'></i> Edit</button>";
+                                    btnDeleteId = "<button class='btn btn-danger btn-xs btn-block' onclick='btnContactInformationDeleteOnclick()' disabled><i class='fa fa-trash'></i> Delete</button>";
+                                }
+
+                                contactInformationObservableArray.push({
+                                    EditId: btnEditId,
+                                    DeleteId: btnDeleteId,
+                                    Id: results[i]["Id"],
+                                    ContactPerson: results[i]["ContactPerson"],
+                                    ContactNumber: results[i]["ContactNumber"],
+                                    Remarks: results[i]["Remarks"]
+                                });
+                            }
+                        }
+
+                        NProgress.done();
+                    }
+                });
+            }
+
+            return contactInformationObservableArray;
+        }
+
+        // ====================================
+        // Create Contact Information Flex Grid
+        // ====================================
         function createContactInformationFlexGrid() {
-            createCboShowRowsContactInformation();
+            createContactInformationboDisplayNumberOfRows();
 
-            contactInformations = new wijmo.collections.CollectionView(getContactInformation());
-            contactInformations.canFilter = true;
-            contactInformations.pageSize = cboContactInformationShowNumberOfRows.selectedValue;
+            contactInformationCollectionView = new wijmo.collections.CollectionView(getContactInformationData());
+            contactInformationCollectionView.canFilter = true;
+            contactInformationCollectionView.pageSize = cboContactInformationDisplayNumberOfRows.selectedValue;
 
             var filterText = '';
-            $('#ContactInformationInputFilter').keyup(function () {
+            $('#inpContactInformationSearchFilter').keyup(function () {
                 filterText = this.value.toLowerCase();
-                contactInformations.refresh();
+                contactInformationCollectionView.refresh();
             });
 
-            contactInformations.filter = function (item) {
+            contactInformationCollectionView.filter = function (item) {
                 return !filterText || (item.ContactPerson.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
             }
 
-            contactInformations.collectionChanged.addHandler(function (sender, args) {
-                updateNavigateButtonsItemsContactInformation();
+            contactInformationCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateContactInformationNavigationButtons();
             });
 
-            contactInformationGrid = new wijmo.grid.FlexGrid('#ContactInformationGrid');
-            contactInformationGrid.initialize({
+            contactInformationFlexGrid = new wijmo.grid.FlexGrid('#contactInformationFlexGrid');
+            contactInformationFlexGrid.initialize({
                 columns: [
                     @{
                         if (canEdit)
@@ -1485,291 +1487,42 @@
                     },
                 ],
                 autoGenerateColumns: false,
-                itemsSource: contactInformations,
+                itemsSource: contactInformationCollectionView,
                 isReadOnly: true,
                 autoSizeMode: wijmo.grid.AutoSizeMode.Both,
                 allowDragging: wijmo.grid.AllowDragging.None,
                 selectionMode: wijmo.grid.SelectionMode.Row
             });
 
-            contactInformationGrid.trackChanges = true;
+            contactInformationFlexGrid.trackChanges = true;
 
-            updateNavigateButtonsItemsContactInformation();
+            updateContactInformationNavigationButtons();
 
-            btnMoveToFirstPageGridContactInformation.addEventListener('click', function () {
-                contactInformations.moveToFirstPage();
-                updateNavigateButtonsItemsContactInformation();
+            btnContactInformationMoveToFirstPageGrid.addEventListener('click', function () {
+                contactInformationCollectionView.moveToFirstPage();
+                updateContactInformationNavigationButtons();
             });
 
-            btnMoveToPreviousPageGridContactInformation.addEventListener('click', function () {
-                contactInformations.moveToPreviousPage();
-                updateNavigateButtonsItemsContactInformation();
+            btnContactInformationMoveToPreviousPageGrid.addEventListener('click', function () {
+                contactInformationCollectionView.moveToPreviousPage();
+                updateContactInformationNavigationButtons();
             });
 
-            btnMoveToNextPageGridContactInformation.addEventListener('click', function () {
-                contactInformations.moveToNextPage();
-                updateNavigateButtonsItemsContactInformation();
+            btnContactInformationMoveToNextPageGrid.addEventListener('click', function () {
+                contactInformationCollectionView.moveToNextPage();
+                updateContactInformationNavigationButtons();
             });
 
-            btnMoveToLastPageGridContactInformation.addEventListener('click', function () {
-                contactInformations.moveToLastPage();
-                updateNavigateButtonsItemsContactInformation();
-            });
-        }
-
-        var contactInformationId = 0;
-
-        // ===========
-        // ADD Contact
-        // ===========
-        function cmdAddContact_OnClick() {
-            $('#contactEdit').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('.requiredContact').each(function () {
-                $(this).css({
-                    "border": ""
-                });
-            });
-
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#contactDetailForm").hide();
-
-            document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $('#cmdSaveContactButton').prop('disabled', true);
-            $('#cmdContactDetailCloseButton').prop('disabled', false);
-
-            contactInformationId = 0;
-            document.getElementById('contact_contactPerson').value = "NA";
-            document.getElementById('contact_contactNumber').value = "NA";
-            document.getElementById('contact_Remarks').value = "NA";
-
-            setTimeout(function () {
-                $("#loadingModalItem").hide();
-                $("#contactDetailForm").show();
-                $('#cmdSaveContactButton').prop('disabled', false);
-            }, 500);
-        }
-
-        // ===========
-        // Edit Button
-        // ===========
-        function btnEditContactOnClick() {
-            $('#contactEdit').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            $('.requiredContact').each(function () {
-                $(this).css({
-                    "border": ""
-                });
-            });
-
-            $("#loadingModalItem").show();
-            document.getElementById("loadingModalItem").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-            $("#contactDetailForm").hide();
-
-            document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-            $('#cmdSaveContactButton').prop('disabled', true);
-            $('#cmdContactDetailCloseButton').prop('disabled', false);
-
-            contactInformations.editItem(contactInformations.currentItem);
-            var contactInformation = contactInformations.currentEditItem;
-            contactInformationId = contactInformation.Id;
-            document.getElementById('contact_contactPerson').value = contactInformation.ContactPerson;
-            document.getElementById('contact_contactNumber').value = contactInformation.ContactNumber;
-            document.getElementById('contact_Remarks').value = contactInformation.Remarks;
-
-            setTimeout(function () {
-                $("#loadingModalItem").hide();
-                $("#contactDetailForm").show();
-                $('#cmdSaveContactButton').prop('disabled', false);
-            }, 500);
-        }
-
-        // ====================================
-        // Contact Information Entry Validation
-        // ====================================
-        function contactInformationEntryValidation() {
-            var isValid = true;
-            $('.requiredContact').each(function () {
-                if ($.trim($(this).val()) == '') {
-                    isValid = false;
-                    $(this).css({
-                        "border": "1px solid red"
-                    });
-                } else {
-                    $(this).css({
-                        "border": ""
-                    });
-                }
-            });
-
-            return isValid;
-        }
-
-        // ============
-        // SAVE Contact
-        // ============
-        function cmdContactSaveButton_OnClick() {
-            var contactObject = new Object();
-            contactObject.ContactPerson = document.getElementById('contact_contactPerson').value;
-            contactObject.ContactNumber = document.getElementById('contact_contactNumber').value;
-            contactObject.Remarks = document.getElementById('contact_Remarks').value;
-            var contactData = JSON.stringify(contactObject);
-
-            if (contactInformationEntryValidation()) {
-                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
-                $('#cmdSaveContactButton').prop('disabled', true);
-                $('#cmdContactDetailCloseButton').prop('disabled', true);
-
-                if (contactInformationId == 0) {
-                    $.ajax({
-                        type: "POST",
-                        url: '/api/moreContactInformation/add/' + supplierId,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        data: contactData,
-                        statusCode: {
-                            200: function () {
-                                toastr.success("Save Successful");
-                                $('#contactEdit').modal('hide');
-                                refreshContactInformationFlexGrid();
-                            },
-                            404: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            },
-                            400: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            },
-                            500: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            }
-                        }
-                    });
-                } else {
-                    $.ajax({
-                        type: "PUT",
-                        url: '/api/moreContactInformation/update/' + contactInformationId + '/' + supplierId,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        data: contactData,
-                        statusCode: {
-                            200: function () {
-                                toastr.success("Update Successful");
-                                $('#contactEdit').modal('hide');
-                                refreshContactInformationFlexGrid();
-                            },
-                            404: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            },
-                            400: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            },
-                            500: function (message) {
-                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#contactEdit').modal('hide');
-                                document.getElementById('cmdSaveContactButton').innerHTML = "<i class='fa fa-save'></i> Save";
-                                $('#cmdSaveContactButton').prop('disabled', false);
-                                $('#cmdContactDetailCloseButton').prop('disabled', false);
-                            }
-                        }
-                    });
-                }
-            } else {
-                toastr.error("Invalid Entry");
-            }
-        }
-
-        // ==============
-        // DELETE Contact
-        // ==============
-        function btnDeleteContactOnClick() {
-            $('#deleteContactConfirm').modal({
-                show: true,
-                backdrop: 'static'
-            });
-
-            document.getElementById('cmdConfirmDeleteContact').innerHTML = "<i class='fa fa-trash'></i> Delete";
-            $('#cmdConfirmDeleteContact').prop('disabled', false);
-            $('#cmdConfirmDeleteContactCloseButton').prop('disabled', false);
-        }
-
-        // ======================
-        // Contact Confirm Delete
-        // ======================
-        function cmdContactConfirmDeleteButton_OnClick() {
-            document.getElementById('cmdConfirmDeleteContact').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
-            $('#cmdConfirmDeleteContact').prop('disabled', true);
-            $('#cmdConfirmDeleteContactCloseButton').prop('disabled', true);
-
-            contactInformations.editItem(contactInformations.currentItem);
-            var contactId = contactInformations.currentEditItem.Id;
-
-            $.ajax({
-                url: '/api/moreContactInformation/delete/' + contactId + '/' + supplierId,
-                type: "DELETE",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                statusCode: {
-                    200: function () {
-                        toastr.success("Delete Successful");
-                        $('#deleteContactConfirm').modal('hide');
-                        refreshContactInformationFlexGrid();
-                    },
-                    404: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                        $('#deleteContactConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteContact').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteContact').prop('disabled', false);
-                        $('#cmdConfirmDeleteContactCloseButton').prop('disabled', false);
-                    },
-                    400: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                        $('#deleteContactConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteContact').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteContact').prop('disabled', false);
-                        $('#cmdConfirmDeleteContactCloseButton').prop('disabled', false);
-                    },
-                    500: function (message) {
-                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                        $('#deleteContactConfirm').modal('hide');
-                        document.getElementById('cmdConfirmDeleteContact').innerHTML = "<i class='fa fa-trash'></i> Delete";
-                        $('#cmdConfirmDeleteContact').prop('disabled', false);
-                        $('#cmdConfirmDeleteContactCloseButton').prop('disabled', false);
-                    }
-                }
+            btnContactInformationMoveToLastPageGrid.addEventListener('click', function () {
+                contactInformationCollectionView.moveToLastPage();
+                updateContactInformationNavigationButtons();
             });
         }
 
-        // ===============
-        // Show Rows Table
-        // ===============
-        function createCboShowRowsCosignmentItem() {
+        // =======================================================
+        // Create Contact Information Combo Display Number of Rows
+        // =======================================================
+        function createContactInformationboDisplayNumberOfRows() {
             var rowsObservableArray = new wijmo.collections.ObservableArray();
 
             for (var i = 0; i <= 4; i++) {
@@ -1799,8 +1552,8 @@
                 });
             }
 
-            cboConsignmentShowNumberOfRows.dispose();
-            cboConsignmentShowNumberOfRows = new wijmo.input.ComboBox('#cboConsignmentShowNumberOfRows', {
+            cboContactInformationDisplayNumberOfRows.dispose();
+            cboContactInformationDisplayNumberOfRows = new wijmo.input.ComboBox('#cboContactInformationDisplayNumberOfRows', {
                 isEditable: false,
                 itemsSource: rowsObservableArray,
                 displayMemberPath: "rowString",
@@ -1810,13 +1563,318 @@
                     NProgress.start();
 
                     setTimeout(function () {
-                        var numberOfRows = cboConsignmentShowNumberOfRows.selectedValue;
-                        consignmentItemCollectionView.pageSize = parseInt(numberOfRows);
-                        consignmentItemCollectionView.refresh();
-                        consignmentItemFlexGrid.refresh();
+                        var numberOfRows = cboContactInformationDisplayNumberOfRows.selectedValue;
+                        contactInformationCollectionView.pageSize = parseInt(numberOfRows);
+                        contactInformationCollectionView.refresh();
+                        contactInformationFlexGrid.refresh();
 
                         NProgress.done();
                     }, 300);
+                }
+            });
+        }
+
+        // =============================================
+        // Update Contact Information Navigation Buttons
+        // =============================================
+        function updateContactInformationNavigationButtons() {
+            if (contactInformationCollectionView.pageSize <= 0) {
+                document.getElementById('contactInformationNavigationPageGrid').style.display = 'none';
+                return;
+            }
+            document.getElementById('contactInformationNavigationPageGrid').style.display = 'block';
+            if (contactInformationCollectionView.pageIndex === 0) {
+                btnContactInformationMoveToFirstPageGrid.setAttribute('disabled', 'disabled');
+                btnContactInformationMoveToPreviousPageGrid.setAttribute('disabled', 'disabled');
+                btnContactInformationMoveToNextPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToLastPageGrid.removeAttribute('disabled');
+            } else if (contactInformationCollectionView.pageIndex === (contactInformationCollectionView.pageCount - 1)) {
+                btnContactInformationMoveToFirstPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToLastPageGrid.setAttribute('disabled', 'disabled');
+                btnContactInformationMoveToNextPageGrid.setAttribute('disabled', 'disabled');
+            } else {
+                btnContactInformationMoveToFirstPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToPreviousPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToNextPageGrid.removeAttribute('disabled');
+                btnContactInformationMoveToLastPageGrid.removeAttribute('disabled');
+            }
+            btnContactInformationCurrentPageGrid.innerHTML = (contactInformationCollectionView.pageIndex + 1) + ' / ' + contactInformationCollectionView.pageCount;
+        }
+
+        // =====================================
+        // Refresh Contact Information Flex Grid
+        // =====================================
+        function refreshContactInformationFlexGrid() {
+            contactInformationCollectionView = new wijmo.collections.CollectionView(getContactInformationData());
+            contactInformationCollectionView.canFilter = true;
+            contactInformationCollectionView.pageSize = cboContactInformationDisplayNumberOfRows.selectedValue;
+
+            var filterText = '';
+            $('#inpContactInformationSearchFilter').keyup(function () {
+                filterText = this.value.toLowerCase();
+                contactInformationCollectionView.refresh();
+            });
+
+            contactInformationCollectionView.filter = function (item) {
+                return !filterText || (item.ContactPerson.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.Remarks.toLowerCase().indexOf(filterText) > -1);
+            }
+
+            contactInformationCollectionView.collectionChanged.addHandler(function (sender, args) {
+                updateContactInformationNavigationButtons();
+            });
+
+            contactInformationFlexGrid.itemsSource = contactInformationCollectionView;
+            contactInformationFlexGrid.trackChanges = true;
+        }
+
+        // =======================
+        // Add Contact Information
+        // =======================
+        function btnContactInformationAddOnclick() {
+            $('#contactInformationDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredContact').each(function () {
+                $(this).css({
+                    "border": ""
+                });
+            });
+
+            document.getElementById("contactInformationModalTitle").innerHTML = 'Add Contact Information';
+            $("#contactInformationLoading").show();
+            document.getElementById("contactInformationLoading").innerHTML = 'Loading...';
+            $("#contactInformationDetailForm").hide();
+
+            document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $('#btnContactInformationSave').prop('disabled', true);
+            $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+
+            contactInformationId = 0;
+            document.getElementById('inpContactInformationContactPerson').value = "NA";
+            document.getElementById('inpContactInformationContactNumber').value = "NA";
+            document.getElementById('inpContactInformationRemarks').value = "NA";
+
+            setTimeout(function () {
+                $("#contactInformationLoading").hide();
+                $("#contactInformationDetailForm").show();
+                $('#btnContactInformationSave').prop('disabled', false);
+            }, 500);
+        }
+
+        // ========================
+        // Edit Contact Information
+        // ========================
+        function btnContactInformationEditOnclick() {
+            $('#contactInformationDetailModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            $('.requiredContact').each(function () {
+                $(this).css({
+                    "border": ""
+                });
+            });
+
+            document.getElementById("contactInformationModalTitle").innerHTML = 'Edit Contact Information';
+            $("#contactInformationLoading").show();
+            document.getElementById("contactInformationLoading").innerHTML = 'Loading...';
+            $("#contactInformationDetailForm").hide();
+
+            document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+            $('#btnContactInformationSave').prop('disabled', true);
+            $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+
+            contactInformationCollectionView.editItem(contactInformationCollectionView.currentItem);
+            var contactInformation = contactInformationCollectionView.currentEditItem;
+            contactInformationId = contactInformation.Id;
+            document.getElementById('inpContactInformationContactPerson').value = contactInformation.ContactPerson;
+            document.getElementById('inpContactInformationContactNumber').value = contactInformation.ContactNumber;
+            document.getElementById('inpContactInformationRemarks').value = contactInformation.Remarks;
+
+            setTimeout(function () {
+                $("#contactInformationLoading").hide();
+                $("#contactInformationDetailForm").show();
+                $('#btnContactInformationSave').prop('disabled', false);
+            }, 500);
+        }
+
+        // ====================================
+        // Contact Information Entry Validation
+        // ====================================
+        function contactInformationEntryValidation() {
+            var isValid = true;
+            $('.requiredContact').each(function () {
+                if ($.trim($(this).val()) == '') {
+                    isValid = false;
+                    $(this).css({
+                        "border": "1px solid red"
+                    });
+                } else {
+                    $(this).css({
+                        "border": ""
+                    });
+                }
+            });
+
+            return isValid;
+        }
+
+        // ========================
+        // Save Contact Information
+        // ========================
+        function btnContactInformationSaveOnclick() {
+            var contactObject = new Object();
+            contactObject.ContactPerson = document.getElementById('inpContactInformationContactPerson').value;
+            contactObject.ContactNumber = document.getElementById('inpContactInformationContactNumber').value;
+            contactObject.Remarks = document.getElementById('inpContactInformationRemarks').value;
+            var contactData = JSON.stringify(contactObject);
+
+            if (contactInformationEntryValidation()) {
+                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
+                $('#btnContactInformationSave').prop('disabled', true);
+                $('#btnContactInformationCloseDetailModal').prop('disabled', true);
+
+                if (contactInformationId == 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: '/api/moreContactInformation/add/' + supplierId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: contactData,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Save Successful");
+                                $('#contactInformationDetailModal').modal('hide');
+                                refreshContactInformationFlexGrid();
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            }
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        type: "PUT",
+                        url: '/api/moreContactInformation/update/' + contactInformationId + '/' + supplierId,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        data: contactData,
+                        statusCode: {
+                            200: function () {
+                                toastr.success("Update Successful");
+                                $('#contactInformationDetailModal').modal('hide');
+                                refreshContactInformationFlexGrid();
+                            },
+                            404: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            },
+                            400: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            },
+                            500: function (message) {
+                                toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                                $('#contactInformationDetailModal').modal('hide');
+                                document.getElementById('btnContactInformationSave').innerHTML = "<i class='fa fa-save'></i> Save";
+                                $('#btnContactInformationSave').prop('disabled', false);
+                                $('#btnContactInformationCloseDetailModal').prop('disabled', false);
+                            }
+                        }
+                    });
+                }
+            } else {
+                toastr.error("Invalid Entry");
+            }
+        }
+
+        // ==========================
+        // Delete Contact Information
+        // ==========================
+        function btnContactInformationDeleteOnclick() {
+            $('#contactInformationConfirmDeleteModal').modal({
+                show: true,
+                backdrop: 'static'
+            });
+
+            document.getElementById('btnContactInformationConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+            $('#btnContactInformationConfirmDelete').prop('disabled', false);
+            $('#btnContactInformationCloseConfirmDeleteModal').prop('disabled', false);
+        }
+
+        // ==================================
+        // Contact Information Confirm Delete
+        // ==================================
+        function btnContactInformationConfirmDeleteOnclick() {
+            document.getElementById('btnContactInformationConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
+            $('#btnContactInformationConfirmDelete').prop('disabled', true);
+            $('#btnContactInformationCloseConfirmDeleteModal').prop('disabled', true);
+
+            contactInformationCollectionView.editItem(contactInformationCollectionView.currentItem);
+            var contactId = contactInformationCollectionView.currentEditItem.Id;
+
+            $.ajax({
+                url: '/api/moreContactInformation/delete/' + contactId + '/' + supplierId,
+                type: "DELETE",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                statusCode: {
+                    200: function () {
+                        toastr.success("Delete Successful");
+                        $('#contactInformationConfirmDeleteModal').modal('hide');
+                        refreshContactInformationFlexGrid();
+                    },
+                    404: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
+                        $('#contactInformationConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnContactInformationConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnContactInformationConfirmDelete').prop('disabled', false);
+                        $('#btnContactInformationCloseConfirmDeleteModal').prop('disabled', false);
+                    },
+                    400: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
+                        $('#contactInformationConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnContactInformationConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnContactInformationConfirmDelete').prop('disabled', false);
+                        $('#btnContactInformationCloseConfirmDeleteModal').prop('disabled', false);
+                    },
+                    500: function (message) {
+                        toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
+                        $('#contactInformationConfirmDeleteModal').modal('hide');
+                        document.getElementById('btnContactInformationConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Delete";
+                        $('#btnContactInformationConfirmDelete').prop('disabled', false);
+                        $('#btnContactInformationCloseConfirmDeleteModal').prop('disabled', false);
+                    }
                 }
             });
         }
@@ -1892,7 +1950,7 @@
         // Create Consignment Item Flex Grid
         // =================================
         function createConsignmentItemFlexGrid() {
-            createCboShowRowsCosignmentItem();
+            createConsignmentCboDisplayNumberOfRows();
 
             consignmentItemCollectionView = new wijmo.collections.CollectionView(getConsignmentItemData());
             consignmentItemCollectionView.canFilter = true;
@@ -2064,6 +2122,60 @@
             consignmentItemFlexGrid.trackChanges = true;
         }
 
+        // ================================================
+        // Create Consignment Combo Display Number of Rows
+        // ===============================================
+        function createConsignmentCboDisplayNumberOfRows() {
+            var rowsObservableArray = new wijmo.collections.ObservableArray();
+
+            for (var i = 0; i <= 4; i++) {
+                var rows = 0;
+                var rowsString = "";
+
+                if (i == 0) {
+                    rows = 15;
+                    rowsString = "Show 15 Rows";
+                } else if (i == 1) {
+                    rows = 50;
+                    rowsString = "Show 50 Rows";
+                } else if (i == 2) {
+                    rows = 100;
+                    rowsString = "Show 100 Rows";
+                } else if (i == 3) {
+                    rows = 150;
+                    rowsString = "Show 150 Rows";
+                } else {
+                    rows = 200;
+                    rowsString = "Show 200 Rows";
+                }
+
+                rowsObservableArray.push({
+                    rowNumber: rows,
+                    rowString: rowsString
+                });
+            }
+            cboConsignmentShowNumberOfRows.dispose();
+            cboConsignmentShowNumberOfRows = new wijmo.input.ComboBox('#cboConsignmentShowNumberOfRows', {
+                isEditable: false,
+                itemsSource: rowsObservableArray,
+                displayMemberPath: "rowString",
+                selectedValuePath: "rowNumber",
+                selectedValue: 50,
+                onSelectedIndexChanged: function () {
+                    NProgress.start();
+
+                    setTimeout(function () {
+                        var numberOfRows = cboConsignmentShowNumberOfRows.selectedValue;
+                        consignmentItemCollectionView.pageSize = parseInt(numberOfRows);
+                        consignmentItemCollectionView.refresh();
+                        consignmentItemFlexGrid.refresh();
+
+                        NProgress.done();
+                    }, 300);
+                }
+            });
+        }
+
         // ==================================
         // Create Consignment Item Combo Box
         // =================================
@@ -2149,8 +2261,10 @@
             });
 
             $("#consignmentLoading").show();
-            document.getElementById("consignmentLoading").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById("consignmentLoading").innerHTML = 'Loading...';
             $("#consignmentContent").hide();
+
+            document.getElementById("consignmentModalLabel").innerHTML = 'Add Consignment Item';
 
             document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
             $('#btnConsignmentItemSave').prop('disabled', true);
@@ -2177,8 +2291,10 @@
             });
 
             $("#consignmentLoading").show();
-            document.getElementById("consignmentLoading").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+            document.getElementById("consignmentLoading").innerHTML = 'Loadng...';
             $("#consignmentContent").hide();
+
+            document.getElementById("consignmentModalLabel").innerHTML = 'Edit Consignment Item';
 
             document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Save";
             $('#btnConsignmentItemSave').prop('disabled', true);
@@ -2209,7 +2325,7 @@
         // Consignment Confirm Delete
         // ==========================
         function btnConsignmentItemConfirmDeleteOnclick() {
-            document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Deleting";
+            document.getElementById('btnConsignmentItemConfirmDelete').innerHTML = "<i class='fa fa-trash'></i> Deleting...";
             $('#btnConsignmentItemConfirmDelete').prop('disabled', true);
             $('#btnConsignmentItemConfirmDeleteCloseModal').prop('disabled', true);
 
@@ -2263,7 +2379,7 @@
             var objConsignmentData = JSON.stringify(objConsignment);
 
             if (consignmentEntryValidation()) {
-                document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Saving";
+                document.getElementById('btnConsignmentItemSave').innerHTML = "<i class='fa fa-save'></i> Saving...";
                 $('#btnConsignmentItemSave').prop('disabled', true);
                 $('#btnConsignmentItemCloseModal').prop('disabled', true);
 
@@ -2307,16 +2423,9 @@
             }
         }
 
-        // ============
-        // On Page Load
-        // ============
-        $(document).ready(function () {
-            getSupplierGroup();
-        });
-
-        // ====
-        // TABS
-        // ====
+        // ==========================
+        // Supplier Tabs and Controls
+        // ==========================
         $('#journalLedgerTab').click(function () {
             $('#JournalLedger').show();
             $('#ContactInformation').hide();
@@ -2324,7 +2433,6 @@
             NProgress.start();
             refreshJournalLedgerFlexGrid();
         });
-
         $('#contactInformationTab').click(function () {
             $('#JournalLedger').hide();
             $('#ContactInformation').show();
@@ -2332,7 +2440,6 @@
             NProgress.start();
             refreshContactInformationFlexGrid();
         });
-
         $('#consignmentTab').click(function () {
             $('#JournalLedger').hide();
             $('#ContactInformation').hide();
@@ -2340,24 +2447,23 @@
             NProgress.start();
             refreshConsignmentItemFlexGrid();
         });
-    </script>
-    <script type="text/javascript">
-        var slideLeft = new Menu({
-            wrapper: '#o-wrapper',
-            type: 'slide-left',
-            menuOpenerClass: '.c-button',
-            maskId: '#c-mask'
-        });
 
-        var slideLeftBtn = document.querySelector('#c-button--slide-left');
-
-        slideLeftBtn.addEventListener('click', function (e) {
-            e.preventDefault;
-            slideLeft.open();
+        // =============================
+        // Document Ready - On load Page
+        // =============================
+        $(document).ready(function () {
+            createCboSupplierDetailSupplierGroup();
         });
     </script>
     <script type="text/javascript">
+        // =================
+        // User Branch Combo
+        // =================
         var cboUserBranches = new wijmo.input.ComboBox('#cboUserBranches');
+
+        // =========================
+        // Get Current User Branches
+        // =========================
         function getUserBranches() {
             $("#loadingUserBranches").show();
             document.getElementById("loadingUserBranches").innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
@@ -2404,6 +2510,9 @@
             });
         }
 
+        // ==========================
+        // Update Current User Branch
+        // ==========================
         function updateUserBranchOnclick() {
             document.getElementById('updateUserBranch').innerHTML = "<i class='fa fa-spinner fa-spin'></i> Updating";
             $("#updateUserBranch").prop("disabled", true);
@@ -2441,6 +2550,24 @@
                 }
             });
         }
+    </script>
+    <script type="text/javascript">
+        // ======================
+        // Side Bar Menu Settings
+        // ======================
+        var slideLeft = new Menu({
+            wrapper: '#o-wrapper',
+            type: 'slide-left',
+            menuOpenerClass: '.c-button',
+            maskId: '#c-mask'
+        });
+
+        var slideLeftBtn = document.querySelector('#c-button--slide-left');
+
+        slideLeftBtn.addEventListener('click', function (e) {
+            e.preventDefault;
+            slideLeft.open();
+        });
     </script>
 </body>
 </html>
