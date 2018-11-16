@@ -502,7 +502,18 @@ namespace easyfis.ModifiedApiControllers
 
                             if (receivingReceipt.Any())
                             {
-                                int countInvalidPO = (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Where(d => d.TrnPurchaseOrder.IsLocked == false || d.TrnPurchaseOrder.IsCancelled == true).Count());
+                                int countInvalidPO = 0;
+                                var invalidPOs = from d in db.TrnReceivingReceiptItems
+                                                 where d.RRId == receivingReceipt.FirstOrDefault().Id
+                                                 && d.TrnPurchaseOrder.IsLocked == false
+                                                 && d.TrnPurchaseOrder.IsCancelled == true
+                                                 select d;
+
+                                if (invalidPOs.Any())
+                                {
+                                    countInvalidPO = invalidPOs.Count();
+                                }
+
                                 if (!receivingReceipt.FirstOrDefault().IsLocked && countInvalidPO == 0)
                                 {
                                     String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());

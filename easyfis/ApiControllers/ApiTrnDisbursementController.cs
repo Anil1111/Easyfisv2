@@ -478,7 +478,18 @@ namespace easyfis.ModifiedApiControllers
 
                             if (disbursement.Any())
                             {
-                                int countInvalidRR = (disbursement.FirstOrDefault().TrnDisbursementLines.Where(d => d.TrnReceivingReceipt.IsLocked == false || d.TrnReceivingReceipt.IsCancelled == true).Count());
+                                int countInvalidRR = 0;
+                                var invalidRRs = from d in db.TrnDisbursementLines
+                                                 where d.CVId == disbursement.FirstOrDefault().Id
+                                                 && d.TrnReceivingReceipt.IsLocked == false
+                                                 && d.TrnReceivingReceipt.IsCancelled == true
+                                                 select d;
+
+                                if (invalidRRs.Any())
+                                {
+                                    countInvalidRR = invalidRRs.Count();
+                                }
+
                                 if (!disbursement.FirstOrDefault().IsLocked && countInvalidRR == 0)
                                 {
                                     String oldObject = auditTrail.GetObjectString(disbursement.FirstOrDefault());

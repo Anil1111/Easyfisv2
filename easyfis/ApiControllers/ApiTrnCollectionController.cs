@@ -393,7 +393,18 @@ namespace easyfis.ModifiedApiControllers
 
                             if (collection.Any())
                             {
-                                int countInvalidSI = (collection.FirstOrDefault().TrnCollectionLines.Where(d => d.TrnSalesInvoice.IsLocked == false || d.TrnSalesInvoice.IsCancelled == true).Count());
+                                int countInvalidSI = 0;
+                                var invalidSIs = from d in db.TrnCollectionLines
+                                                 where d.ORId == collection.FirstOrDefault().Id
+                                                 && d.TrnSalesInvoice.IsLocked == false
+                                                 && d.TrnSalesInvoice.IsCancelled == true
+                                                 select d;
+
+                                if (invalidSIs.Any())
+                                {
+                                    countInvalidSI = invalidSIs.Count();
+                                }
+
                                 if (!collection.FirstOrDefault().IsLocked && countInvalidSI == 0)
                                 {
                                     String oldObject = auditTrail.GetObjectString(collection.FirstOrDefault());
