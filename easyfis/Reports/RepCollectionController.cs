@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using Microsoft.AspNet.Identity;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -172,8 +173,34 @@ namespace easyfis.Reports
 
                     Decimal totalAmount = 0;
 
+                    List<Entities.TrnSalesInvoiceItem> salesInvoiceVATItems = new List<Entities.TrnSalesInvoiceItem>();
+
                     foreach (var collectionLine in collectionLines)
                     {
+                        var salesInvoice = from d in db.TrnSalesInvoices
+                                           where d.Id == collectionLine.SIId
+                                           select d;
+
+                        if (salesInvoice.Any())
+                        {
+                            var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
+                                                    where d.SIId == salesInvoice.FirstOrDefault().Id
+                                                    select d;
+
+                            if (salesInvoiceItems.Any())
+                            {
+                                foreach (var salesInvoiceItem in salesInvoiceItems)
+                                {
+                                    salesInvoiceVATItems.Add(new Entities.TrnSalesInvoiceItem()
+                                    {
+                                        VAT = salesInvoiceItem.MstTaxType.TaxType,
+                                        Amount = salesInvoiceItem.Amount,
+                                        VATAmount = salesInvoiceItem.VATAmount
+                                    });
+                                }
+                            }
+                        }
+
                         tableCollectionLines.AddCell(new PdfPCell(new Phrase(collectionLine.SI, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableCollectionLines.AddCell(new PdfPCell(new Phrase(collectionLine.PayType, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tableCollectionLines.AddCell(new PdfPCell(new Phrase(collectionLine.CheckNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -189,6 +216,54 @@ namespace easyfis.Reports
                     document.Add(tableCollectionLines);
 
                     document.Add(spaceTable);
+
+                    // ============
+                    // VAT Analysis
+                    // ============
+                    var VATItems = from d in salesInvoiceVATItems
+                                   group d by new
+                                   {
+                                       VAT = d.VAT
+                                   } into g
+                                   select new
+                                   {
+                                       VAT = g.Key.VAT,
+                                       Amount = g.Sum(d => d.Amount),
+                                       VATAmount = g.Sum(d => d.VATAmount)
+                                   };
+
+                    if (VATItems.Any())
+                    {
+                        PdfPTable tableVATAnalysis = new PdfPTable(3);
+                        float[] widthsCellsVATItems = new float[] { 200f, 100f, 100f };
+                        tableVATAnalysis.SetWidths(widthsCellsVATItems);
+                        tableVATAnalysis.HorizontalAlignment = Element.ALIGN_LEFT;
+                        tableVATAnalysis.WidthPercentage = 40;
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT", fontArial9Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase("Amount", fontArial9Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT Amount", fontArial9Bold)) { HorizontalAlignment = 1, PaddingTop = 3f, PaddingBottom = 7f });
+
+                        Decimal totalVATAmount = 0;
+                        Decimal totalVAT = 0;
+
+                        foreach (var VATItem in VATItems)
+                        {
+                            tableVATAnalysis.AddCell(new PdfPCell(new Phrase(VATItem.VAT, fontArial9)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                            tableVATAnalysis.AddCell(new PdfPCell(new Phrase(VATItem.Amount.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+                            tableVATAnalysis.AddCell(new PdfPCell(new Phrase(VATItem.VATAmount.ToString("#,##0.00"), fontArial9)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
+
+                            totalVATAmount += VATItem.Amount;
+                            totalVAT += VATItem.VATAmount;
+                        }
+
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase("Total", fontArial9Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase(totalVATAmount.ToString("#,##0.00"), fontArial9Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+                        tableVATAnalysis.AddCell(new PdfPCell(new Phrase(totalVAT.ToString("#,##0.00"), fontArial9Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
+                        // TODO: Option Settings for VAT Analysis Table
+                        document.Add(tableVATAnalysis);
+                        document.Add(spaceTable);
+                    }
                 }
 
                 // ==============

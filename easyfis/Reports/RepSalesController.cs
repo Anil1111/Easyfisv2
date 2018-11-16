@@ -269,9 +269,8 @@ namespace easyfis.Reports
                     tableVATAnalysis.AddCell(new PdfPCell(new Phrase(totalVAT.ToString("#,##0.00"), fontArial9Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
 
                     // TODO: Option Settings for VAT Analysis Table
-                    // document.Add(tableVATAnalysis);
-
-                    //document.Add(spaceTable);
+                    document.Add(tableVATAnalysis);
+                    document.Add(spaceTable);
                 }
 
                 // ==============
