@@ -112,11 +112,12 @@
                     ========
                 -->
                 <ul class="nav nav-tabs" role="tablist" id="myTab">
-                    <li role="presentation" class="active"><a data-toggle="tab" href="#CollectionLine" id="branchList">Branches</a></li>
+                    <li role="presentation" class="active"><a data-toggle="tab" href="#tabBranches" id="tabPaneBranches">Branches</a></li>
+                    <li role="presentation"><a data-toggle="tab" href="#tabMore" id="tabPaneMore">More</a></li>
                 </ul>
                 <br />
                 <div class="tab-content">
-                    <div id="branchList" class="tab-pane fade in active">
+                    <div id="tabBranches" class="tab-pane active">
                         <div class="panel panel-default">
 
                             <!--
@@ -184,6 +185,26 @@
                                             <span class="glyphicon glyphicon-fast-forward"></span>
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tabMore" class="tab-pane">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form class="form-horizontal" role="form">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-4">Closing Date</label>
+                                                <div class="col-sm-8">
+                                                    <div class="comboBox-wide" id="cboCompanyClosingDate"></div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-6"></div>
                                 </div>
                             </div>
                         </div>
@@ -305,6 +326,7 @@
         // Company Detail Data and Fields
         // ==============================
         var isLocked = false;
+        var cboCompanyClosingDate = new wijmo.input.InputDate('#cboCompanyClosingDate');
 
         // ========================================================
         // Branch Collection View, Flex Grid and Navigation Buttons
@@ -366,11 +388,24 @@
                             document.getElementById('updatedBy').innerHTML = results.UpdatedBy;
                             document.getElementById('updatedDate').innerHTML = results.UpdatedDateTime;
 
+                            var closingDate = null;
+                            if (results.ClosingDate != "") {
+                                closingDate = new Date(results.ClosingDate);   
+                            }
+
+                            cboCompanyClosingDate.dispose();
+                            cboCompanyClosingDate = new wijmo.input.InputDate('#cboCompanyClosingDate', {
+                                required: false,
+                                format: 'MM-dd-yyyy',
+                                value: closingDate,
+                            });
+
                             if (results.IsLocked) {
                                 document.getElementById('inpComapanyDetailCompany').disabled = true;
                                 document.getElementById('inpComapanyDetailAddress').disabled = true;
                                 document.getElementById('inpComapanyDetailContactNumber').disabled = true;
                                 document.getElementById('inpComapanyDetailTaxNumber').disabled = true;
+                                cboCompanyClosingDate.disabled = true;
 
                                 $("#btnCompanyDetailSave").prop("disabled", true);
                                 $("#btnCompanyDetailLock").prop("disabled", true);
@@ -412,6 +447,13 @@
             companyObject.Address = document.getElementById('inpComapanyDetailAddress').value;
             companyObject.ContactNumber = document.getElementById('inpComapanyDetailContactNumber').value;
             companyObject.TaxNumber = document.getElementById('inpComapanyDetailTaxNumber').value;
+
+            var closingDate = "";
+            if (cboCompanyClosingDate.value != null) {
+                closingDate = cboCompanyClosingDate.value.toLocaleDateString();
+            }
+
+            companyObject.ClosingDate = closingDate;
             var dataUpdate = JSON.stringify(companyObject);
 
             var isValid = true;
@@ -504,6 +546,14 @@
             companyObject.Address = document.getElementById('inpComapanyDetailAddress').value;
             companyObject.ContactNumber = document.getElementById('inpComapanyDetailContactNumber').value;
             companyObject.TaxNumber = document.getElementById('inpComapanyDetailTaxNumber').value;
+
+            var closingDate = "";
+            if (cboCompanyClosingDate.value != null) {
+                closingDate = cboCompanyClosingDate.value.toLocaleDateString();
+                console.log(closingDate);
+            }
+
+            companyObject.ClosingDate = closingDate;
             var dataUpdate = JSON.stringify(companyObject);
 
             var isValid = true;
@@ -1146,6 +1196,20 @@
                 }
             });
         }
+
+        // ====
+        // TABS
+        // ====
+        $('#tabPaneBranches').click(function () {
+            $('#tabBranches').show();
+            $('#tabMore').hide();
+            NProgress.start();
+            refreshBranchFlexGrid();
+        });
+        $('#tabPaneMore').click(function () {
+            $('#tabBranches').hide();
+            $('#tabMore').show();
+        });
 
         // =============================
         // Document Ready - On load Page

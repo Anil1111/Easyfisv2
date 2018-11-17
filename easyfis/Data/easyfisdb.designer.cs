@@ -11684,6 +11684,8 @@ namespace easyfis.Data
 		
 		private string _TaxNumber;
 		
+		private System.Nullable<System.DateTime> _ClosingDate;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -11716,6 +11718,8 @@ namespace easyfis.Data
     partial void OnContactNumberChanged();
     partial void OnTaxNumberChanging(string value);
     partial void OnTaxNumberChanged();
+    partial void OnClosingDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnClosingDateChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -11833,6 +11837,26 @@ namespace easyfis.Data
 					this._TaxNumber = value;
 					this.SendPropertyChanged("TaxNumber");
 					this.OnTaxNumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ClosingDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> ClosingDate
+		{
+			get
+			{
+				return this._ClosingDate;
+			}
+			set
+			{
+				if ((this._ClosingDate != value))
+				{
+					this.OnClosingDateChanging(value);
+					this.SendPropertyChanging();
+					this._ClosingDate = value;
+					this.SendPropertyChanged("ClosingDate");
+					this.OnClosingDateChanged();
 				}
 			}
 		}

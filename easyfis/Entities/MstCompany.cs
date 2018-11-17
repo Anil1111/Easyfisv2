@@ -12,6 +12,7 @@ namespace easyfis.Entities
         public String Address { get; set; }
         public String ContactNumber { get; set; }
         public String TaxNumber { get; set; }
+        public String ClosingDate { get; set; }
         public Boolean IsLocked { get; set; }
         public Int32 CreatedById { get; set; }
         public String CreatedBy { get; set; }

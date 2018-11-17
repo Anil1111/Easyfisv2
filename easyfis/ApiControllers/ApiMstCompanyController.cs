@@ -7,6 +7,7 @@ using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using System.Diagnostics;
 using System.Reflection;
+using System.Globalization;
 
 namespace easyfis.ModifiedApiControllers
 {
@@ -35,6 +36,7 @@ namespace easyfis.ModifiedApiControllers
                                 Company = d.Company,
                                 Address = d.Address,
                                 TaxNumber = d.TaxNumber,
+                                ClosingDate = d.ClosingDate != null ? Convert.ToDateTime(d.ClosingDate).ToShortDateString() : "",
                                 IsLocked = d.IsLocked,
                                 CreatedBy = d.MstUser.FullName,
                                 CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -60,6 +62,7 @@ namespace easyfis.ModifiedApiControllers
                               Address = d.Address,
                               ContactNumber = d.ContactNumber,
                               TaxNumber = d.TaxNumber,
+                              ClosingDate = d.ClosingDate != null ? Convert.ToDateTime(d.ClosingDate).ToShortDateString() : "",
                               IsLocked = d.IsLocked,
                               CreatedBy = d.MstUser.FullName,
                               CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
@@ -166,11 +169,18 @@ namespace easyfis.ModifiedApiControllers
                         {
                             String oldObject = at.GetObjectString(company.FirstOrDefault());
 
+                            DateTime? closingDate = null;
+                            if (!objCompany.ClosingDate.Equals(""))
+                            {
+                                closingDate = Convert.ToDateTime(objCompany.ClosingDate);
+                            }
+
                             var saveCompany = company.FirstOrDefault();
                             saveCompany.Company = objCompany.Company;
                             saveCompany.Address = objCompany.Address;
                             saveCompany.ContactNumber = objCompany.ContactNumber;
                             saveCompany.TaxNumber = objCompany.TaxNumber;
+                            saveCompany.ClosingDate = closingDate;
                             saveCompany.UpdatedById = currentUserId;
                             saveCompany.UpdatedDateTime = DateTime.Now;
 
@@ -238,11 +248,19 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     String oldObject = at.GetObjectString(company.FirstOrDefault());
 
+                                    DateTime? closingDate = null;
+                                    if (!objCompany.ClosingDate.Equals(""))
+                                    {
+                                        closingDate = Convert.ToDateTime(objCompany.ClosingDate);
+                                        Debug.WriteLine(closingDate);
+                                    }
+
                                     var lockCompany = company.FirstOrDefault();
                                     lockCompany.Company = objCompany.Company;
                                     lockCompany.Address = objCompany.Address;
                                     lockCompany.ContactNumber = objCompany.ContactNumber;
                                     lockCompany.TaxNumber = objCompany.TaxNumber;
+                                    lockCompany.ClosingDate = closingDate;
                                     lockCompany.IsLocked = true;
                                     lockCompany.UpdatedById = currentUserId;
                                     lockCompany.UpdatedDateTime = DateTime.Now;
