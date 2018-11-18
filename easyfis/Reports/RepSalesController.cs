@@ -248,7 +248,7 @@ namespace easyfis.Reports
                 PdfPTable tblFooter = new PdfPTable(1);
                 tblFooter.SetWidths(new float[] { 100f });
                 tblFooter.WidthPercentage = 100;
-                tblFooter.AddCell(new PdfPCell(new Phrase("THE " + InvoiceName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ISSUANCE", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+                tblFooter.AddCell(new PdfPCell(new Phrase("THE " + InvoiceName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
                 document.Add(tblFooter);
             }
 
