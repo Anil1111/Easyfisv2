@@ -36,7 +36,6 @@ namespace easyfis.ModifiedApiControllers
                                 Company = d.Company,
                                 Address = d.Address,
                                 TaxNumber = d.TaxNumber,
-                                ClosingDate = d.ClosingDate != null ? Convert.ToDateTime(d.ClosingDate).ToShortDateString() : "",
                                 IsLocked = d.IsLocked,
                                 CreatedBy = d.MstUser.FullName,
                                 CreatedDateTime = d.CreatedDateTime.ToShortDateString(),
