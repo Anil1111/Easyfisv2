@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using Microsoft.AspNet.Identity;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -150,47 +151,80 @@ namespace easyfis.Reports
                         tblSalesInvoiceItemsData.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.NetPrice.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
                         tblSalesInvoiceItemsData.AddCell(new PdfPCell(new Phrase(salesInvoiceItem.Amount.ToString("#,##0.00"), fontArial10)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 7f, PaddingLeft = 5f, PaddingRight = 5f });
 
-                        totalAmount += salesInvoiceItem.Amount;
+                        if (salesInvoiceItem.MstDiscount.Discount.Equals("Senior Citizen Discount") || salesInvoiceItem.MstDiscount.Discount.Equals("PWD"))
+                        {
+                            totalAmount += salesInvoiceItem.Price * salesInvoiceItem.Quantity;
+                        }
+                        else
+                        {
+                            totalAmount += salesInvoiceItem.Amount;
+                        }
                     }
 
                     document.Add(tblSalesInvoiceItemsData);
-                }
 
-                PdfPTable tblVATAnalysis = new PdfPTable(5);
-                tblVATAnalysis.SetWidths(new float[] { 130f, 50f, 50f, 60f, 50f });
-                tblVATAnalysis.WidthPercentage = 100;
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VATable Sales:", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Total Sales (VAT Inclusive).:", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT Exempt Sales:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Less VAT:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Zero Rated Sales:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Amount Net of VAT:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT Amount:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Less SC/PWD Discount:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Amount Due:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Add VAT:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("____________________", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("TOTAL AMOUNT DUE:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblVATAnalysis.AddCell(new PdfPCell(new Phrase("________________", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                document.Add(tblVATAnalysis);
-                document.Add(spaceTable);
-                document.Add(spaceTable);
+                    var vatItems = from d in salesInvoice.FirstOrDefault().TrnSalesInvoiceItems group d by new { d.MstTaxType.TaxType, d.MstDiscount.Discount } into g select g;
+                    Decimal totalVATAmount = vatItems.Where(d => d.Key.Discount != "Senior Citizen Discount" || d.Key.Discount != "PWD" ).Sum(d => d.Sum(g => g.VATAmount));
+                    Decimal totalVATAmountSenior = vatItems.Where(d => d.Key.Discount == "Senior Citizen Discount" || d.Key.Discount == "PWD").Sum(d => d.Sum(g => ((g.MstArticle.MstTaxType.TaxRate / 100) * (g.Price * g.Quantity) / ((g.MstArticle.MstTaxType.TaxRate / 100) + 1))));
+
+                    Decimal totalAmountNetofVAT = totalAmount - (totalVATAmount + totalVATAmountSenior);
+
+                    var vatableSalesItems = from d in salesInvoiceItems where d.MstTaxType.TaxType.Equals("VAT Output") select d;
+                    var vatExemptItems = from d in salesInvoiceItems where d.MstTaxType.TaxType.Equals("VAT Exempt") 
+                                         && !(d.MstDiscount.Discount.Equals("Senior Citizen Discount") 
+                                         || d.MstDiscount.Discount.Equals("PWD"))
+                                         select d;
+
+                     var vatExemptItemsSenior = from d in salesInvoiceItems where d.MstTaxType.TaxType.Equals("VAT Exempt") 
+                                                && (d.MstDiscount.Discount.Equals("Senior Citizen Discount") 
+                                                || d.MstDiscount.Discount.Equals("PWD"))
+                                                select d;
+
+                    var vatExemptAmount = vatExemptItems.Sum(d => d.Amount) + vatExemptItemsSenior.Sum(g => totalAmount - ((g.MstArticle.MstTaxType.TaxRate / 100) * (g.Price * g.Quantity) / ((g.MstArticle.MstTaxType.TaxRate / 100) + 1)));
+
+                    var vatZeroRatedItems = from d in salesInvoiceItems where d.MstTaxType.TaxType.Equals("VAT Zero Rated") select d;
+                    var lessSCPWDDiscount = from d in salesInvoiceItems where d.MstDiscount.Discount.Equals("Senior Citizen Discount") || d.MstDiscount.Discount.Equals("PWD") select d;
+
+                    var lessSCPWDDiscountAmount = lessSCPWDDiscount.Sum(d => d.DiscountAmount * d.Quantity);
+                    var totalAmountDue = totalAmount;
+
+                    var amountDue = totalAmountNetofVAT - lessSCPWDDiscountAmount;
+                    if (lessSCPWDDiscountAmount > 0)
+                    {
+                        totalAmountDue = amountDue;
+                    }
+                    
+                    PdfPTable tblVATAnalysis = new PdfPTable(5);
+                    tblVATAnalysis.SetWidths(new float[] { 130f, 50f, 30f, 70f, 30f });
+                    tblVATAnalysis.WidthPercentage = 100;
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VATable Sales:", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(vatableSalesItems.Sum(d => d.Amount).ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Total Sales (VAT Inclusive).:", fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT Exempt Sales:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(vatExemptAmount.ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Less VAT:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase((totalVATAmount + totalVATAmountSenior).ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Zero Rated Sales:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(vatZeroRatedItems.Sum(d => d.Amount).ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Amount Net of VAT:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(totalAmountNetofVAT.ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("VAT Amount:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(totalVATAmount.ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("Less SC/PWD Discount:", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(lessSCPWDDiscount.Sum(d => d.DiscountAmount * d.Quantity).ToString("#,##0.00"), fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase("TOTAL AMOUNT DUE:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    tblVATAnalysis.AddCell(new PdfPCell(new Phrase(totalAmountDue.ToString("#,##0.00"), fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                    document.Add(tblVATAnalysis);
+                    document.Add(spaceTable);
+                    document.Add(spaceTable);
+
+                }
 
                 PdfPTable tblSignatures = new PdfPTable(4);
                 tblSignatures.WidthPercentage = 100;
@@ -209,10 +243,12 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase("Date Received:", fontArial11Bold)) { HorizontalAlignment = 0, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 document.Add(tblSignatures);
 
+                var InvoiceName = currentDefaultSalesInvoiceName.ToUpper();
+
                 PdfPTable tblFooter = new PdfPTable(1);
                 tblFooter.SetWidths(new float[] { 100f });
                 tblFooter.WidthPercentage = 100;
-                tblFooter.AddCell(new PdfPCell(new Phrase("THE INVOICE SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ISSUANCE", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+                tblFooter.AddCell(new PdfPCell(new Phrase("THE " + InvoiceName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ISSUANCE", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
                 document.Add(tblFooter);
             }
 

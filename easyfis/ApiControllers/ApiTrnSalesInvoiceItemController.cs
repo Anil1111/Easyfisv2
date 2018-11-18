@@ -362,15 +362,15 @@ namespace easyfis.ModifiedApiControllers
 
                                                 if (conversionUnit.Any())
                                                 {
-                                                    Decimal discountAmount = objSalesInvoiceItem.Price * (objSalesInvoiceItem.DiscountRate / 100);
-                                                    Decimal netPrice = objSalesInvoiceItem.Price - discountAmount;
-                                                    Decimal amount = netPrice * objSalesInvoiceItem.Quantity;
-                                                    Decimal VATAmount = amount * (objSalesInvoiceItem.VATPercentage / 100);
+                                                    //Decimal discountAmount = objSalesInvoiceItem.Price * (objSalesInvoiceItem.DiscountRate / 100);
+                                                    //Decimal netPrice = objSalesInvoiceItem.Price - discountAmount;
+                                                    //Decimal amount = netPrice * objSalesInvoiceItem.Quantity;
+                                                    //Decimal VATAmount = amount * (objSalesInvoiceItem.VATPercentage / 100);
 
-                                                    if (taxTypes.FirstOrDefault().IsInclusive)
-                                                    {
-                                                        VATAmount = amount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
-                                                    }
+                                                    //if (taxTypes.FirstOrDefault().IsInclusive)
+                                                    //{
+                                                    //    VATAmount = amount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
+                                                    //}
 
                                                     Decimal baseQuantity = objSalesInvoiceItem.Quantity * 1;
                                                     if (conversionUnit.FirstOrDefault().Multiplier > 0)
@@ -378,10 +378,10 @@ namespace easyfis.ModifiedApiControllers
                                                         baseQuantity = objSalesInvoiceItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                                                     }
 
-                                                    Decimal basePrice = amount;
+                                                    Decimal basePrice = objSalesInvoiceItem.Amount;
                                                     if (baseQuantity > 0)
                                                     {
-                                                        basePrice = amount / baseQuantity;
+                                                        basePrice = objSalesInvoiceItem.Amount / baseQuantity;
                                                     }
 
                                                     Int32? itemInventoryId = null;
@@ -401,12 +401,12 @@ namespace easyfis.ModifiedApiControllers
                                                         Price = objSalesInvoiceItem.Price,
                                                         DiscountId = objSalesInvoiceItem.DiscountId,
                                                         DiscountRate = objSalesInvoiceItem.DiscountRate,
-                                                        DiscountAmount = discountAmount,
-                                                        NetPrice = netPrice,
-                                                        Amount = amount,
+                                                        DiscountAmount = objSalesInvoiceItem.DiscountAmount,
+                                                        NetPrice = objSalesInvoiceItem.NetPrice,
+                                                        Amount = objSalesInvoiceItem.Amount,
                                                         VATId = objSalesInvoiceItem.VATId,
                                                         VATPercentage = objSalesInvoiceItem.VATPercentage,
-                                                        VATAmount = VATAmount,
+                                                        VATAmount = objSalesInvoiceItem.VATAmount,
                                                         BaseUnitId = item.FirstOrDefault().UnitId,
                                                         BaseQuantity = baseQuantity,
                                                         BasePrice = basePrice,
@@ -487,7 +487,7 @@ namespace easyfis.ModifiedApiControllers
                                                                         Price = 0,
                                                                         DiscountId = objSalesInvoiceItem.DiscountId,
                                                                         DiscountRate = objSalesInvoiceItem.DiscountRate,
-                                                                        DiscountAmount = discountAmount,
+                                                                        DiscountAmount = objSalesInvoiceItem.DiscountAmount,
                                                                         NetPrice = itemComponentNetPrice,
                                                                         Amount = itemComponentAmount,
                                                                         VATId = objSalesInvoiceItem.VATId,
@@ -645,15 +645,15 @@ namespace easyfis.ModifiedApiControllers
 
                                                     if (conversionUnit.Any())
                                                     {
-                                                        Decimal discountAmount = objSalesInvoiceItem.Price * (objSalesInvoiceItem.DiscountRate / 100);
-                                                        Decimal netPrice = objSalesInvoiceItem.Price - discountAmount;
-                                                        Decimal amount = netPrice * objSalesInvoiceItem.Quantity;
-                                                        Decimal VATAmount = amount * (objSalesInvoiceItem.VATPercentage / 100);
+                                                        //Decimal discountAmount = objSalesInvoiceItem.Price * (objSalesInvoiceItem.DiscountRate / 100);
+                                                        //Decimal netPrice = objSalesInvoiceItem.Price - discountAmount;
+                                                        //Decimal amount = netPrice * objSalesInvoiceItem.Quantity;
+                                                        //Decimal VATAmount = amount * (objSalesInvoiceItem.VATPercentage / 100);
 
-                                                        if (taxTypes.FirstOrDefault().IsInclusive)
-                                                        {
-                                                            VATAmount = amount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
-                                                        }
+                                                        //if (taxTypes.FirstOrDefault().IsInclusive)
+                                                        //{
+                                                        //    VATAmount = amount / (1 + (objSalesInvoiceItem.VATPercentage / 100)) * (objSalesInvoiceItem.VATPercentage / 100);
+                                                        //}
 
                                                         Decimal baseQuantity = objSalesInvoiceItem.Quantity * 1;
                                                         if (conversionUnit.FirstOrDefault().Multiplier > 0)
@@ -661,10 +661,10 @@ namespace easyfis.ModifiedApiControllers
                                                             baseQuantity = objSalesInvoiceItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                                                         }
 
-                                                        Decimal basePrice = amount;
+                                                        Decimal basePrice = objSalesInvoiceItem.Amount;
                                                         if (baseQuantity > 0)
                                                         {
-                                                            basePrice = amount / baseQuantity;
+                                                            basePrice = objSalesInvoiceItem.Amount / baseQuantity;
                                                         }
 
                                                         Boolean canUpdateSalesInvoiceItem = false;
@@ -700,12 +700,12 @@ namespace easyfis.ModifiedApiControllers
                                                             updateSalesInvoiceItem.Price = objSalesInvoiceItem.Price;
                                                             updateSalesInvoiceItem.DiscountId = objSalesInvoiceItem.DiscountId;
                                                             updateSalesInvoiceItem.DiscountRate = objSalesInvoiceItem.DiscountRate;
-                                                            updateSalesInvoiceItem.DiscountAmount = discountAmount;
-                                                            updateSalesInvoiceItem.NetPrice = netPrice;
-                                                            updateSalesInvoiceItem.Amount = amount;
+                                                            updateSalesInvoiceItem.DiscountAmount = objSalesInvoiceItem.DiscountAmount;
+                                                            updateSalesInvoiceItem.NetPrice = objSalesInvoiceItem.NetPrice;
+                                                            updateSalesInvoiceItem.Amount = objSalesInvoiceItem.Amount;
                                                             updateSalesInvoiceItem.VATId = objSalesInvoiceItem.VATId;
                                                             updateSalesInvoiceItem.VATPercentage = objSalesInvoiceItem.VATPercentage;
-                                                            updateSalesInvoiceItem.VATAmount = VATAmount;
+                                                            updateSalesInvoiceItem.VATAmount = objSalesInvoiceItem.VATAmount;
                                                             updateSalesInvoiceItem.BaseUnitId = item.FirstOrDefault().UnitId;
                                                             updateSalesInvoiceItem.BaseQuantity = baseQuantity;
                                                             updateSalesInvoiceItem.BasePrice = basePrice;

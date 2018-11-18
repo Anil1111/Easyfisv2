@@ -2321,8 +2321,10 @@
                         onSelectedIndexChanged: function () {
                             $("#btnSalesInvoiceItemSave").prop("disabled", false);
                             cboSalesInvoiceItemCode.selectedValue = this.selectedValue;
+
                             createCboSalesInvoiceItemInventoryCode(inventoryCodeId, unitId, 0, discountId, VATId);
-                            computation();
+
+                            computeAmount();
                         }
                     });
 
@@ -2536,7 +2538,7 @@
                                     document.getElementById("inpSalesInvoiceItemPrice").value = formatDecimalValues(0);
                                 }
 
-                                computation();
+                                computeAmount();
                             }
                         });
 
@@ -2674,7 +2676,7 @@
                         selectedValue: defaultDiscount,
                         onSelectedIndexChanged: function () {
                             document.getElementById("inpSalesInvoiceItemDiscountRate").value = formatDecimalValues(this.selectedItem["DiscountRate"]);
-                            computation();
+                            computeAmount();
                         }
                     });
 
@@ -2740,7 +2742,9 @@
                         selectedValue: VATIdValue,
                         onSelectedIndexChanged: function () {
                             document.getElementById("inpSalesInvoiceItemVATRate").value = formatDecimalValues(this.selectedItem["TaxRate"]);
-                            computation();
+
+                            var amount = document.getElementById('inpSalesInvoiceItemAmount').value.replace(/\,/g, '');
+                            computeVAT(amount);
                         }
                     });
 
@@ -2751,7 +2755,7 @@
                         }
                     }
 
-                    computation();
+                    computeAmount();
 
                     $("#salesInvoiceItemLoading").hide();
                     $("#salesInvoiceItemContent").show();
@@ -2759,57 +2763,70 @@
             });
         }
 
-        // ===========
-        // Computation
-        // ===========
-        function computation() {
+        // ==============
+        // Compute Amount
+        // ==============
+        function computeAmount() {
             var price = document.getElementById('inpSalesInvoiceItemPrice').value.replace(/\,/g, '');
+            if (cboSalesInvoiceItemDiscount.selectedItem["Discount"] === "Senior Citizen Discount (Inclusive)" || cboSalesInvoiceItemDiscount.selectedItem["Discount"] === "PWD (Inclusive)") {
+                price = price - ((price / 1.12) * .12);
+
+                cboSalesInvoiceItemVAT.selectedValuePath = "TaxType";
+                cboSalesInvoiceItemVAT.selectedValue = "VAT Exempt";
+
+                cboSalesInvoiceItemVAT.selectedValuePath = "Id";
+            }
+
             var discountRate = document.getElementById('inpSalesInvoiceItemDiscountRate').value.replace(/\,/g, '');
             var discountAmount = price * (discountRate / 100);
+
             document.getElementById('inpSalesInvoiceItemDiscountAmount').value = formatDecimalValues(discountAmount);
 
             var netPrice = price - discountAmount;
-            document.getElementById('inpSalesInvoiceItemNetPrice').value = formatDecimalValues(netPrice);
-
             var quantity = document.getElementById('inpSalesInvoiceItemQuantity').value.replace(/\,/g, '');
+
             var amount = netPrice * quantity;
+
+            document.getElementById('inpSalesInvoiceItemNetPrice').value = formatDecimalValues(netPrice);
             document.getElementById('inpSalesInvoiceItemAmount').value = formatDecimalValues(amount);
 
+            computeVAT(amount);
+        }
+
+        // ===========
+        // Compute VAT
+        // ===========
+        function computeVAT(amount) {
             var VATPercentage = document.getElementById('inpSalesInvoiceItemVATRate').value.replace(/\,/g, '');
-            if (cboSalesInvoiceItemVAT.selectedItem["IsInclusive"]) {
-                VATAmount = amount / (1 + (VATPercentage / 100)) * (VATPercentage / 100);
-            } else {
-                VATAmount = amount * (VATPercentage / 100);
-            }
+            if (cboSalesInvoiceItemVAT.selectedItem["IsInclusive"]) { VATAmount = amount / (1 + (VATPercentage / 100)) * (VATPercentage / 100); }
+            else { VATAmount = amount * (VATPercentage / 100); }
 
             document.getElementById('inpSalesInvoiceItemVATAmount').value = formatDecimalValues(VATAmount);
         }
 
-        $("#inpSalesInvoiceItemQuantity").keyup(function (e) { computation(); });
-        $("#inpSalesInvoiceItemPrice").keyup(function (e) { computation(); });
-        $("#inpSalesInvoiceItemDiscountRate").keyup(function (e) { computation(); });
-
+        $("#inpSalesInvoiceItemQuantity").keyup(function (e) { computeAmount(); });
+        $("#inpSalesInvoiceItemPrice").keyup(function (e) { computeAmount(); });
+        $("#inpSalesInvoiceItemDiscountRate").keyup(function (e) { computeAmount(); });
         $("#inpSalesInvoiceItemDiscountAmount").keyup(function (e) {
             var price = document.getElementById('inpSalesInvoiceItemPrice').value.replace(/\,/g, '');
+            if (cboSalesInvoiceItemDiscount.selectedItem["Discount"] === "Senior Citizen Discount (Inclusive)" || cboSalesInvoiceItemDiscount.selectedItem["Discount"] === "PWD (Inclusive)") {
+                price = price - ((price / 1.12) * .12);
+            }
+
             var discountAmount = document.getElementById('inpSalesInvoiceItemDiscountAmount').value.replace(/\,/g, '');
             var discountRate = (discountAmount / price) * 100;
+
             document.getElementById('inpSalesInvoiceItemDiscountRate').value = formatDecimalValues(discountRate);
 
             var netPrice = price - discountAmount;
-            document.getElementById('inpSalesInvoiceItemNetPrice').value = formatDecimalValues(netPrice);
-
             var quantity = document.getElementById('inpSalesInvoiceItemQuantity').value.replace(/\,/g, '');
+
             var amount = netPrice * quantity;
+
+            document.getElementById('inpSalesInvoiceItemNetPrice').value = formatDecimalValues(netPrice);
             document.getElementById('inpSalesInvoiceItemAmount').value = formatDecimalValues(amount);
 
-            var VATPercentage = document.getElementById('inpSalesInvoiceItemVATRate').value.replace(/\,/g, '');
-            if (cboSalesInvoiceItemVAT.selectedItem["IsInclusive"]) {
-                VATAmount = amount / (1 + (VATPercentage / 100)) * (VATPercentage / 100);
-            } else {
-                VATAmount = amount * (VATPercentage / 100);
-            }
-
-            document.getElementById('inpSalesInvoiceItemVATAmount').value = formatDecimalValues(VATAmount);
+            computeVAT(amount);
         });
 
         // =====================
@@ -2898,8 +2915,12 @@
             saleItemObject.Price = document.getElementById('inpSalesInvoiceItemPrice').value;
             saleItemObject.DiscountId = cboSalesInvoiceItemDiscount.selectedValue;
             saleItemObject.DiscountRate = document.getElementById('inpSalesInvoiceItemDiscountRate').value;
+            saleItemObject.DiscountAmount = document.getElementById('inpSalesInvoiceItemDiscountAmount').value;
+            saleItemObject.NetPrice = document.getElementById('inpSalesInvoiceItemNetPrice').value;
+            saleItemObject.Amount = document.getElementById('inpSalesInvoiceItemAmount').value;
             saleItemObject.VATId = cboSalesInvoiceItemVAT.selectedValue;
             saleItemObject.VATPercentage = document.getElementById('inpSalesInvoiceItemVATRate').value;
+            saleItemObject.VATAmount = document.getElementById('inpSalesInvoiceItemVATAmount').value;
             var saleItemData = JSON.stringify(saleItemObject);
 
             var isValid = true;
