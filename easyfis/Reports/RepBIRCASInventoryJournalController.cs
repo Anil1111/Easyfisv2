@@ -51,7 +51,13 @@ namespace easyfis.Reports
             // Company Detail
             // ==============
             var company = from d in db.MstCompanies where d.Id == Convert.ToInt32(CompanyId) select d;
-            var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+
+            var branchName = "All Branches";
+            if (Convert.ToInt32(BranchId) != 0)
+            {
+                var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+                branchName = branch.FirstOrDefault().Branch;
+            }
 
             // ===========
             // Header Page
@@ -62,7 +68,7 @@ namespace easyfis.Reports
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Company, fontArial17Bold)) { Border = 0 });
             header.AddCell(new PdfPCell(new Phrase("Inventory Journal", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Address, fontArial11)) { Border = 0, PaddingTop = 5f });
-            header.AddCell(new PdfPCell(new Phrase(branch.FirstOrDefault().Branch, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+            header.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().ContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
             header.AddCell(new PdfPCell(new Phrase("Date Printed: " + DateTime.Now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase("TIN: " + company.FirstOrDefault().TaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
@@ -92,12 +98,25 @@ namespace easyfis.Reports
             // ====
             // Data
             // ====
-            var inventories = from d in db.TrnInventories
+            IQueryable<Data.TrnInventory> inventories;
+            if (Convert.ToInt32(BranchId) != 0)
+            {
+                inventories = from d in db.TrnInventories
                               where d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                               && d.BranchId == Convert.ToInt32(BranchId)
                               && d.InventoryDate >= Convert.ToDateTime(StartDate)
                               && d.InventoryDate <= Convert.ToDateTime(EndDate)
                               select d;
+
+            }
+            else
+            {
+                inventories = from d in db.TrnInventories
+                              where d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                              && d.InventoryDate >= Convert.ToDateTime(StartDate)
+                              && d.InventoryDate <= Convert.ToDateTime(EndDate)
+                              select d;
+            }
 
             if (inventories.Any())
             {
@@ -121,31 +140,31 @@ namespace easyfis.Reports
 
                     if (inventory.RRId != null)
                     {
-                        referenceNumber = "RR-" + inventory.TrnReceivingReceipt.RRNumber;
+                        referenceNumber = "RR-" + inventory.TrnReceivingReceipt.MstBranch.BranchCode + "-" + inventory.TrnReceivingReceipt.RRNumber;
                     }
                     else if (inventory.SIId != null)
                     {
-                        referenceNumber = "SI-" + inventory.TrnSalesInvoice.SINumber;
+                        referenceNumber = "SI-" + inventory.TrnSalesInvoice.MstBranch.BranchCode + "-" + inventory.TrnSalesInvoice.SINumber;
                     }
                     else if (inventory.INId != null)
                     {
-                        referenceNumber = "IN-" + inventory.TrnStockIn.INNumber;
+                        referenceNumber = "IN-" + inventory.TrnStockIn.MstBranch.BranchCode + "-" + inventory.TrnStockIn.INNumber;
                     }
                     else if (inventory.OTId != null)
                     {
-                        referenceNumber = "OT-" + inventory.TrnStockOut.OTNumber;
+                        referenceNumber = "OT-" + inventory.TrnStockOut.MstBranch.BranchCode + "-" + inventory.TrnStockOut.OTNumber;
                     }
                     else if (inventory.STId != null)
                     {
-                        referenceNumber = "ST-" + inventory.TrnStockTransfer.STNumber;
+                        referenceNumber = "ST-" + inventory.TrnStockTransfer.MstBranch.BranchCode + "-" + inventory.TrnStockTransfer.STNumber;
                     }
                     else if (inventory.SWId != null)
                     {
-                        referenceNumber = "SW-" + inventory.TrnStockWithdrawal.SWNumber;
+                        referenceNumber = "SW-" + inventory.TrnStockWithdrawal.MstBranch.BranchCode + "-" + inventory.TrnStockWithdrawal.SWNumber;
                     }
                     else
                     {
-                        referenceNumber = "0000000000";
+                        referenceNumber = "??-00000-0000000000";
                     }
 
                     Decimal debitAmount = 0;

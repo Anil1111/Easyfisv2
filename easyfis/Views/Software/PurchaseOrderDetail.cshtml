@@ -2102,16 +2102,21 @@
         // =======================================
         // Create Purchase Order Item Combo - Item
         // =======================================
-        function createCboPurchaseOrderItem(itemIdSelectedValue, articleUnitIdSelectedValue) {
+        function createCboPurchaseOrderItem(itemIdSelectedValue, itemUnitIdSelectedValue) {
             var itemsObservableArray = new wijmo.collections.ObservableArray();
             $.ajax({
                 url: '/api/purchaseOrderItem/dropdown/list/item',
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                data: {},
                 success: function (results) {
+                    var disabled = true;
+                    document.getElementById("btnPurchaseOrderItemSave").disabled = true;
+
                     if (results.length > 0) {
+                        disabled = false;
+                        document.getElementById("btnPurchaseOrderItemSave").disabled = false;
+
                         for (i = 0; i < results.length; i++) {
                             itemsObservableArray.push({
                                 Id: results[i]["Id"],
@@ -2123,33 +2128,32 @@
 
                     cboPurchaseOrderItemCode.dispose();
                     cboPurchaseOrderItemCode = new wijmo.input.ComboBox('#cboPurchaseOrderItemCode', {
+                        disabled: disabled,
                         isEditable: false,
-                        placeholder: "Select Item Code",
                         itemsSource: itemsObservableArray,
                         displayMemberPath: "ManualArticleCode",
                         selectedValuePath: "Id",
                         selectedValue: itemIdSelectedValue,
                         onSelectedIndexChanged: function () {
                             cboPurchaseOrderItemDescription.selectedValue = this.selectedValue;
-                            createCboPurchaseOrderItemUnit(this.selectedValue);
                         }
                     });
 
                     cboPurchaseOrderItemDescription.dispose();
                     cboPurchaseOrderItemDescription = new wijmo.input.ComboBox('#cboPurchaseOrderItemDescription', {
+                        disabled: disabled,
                         isEditable: false,
-                        placeholder: "Select Item",
                         itemsSource: itemsObservableArray,
                         displayMemberPath: "Article",
                         selectedValuePath: "Id",
                         selectedValue: itemIdSelectedValue,
                         onSelectedIndexChanged: function () {
                             cboPurchaseOrderItemCode.selectedValue = this.selectedValue;
-                            createCboPurchaseOrderItemUnit(this.selectedValue);
+                            createCboPurchaseOrderItemUnit(this.selectedValue, itemUnitIdSelectedValue);
                         }
                     });
 
-                    createCboPurchaseOrderItemUnit(cboPurchaseOrderItemDescription.selectedValue, articleUnitIdSelectedValue);
+                    createCboPurchaseOrderItemUnit(cboPurchaseOrderItemDescription.selectedValue, itemUnitIdSelectedValue);
                 }
             });
         }
@@ -2157,40 +2161,61 @@
         // =======================================
         // Create Purchase Order Item Combo - Unit
         // =======================================
-        function createCboPurchaseOrderItemUnit(itemId, articleUnitIdSelectedValue) {
+        function createCboPurchaseOrderItemUnit(itemId, itemUnitIdSelectedValue) {
             var unitsObservableArray = new wijmo.collections.ObservableArray();
-            $.ajax({
-                url: '/api/purchaseOrderItem/dropdown/list/itemUnit/' + itemId,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                data: {},
-                success: function (results) {
-                    if (results.length > 0) {
-                        for (i = 0; i < results.length; i++) {
-                            unitsObservableArray.push({
-                                Id: results[i]["Id"],
-                                UnitId: results[i]["UnitId"],
-                                Unit: results[i]["Unit"]
-                            });
+            if (itemId != null) {
+                $.ajax({
+                    url: '/api/purchaseOrderItem/dropdown/list/itemUnit/' + itemId,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var disabled = true;
+                        if (results.length > 0) {
+                            disabled = false;
+
+                            if (!document.getElementById("btnPurchaseOrderItemSave").disabled) {
+                                document.getElementById("btnPurchaseOrderItemSave").disabled = false;
+                            }
+
+                            for (i = 0; i < results.length; i++) {
+                                unitsObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    UnitId: results[i]["UnitId"],
+                                    Unit: results[i]["Unit"]
+                                });
+                            }
+                        } else {
+                            document.getElementById("btnPurchaseOrderItemSave").disabled = true;
                         }
+
+                        cboPurchaseOrderItemUnit.dispose();
+                        cboPurchaseOrderItemUnit = new wijmo.input.ComboBox('#cboPurchaseOrderItemUnit', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: unitsObservableArray,
+                            displayMemberPath: "Unit",
+                            selectedValuePath: "UnitId",
+                            selectedValue: itemUnitIdSelectedValue
+                        });
+
+                        $("#purchaseOrderItemLoading").hide();
+                        $("#POItemContent").show();
                     }
+                });
+            } else {
+                document.getElementById("btnPurchaseOrderItemSave").disabled = true;
 
-                    cboPurchaseOrderItemUnit.dispose();
-                    cboPurchaseOrderItemUnit = new wijmo.input.ComboBox('#cboPurchaseOrderItemUnit', {
-                        isEditable: false,
-                        placeholder: "Select Unit",
-                        itemsSource: unitsObservableArray,
-                        displayMemberPath: "Unit",
-                        selectedValuePath: "UnitId",
-                        selectedValue: articleUnitIdSelectedValue
-                    });
+                cboPurchaseOrderItemUnit.dispose();
+                cboPurchaseOrderItemUnit = new wijmo.input.ComboBox('#cboPurchaseOrderItemUnit', {
+                    disabled: true,
+                    isEditable: false,
+                    itemsSource: unitsObservableArray
+                });
 
-                    $("#purchaseOrderItemLoading").hide();
-                    $("#btnPurchaseOrderItemSave").prop("disabled", false);
-                    $("#POItemContent").show();
-                }
-            });
+                $("#purchaseOrderItemLoading").hide();
+                $("#POItemContent").show();
+            }
         }
 
         // =======================
@@ -2424,26 +2449,16 @@
             }
         }
 
-        // ==========
-        // Key Events
-        // ==========
-        $('#inpPurchaseOrderItemQuantity').keyup(function () {
-            computePurchaseOrderItemAmount();
-        });
+        // ==============
+        // Compute Amount
+        // ==============
+        $('#inpPurchaseOrderItemQuantity').keyup(function () { computeAmount(); });
+        $('#inpPurchaseOrderItemCost').keyup(function () { computeAmount(); });
+        function computeAmount() {
+            var quantity = parseFloat(document.getElementById('inpPurchaseOrderItemQuantity').value.replace(/\,/g, ''));
+            var cost = parseFloat(document.getElementById('inpPurchaseOrderItemCost').value.replace(/\,/g, ''));
 
-        $('#inpPurchaseOrderItemCost').keyup(function () {
-            computePurchaseOrderItemAmount();
-        });
-
-        // ==================================
-        // Compute Purchase Order Item Amount
-        // ==================================
-        function computePurchaseOrderItemAmount() {
-            var inputQuantity = document.getElementById('inpPurchaseOrderItemQuantity').value;
-            var inputCost = document.getElementById('inpPurchaseOrderItemCost').value;
-            var replacedCost = inputCost.replace(/\,/g, '');
-            var replacedQuantity = inputQuantity.replace(/\,/g, '');
-            var amount = replacedCost * replacedQuantity;
+            var amount = quantity * cost;
             document.getElementById('inpPurchaseOrderItemAmount').value = formatDecimalValues(amount);
         }
 
@@ -2935,7 +2950,7 @@
                 }
             });
         }
-        
+
         // ============================
         // Purchase Request - Pick Item
         // ============================

@@ -424,9 +424,9 @@ namespace easyfis.ModifiedApiControllers
                         {
                             String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
-                            Decimal amount = 0;
+                            Decimal amount = 0, WTAXAmount = 0;
                             var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == Convert.ToInt32(id) select d;
-                            if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); }
+                            if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); WTAXAmount = receivingReceiptItems.Sum(d => d.WTAXAmount); }
 
                             var saveReceivingReceipt = receivingReceipt.FirstOrDefault();
                             saveReceivingReceipt.RRDate = Convert.ToDateTime(objReceivingReceipt.RRDate);
@@ -436,6 +436,7 @@ namespace easyfis.ModifiedApiControllers
                             saveReceivingReceipt.Remarks = objReceivingReceipt.Remarks;
                             saveReceivingReceipt.ManualRRNumber = objReceivingReceipt.ManualRRNumber;
                             saveReceivingReceipt.Amount = amount;
+                            saveReceivingReceipt.WTaxAmount = WTAXAmount;
                             saveReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
                             saveReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
                             saveReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;
@@ -518,9 +519,9 @@ namespace easyfis.ModifiedApiControllers
                                 {
                                     String oldObject = auditTrail.GetObjectString(receivingReceipt.FirstOrDefault());
 
-                                    Decimal amount = 0;
+                                    Decimal amount = 0, WTAXAmount = 0;
                                     var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == Convert.ToInt32(id) select d;
-                                    if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); }
+                                    if (receivingReceiptItems.Any()) { amount = receivingReceiptItems.Sum(d => d.Amount); WTAXAmount = receivingReceiptItems.Sum(d => d.WTAXAmount); }
 
                                     var lockReceivingReceipt = receivingReceipt.FirstOrDefault();
                                     lockReceivingReceipt.RRDate = Convert.ToDateTime(objReceivingReceipt.RRDate);
@@ -530,6 +531,7 @@ namespace easyfis.ModifiedApiControllers
                                     lockReceivingReceipt.Remarks = objReceivingReceipt.Remarks;
                                     lockReceivingReceipt.ManualRRNumber = objReceivingReceipt.ManualRRNumber;
                                     lockReceivingReceipt.Amount = amount;
+                                    lockReceivingReceipt.WTaxAmount = WTAXAmount;
                                     lockReceivingReceipt.ReceivedById = objReceivingReceipt.ReceivedById;
                                     lockReceivingReceipt.CheckedById = objReceivingReceipt.CheckedById;
                                     lockReceivingReceipt.ApprovedById = objReceivingReceipt.ApprovedById;

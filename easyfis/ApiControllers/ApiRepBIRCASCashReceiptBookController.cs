@@ -53,23 +53,45 @@ namespace easyfis.ApiControllers
         [Authorize, HttpGet, Route("api/BIRCASCashReceiptBook/list/{startDate}/{endDate}/{companyId}/{branchId}")]
         public List<Entities.RepBIRCASCashReceiptBook> ListBIRCASCashReceiptBook(String startDate, String endDate, String companyId, String branchId)
         {
-            var journals = from d in db.TrnJournals
-                           where d.ORId != null
-                           && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                           && d.BranchId == Convert.ToInt32(branchId)
-                           && d.JournalDate >= Convert.ToDateTime(startDate)
-                           && d.JournalDate <= Convert.ToDateTime(endDate)
-                           select new Entities.RepBIRCASCashReceiptBook
-                           {
-                               Date = d.JournalDate.ToShortDateString(),
-                               ReferenceNumber = "OR-" + d.TrnCollection.ORNumber,
-                               AccountCode = d.MstAccount.AccountCode,
-                               Account = d.MstAccount.Account,
-                               DebitAmount = d.DebitAmount,
-                               CreditAmount = d.CreditAmount
-                           };
+            if (Convert.ToInt32(branchId) != 0)
+            {
+                var journals = from d in db.TrnJournals
+                               where d.ORId != null
+                               && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                               && d.BranchId == Convert.ToInt32(branchId)
+                               && d.JournalDate >= Convert.ToDateTime(startDate)
+                               && d.JournalDate <= Convert.ToDateTime(endDate)
+                               select new Entities.RepBIRCASCashReceiptBook
+                               {
+                                   Date = d.JournalDate.ToShortDateString(),
+                                   ReferenceNumber = "OR-" + d.TrnCollection.MstBranch.BranchCode + "-" + d.TrnCollection.ORNumber,
+                                   AccountCode = d.MstAccount.AccountCode,
+                                   Account = d.MstAccount.Account,
+                                   DebitAmount = d.DebitAmount,
+                                   CreditAmount = d.CreditAmount
+                               };
 
-            return journals.ToList();
+                return journals.ToList();
+            }
+            else
+            {
+                var journals = from d in db.TrnJournals
+                               where d.ORId != null
+                               && d.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                               && d.JournalDate >= Convert.ToDateTime(startDate)
+                               && d.JournalDate <= Convert.ToDateTime(endDate)
+                               select new Entities.RepBIRCASCashReceiptBook
+                               {
+                                   Date = d.JournalDate.ToShortDateString(),
+                                   ReferenceNumber = "OR-" + d.TrnCollection.MstBranch.BranchCode + "-" + d.TrnCollection.ORNumber,
+                                   AccountCode = d.MstAccount.AccountCode,
+                                   Account = d.MstAccount.Account,
+                                   DebitAmount = d.DebitAmount,
+                                   CreditAmount = d.CreditAmount
+                               };
+
+                return journals.ToList();
+            }
         }
     }
 }

@@ -53,27 +53,53 @@ namespace easyfis.ApiControllers
         [Authorize, HttpGet, Route("api/BIRCASPurchaseJournal/list/{startDate}/{endDate}/{companyId}/{branchId}")]
         public List<Entities.RepBIRCASPurchaseJournal> ListBIRCASPurchaseJournal(String startDate, String endDate, String companyId, String branchId)
         {
-            var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
-                                        where d.TrnReceivingReceipt.MstBranch.CompanyId == Convert.ToInt32(companyId)
-                                        && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(branchId)
-                                        && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(startDate)
-                                        && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(endDate)
-                                        && (d.TrnReceivingReceipt.IsLocked==true && d.TrnReceivingReceipt.IsCancelled==false)
-                                        select new Entities.RepBIRCASPurchaseJournal
-                                        {
-                                            Date = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
-                                            ReferenceNumber = "RR-" + d.TrnReceivingReceipt.RRNumber,
-                                            Supplier = d.TrnReceivingReceipt.MstArticle.Article,
-                                            SupplierTIN = d.TrnReceivingReceipt.MstArticle.TaxNumber,
-                                            Address = d.TrnReceivingReceipt.MstArticle.Address,
-                                            ManualReferenceNumber = d.TrnReceivingReceipt.ManualRRNumber,
-                                            TotalAmount = d.Amount,
-                                            Discount = 0,
-                                            VAT = d.VATAmount,
-                                            NetPurchase = d.Amount
-                                        };
+            if (Convert.ToInt32(branchId) != 0)
+            {
+                var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                            where d.TrnReceivingReceipt.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                            && d.TrnReceivingReceipt.BranchId == Convert.ToInt32(branchId)
+                                            && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(startDate)
+                                            && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(endDate)
+                                            && (d.TrnReceivingReceipt.IsLocked == true && d.TrnReceivingReceipt.IsCancelled == false)
+                                            select new Entities.RepBIRCASPurchaseJournal
+                                            {
+                                                Date = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
+                                                ReferenceNumber = "RR-" + d.TrnReceivingReceipt.MstBranch.BranchCode + "-" + d.TrnReceivingReceipt.RRNumber,
+                                                Supplier = d.TrnReceivingReceipt.MstArticle.Article,
+                                                SupplierTIN = d.TrnReceivingReceipt.MstArticle.TaxNumber,
+                                                Address = d.TrnReceivingReceipt.MstArticle.Address,
+                                                ManualReferenceNumber = d.TrnReceivingReceipt.ManualRRNumber,
+                                                TotalAmount = d.Amount,
+                                                Discount = 0,
+                                                VAT = d.VATAmount,
+                                                NetPurchase = d.Amount
+                                            };
 
-            return receivingReceiptItems.ToList();
+                return receivingReceiptItems.ToList();
+            }
+            else
+            {
+                var receivingReceiptItems = from d in db.TrnReceivingReceiptItems
+                                            where d.TrnReceivingReceipt.MstBranch.CompanyId == Convert.ToInt32(companyId)
+                                            && d.TrnReceivingReceipt.RRDate >= Convert.ToDateTime(startDate)
+                                            && d.TrnReceivingReceipt.RRDate <= Convert.ToDateTime(endDate)
+                                            && (d.TrnReceivingReceipt.IsLocked == true && d.TrnReceivingReceipt.IsCancelled == false)
+                                            select new Entities.RepBIRCASPurchaseJournal
+                                            {
+                                                Date = d.TrnReceivingReceipt.RRDate.ToShortDateString(),
+                                                ReferenceNumber = "RR-" + d.TrnReceivingReceipt.MstBranch.BranchCode + "-" + d.TrnReceivingReceipt.RRNumber,
+                                                Supplier = d.TrnReceivingReceipt.MstArticle.Article,
+                                                SupplierTIN = d.TrnReceivingReceipt.MstArticle.TaxNumber,
+                                                Address = d.TrnReceivingReceipt.MstArticle.Address,
+                                                ManualReferenceNumber = d.TrnReceivingReceipt.ManualRRNumber,
+                                                TotalAmount = d.Amount,
+                                                Discount = 0,
+                                                VAT = d.VATAmount,
+                                                NetPurchase = d.Amount
+                                            };
+
+                return receivingReceiptItems.ToList();
+            }
         }
     }
 }

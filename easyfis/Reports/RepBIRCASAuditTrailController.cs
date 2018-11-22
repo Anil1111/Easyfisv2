@@ -55,7 +55,13 @@ namespace easyfis.Reports
             // Company Detail
             // ==============
             var company = from d in db.MstCompanies where d.Id == Convert.ToInt32(CompanyId) select d;
-            var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+
+            var branchName = "All Branches";
+            if (Convert.ToInt32(BranchId) != 0)
+            {
+                var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+                branchName = branch.FirstOrDefault().Branch;
+            }
 
             // ===========
             // Header Page
@@ -66,7 +72,7 @@ namespace easyfis.Reports
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Company, fontArial17Bold)) { Border = 0 });
             header.AddCell(new PdfPCell(new Phrase("Audit Trail", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Address, fontArial11)) { Border = 0, PaddingTop = 5f });
-            header.AddCell(new PdfPCell(new Phrase(branch.FirstOrDefault().Branch, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+            header.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().ContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
             header.AddCell(new PdfPCell(new Phrase("Date Printed: " + DateTime.Now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase("TIN: " + company.FirstOrDefault().TaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
@@ -96,7 +102,7 @@ namespace easyfis.Reports
             // ====
             // Data
             // ====
-            var auditTrails = from d in db.SysAuditTrails
+            var auditTrails = from d in db.SysAuditTrails.OrderByDescending(d => d.AuditDate)
                               where d.AuditDate >= Convert.ToDateTime(StartDate)
                               && d.AuditDate <= Convert.ToDateTime(EndDate).AddHours(24)
                               select d;

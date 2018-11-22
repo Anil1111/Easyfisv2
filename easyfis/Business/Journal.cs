@@ -137,7 +137,6 @@ namespace easyfis.Business
 
                             db.TrnJournals.InsertOnSubmit(newRRItemJournal);
                         }
-
                     }
 
                     // ==========
@@ -176,7 +175,6 @@ namespace easyfis.Business
 
                             db.TrnJournals.InsertOnSubmit(newRRItemTaxJournal);
                         }
-
                     }
 
                     // ====================================
@@ -190,12 +188,50 @@ namespace easyfis.Business
                         ArticleId = receivingReceipts.FirstOrDefault().SupplierId,
                         Particulars = receivingReceipts.FirstOrDefault().Remarks,
                         DebitAmount = 0,
-                        CreditAmount = receivingReceipts.FirstOrDefault().Amount,
+                        CreditAmount = receivingReceipts.FirstOrDefault().Amount - receivingReceipts.FirstOrDefault().WTaxAmount,
                         RRId = RRId,
                         DocumentReference = "RR-" + receivingReceipts.FirstOrDefault().MstBranch.BranchCode + "-" + receivingReceipts.FirstOrDefault().RRNumber
                     };
 
                     db.TrnJournals.InsertOnSubmit(newRRSupplierJournal);
+
+                    // ============
+                    // Credit: WTAX 
+                    // ============
+                    var receivingReceiptWTaxes = from d in db.TrnReceivingReceiptItems
+                                                 where d.RRId == RRId
+                                                 group d by new
+                                                 {
+                                                     ReceivingReceipt = d.TrnReceivingReceipt,
+                                                     TaxAccountId = d.MstTaxType1.AccountId
+                                                 } into g
+                                                 select new
+                                                 {
+                                                     TaxAccountId = g.Key.TaxAccountId,
+                                                     Particulars = g.Key.ReceivingReceipt.Remarks,
+                                                     TaxAmount = g.Sum(d => d.WTAXAmount)
+                                                 };
+
+                    if (receivingReceiptWTaxes.Any())
+                    {
+                        foreach (var receivingReceiptWTaxe in receivingReceiptWTaxes)
+                        {
+                            Data.TrnJournal newRRItemTaxJournal = new Data.TrnJournal
+                            {
+                                JournalDate = receivingReceipts.FirstOrDefault().RRDate,
+                                BranchId = receivingReceipts.FirstOrDefault().BranchId,
+                                AccountId = receivingReceiptWTaxe.TaxAccountId,
+                                ArticleId = receivingReceipts.FirstOrDefault().SupplierId,
+                                Particulars = receivingReceiptWTaxe.Particulars,
+                                DebitAmount = 0,
+                                CreditAmount = receivingReceiptWTaxe.TaxAmount,
+                                RRId = RRId,
+                                DocumentReference = "RR-" + receivingReceipts.FirstOrDefault().MstBranch.BranchCode + "-" + receivingReceipts.FirstOrDefault().RRNumber
+                            };
+
+                            db.TrnJournals.InsertOnSubmit(newRRItemTaxJournal);
+                        }
+                    }
 
                     db.SubmitChanges();
                 }

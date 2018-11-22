@@ -7,6 +7,7 @@ namespace easyfis.Entities
 {
     public class RepBIRCASGeneralLedger
     {
+        public Int32 Id { get; set; }
         public String Date { get; set; }
         public String ReferenceNumber { get; set; }
         public String AccountCode { get; set; }

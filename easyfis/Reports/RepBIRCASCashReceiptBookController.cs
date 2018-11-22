@@ -52,7 +52,13 @@ namespace easyfis.Reports
             // Company Detail
             // ==============
             var company = from d in db.MstCompanies where d.Id == Convert.ToInt32(CompanyId) select d;
-            var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+
+            var branchName = "All Branches";
+            if (Convert.ToInt32(BranchId) != 0)
+            {
+                var branch = from d in db.MstBranches where d.Id == Convert.ToInt32(BranchId) select d;
+                branchName = branch.FirstOrDefault().Branch;
+            }
 
             // ===========
             // Header Page
@@ -63,7 +69,7 @@ namespace easyfis.Reports
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Company, fontArial17Bold)) { Border = 0 });
             header.AddCell(new PdfPCell(new Phrase("Cash Receipt Book", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().Address, fontArial11)) { Border = 0, PaddingTop = 5f });
-            header.AddCell(new PdfPCell(new Phrase(branch.FirstOrDefault().Branch, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+            header.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase(company.FirstOrDefault().ContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
             header.AddCell(new PdfPCell(new Phrase("Date Printed: " + DateTime.Now.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             header.AddCell(new PdfPCell(new Phrase("TIN: " + company.FirstOrDefault().TaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
@@ -93,18 +99,31 @@ namespace easyfis.Reports
             // ====
             // Data
             // ====
-            var journals = from d in db.TrnJournals
+            IQueryable<Data.TrnJournal> journals = null;
+            if (Convert.ToInt32(BranchId) != 0)
+            {
+                journals = from d in db.TrnJournals
                            where d.ORId != null
                            && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
                            && d.BranchId == Convert.ToInt32(BranchId)
                            && d.JournalDate >= Convert.ToDateTime(StartDate)
                            && d.JournalDate <= Convert.ToDateTime(EndDate)
                            select d;
+            }
+            else
+            {
+                journals = from d in db.TrnJournals
+                           where d.ORId != null
+                           && d.MstBranch.CompanyId == Convert.ToInt32(CompanyId)
+                           && d.JournalDate >= Convert.ToDateTime(StartDate)
+                           && d.JournalDate <= Convert.ToDateTime(EndDate)
+                           select d;
+            }
 
             if (journals.Any())
             {
                 PdfPTable data = new PdfPTable(6);
-                data.SetWidths(new float[] { 50f, 60f, 60f, 150f, 80f, 80f });
+                data.SetWidths(new float[] { 50f, 80f, 60f, 150f, 80f, 80f });
                 data.WidthPercentage = 100;
                 data.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
                 data.AddCell(new PdfPCell(new Phrase("Reference No.", fontArial11Bold)) { HorizontalAlignment = 1, PaddingTop = 4f, PaddingBottom = 8f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -122,7 +141,7 @@ namespace easyfis.Reports
                     totalCreditAmount += journal.CreditAmount;
 
                     data.AddCell(new PdfPCell(new Phrase(journal.JournalDate.ToShortDateString(), fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
-                    data.AddCell(new PdfPCell(new Phrase("OR-" + journal.TrnCollection.ORNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
+                    data.AddCell(new PdfPCell(new Phrase("OR-" + journal.TrnCollection.MstBranch.BranchCode + "-" + journal.TrnCollection.ORNumber, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(journal.MstAccount.AccountCode, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(journal.MstAccount.Account, fontArial11)) { HorizontalAlignment = 0, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });
                     data.AddCell(new PdfPCell(new Phrase(journal.DebitAmount.ToString("#,##0.00"), fontArial11)) { HorizontalAlignment = 2, PaddingTop = 3f, PaddingBottom = 6f, PaddingLeft = 5f, PaddingRight = 5f });

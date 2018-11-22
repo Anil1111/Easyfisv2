@@ -475,6 +475,10 @@
                                     <dd>
                                         <input type="text" class="form-control numberField requiredRRLine" id="inpReceivingReceiptItemCost" placeholder="0.00" />
                                     </dd>
+                                    <dt>WTAX Amount</dt>
+                                    <dd>
+                                        <input type="text" class="form-control numberField requiredRRLine" id="inpReceivingReceiptItemWTAXAmount" placeholder="0.00" disabled />
+                                    </dd>
                                     <dt>Amount</dt>
                                     <dd>
                                         <input type="text" class="form-control numberField requiredRRLine" id="inpReceivingReceiptItemAmount" placeholder="0.00" disabled />
@@ -502,10 +506,6 @@
                                     <dt>WTAX Rate</dt>
                                     <dd>
                                         <input type="text" class="form-control numberField requiredRRLine" id="inpReceivingReceiptItemWTAXRate" placeholder="0.00" disabled />
-                                    </dd>
-                                    <dt>WTAX Amount</dt>
-                                    <dd>
-                                        <input type="text" class="form-control numberField requiredRRLine" id="inpReceivingReceiptItemWTAXAmount" placeholder="0.00" disabled />
                                     </dd>
                                 </dl>
                             </div>
@@ -736,7 +736,7 @@
             </div>
         </div>
     </div>
-    
+
     <!--
         =======================================
         Receiving Receipt: Cancel Confirm Modal
@@ -2173,9 +2173,14 @@
                 cache: false,
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
-                data: {},
                 success: function (results) {
+                    var disabled = true;
+                    document.getElementById("btnReceivingReceiptItemSave").disabled = true;
+
                     if (results.length > 0) {
+                        disabled = false;
+                        document.getElementById("btnReceivingReceiptItemSave").disabled = false;
+
                         for (i = 0; i < results.length; i++) {
                             branchesObservableArray.push({
                                 Id: results[i]["Id"],
@@ -2186,8 +2191,8 @@
 
                     cboReceivingReceiptItemBranch.dispose();
                     cboReceivingReceiptItemBranch = new wijmo.input.ComboBox('#cboReceivingReceiptItemBranch', {
+                        disabled: disabled,
                         isEditable: false,
-                        placeholder: "Select Branch",
                         itemsSource: branchesObservableArray,
                         displayMemberPath: "Branch",
                         selectedValuePath: "Id",
@@ -2204,50 +2209,61 @@
         // =============================================
         function createCboReceivingReceiptItemPONumber(POIdSelectedValue, ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue) {
             var purchaseOrderObservableArray = new wijmo.collections.ObservableArray();
-            var supplierId = cboReceivingReceiptSupplier.selectedValue;
-            $.ajax({
-                url: '/api/receivingReceiptItem/dropdown/list/purchaseOrder/' + supplierId,
-                cache: false,
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                success: function (results) {
-                    if (results.length > 0) {
-                        $("#btnReceivingReceiptItemSave").prop("disabled", false);
-                        for (i = 0; i < results.length; i++) {
-                            purchaseOrderObservableArray.push({
-                                Id: results[i]["Id"],
-                                PONumber: results[i]["PONumber"],
-                                PODate: results[i]["PODate"],
-                                PODetails: results[i]["PONumber"] + " (" + (results[i]["PODate"]).replace(/\//g, '-') + ")"
-                            });
+            if (cboReceivingReceiptSupplier.selectedValue) {
+                $.ajax({
+                    url: '/api/receivingReceiptItem/dropdown/list/purchaseOrder/' + cboReceivingReceiptSupplier.selectedValue,
+                    cache: false,
+                    type: 'GET',
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (results) {
+                        var disabled = true;
+
+                        if (results.length > 0) {
+                            disabled = false;
+                            if (!document.getElementById("btnReceivingReceiptItemSave").disabled) {
+                                document.getElementById("btnReceivingReceiptItemSave").disabled = false;
+                            }
+
+                            for (i = 0; i < results.length; i++) {
+                                purchaseOrderObservableArray.push({
+                                    Id: results[i]["Id"],
+                                    PONumber: results[i]["PONumber"],
+                                    PODate: results[i]["PODate"],
+                                    PODetails: results[i]["PONumber"] + " (" + (results[i]["PODate"]).replace(/\//g, '-') + ")"
+                                });
+                            }
+                        } else {
+                            document.getElementById("btnReceivingReceiptItemSave").disabled = true;
                         }
+
+                        cboReceivingReceiptItemPONumber.dispose();
+                        cboReceivingReceiptItemPONumber = new wijmo.input.ComboBox('#cboReceivingReceiptItemPONumber', {
+                            disabled: disabled,
+                            isEditable: false,
+                            itemsSource: purchaseOrderObservableArray,
+                            displayMemberPath: "PODetails",
+                            selectedValuePath: "Id",
+                            selectedValue: POIdSelectedValue,
+                            onSelectedIndexChanged: function () {
+                                createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue);
+                            }
+                        });
+
+                        createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue);
                     }
+                });
+            } else {
+                document.getElementById("btnReceivingReceiptItemSave").disabled = true;
 
-                    var disabled = true;
-                    if (results.length > 0) {
-                        disabled = false;
-                        $("#btnReceivingReceiptItemSave").prop("disabled", false);
-                    } else {
-                        $("#btnReceivingReceiptItemSave").prop("disabled", true);
-                    }
+                cboReceivingReceiptItemPONumber.dispose();
+                cboReceivingReceiptItemPONumber = new wijmo.input.ComboBox('#cboReceivingReceiptItemPONumber', {
+                    disabled: true,
+                    isEditable: false,
+                    itemsSource: purchaseOrderObservableArray
+                });
 
-                    cboReceivingReceiptItemPONumber.dispose();
-                    cboReceivingReceiptItemPONumber = new wijmo.input.ComboBox('#cboReceivingReceiptItemPONumber', {
-                        disabled: disabled,
-                        isEditable: false,
-                        itemsSource: purchaseOrderObservableArray,
-                        displayMemberPath: "PODetails",
-                        selectedValuePath: "Id",
-                        selectedValue: POIdSelectedValue,
-                        onSelectedIndexChanged: function () {
-                            $("#btnReceivingReceiptItemSave").prop("disabled", false);
-                            createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue);
-                        }
-                    });
-
-                    createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue);
-                }
-            });
+                createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue);
+            }
         }
 
         // ========================================
@@ -2256,14 +2272,20 @@
         function createCboReceivingReceiptItem(ItemIdSelectedValue, VATIdSelectedValue, WTAXSelectedValue) {
             var purchaseOrderItemsObservableArray = new wijmo.collections.ObservableArray();
             if (cboReceivingReceiptItemPONumber.selectedValue != null) {
-                var POId = cboReceivingReceiptItemPONumber.selectedValue;
                 $.ajax({
-                    url: '/api/receivingReceiptItem/dropdown/list/item/' + POId,
+                    url: '/api/receivingReceiptItem/dropdown/list/item/' + cboReceivingReceiptItemPONumber.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
+                        var disabled = true;
+
                         if (results.length > 0) {
+                            disabled = false;
+                            if (!document.getElementById("btnReceivingReceiptItemSave").disabled) {
+                                document.getElementById("btnReceivingReceiptItemSave").disabled = false;
+                            }
+
                             for (i = 0; i < results.length; i++) {
                                 purchaseOrderItemsObservableArray.push({
                                     POId: results[i]["POId"],
@@ -2279,13 +2301,8 @@
                                     WTAXId: results[i]["ItemWTAXId"]
                                 });
                             }
-                        }
-
-                        var disabled = true;
-                        if (results.length > 0) {
-                            disabled = false;
                         } else {
-                            $("#btnReceivingReceiptItemSave").prop("disabled", true);
+                            document.getElementById("btnReceivingReceiptItemSave").disabled = true;
                         }
 
                         cboReceivingReceiptItemCode.dispose();
@@ -2297,7 +2314,6 @@
                             selectedValuePath: "ItemId",
                             selectedValue: ItemIdSelectedValue,
                             onSelectedIndexChanged: function () {
-                                $("#btnReceivingReceiptItemSave").prop("disabled", false);
                                 cboReceivingReceiptItemDescription.selectedValue = this.selectedValue;
                             }
                         });
@@ -2311,23 +2327,22 @@
                             selectedValuePath: "ItemId",
                             selectedValue: ItemIdSelectedValue,
                             onSelectedIndexChanged: function () {
-                                $("#btnReceivingReceiptItemSave").prop("disabled", false);
                                 cboReceivingReceiptItemCode.selectedValue = this.selectedValue;
 
                                 document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(this.selectedItem["Cost"]);
-                                computeAmountAndTaxes();
+                                computeAmount();
 
                                 createCboReceivingReceiptItemUnit(VATIdSelectedValue, WTAXSelectedValue);
                             }
                         });
 
                         if (receivingReceiptItemId == 0) {
-                            if (cboReceivingReceiptItemDescription.selectedValue != null) {
+                            if (cboReceivingReceiptItemCode.selectedValue != null && cboReceivingReceiptItemDescription.selectedValue != null) {
                                 document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(cboReceivingReceiptItemDescription.selectedItem["Cost"]);
-                                computeAmountAndTaxes();
+                                computeAmount();
                             } else {
                                 document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(0);
-                                computeAmountAndTaxes();
+                                computeAmount();
                             }
                         }
 
@@ -2340,9 +2355,6 @@
                     disabled: true,
                     isEditable: false,
                     itemsSource: purchaseOrderItemsObservableArray,
-                    displayMemberPath: "ItemCode",
-                    selectedValuePath: "ItemId",
-                    selectedValue: ItemIdSelectedValue
                 });
 
                 cboReceivingReceiptItemDescription.dispose();
@@ -2350,20 +2362,10 @@
                     disabled: true,
                     isEditable: false,
                     itemsSource: purchaseOrderItemsObservableArray,
-                    displayMemberPath: "ItemDescription",
-                    selectedValuePath: "ItemId",
-                    selectedValue: ItemIdSelectedValue
                 });
 
-                if (receivingReceiptItemId == 0) {
-                    if (cboReceivingReceiptItemDescription.selectedValue != null) {
-                        document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(cboReceivingReceiptItemDescription.selectedItem["Cost"]);
-                        computeAmountAndTaxes();
-                    } else {
-                        document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(0);
-                        computeAmountAndTaxes();
-                    }
-                }
+                document.getElementById('inpReceivingReceiptItemCost').value = formatDecimalValues(0);
+                computeAmount();
 
                 createCboReceivingReceiptItemUnit(VATIdSelectedValue, WTAXSelectedValue);
             }
@@ -2374,27 +2376,29 @@
         // =============================================
         function createCboReceivingReceiptItemUnit(VATIdSelectedValue, WTAXSelectedValue) {
             var unitsObservableArray = new wijmo.collections.ObservableArray();
-            if (cboReceivingReceiptItemDescription.selectedValue != null) {
+            if (cboReceivingReceiptItemCode.selectedValue != null && cboReceivingReceiptItemDescription.selectedValue != null) {
                 $.ajax({
                     url: '/api/receivingReceiptItem/dropdown/list/itemUnit/' + cboReceivingReceiptItemDescription.selectedValue,
                     cache: false,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     success: function (results) {
+                        var disabled = true;
+
                         if (results.length > 0) {
+                            disabled = false;
+                            if (!document.getElementById("btnReceivingReceiptItemSave").disabled) {
+                                document.getElementById("btnReceivingReceiptItemSave").disabled = false;
+                            }
+
                             for (i = 0; i < results.length; i++) {
                                 unitsObservableArray.push({
                                     UnitId: results[i]["UnitId"],
                                     Unit: results[i]["Unit"]
                                 });
                             }
-                        }
-
-                        var disabled = true;
-                        if (results.length > 0) {
-                            disabled = false;
                         } else {
-                            $("#btnReceivingReceiptItemSave").prop("disabled", true);
+                            document.getElementById("btnReceivingReceiptItemSave").disabled = true;
                         }
 
                         cboReceivingReceiptItemUnit.dispose();
@@ -2410,17 +2414,16 @@
                     }
                 });
             } else {
+                document.getElementById("btnReceivingReceiptItemSave").disabled = true;
+
                 cboReceivingReceiptItemUnit.dispose();
                 cboReceivingReceiptItemUnit = new wijmo.input.ComboBox('#cboReceivingReceiptItemUnit', {
                     disabled: true,
                     isEditable: false,
-                    itemsSource: unitsObservableArray,
-                    displayMemberPath: "Unit",
-                    selectedValuePath: "UnitId"
+                    itemsSource: unitsObservableArray
                 });
 
                 createCboReceivingReceiptItemTax(VATIdSelectedValue, WTAXSelectedValue);
-                $("#btnReceivingReceiptItemSave").prop("disabled", true);
             }
         }
 
@@ -2435,7 +2438,14 @@
                 type: 'GET',
                 contentType: 'application/json; charset=utf-8',
                 success: function (results) {
+                    var disabled = true;
+
                     if (results.length > 0) {
+                        disabled = false;
+                        if (!document.getElementById("btnReceivingReceiptItemSave").disabled) {
+                            document.getElementById("btnReceivingReceiptItemSave").disabled = false;
+                        }
+
                         for (i = 0; i < results.length; i++) {
                             taxTypesObservableArray.push({
                                 Id: results[i]["Id"],
@@ -2444,24 +2454,17 @@
                                 IsInclusive: results[i]["IsInclusive"],
                             });
                         }
-                    }
-
-                    var disabled = true;
-                    if (results.length > 0) {
-                        disabled = false;
                     } else {
-                        $("#btnReceivingReceiptItemSave").prop("disabled", true);
+                        document.getElementById("btnReceivingReceiptItemSave").disabled = true;
                     }
 
                     var VATIdValue = VATIdSelectedValue;
                     var WTAXValue = WTAXSelectedValue;
+
                     if (receivingReceiptItemId == 0) {
                         if (cboReceivingReceiptItemDescription.selectedValue != null) {
                             VATIdValue = cboReceivingReceiptItemDescription.selectedItem["VATId"];
                             WTAXValue = cboReceivingReceiptItemDescription.selectedItem["WTAXId"];
-                        } else {
-                            VATIdValue = 0;
-                            WTAXValue = 0;
                         }
                     }
 
@@ -2493,8 +2496,13 @@
                         }
                     });
 
-                    document.getElementById('inpReceivingReceiptItemVATRate').value = formatDecimalValues(cboReceivingReceiptItemVAT.selectedItem["TaxRate"]);
-                    document.getElementById('inpReceivingReceiptItemWTAXRate').value = formatDecimalValues(cboReceivingReceiptItemWTAX.selectedItem["TaxRate"]);
+                    if (cboReceivingReceiptItemVAT.selectedValue != null && cboReceivingReceiptItemWTAX.selectedValue != null) {
+                        document.getElementById('inpReceivingReceiptItemVATRate').value = formatDecimalValues(cboReceivingReceiptItemVAT.selectedItem["TaxRate"]);
+                        document.getElementById('inpReceivingReceiptItemWTAXRate').value = formatDecimalValues(cboReceivingReceiptItemWTAX.selectedItem["TaxRate"]);
+                    } else {
+                        document.getElementById('inpReceivingReceiptItemVATRate').value = formatDecimalValues(0);
+                        document.getElementById('inpReceivingReceiptItemWTAXRate').value = formatDecimalValues(0);
+                    }
 
                     computeTAX();
 
@@ -2502,32 +2510,6 @@
                     $("#receivingReceiptItemContent").show();
                 }
             });
-        }
-
-        // ===========
-        // Compute Tax
-        // ===========
-        function computeTAX() {
-            var inputedQuantity = document.getElementById('inpReceivingReceiptItemQuantity').value;
-            var inputedCost = document.getElementById('inpReceivingReceiptItemCost').value;
-            var inputedAmount = document.getElementById('inpReceivingReceiptItemAmount').value;
-            var inputedVATRate = document.getElementById('inpReceivingReceiptItemVATRate').value;
-            var inputedWTAXRate = document.getElementById('inpReceivingReceiptItemWTAXRate').value;
-
-            var replacedQuantity = inputedQuantity.replace(/\,/g, '');
-            var replacedCost = inputedCost.replace(/\,/g, '');
-            var replacedAmount = inputedAmount.replace(/\,/g, '');
-            var replacedVATRate = inputedVATRate.replace(/\,/g, '');
-            var replacedWTAXRate = inputedWTAXRate.replace(/\,/g, '');
-
-            if (cboReceivingReceiptItemVAT.selectedItem["IsInclusive"]) {
-                document.getElementById('inpReceivingReceiptItemVATAmount').value = formatDecimalValues((replacedAmount / (1 + replacedVATRate / 100)) * (replacedVATRate / 100));
-                document.getElementById('inpReceivingReceiptItemWTAXAmount').value = formatDecimalValues((replacedAmount / (1 + replacedVATRate / 100)) * (replacedWTAXRate / 100));
-            } else {
-                document.getElementById('inpReceivingReceiptItemVATAmount').value = formatDecimalValues(replacedAmount * (replacedVATRate / 100));
-                document.getElementById('inpReceivingReceiptItemWTAXAmount').value = formatDecimalValues(replacedAmount * (replacedWTAXRate / 100));
-                document.getElementById('inpReceivingReceiptItemAmount').value = formatDecimalValues((replacedCost * replacedQuantity) + (replacedAmount * (replacedVATRate / 100)));
-            }
         }
 
         // ==========================
@@ -2785,26 +2767,44 @@
         // ========================
         // Compute Amount and Taxes
         // ========================
-        $('#inpReceivingReceiptItemQuantity').keyup(function () {
-            computeAmountAndTaxes();
-        });
-        $('#inpReceivingReceiptItemCost').keyup(function () {
-            computeAmountAndTaxes();
-        });
-        function computeAmountAndTaxes() {
-            var inputQuantity = document.getElementById('inpReceivingReceiptItemQuantity').value;
-            var inputCost = document.getElementById('inpReceivingReceiptItemCost').value;
-            var replacedCost = inputCost.replace(/\,/g, '');
-            var replacedQuantity = inputQuantity.replace(/\,/g, '');
+        $('#inpReceivingReceiptItemQuantity').keyup(function () { computeAmount(); });
+        $('#inpReceivingReceiptItemCost').keyup(function () { computeAmount(); });
+        function computeAmount() {
+            var quantity = parseFloat(document.getElementById('inpReceivingReceiptItemQuantity').value.replace(/\,/g, ''));
+            var cost = parseFloat(document.getElementById('inpReceivingReceiptItemCost').value.replace(/\,/g, ''));
 
-            var VATRate = document.getElementById('inpReceivingReceiptItemVATRate').value;
-            var WTAXRate = document.getElementById('inpReceivingReceiptItemWTAXRate').value;
+            var amount = cost * quantity;
 
-            var amount = replacedCost * replacedQuantity;
-            document.getElementById('inpReceivingReceiptItemAmount').value = formatDecimalValues(amount);
+            var WTAXAmount = parseFloat(document.getElementById('inpReceivingReceiptItemWTAXAmount').value.replace(/\,/g, ''));
 
-            document.getElementById('inpReceivingReceiptItemVATAmount').value = formatDecimalValues((amount / (1 + VATRate / 100)) * (VATRate / 100));
-            document.getElementById('inpReceivingReceiptItemWTAXAmount').value = formatDecimalValues((amount / (1 + VATRate / 100)) * (WTAXRate / 100));
+            document.getElementById('inpReceivingReceiptItemAmount').value = formatDecimalValues(amount - WTAXAmount);
+        }
+
+        // ===========
+        // Compute Tax
+        // ===========
+        function computeTAX() {
+            var quantity = parseFloat(document.getElementById('inpReceivingReceiptItemQuantity').value.replace(/\,/g, ''));
+            var cost = parseFloat(document.getElementById('inpReceivingReceiptItemCost').value.replace(/\,/g, ''));
+            var amount = cost * quantity;
+
+            var VATRate = parseFloat(document.getElementById('inpReceivingReceiptItemVATRate').value.replace(/\,/g, ''));
+            var WTAXRate = parseFloat(document.getElementById('inpReceivingReceiptItemWTAXRate').value.replace(/\,/g, ''));
+
+            var VATAmount = amount * (VATRate / 100);
+            if (cboReceivingReceiptItemVAT.selectedItem["IsInclusive"]) {
+                VATAmount = amount / (1 + (VATRate / 100)) * (VATRate / 100);
+            }
+
+            var WTAXAmount = amount * (WTAXRate / 100);
+            if (cboReceivingReceiptItemWTAX.selectedItem["IsInclusive"]) {
+                WTAXAmount = amount / (1 + (WTAXRate / 100)) * (WTAXRate / 100);
+            }
+
+            document.getElementById('inpReceivingReceiptItemVATAmount').value = formatDecimalValues(VATAmount);
+            document.getElementById('inpReceivingReceiptItemWTAXAmount').value = formatDecimalValues(WTAXAmount);
+
+            document.getElementById('inpReceivingReceiptItemAmount').value = formatDecimalValues(amount - WTAXAmount);
         }
 
         // =====================

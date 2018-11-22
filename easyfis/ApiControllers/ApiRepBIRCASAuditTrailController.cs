@@ -54,7 +54,7 @@ namespace easyfis.ApiControllers
         [Authorize, HttpGet, Route("api/BIRCASAuditTrail/list/{startDate}/{endDate}")]
         public List<Entities.RepBIRCASAuditTrail> ListBIRCASAuditTrail(String startDate, String endDate)
         {
-            var auditTrails = from d in db.SysAuditTrails
+            var auditTrails = from d in db.SysAuditTrails.OrderByDescending(d => d.AuditDate)
                               where d.AuditDate >= Convert.ToDateTime(startDate)
                               && d.AuditDate <= Convert.ToDateTime(endDate).AddHours(24)
                               select new Entities.RepBIRCASAuditTrail

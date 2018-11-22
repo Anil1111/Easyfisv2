@@ -101,6 +101,7 @@ namespace easyfis.ModifiedApiControllers
             var purchaseOrderItems = from d in db.TrnPurchaseOrderItems
                                      where d.POId == Convert.ToInt32(POId)
                                      && d.TrnPurchaseOrder.IsLocked == true
+                                     && d.MstArticle.IsLocked == true
                                      select new Entities.TrnPurchaseOrderItem
                                      {
                                          ItemId = d.ItemId,
@@ -280,11 +281,11 @@ namespace easyfis.ModifiedApiControllers
         // ===================
         // Compute WTAX Amount
         // ===================
-        public Decimal ComputeWTAXAmount(Boolean IsInclusive, Decimal Amount, Decimal VATRate, Decimal WTAXRate)
+        public Decimal ComputeWTAXAmount(Boolean IsInclusive, Decimal Amount, Decimal WTAXRate)
         {
             if (IsInclusive)
             {
-                return (Amount / (1 + VATRate / 100)) * (WTAXRate / 100);
+                return (Amount / (1 + WTAXRate / 100)) * (WTAXRate / 100);
             }
             else
             {
@@ -390,7 +391,7 @@ namespace easyfis.ModifiedApiControllers
                                         VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate),
                                         WTAXId = item.FirstOrDefault().WTaxTypeId,
                                         WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
-                                        WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate, item.FirstOrDefault().MstTaxType2.TaxRate),
+                                        WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType2.TaxRate),
                                         BranchId = objReceivingReceiptItem.BranchId,
                                         BaseUnitId = item.FirstOrDefault().UnitId,
                                         BaseQuantity = baseQuantity,
@@ -517,7 +518,7 @@ namespace easyfis.ModifiedApiControllers
                                                     baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                                                 }
 
-                                                Decimal amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost;
+                                                Decimal amount = objReceivingReceiptItem.Amount;
                                                 Decimal baseCost = amount - objReceivingReceiptItem.VATAmount;
                                                 if (baseQuantity > 0)
                                                 {
@@ -533,13 +534,13 @@ namespace easyfis.ModifiedApiControllers
                                                     UnitId = objReceivingReceiptItem.UnitId,
                                                     Quantity = objReceivingReceiptItem.Quantity,
                                                     Cost = objReceivingReceiptItem.Cost,
-                                                    Amount = amount,
+                                                    Amount = objReceivingReceiptItem.Amount,
                                                     VATId = objReceivingReceiptItem.VATId,
                                                     VATPercentage = objReceivingReceiptItem.VATPercentage,
-                                                    VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage),
+                                                    VATAmount = objReceivingReceiptItem.VATAmount,
                                                     WTAXId = objReceivingReceiptItem.WTAXId,
                                                     WTAXPercentage = objReceivingReceiptItem.WTAXPercentage,
-                                                    WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage),
+                                                    WTAXAmount = objReceivingReceiptItem.WTAXAmount,
                                                     BranchId = objReceivingReceiptItem.BranchId,
                                                     BaseUnitId = item.FirstOrDefault().UnitId,
                                                     BaseQuantity = baseQuantity,
@@ -684,7 +685,7 @@ namespace easyfis.ModifiedApiControllers
                                                         baseQuantity = objReceivingReceiptItem.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier);
                                                     }
 
-                                                    Decimal amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost;
+                                                    Decimal amount = objReceivingReceiptItem.Amount;
                                                     Decimal baseCost = amount - objReceivingReceiptItem.VATAmount;
                                                     if (baseQuantity > 0)
                                                     {
@@ -705,7 +706,7 @@ namespace easyfis.ModifiedApiControllers
                                                     updateReceivingReceiptItem.VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage);
                                                     updateReceivingReceiptItem.WTAXId = objReceivingReceiptItem.WTAXId;
                                                     updateReceivingReceiptItem.WTAXPercentage = objReceivingReceiptItem.WTAXPercentage;
-                                                    updateReceivingReceiptItem.WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage, objReceivingReceiptItem.WTAXPercentage);
+                                                    updateReceivingReceiptItem.WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.WTAXPercentage);
                                                     updateReceivingReceiptItem.BranchId = objReceivingReceiptItem.BranchId;
                                                     updateReceivingReceiptItem.BaseUnitId = item.FirstOrDefault().UnitId;
                                                     updateReceivingReceiptItem.BaseQuantity = baseQuantity;
