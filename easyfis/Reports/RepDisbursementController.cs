@@ -73,8 +73,8 @@ namespace easyfis.Reports
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var disbursement = from d in db.TrnDisbursements where d.Id == DisbursementId && d.IsLocked == true select d;
@@ -102,7 +102,7 @@ namespace easyfis.Reports
                 tblDisbursement.AddCell(new PdfPCell(new Phrase("CV-" + disbursement.FirstOrDefault().MstBranch.BranchCode + "-" + CVNumber, fontArial13Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase("Particulars:", fontArial11Bold)) { Rowspan = 4, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase(particulars, fontArial11Bold)) { Rowspan = 4, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblDisbursement.AddCell(new PdfPCell(new Phrase("Manual No.:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tblDisbursement.AddCell(new PdfPCell(new Phrase("CV Ref. No.:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase(ManualCVNumber, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase("Date:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase(CVDate, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
@@ -112,12 +112,14 @@ namespace easyfis.Reports
                 tblDisbursement.AddCell(new PdfPCell(new Phrase(checkDate, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase("Bank:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblDisbursement.AddCell(new PdfPCell(new Phrase(bank, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+
                 document.Add(tblDisbursement);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var journals = from d in disbursement.FirstOrDefault().TrnJournals where d.CVId != null select d;
@@ -152,8 +154,8 @@ namespace easyfis.Reports
                     tblJournal.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 4, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblJournal.AddCell(new PdfPCell(new Phrase(totalDebitAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblJournal.AddCell(new PdfPCell(new Phrase(totalCreditAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    document.Add(tblJournal);
 
+                    document.Add(tblJournal);
                     document.Add(spaceTable);
                 }
 
@@ -190,9 +192,8 @@ namespace easyfis.Reports
 
                     tblDisbursementLines.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 3, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblDisbursementLines.AddCell(new PdfPCell(new Phrase(totalPaidAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    document.Add(tblDisbursementLines);
 
-                    document.Add(spaceTable);
+                    document.Add(tblDisbursementLines);
                     document.Add(spaceTable);
                 }
 
@@ -208,8 +209,8 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(preparedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                document.Add(tblSignatures);
 
+                document.Add(tblSignatures);
                 document.Add(spaceTable);
                 document.Add(spaceTable);
 
@@ -247,8 +248,8 @@ namespace easyfis.Reports
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase(bank, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase("Manual No.", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tableMoneyWord.AddCell(new PdfPCell(new Phrase(ManualCVNumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                document.Add(tableMoneyWord);
 
+                document.Add(tableMoneyWord);
                 document.Add(Chunk.NEWLINE);
                 document.Add(Chunk.NEWLINE);
 
@@ -263,7 +264,16 @@ namespace easyfis.Reports
                 tableSignature.AddCell(new PdfPCell(new Phrase("Signature Over Printed Name", fontArial11Bold)) { Border = 1, HorizontalAlignment = 1 });
                 tableSignature.AddCell(new PdfPCell(new Phrase(" ", fontArial11Bold)) { Border = 0 });
                 tableSignature.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { Border = 1, HorizontalAlignment = 1 });
+
                 document.Add(tableSignature);
+                document.Add(spaceTable);
+
+                PdfPTable tblFooter = new PdfPTable(1);
+                tblFooter.SetWidths(new float[] { 100f });
+                tblFooter.WidthPercentage = 100;
+                tblFooter.AddCell(new PdfPCell(new Phrase("THIS DOCUMENT IS NOT VALID FOR CLAIM OF INPUT TAXES. THIS DISBURSEMENT SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP.", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+
+                document.Add(tblFooter);
             }
 
             document.Close();

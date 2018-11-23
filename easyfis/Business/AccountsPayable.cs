@@ -39,8 +39,7 @@ namespace easyfis.Business
                 }
 
                 Decimal receivingReceiptAmount = receivingReceipt.FirstOrDefault().Amount;
-                Decimal WTAXAmount = receivingReceipt.FirstOrDefault().WTaxAmount;
-                Decimal balanceAmount = (receivingReceiptAmount - WTAXAmount - paidAmount) + adjustmentAmount;
+                Decimal balanceAmount = (receivingReceiptAmount - paidAmount) + adjustmentAmount;
 
                 var updateReceivingReceipt = receivingReceipt.FirstOrDefault();
                 updateReceivingReceipt.PaidAmount = paidAmount;

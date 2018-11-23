@@ -74,8 +74,8 @@ namespace easyfis.Reports
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var collection = from d in db.TrnCollections where d.Id == CollectonId && d.IsLocked == true select d;
@@ -86,7 +86,7 @@ namespace easyfis.Reports
                 String TIN = collection.FirstOrDefault().MstArticle.TaxNumber;
                 String collectionDate = collection.FirstOrDefault().ORDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
                 String address = collection.FirstOrDefault().MstArticle.Address;
-                String documentReference = collection.FirstOrDefault().ManualORNumber;
+                String manualORNumber = collection.FirstOrDefault().ManualORNumber;
                 String businessStyle = collection.FirstOrDefault().MstArticle.MstArticleGroup.ArticleGroup;
                 String salesPerson = collection.FirstOrDefault().MstUser4.FullName;
                 String salesRemarks = collection.FirstOrDefault().MstArticle.Particulars;
@@ -107,18 +107,20 @@ namespace easyfis.Reports
                 tblCollection.AddCell(new PdfPCell(new Phrase(collectionDate, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblCollection.AddCell(new PdfPCell(new Phrase("Address:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblCollection.AddCell(new PdfPCell(new Phrase(address, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblCollection.AddCell(new PdfPCell(new Phrase("Document Ref.:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
-                tblCollection.AddCell(new PdfPCell(new Phrase(documentReference, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tblCollection.AddCell(new PdfPCell(new Phrase("OR Ref. No.:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tblCollection.AddCell(new PdfPCell(new Phrase(manualORNumber, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblCollection.AddCell(new PdfPCell(new Phrase("Business Style:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblCollection.AddCell(new PdfPCell(new Phrase(businessStyle, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
                 tblCollection.AddCell(new PdfPCell(new Phrase("Remarks:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblCollection.AddCell(new PdfPCell(new Phrase(salesRemarks, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
+
                 document.Add(tblCollection);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var collectionLines = from d in collection.FirstOrDefault().TrnCollectionLines select d;
@@ -157,9 +159,8 @@ namespace easyfis.Reports
 
                     tblCollectionLines.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 5, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblCollectionLines.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    document.Add(tblCollectionLines);
 
-                    document.Add(spaceTable);
+                    document.Add(tblCollectionLines);
                     document.Add(spaceTable);
                 }
 
@@ -176,6 +177,7 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(preparedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblSignatures);
 
                 var collectionName = currentDefaultOfficialReceiptName.ToUpper();
@@ -183,6 +185,7 @@ namespace easyfis.Reports
                 tblFooter.SetWidths(new float[] { 100f });
                 tblFooter.WidthPercentage = 100;
                 tblFooter.AddCell(new PdfPCell(new Phrase("THIS DOCUMENT IS NOT VALID FOR CLAIM OF INPUT TAXES. THIS " + collectionName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP.", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+
                 document.Add(tblFooter);
             }
 

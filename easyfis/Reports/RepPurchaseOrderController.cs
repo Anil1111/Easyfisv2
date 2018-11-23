@@ -72,8 +72,8 @@ namespace easyfis.Reports
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var purchaseOrder = from d in db.TrnPurchaseOrders where d.Id == Convert.ToInt32(POId) && d.IsLocked == true select d;
@@ -109,12 +109,14 @@ namespace easyfis.Reports
                 tblPurchaseOrder.AddCell(new PdfPCell(new Phrase("Remarks:", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblPurchaseOrder.AddCell(new PdfPCell(new Phrase(remarks, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblPurchaseOrder.AddCell(new PdfPCell(new Phrase(" ", fontArial11)) { Colspan = 2, Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblPurchaseOrder);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var purchaseOrderItems = from d in purchaseOrder.FirstOrDefault().TrnPurchaseOrderItems select d;
@@ -156,16 +158,14 @@ namespace easyfis.Reports
 
                     tblPurchaseOrderItems.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 6, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblPurchaseOrderItems.AddCell(new PdfPCell(new Phrase(totalAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    document.Add(tblPurchaseOrderItems);
 
-                    document.Add(spaceTable);
+                    document.Add(tblPurchaseOrderItems);
                     document.Add(spaceTable);
                 }
 
                 PdfPTable tblSignatures = new PdfPTable(4);
-                float[] widthsCellsTableUsers = new float[] { 100f, 100f, 100f, 100f };
+                tblSignatures.SetWidths(new float[] { 100f, 100f, 100f, 100f });
                 tblSignatures.WidthPercentage = 100;
-                tblSignatures.SetWidths(widthsCellsTableUsers);
                 tblSignatures.AddCell(new PdfPCell(new Phrase("Prepared by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase("Checked by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase("Approved by", fontArial11Bold)) { PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
@@ -178,7 +178,15 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(requestedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblSignatures);
+
+                PdfPTable tblFooter = new PdfPTable(1);
+                tblFooter.SetWidths(new float[] { 100f });
+                tblFooter.WidthPercentage = 100;
+                tblFooter.AddCell(new PdfPCell(new Phrase("THIS DOCUMENT IS NOT VALID FOR CLAIM OF INPUT TAXES. THIS PURCHASE ORDER SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP.", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+
+                document.Add(tblFooter);
             }
 
             document.Close();

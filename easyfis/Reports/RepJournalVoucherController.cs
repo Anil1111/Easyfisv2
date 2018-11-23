@@ -72,8 +72,8 @@ namespace easyfis.Reports
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var journalVoucher = from d in db.TrnJournalVouchers where d.Id == JVId select d;
@@ -95,12 +95,14 @@ namespace easyfis.Reports
                 tblJournalVouchers.AddCell(new PdfPCell(new Phrase("JV-" + journalVoucher.FirstOrDefault().MstBranch.BranchCode + "-" + JVNumber, fontArial13Bold)) { Border = 0, PaddingTop = 10f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblJournalVouchers.AddCell(new PdfPCell(new Phrase("Date:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblJournalVouchers.AddCell(new PdfPCell(new Phrase(JVDate, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+
                 document.Add(tblJournalVouchers);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var journals = from d in db.TrnJournals where d.JVId == JVId select d;
@@ -135,9 +137,8 @@ namespace easyfis.Reports
                     tblJournal.AddCell(new PdfPCell(new Phrase("Total", fontArial11Bold)) { Colspan = 4, HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblJournal.AddCell(new PdfPCell(new Phrase(totalDebitAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                     tblJournal.AddCell(new PdfPCell(new Phrase(totalCreditAmount.ToString("#,##0.00"), fontArial11Bold)) { HorizontalAlignment = 2, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
-                    document.Add(tblJournal);
 
-                    document.Add(spaceTable);
+                    document.Add(tblJournal);
                     document.Add(spaceTable);
                 }
 
@@ -153,7 +154,15 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(preparedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblSignatures);
+
+                PdfPTable tblFooter = new PdfPTable(1);
+                tblFooter.SetWidths(new float[] { 100f });
+                tblFooter.WidthPercentage = 100;
+                tblFooter.AddCell(new PdfPCell(new Phrase("THIS DOCUMENT IS NOT VALID FOR CLAIM OF INPUT TAXES. THIS JOURNAL VOUCHER SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP.", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+
+                document.Add(tblFooter);
             }
 
             document.Close();

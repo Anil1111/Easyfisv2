@@ -73,8 +73,8 @@ namespace easyfis.Views.Software
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var stockIn = from d in db.TrnStockIns where d.Id == StockInId && d.IsLocked == true select d;
@@ -99,12 +99,14 @@ namespace easyfis.Views.Software
                 tblStockIn.AddCell(new PdfPCell(new Phrase(particulars, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblStockIn.AddCell(new PdfPCell(new Phrase("Date", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblStockIn.AddCell(new PdfPCell(new Phrase(INDate, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+
                 document.Add(tblStockIn);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var stockInItems = from d in stockIn.FirstOrDefault().TrnStockInItems select d;
@@ -164,8 +166,6 @@ namespace easyfis.Views.Software
                     }
 
                     document.Add(tblStockInItems);
-
-                    document.Add(spaceTable);
                     document.Add(spaceTable);
                 }
 
@@ -181,6 +181,7 @@ namespace easyfis.Views.Software
                 tblSignatures.AddCell(new PdfPCell(new Phrase(preparedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblSignatures);
             }
 

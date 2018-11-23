@@ -20,7 +20,7 @@ namespace easyfis.ModifiedApiControllers
         // ===========
         // Audit Trail
         // ===========
-        private Business.AuditTrail at = new Business.AuditTrail();
+        private Business.AuditTrail auditTrail = new Business.AuditTrail();
 
         // ===========================
         // List Receiving Receipt Item
@@ -370,10 +370,13 @@ namespace easyfis.ModifiedApiControllers
                                     }
 
                                     Decimal amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost;
-                                    Decimal baseCost = amount - ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate);
+                                    Decimal VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate);
+                                    Decimal WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType2.TaxRate);
+
+                                    Decimal baseCost = 0;
                                     if (baseQuantity > 0)
                                     {
-                                        baseCost = (amount - ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate)) / baseQuantity;
+                                        baseCost = (amount - VATAmount + WTAXAmount) / baseQuantity;
                                     }
 
                                     Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
@@ -388,10 +391,10 @@ namespace easyfis.ModifiedApiControllers
                                         Amount = objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost,
                                         VATId = item.FirstOrDefault().InputTaxId,
                                         VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
-                                        VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType1.TaxRate),
+                                        VATAmount = VATAmount,
                                         WTAXId = item.FirstOrDefault().WTaxTypeId,
                                         WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
-                                        WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.BaseCost, item.FirstOrDefault().MstTaxType2.TaxRate),
+                                        WTAXAmount = WTAXAmount,
                                         BranchId = objReceivingReceiptItem.BranchId,
                                         BaseUnitId = item.FirstOrDefault().UnitId,
                                         BaseQuantity = baseQuantity,
@@ -402,17 +405,17 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (objReceivingReceiptItems.Count() == 1)
                                     {
-                                        newObject += at.GetObjectString(newReceivingReceiptItem);
+                                        newObject += auditTrail.GetObjectString(newReceivingReceiptItem);
                                     }
                                     else
                                     {
                                         if (count == objReceivingReceiptItems.Count())
                                         {
-                                            newObject += at.GetObjectString(newReceivingReceiptItem);
+                                            newObject += auditTrail.GetObjectString(newReceivingReceiptItem);
                                         }
                                         else
                                         {
-                                            newObject += at.GetObjectString(newReceivingReceiptItem) + ", ";
+                                            newObject += auditTrail.GetObjectString(newReceivingReceiptItem) + ", ";
                                         }
                                     }
                                 }
@@ -433,7 +436,7 @@ namespace easyfis.ModifiedApiControllers
                         db.SubmitChanges();
 
                         newObject += "]";
-                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                         return Request.CreateResponse(HttpStatusCode.OK);
                     }
@@ -519,10 +522,13 @@ namespace easyfis.ModifiedApiControllers
                                                 }
 
                                                 Decimal amount = objReceivingReceiptItem.Amount;
-                                                Decimal baseCost = amount - objReceivingReceiptItem.VATAmount;
+                                                Decimal VATAmount = objReceivingReceiptItem.VATAmount;
+                                                Decimal WTAXAmount = objReceivingReceiptItem.WTAXAmount;
+
+                                                Decimal baseCost = 0;
                                                 if (baseQuantity > 0)
                                                 {
-                                                    baseCost = (amount - objReceivingReceiptItem.VATAmount) / baseQuantity;
+                                                    baseCost = (amount - VATAmount + WTAXAmount) / baseQuantity;
                                                 }
 
                                                 Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
@@ -551,7 +557,6 @@ namespace easyfis.ModifiedApiControllers
                                                 db.SubmitChanges();
 
                                                 Decimal receivingReceiptItemTotalAmount = 0;
-
                                                 if (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Any())
                                                 {
                                                     receivingReceiptItemTotalAmount = receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Sum(d => d.Amount);
@@ -561,8 +566,8 @@ namespace easyfis.ModifiedApiControllers
                                                 updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
                                                 db.SubmitChanges();
 
-                                                String newObject = at.GetObjectString(newReceivingReceiptItem);
-                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                                String newObject = auditTrail.GetObjectString(newReceivingReceiptItem);
+                                                auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
                                                 return Request.CreateResponse(HttpStatusCode.OK);
                                             }
@@ -653,7 +658,7 @@ namespace easyfis.ModifiedApiControllers
 
                                     if (receivingReceiptItem.Any())
                                     {
-                                        String oldObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
+                                        String oldObject = auditTrail.GetObjectString(receivingReceiptItem.FirstOrDefault());
 
                                         var purchaseOrders = from d in db.TrnPurchaseOrders
                                                              where d.Id == Convert.ToInt32(objReceivingReceiptItem.POId)
@@ -686,10 +691,13 @@ namespace easyfis.ModifiedApiControllers
                                                     }
 
                                                     Decimal amount = objReceivingReceiptItem.Amount;
-                                                    Decimal baseCost = amount - objReceivingReceiptItem.VATAmount;
+                                                    Decimal VATAmount = objReceivingReceiptItem.VATAmount;
+                                                    Decimal WTAXAmount = objReceivingReceiptItem.WTAXAmount;
+
+                                                    Decimal baseCost = 0;
                                                     if (baseQuantity > 0)
                                                     {
-                                                        baseCost = (amount - objReceivingReceiptItem.VATAmount) / baseQuantity;
+                                                        baseCost = (amount - VATAmount + WTAXAmount) / baseQuantity;
                                                     }
 
                                                     var updateReceivingReceiptItem = receivingReceiptItem.FirstOrDefault();
@@ -703,10 +711,10 @@ namespace easyfis.ModifiedApiControllers
                                                     updateReceivingReceiptItem.Amount = amount;
                                                     updateReceivingReceiptItem.VATId = objReceivingReceiptItem.VATId;
                                                     updateReceivingReceiptItem.VATPercentage = objReceivingReceiptItem.VATPercentage;
-                                                    updateReceivingReceiptItem.VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.VATPercentage);
+                                                    updateReceivingReceiptItem.VATAmount = objReceivingReceiptItem.VATAmount;
                                                     updateReceivingReceiptItem.WTAXId = objReceivingReceiptItem.WTAXId;
                                                     updateReceivingReceiptItem.WTAXPercentage = objReceivingReceiptItem.WTAXPercentage;
-                                                    updateReceivingReceiptItem.WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, objReceivingReceiptItem.Quantity * objReceivingReceiptItem.Cost, objReceivingReceiptItem.WTAXPercentage);
+                                                    updateReceivingReceiptItem.WTAXAmount = objReceivingReceiptItem.WTAXAmount;
                                                     updateReceivingReceiptItem.BranchId = objReceivingReceiptItem.BranchId;
                                                     updateReceivingReceiptItem.BaseUnitId = item.FirstOrDefault().UnitId;
                                                     updateReceivingReceiptItem.BaseQuantity = baseQuantity;
@@ -715,7 +723,6 @@ namespace easyfis.ModifiedApiControllers
                                                     db.SubmitChanges();
 
                                                     Decimal receivingReceiptItemTotalAmount = 0;
-
                                                     if (receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Any())
                                                     {
                                                         receivingReceiptItemTotalAmount = receivingReceipt.FirstOrDefault().TrnReceivingReceiptItems.Sum(d => d.Amount);
@@ -725,8 +732,8 @@ namespace easyfis.ModifiedApiControllers
                                                     updateReceivingReceiptAmount.Amount = receivingReceiptItemTotalAmount;
                                                     db.SubmitChanges();
 
-                                                    String newObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
-                                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                                    String newObject = auditTrail.GetObjectString(receivingReceiptItem.FirstOrDefault());
+                                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
                                                     return Request.CreateResponse(HttpStatusCode.OK);
                                                 }
@@ -823,8 +830,8 @@ namespace easyfis.ModifiedApiControllers
                                     {
                                         db.TrnReceivingReceiptItems.DeleteOnSubmit(receivingReceiptItem.First());
 
-                                        String oldObject = at.GetObjectString(receivingReceiptItem.FirstOrDefault());
-                                        at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
+                                        String oldObject = auditTrail.GetObjectString(receivingReceiptItem.FirstOrDefault());
+                                        auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, "NA");
 
                                         db.SubmitChanges();
 

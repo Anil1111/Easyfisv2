@@ -115,7 +115,7 @@ namespace easyfis.Business
                                                 {
                                                     ArticleGroupId = g.Key.ArticleGroupId,
                                                     Particulars = g.Key.ReceivingReceipt.Remarks,
-                                                    Amount = g.Sum(d => d.Amount - d.VATAmount)
+                                                    Amount = g.Sum(d => d.Amount - d.VATAmount + d.WTAXAmount)
                                                 };
 
                     if (receivingReceiptItems.Any())
@@ -188,7 +188,7 @@ namespace easyfis.Business
                         ArticleId = receivingReceipts.FirstOrDefault().SupplierId,
                         Particulars = receivingReceipts.FirstOrDefault().Remarks,
                         DebitAmount = 0,
-                        CreditAmount = receivingReceipts.FirstOrDefault().Amount - receivingReceipts.FirstOrDefault().WTaxAmount,
+                        CreditAmount = receivingReceipts.FirstOrDefault().Amount,
                         RRId = RRId,
                         DocumentReference = "RR-" + receivingReceipts.FirstOrDefault().MstBranch.BranchCode + "-" + receivingReceipts.FirstOrDefault().RRNumber
                     };

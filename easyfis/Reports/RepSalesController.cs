@@ -74,8 +74,8 @@ namespace easyfis.Reports
             headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
             headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
             headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-            document.Add(headerPage);
 
+            document.Add(headerPage);
             document.Add(line);
 
             var salesInvoice = from d in db.TrnSalesInvoices where d.Id == Convert.ToInt32(SalesId) && d.IsLocked == true select d;
@@ -107,7 +107,7 @@ namespace easyfis.Reports
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(salesDate, fontArial11)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase("Address: ", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(address, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
-                tblSalesInvoice.AddCell(new PdfPCell(new Phrase("Document Ref.: ", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+                tblSalesInvoice.AddCell(new PdfPCell(new Phrase("Doc. Ref. No.: ", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(documentReference, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase("Business Style: ", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(businessStyle, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
@@ -115,12 +115,14 @@ namespace easyfis.Reports
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(salesPerson, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase("Remarks: ", fontArial11Bold)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSalesInvoice.AddCell(new PdfPCell(new Phrase(salesRemarks, fontArial11)) { Border = 0, PaddingTop = 5f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3 });
+
                 document.Add(tblSalesInvoice);
 
                 PdfPTable spaceTable = new PdfPTable(1);
                 spaceTable.SetWidths(new float[] { 100f });
                 spaceTable.WidthPercentage = 100;
                 spaceTable.AddCell(new PdfPCell(new Phrase(" ", fontArial10Bold)) { Border = 0, PaddingTop = 5f });
+
                 document.Add(spaceTable);
 
                 var salesInvoiceItems = from d in salesInvoice.FirstOrDefault().TrnSalesInvoiceItems select d;
@@ -172,15 +174,11 @@ namespace easyfis.Reports
 
                     var vatableSalesItems = from d in salesInvoiceItems where d.MstTaxType.TaxType.Equals("VAT Output") select d;
                     var vatExemptItems = from d in salesInvoiceItems
-                                         where d.MstTaxType.TaxType.Equals("VAT Exempt")
-             && !(d.MstDiscount.Discount.Equals("Senior Citizen Discount")
-             || d.MstDiscount.Discount.Equals("PWD"))
+                                         where d.MstTaxType.TaxType.Equals("VAT Exempt") && !(d.MstDiscount.Discount.Equals("Senior Citizen Discount") || d.MstDiscount.Discount.Equals("PWD"))
                                          select d;
 
                     var vatExemptItemsSenior = from d in salesInvoiceItems
-                                               where d.MstTaxType.TaxType.Equals("VAT Exempt")
-                   && (d.MstDiscount.Discount.Equals("Senior Citizen Discount")
-                   || d.MstDiscount.Discount.Equals("PWD"))
+                                               where d.MstTaxType.TaxType.Equals("VAT Exempt") && (d.MstDiscount.Discount.Equals("Senior Citizen Discount") || d.MstDiscount.Discount.Equals("PWD"))
                                                select d;
 
                     var vatExemptAmount = vatExemptItems.Sum(d => d.Amount) + vatExemptItemsSenior.Sum(g => totalAmount - ((g.MstArticle.MstTaxType.TaxRate / 100) * (g.Price * g.Quantity) / ((g.MstArticle.MstTaxType.TaxRate / 100) + 1)));
@@ -223,11 +221,9 @@ namespace easyfis.Reports
                     tblVATAnalysis.AddCell(new PdfPCell(new Phrase(" ", fontArial9)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, Colspan = 3, HorizontalAlignment = 2 });
                     tblVATAnalysis.AddCell(new PdfPCell(new Phrase("TOTAL AMOUNT DUE:", fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
                     tblVATAnalysis.AddCell(new PdfPCell(new Phrase(totalAmountDue.ToString("#,##0.00"), fontArial11Bold)) { Border = 0, PaddingTop = 3f, PaddingLeft = 5f, PaddingRight = 5f, HorizontalAlignment = 2 });
+
                     document.Add(tblVATAnalysis);
-
                     document.Add(spaceTable);
-                    document.Add(spaceTable);
-
                 }
 
                 PdfPTable tblSignatures = new PdfPTable(4);
@@ -245,6 +241,7 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(checkedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
                 tblSignatures.AddCell(new PdfPCell(new Phrase("Date Received:", fontArial11Bold)) { HorizontalAlignment = 0, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
+
                 document.Add(tblSignatures);
 
                 var InvoiceName = currentDefaultSalesInvoiceName.ToUpper();
@@ -252,6 +249,7 @@ namespace easyfis.Reports
                 tblFooter.SetWidths(new float[] { 100f });
                 tblFooter.WidthPercentage = 100;
                 tblFooter.AddCell(new PdfPCell(new Phrase("THE " + InvoiceName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
+
                 document.Add(tblFooter);
             }
 
