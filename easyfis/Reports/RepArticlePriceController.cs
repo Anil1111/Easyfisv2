@@ -46,39 +46,46 @@ namespace easyfis.Reports
             Font fontArial17Bold = FontFactory.GetFont("Arial", 17, Font.BOLD);
             Paragraph line = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(0.0F, 100.0F, BaseColor.BLACK, Element.ALIGN_LEFT, 4.5F)));
 
-            var identityUserId = User.Identity.GetUserId();
-            var currentUser = from d in db.MstUsers where d.UserId == identityUserId select d;
-
-            var currentCompanyId = currentUser.FirstOrDefault().CompanyId;
-            var currentBranchId = currentUser.FirstOrDefault().BranchId;
-
-            var currentCompany = from d in db.MstCompanies where d.Id == Convert.ToInt32(currentCompanyId) select d;
-            var currentBranch = from d in db.MstBranches where d.Id == Convert.ToInt32(currentBranchId) select d;
-
-            String companyName = currentCompany.FirstOrDefault().Company;
-            String companyTaxNumber = currentCompany.FirstOrDefault().TaxNumber;
-            String companyAddress = currentCompany.FirstOrDefault().Address;
-            String companyContactNumber = currentCompany.FirstOrDefault().ContactNumber;
-            String branchName = currentBranch.FirstOrDefault().Branch;
-            String branchCode = currentBranch.FirstOrDefault().BranchCode;
-
-            PdfPTable headerPage = new PdfPTable(2);
-            headerPage.SetWidths(new float[] { 100f, 75f });
-            headerPage.WidthPercentage = 100;
-            headerPage.AddCell(new PdfPCell(new Phrase(companyName, fontArial17Bold)) { Border = 0 });
-            headerPage.AddCell(new PdfPCell(new Phrase("Item Price", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyTaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
-            headerPage.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
-            headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-
-            document.Add(headerPage);
-            document.Add(line);
-
             var articlePrice = from d in db.TrnArticlePrices where d.Id == articlePriceId && d.IsLocked == true select d;
             if (articlePrice.Any())
             {
+                var identityUserId = User.Identity.GetUserId();
+                var currentUser = from d in db.MstUsers where d.UserId == identityUserId select d;
+
+                var currentCompanyId = currentUser.FirstOrDefault().CompanyId;
+                var currentBranchId = currentUser.FirstOrDefault().BranchId;
+
+                var currentCompany = from d in db.MstCompanies where d.Id == Convert.ToInt32(currentCompanyId) select d;
+                var currentBranch = from d in db.MstBranches where d.Id == Convert.ToInt32(currentBranchId) select d;
+
+                String companyName = currentCompany.FirstOrDefault().Company;
+                String companyTaxNumber = currentCompany.FirstOrDefault().TaxNumber;
+                String companyAddress = currentCompany.FirstOrDefault().Address;
+                String companyContactNumber = currentCompany.FirstOrDefault().ContactNumber;
+                String branchName = currentBranch.FirstOrDefault().Branch;
+                String branchCode = currentBranch.FirstOrDefault().BranchCode;
+
+                String reprinted = "";
+                if (articlePrice.FirstOrDefault().IsPrinted)
+                {
+                    reprinted = "Reprinted";
+                }
+
+                PdfPTable headerPage = new PdfPTable(2);
+                headerPage.SetWidths(new float[] { 100f, 75f });
+                headerPage.WidthPercentage = 100;
+                headerPage.AddCell(new PdfPCell(new Phrase(companyName, fontArial17Bold)) { Border = 0 });
+                headerPage.AddCell(new PdfPCell(new Phrase("Item Price", fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyTaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase(reprinted, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+
+                document.Add(headerPage);
+                document.Add(line);
+
                 String particulars = articlePrice.FirstOrDefault().Particulars;
                 String IPNumber = articlePrice.FirstOrDefault().IPNumber;
                 String IPDate = articlePrice.FirstOrDefault().IPDate.ToString("MM-dd-yyyy", CultureInfo.InvariantCulture);
@@ -143,6 +150,12 @@ namespace easyfis.Reports
                 tblSignatures.AddCell(new PdfPCell(new Phrase(approvedBy, fontArial11)) { HorizontalAlignment = 1, PaddingTop = 5f, PaddingBottom = 9f, PaddingLeft = 5f, PaddingRight = 5f });
 
                 document.Add(tblSignatures);
+
+                if (!articlePrice.FirstOrDefault().IsPrinted)
+                {
+                    articlePrice.FirstOrDefault().IsPrinted = true;
+                    db.SubmitChanges();
+                }
             }
 
             document.Close();

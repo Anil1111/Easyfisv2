@@ -301,6 +301,7 @@ namespace easyfis.ModifiedApiControllers
                                             ApprovedById = currentSalesInvoiceApprovedById,
                                             Status = null,
                                             IsCancelled = false,
+                                            IsPrinted = false,
                                             IsLocked = false,
                                             CreatedById = currentUserId,
                                             CreatedDateTime = DateTime.Now,

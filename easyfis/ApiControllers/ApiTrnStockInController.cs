@@ -324,6 +324,7 @@ namespace easyfis.ModifiedApiControllers
                                                 PreparedById = currentUserId,
                                                 CheckedById = currentUserId,
                                                 ApprovedById = currentUserId,
+                                                IsPrinted = false,
                                                 IsLocked = false,
                                                 CreatedById = currentUserId,
                                                 CreatedDateTime = DateTime.Now,

@@ -47,40 +47,47 @@ namespace easyfis.Reports
             Font fontArial17Bold = FontFactory.GetFont("Arial", 17, Font.BOLD);
             Paragraph line = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(0.0F, 100.0F, BaseColor.BLACK, Element.ALIGN_LEFT, 4.5F)));
 
-            var identityUserId = User.Identity.GetUserId();
-            var currentUser = from d in db.MstUsers where d.UserId == identityUserId select d;
-
-            var currentCompanyId = currentUser.FirstOrDefault().CompanyId;
-            var currentBranchId = currentUser.FirstOrDefault().BranchId;
-            var currentDefaultSalesInvoiceName = currentUser.FirstOrDefault().SalesInvoiceName;
-
-            var currentCompany = from d in db.MstCompanies where d.Id == Convert.ToInt32(currentCompanyId) select d;
-            var currentBranch = from d in db.MstBranches where d.Id == Convert.ToInt32(currentBranchId) select d;
-
-            String companyName = currentCompany.FirstOrDefault().Company;
-            String companyTaxNumber = currentCompany.FirstOrDefault().TaxNumber;
-            String companyAddress = currentCompany.FirstOrDefault().Address;
-            String companyContactNumber = currentCompany.FirstOrDefault().ContactNumber;
-            String branchName = currentBranch.FirstOrDefault().Branch;
-            String branchCode = currentBranch.FirstOrDefault().BranchCode;
-
-            PdfPTable headerPage = new PdfPTable(2);
-            headerPage.SetWidths(new float[] { 100f, 75f });
-            headerPage.WidthPercentage = 100;
-            headerPage.AddCell(new PdfPCell(new Phrase(companyName, fontArial17Bold)) { Border = 0 });
-            headerPage.AddCell(new PdfPCell(new Phrase(currentDefaultSalesInvoiceName, fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyTaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
-            headerPage.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
-            headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
-            headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f, Colspan = 2 });
-
-            document.Add(headerPage);
-            document.Add(line);
-
             var salesInvoice = from d in db.TrnSalesInvoices where d.Id == Convert.ToInt32(SalesId) && d.IsLocked == true select d;
             if (salesInvoice.Any())
             {
+                var identityUserId = User.Identity.GetUserId();
+                var currentUser = from d in db.MstUsers where d.UserId == identityUserId select d;
+
+                var currentCompanyId = currentUser.FirstOrDefault().CompanyId;
+                var currentBranchId = currentUser.FirstOrDefault().BranchId;
+                var currentDefaultSalesInvoiceName = currentUser.FirstOrDefault().SalesInvoiceName;
+
+                var currentCompany = from d in db.MstCompanies where d.Id == Convert.ToInt32(currentCompanyId) select d;
+                var currentBranch = from d in db.MstBranches where d.Id == Convert.ToInt32(currentBranchId) select d;
+
+                String companyName = currentCompany.FirstOrDefault().Company;
+                String companyTaxNumber = currentCompany.FirstOrDefault().TaxNumber;
+                String companyAddress = currentCompany.FirstOrDefault().Address;
+                String companyContactNumber = currentCompany.FirstOrDefault().ContactNumber;
+                String branchName = currentBranch.FirstOrDefault().Branch;
+                String branchCode = currentBranch.FirstOrDefault().BranchCode;
+
+                String reprinted = "";
+                if (salesInvoice.FirstOrDefault().IsPrinted)
+                {
+                    reprinted = "Reprinted";
+                }
+
+                PdfPTable headerPage = new PdfPTable(2);
+                headerPage.SetWidths(new float[] { 100f, 75f });
+                headerPage.WidthPercentage = 100;
+                headerPage.AddCell(new PdfPCell(new Phrase(companyName, fontArial17Bold)) { Border = 0 });
+                headerPage.AddCell(new PdfPCell(new Phrase(currentDefaultSalesInvoiceName, fontArial17Bold)) { Border = 0, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyTaxNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase(branchName, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyAddress, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase("Printed " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToString("hh:mm:ss tt"), fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+                headerPage.AddCell(new PdfPCell(new Phrase(companyContactNumber, fontArial11)) { Border = 0, PaddingTop = 5f });
+                headerPage.AddCell(new PdfPCell(new Phrase(reprinted, fontArial11)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 2 });
+
+                document.Add(headerPage);
+                document.Add(line);
+
                 String soldTo = salesInvoice.FirstOrDefault().MstArticle.Article;
                 String salesNo = salesInvoice.FirstOrDefault().SINumber;
                 String TIN = salesInvoice.FirstOrDefault().MstArticle.TaxNumber;
@@ -251,6 +258,12 @@ namespace easyfis.Reports
                 tblFooter.AddCell(new PdfPCell(new Phrase("THE " + InvoiceName + " SHALL BE VALID FOR FIVE (5) YEARS FROM THE DATE OF ATP", fontArial9Italic)) { Border = 0, PaddingTop = 5f, HorizontalAlignment = 1 });
 
                 document.Add(tblFooter);
+
+                if (!salesInvoice.FirstOrDefault().IsPrinted)
+                {
+                    salesInvoice.FirstOrDefault().IsPrinted = true;
+                    db.SubmitChanges();
+                }
             }
 
             document.Close();

@@ -391,55 +391,41 @@ namespace easyfis.ModifiedApiControllers
                         {
                             String oldObject = auditTrail.GetObjectString(item.FirstOrDefault());
 
-                            if (item.FirstOrDefault().MstArticleUnits.Any())
-                            {
-                                if (item.FirstOrDefault().MstArticlePrices.Any())
-                                {
-                                    var saveItem = item.FirstOrDefault();
-                                    saveItem.ManualArticleCode = objItem.ManualArticleCode;
-                                    saveItem.Article = objItem.Article;
-                                    saveItem.ArticleGroupId = objItem.ArticleGroupId;
-                                    saveItem.AccountId = objItem.AccountId;
-                                    saveItem.SalesAccountId = objItem.SalesAccountId;
-                                    saveItem.CostAccountId = objItem.CostAccountId;
-                                    saveItem.AssetAccountId = objItem.AssetAccountId;
-                                    saveItem.ExpenseAccountId = objItem.ExpenseAccountId;
-                                    saveItem.Category = objItem.Category;
-                                    saveItem.UnitId = objItem.UnitId;
-                                    saveItem.Price = objItem.Price;
-                                    saveItem.Particulars = objItem.Particulars;
-                                    saveItem.InputTaxId = objItem.InputTaxId;
-                                    saveItem.OutputTaxId = objItem.OutputTaxId;
-                                    saveItem.WTaxTypeId = objItem.WTaxTypeId;
-                                    saveItem.IsInventory = objItem.IsInventory;
-                                    saveItem.IsConsignment = objItem.IsConsignment;
-                                    saveItem.ConsignmentCostPercentage = objItem.ConsignmentCostPercentage;
-                                    saveItem.ConsignmentCostValue = objItem.ConsignmentCostValue;
-                                    saveItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
-                                    saveItem.Cost = objItem.Cost;
-                                    saveItem.Kitting = objItem.Kitting;
-                                    saveItem.DefaultSupplierId = objItem.DefaultSupplierId;
-                                    saveItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
-                                    saveItem.UsefulLife = objItem.UsefulLife;
-                                    saveItem.SalvageValue = objItem.SalvageValue;
-                                    saveItem.UpdatedById = currentUserId;
-                                    saveItem.UpdatedDateTime = DateTime.Now;
-                                    db.SubmitChanges();
+                            var saveItem = item.FirstOrDefault();
+                            saveItem.ManualArticleCode = objItem.ManualArticleCode;
+                            saveItem.Article = objItem.Article;
+                            saveItem.ArticleGroupId = objItem.ArticleGroupId;
+                            saveItem.AccountId = objItem.AccountId;
+                            saveItem.SalesAccountId = objItem.SalesAccountId;
+                            saveItem.CostAccountId = objItem.CostAccountId;
+                            saveItem.AssetAccountId = objItem.AssetAccountId;
+                            saveItem.ExpenseAccountId = objItem.ExpenseAccountId;
+                            saveItem.Category = objItem.Category;
+                            saveItem.UnitId = objItem.UnitId;
+                            saveItem.Price = objItem.Price;
+                            saveItem.Particulars = objItem.Particulars;
+                            saveItem.InputTaxId = objItem.InputTaxId;
+                            saveItem.OutputTaxId = objItem.OutputTaxId;
+                            saveItem.WTaxTypeId = objItem.WTaxTypeId;
+                            saveItem.IsInventory = objItem.IsInventory;
+                            saveItem.IsConsignment = objItem.IsConsignment;
+                            saveItem.ConsignmentCostPercentage = objItem.ConsignmentCostPercentage;
+                            saveItem.ConsignmentCostValue = objItem.ConsignmentCostValue;
+                            saveItem.ManualArticleOldCode = objItem.ManualArticleOldCode;
+                            saveItem.Cost = objItem.Cost;
+                            saveItem.Kitting = objItem.Kitting;
+                            saveItem.DefaultSupplierId = objItem.DefaultSupplierId;
+                            saveItem.DateAcquired = Convert.ToDateTime(objItem.DateAcquired);
+                            saveItem.UsefulLife = objItem.UsefulLife;
+                            saveItem.SalvageValue = objItem.SalvageValue;
+                            saveItem.UpdatedById = currentUserId;
+                            saveItem.UpdatedDateTime = DateTime.Now;
+                            db.SubmitChanges();
 
-                                    String newObject = auditTrail.GetObjectString(item.FirstOrDefault());
-                                    auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                            String newObject = auditTrail.GetObjectString(item.FirstOrDefault());
+                            auditTrail.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
 
-                                    return Request.CreateResponse(HttpStatusCode.OK);
-                                }
-                                else
-                                {
-                                    return Request.CreateResponse(HttpStatusCode.NotFound, "No Price Found. Please provide at least one price.");
-                                }
-                            }
-                            else
-                            {
-                                return Request.CreateResponse(HttpStatusCode.NotFound, "No Unit Conversion Found. Please provide at least one unit conversion.");
-                            }
+                            return Request.CreateResponse(HttpStatusCode.OK);
                         }
                         else
                         {

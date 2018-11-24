@@ -20349,6 +20349,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -20397,6 +20399,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -20633,6 +20637,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -21265,6 +21289,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -21321,6 +21347,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -21603,6 +21631,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -22731,6 +22779,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -22807,6 +22857,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -23259,6 +23311,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -26094,6 +26166,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -26146,6 +26220,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -26403,6 +26479,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -27378,6 +27474,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -27448,6 +27546,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -27840,6 +27940,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -28831,6 +28951,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -28895,6 +29017,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -29246,6 +29370,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -30222,6 +30366,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -30306,6 +30452,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -30762,6 +30910,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -32217,6 +32385,8 @@ namespace easyfis.Data
 		
 		private bool _IsCancelled;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -32301,6 +32471,8 @@ namespace easyfis.Data
     partial void OnStatusChanged();
     partial void OnIsCancelledChanging(bool value);
     partial void OnIsCancelledChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -32738,6 +32910,26 @@ namespace easyfis.Data
 					this._IsCancelled = value;
 					this.SendPropertyChanged("IsCancelled");
 					this.OnIsCancelledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -34181,6 +34373,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -34227,6 +34421,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -34443,6 +34639,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -35077,6 +35293,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -35139,6 +35357,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -35447,6 +35667,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -36423,6 +36663,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -36483,6 +36725,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -36771,6 +37015,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -37877,6 +38141,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -37937,6 +38203,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -38225,6 +38493,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
@@ -39278,6 +39566,8 @@ namespace easyfis.Data
 		
 		private string _Status;
 		
+		private bool _IsPrinted;
+		
 		private bool _IsLocked;
 		
 		private int _CreatedById;
@@ -39354,6 +39644,8 @@ namespace easyfis.Data
     partial void OnApprovedByIdChanged();
     partial void OnStatusChanging(string value);
     partial void OnStatusChanged();
+    partial void OnIsPrintedChanging(bool value);
+    partial void OnIsPrintedChanged();
     partial void OnIsLockedChanging(bool value);
     partial void OnIsLockedChanged();
     partial void OnCreatedByIdChanging(int value);
@@ -39772,6 +40064,26 @@ namespace easyfis.Data
 					this._Status = value;
 					this.SendPropertyChanged("Status");
 					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsPrinted", DbType="Bit NOT NULL")]
+		public bool IsPrinted
+		{
+			get
+			{
+				return this._IsPrinted;
+			}
+			set
+			{
+				if ((this._IsPrinted != value))
+				{
+					this.OnIsPrintedChanging(value);
+					this.SendPropertyChanging();
+					this._IsPrinted = value;
+					this.SendPropertyChanged("IsPrinted");
+					this.OnIsPrintedChanged();
 				}
 			}
 		}
