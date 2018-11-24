@@ -14,6 +14,48 @@ namespace easyfis.ApiControllers
         // ============
         private Data.easyfisdbDataContext db = new Data.easyfisdbDataContext();
 
+        // ============================
+        // Compute VATable Sales Amount
+        // ============================
+        public Decimal ComputeVATableSales(String taxType, Decimal amount)
+        {
+            Decimal VATableSalesAmount = 0;
+            if (taxType.Equals("VAT Output"))
+            {
+                VATableSalesAmount = amount;
+            }
+
+            return VATableSalesAmount;
+        }
+
+        // ===============================
+        // Compute VAT Exempt Sales Amount
+        // ===============================
+        public Decimal ComputeVATExemptSales(String taxType, Decimal taxRate, String discountType, Decimal price, Decimal quantity, Decimal amount)
+        {
+            Decimal VATExemptAmount = 0;
+            if (taxType.Equals("VAT Exempt") && (discountType.Equals("Senior Citizen Discount") || discountType.Equals("PWD")))
+            {
+                VATExemptAmount = amount - ((taxRate / 100) * (price * quantity) / ((taxRate / 100) + 1));
+            }
+
+            return VATExemptAmount;
+        }
+
+        // ===============================
+        // Compute Zero Rated Sales Amount
+        // ===============================
+        public Decimal ComputeZeroRatedSales(String taxType, Decimal amount)
+        {
+            Decimal zeroRatedAmount = 0;
+            if (taxType.Equals("VAT Zero Rated"))
+            {
+                zeroRatedAmount = amount;
+            }
+
+            return 0;
+        }
+
         // ================================
         // Dropdown List - Company (Filter)
         // ================================
@@ -68,11 +110,14 @@ namespace easyfis.ApiControllers
                                             Customer = d.TrnSalesInvoice.MstArticle.Article,
                                             CustomerTIN = d.TrnSalesInvoice.MstArticle.TaxNumber,
                                             Address = d.TrnSalesInvoice.MstArticle.Address,
+                                            DocumentReference = d.TrnSalesInvoice.DocumentReference,
                                             ManualReferenceNumber = d.TrnSalesInvoice.ManualSINumber,
-                                            TotalAmount = d.Price * d.Quantity,
-                                            Discount = d.DiscountAmount,
-                                            VAT = d.VATAmount,
-                                            NetSales = d.Amount
+                                            DiscountAmount = d.DiscountAmount,
+                                            Amount = d.Amount,
+                                            VATableSalesAmount = ComputeVATableSales(d.MstTaxType.TaxType, d.Amount),
+                                            VATExemptSalesAmount = ComputeVATExemptSales(d.MstTaxType.TaxType, d.MstTaxType.TaxRate, d.MstDiscount.Discount, d.Price, d.Quantity, d.Amount),
+                                            ZeroRatedSalesAmount = ComputeZeroRatedSales(d.MstTaxType.TaxType, d.Amount),
+                                            VATAmount = d.VATAmount
                                         };
 
                 return salesInvoiceItems.ToList();
@@ -91,11 +136,14 @@ namespace easyfis.ApiControllers
                                             Customer = d.TrnSalesInvoice.MstArticle.Article,
                                             CustomerTIN = d.TrnSalesInvoice.MstArticle.TaxNumber,
                                             Address = d.TrnSalesInvoice.MstArticle.Address,
+                                            DocumentReference = d.TrnSalesInvoice.DocumentReference,
                                             ManualReferenceNumber = d.TrnSalesInvoice.ManualSINumber,
-                                            TotalAmount = d.Price * d.Quantity,
-                                            Discount = d.DiscountAmount,
-                                            VAT = d.VATAmount,
-                                            NetSales = d.Amount
+                                            DiscountAmount = d.DiscountAmount,
+                                            Amount = d.Amount,
+                                            VATableSalesAmount = ComputeVATableSales(d.MstTaxType.TaxType, d.Amount),
+                                            VATExemptSalesAmount = ComputeVATExemptSales(d.MstTaxType.TaxType, d.MstTaxType.TaxRate, d.MstDiscount.Discount, d.Price, d.Quantity, d.Amount),
+                                            ZeroRatedSalesAmount = ComputeZeroRatedSales(d.MstTaxType.TaxType, d.Amount),
+                                            VATAmount = d.VATAmount
                                         };
 
                 return salesInvoiceItems.ToList();
