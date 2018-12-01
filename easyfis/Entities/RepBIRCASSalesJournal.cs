@@ -14,6 +14,7 @@ namespace easyfis.Entities
         public String Address { get; set; }
         public String DocumentReference { get; set; }
         public String ManualReferenceNumber { get; set; }
+        public String ItemCode { get; set; }
         public Decimal DiscountAmount { get; set; }
         public Decimal Amount { get; set; }
         public Decimal VATableSalesAmount { get; set; }

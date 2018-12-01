@@ -112,6 +112,7 @@ namespace easyfis.ApiControllers
                                             Address = d.TrnSalesInvoice.MstArticle.Address,
                                             DocumentReference = d.TrnSalesInvoice.DocumentReference,
                                             ManualReferenceNumber = d.TrnSalesInvoice.ManualSINumber,
+                                            ItemCode = d.MstArticle.ManualArticleCode,
                                             DiscountAmount = d.DiscountAmount,
                                             Amount = d.Amount,
                                             VATableSalesAmount = ComputeVATableSales(d.MstTaxType.TaxType, d.Amount),
@@ -120,7 +121,7 @@ namespace easyfis.ApiControllers
                                             VATAmount = d.VATAmount
                                         };
 
-                return salesInvoiceItems.ToList();
+                return salesInvoiceItems.OrderBy(d => d.ReferenceNumber).ToList();
             }
             else
             {
@@ -138,6 +139,7 @@ namespace easyfis.ApiControllers
                                             Address = d.TrnSalesInvoice.MstArticle.Address,
                                             DocumentReference = d.TrnSalesInvoice.DocumentReference,
                                             ManualReferenceNumber = d.TrnSalesInvoice.ManualSINumber,
+                                            ItemCode = d.MstArticle.ManualArticleCode,
                                             DiscountAmount = d.DiscountAmount,
                                             Amount = d.Amount,
                                             VATableSalesAmount = ComputeVATableSales(d.MstTaxType.TaxType, d.Amount),
@@ -146,7 +148,7 @@ namespace easyfis.ApiControllers
                                             VATAmount = d.VATAmount
                                         };
 
-                return salesInvoiceItems.ToList();
+                return salesInvoiceItems.OrderBy(d => d.ReferenceNumber).ToList();
             }
         }
     }

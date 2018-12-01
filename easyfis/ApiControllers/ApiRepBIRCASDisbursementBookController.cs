@@ -65,6 +65,9 @@ namespace easyfis.ApiControllers
                                {
                                    Date = d.JournalDate.ToShortDateString(),
                                    ReferenceNumber = "CV-" + d.TrnDisbursement.MstBranch.BranchCode + "-" + d.TrnDisbursement.CVNumber,
+                                   Supplier = d.TrnDisbursement.MstArticle.Article,
+                                   TIN = d.TrnDisbursement.MstArticle.TaxNumber,
+                                   Address = d.TrnDisbursement.MstArticle.Address,
                                    AccountCode = d.MstAccount.AccountCode,
                                    Account = d.MstAccount.Account,
                                    DebitAmount = d.DebitAmount,
@@ -84,6 +87,9 @@ namespace easyfis.ApiControllers
                                {
                                    Date = d.JournalDate.ToShortDateString(),
                                    ReferenceNumber = "CV-" + d.TrnDisbursement.MstBranch.BranchCode + "-" + d.TrnDisbursement.CVNumber,
+                                   Supplier = d.TrnDisbursement.MstArticle.Article,
+                                   TIN = d.TrnDisbursement.MstArticle.TaxNumber,
+                                   Address = d.TrnDisbursement.MstArticle.Address,
                                    AccountCode = d.MstAccount.AccountCode,
                                    Account = d.MstAccount.Account,
                                    DebitAmount = d.DebitAmount,

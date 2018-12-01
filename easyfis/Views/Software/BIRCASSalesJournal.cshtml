@@ -483,6 +483,7 @@
                                         Address: results[i]["Address"],
                                         DocumentReference: results[i]["DocumentReference"],
                                         ManualReferenceNumber: results[i]["ManualReferenceNumber"],
+                                        ItemCode: results[i]["ItemCode"],
                                         DiscountAmount: results[i]["DiscountAmount"],
                                         DiscountAmountDisplay: parseFloat(results[i]["DiscountAmount"]).toFixed(2).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                                         Amount: results[i]["Amount"],
@@ -596,7 +597,8 @@
                     || !filterText || (item.CustomerTIN.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Address.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualReferenceNumber.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.ManualReferenceNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             BIRCASSalesJournalCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -645,6 +647,12 @@
                     {
                         "header": "SI Ref. No.",
                         "binding": "ManualReferenceNumber",
+                        "allowSorting": true,
+                        "width": "2*"
+                    },
+                    {
+                        "header": "Item Code",
+                        "binding": "ItemCode",
                         "allowSorting": true,
                         "width": "2*"
                     },
@@ -815,7 +823,8 @@
                     || !filterText || (item.CustomerTIN.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.Address.toLowerCase().indexOf(filterText) > -1)
                     || !filterText || (item.DocumentReference.toLowerCase().indexOf(filterText) > -1)
-                    || !filterText || (item.ManualReferenceNumber.toLowerCase().indexOf(filterText) > -1);
+                    || !filterText || (item.ManualReferenceNumber.toLowerCase().indexOf(filterText) > -1)
+                    || !filterText || (item.ItemCode.toLowerCase().indexOf(filterText) > -1);
             }
 
             BIRCASSalesJournalCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -846,6 +855,7 @@
                         Address: BIRCASSalesJournalCollectionView.items[i].Address,
                         DocumentReference: BIRCASSalesJournalCollectionView.items[i].DocumentReference,
                         ManualReferenceNumber: BIRCASSalesJournalCollectionView.items[i].ManualReferenceNumber,
+                        ItemCode: BIRCASSalesJournalCollectionView.items[i].ItemCode,
                         VATableSalesAmount: BIRCASSalesJournalCollectionView.items[i].VATableSalesAmount,
                         VATExemptSalesAmount: BIRCASSalesJournalCollectionView.items[i].VATExemptSalesAmount,
                         ZeroRatedSalesAmount: BIRCASSalesJournalCollectionView.items[i].ZeroRatedSalesAmount,
@@ -870,6 +880,7 @@
                 Address: "Address",
                 DocumentReference: "Doc. Ref. No.",
                 ManualReferenceNumber: "SI Ref. No.",
+                ItemCode: "Item Code",
                 VATableSalesAmount: "VATable Sales",
                 VATExemptSalesAmount: "VAT Exempt Sales",
                 ZeroRatedSalesAmount: "Zero Rated Sales",
@@ -933,8 +944,9 @@
                     var endDate = cboBIRCASSalesJournalEndDateFilter.value.toLocaleDateString().replace(/\//g, '-');
                     var companyId = cboBIRCASSalesJournalCompanyFilter.selectedValue;
                     var branchId = cboBIRCASSalesJournalBranchFilter.selectedValue;
+                    var documentReference = document.getElementById("inpBIRCASSalesJournalSeacrhFilter").value;
 
-                    window.location.href = '/RepBIRCASSalesJournal/BIRCASSalesJournal?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId;
+                    window.location.href = '/RepBIRCASSalesJournal/BIRCASSalesJournal?StartDate=' + startDate + '&EndDate=' + endDate + '&CompanyId=' + companyId + '&BranchId=' + branchId + '&DocumentReference=' + documentReference;;
                 } else {
                     toastr.error("Lacking Information");
                 }
