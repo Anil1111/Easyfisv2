@@ -95,9 +95,7 @@ namespace easyfis.Integration.Quinta.ApiControllers
             {
                 List<Entities.ReturnedDocument> listSINumber = new List<Entities.ReturnedDocument>();
 
-                var branch = from d in db.MstBranches
-                             select d;
-
+                var branch = from d in db.MstBranches select d;
                 if (branch.Any())
                 {
                     Int32 currentBranchId = branch.FirstOrDefault().Id;
@@ -109,33 +107,16 @@ namespace easyfis.Integration.Quinta.ApiControllers
                             if (objSales != null)
                             {
                                 Boolean unitExist = false;
-                                var units = from d in db.MstUnits
-                                            select d;
-
-                                if (units.Any())
-                                {
-                                    unitExist = true;
-                                }
+                                var units = from d in db.MstUnits select d;
+                                if (units.Any()) { unitExist = true; }
 
                                 Boolean termExist = false;
-                                var terms = from d in db.MstTerms
-                                            where d.Term.Equals(objRoot.DefaultTerm)
-                                            select d;
-
-                                if (terms.Any())
-                                {
-                                    termExist = true;
-                                }
+                                var terms = from d in db.MstTerms where d.Term.Equals(objRoot.DefaultTerm) select d;
+                                if (terms.Any()) { termExist = true; }
 
                                 Boolean userExist = false;
-                                var users = from d in db.MstUsers
-                                            where d.UserName.Equals("admin")
-                                            select d;
-
-                                if (users.Any())
-                                {
-                                    userExist = true;
-                                }
+                                var users = from d in db.MstUsers where d.UserName.Equals("admin") select d;
+                                if (users.Any()) { userExist = true; }
 
                                 Int32 customerId = 0;
                                 var customers = from d in db.MstArticles
@@ -214,23 +195,12 @@ namespace easyfis.Integration.Quinta.ApiControllers
                                 }
 
                                 Boolean taxTypeExist = false;
-                                var taxTypes = from d in db.MstTaxTypes
-                                               select d;
-
-                                if (taxTypes.Any())
-                                {
-                                    taxTypeExist = true;
-                                }
+                                var taxTypes = from d in db.MstTaxTypes select d;
+                                if (taxTypes.Any()) { taxTypeExist = true; }
 
                                 Boolean discountExist = false;
-                                var discounts = from d in db.MstDiscounts
-                                                where d.Discount.Equals(objRoot.DefaultDiscount)
-                                                select d;
-
-                                if (discounts.Any())
-                                {
-                                    discountExist = true;
-                                }
+                                var discounts = from d in db.MstDiscounts where d.Discount.Equals(objRoot.DefaultDiscount) select d;
+                                if (discounts.Any()) { discountExist = true; }
 
                                 if (userExist)
                                 {
