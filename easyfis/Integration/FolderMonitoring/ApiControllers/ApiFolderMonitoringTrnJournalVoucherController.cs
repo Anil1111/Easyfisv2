@@ -82,8 +82,8 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnJournalVoucherObject.UserCode) select d;
                         if (user.Any()) { isUserExist = true; }
 
-                        var entryBranchCode = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnJournalVoucherObject.BranchCode) select d;
-                        if (entryBranchCode.Any()) { isEntryBranchCodeExist = true; }
+                        var entryBranch = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnJournalVoucherObject.EntryBranchCode) select d;
+                        if (entryBranch.Any()) { isEntryBranchCodeExist = true; }
 
                         List<easyfis.Entities.MstArticle> listArticles = new List<easyfis.Entities.MstArticle>();
 
@@ -121,7 +121,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         {
                             Int32 JVId = 0;
 
-                            var currentJournalVoucher = from d in db.TrnDisbursements where d.ManualCVNumber.Equals(folderMonitoringTrnJournalVoucherObject.ManualJVNumber) && d.IsLocked == true select d;
+                            var currentJournalVoucher = from d in db.TrnJournalVouchers where d.BranchId == branch.FirstOrDefault().Id && d.ManualJVNumber.Equals(folderMonitoringTrnJournalVoucherObject.ManualJVNumber) && d.IsLocked == true select d;
                             if (currentJournalVoucher.Any())
                             {
                                 JVId = currentJournalVoucher.FirstOrDefault().Id;
@@ -179,7 +179,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                             Data.TrnJournalVoucherLine newJournalVoucherLine = new Data.TrnJournalVoucherLine
                             {
                                 JVId = JVId,
-                                BranchId = entryBranchCode.FirstOrDefault().Id,
+                                BranchId = entryBranch.FirstOrDefault().Id,
                                 AccountId = account.FirstOrDefault().Id,
                                 ArticleId = article.FirstOrDefault().Id,
                                 Particulars = folderMonitoringTrnJournalVoucherObject.Particulars,
@@ -196,6 +196,12 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                             var journalVoucher = from d in db.TrnJournalVouchers where d.Id == JVId && d.IsLocked == true select d;
                             if (journalVoucher.Any())
                             {
+                                var lockJournalVoucher = journalVoucher.FirstOrDefault();
+                                lockJournalVoucher.IsLocked = true;
+                                lockJournalVoucher.UpdatedById = user.FirstOrDefault().Id;
+                                lockJournalVoucher.UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnJournalVoucherObject.CreatedDateTime);
+                                db.SubmitChanges();
+
                                 var journalVoucherLines = from d in journalVoucher.FirstOrDefault().TrnJournalVoucherLines select d;
                                 if (journalVoucherLines.Any())
                                 {

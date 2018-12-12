@@ -120,7 +120,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         {
                             Int32 ORId = 0;
 
-                            var currentCollection = from d in db.TrnCollections where d.ManualORNumber.Equals(folderMonitoringTrnCollectionObject.ManualORNumber) && d.IsLocked == true select d;
+                            var currentCollection = from d in db.TrnCollections where d.BranchId == branch.FirstOrDefault().Id && d.ManualORNumber.Equals(folderMonitoringTrnCollectionObject.ManualORNumber) && d.IsLocked == true select d;
                             if (currentCollection.Any())
                             {
                                 ORId = currentCollection.FirstOrDefault().Id;

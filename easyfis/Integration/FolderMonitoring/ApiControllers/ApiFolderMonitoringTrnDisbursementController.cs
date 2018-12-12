@@ -120,7 +120,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         {
                             Int32 CVId = 0;
 
-                            var currentDisbursement = from d in db.TrnDisbursements where d.ManualCVNumber.Equals(folderMonitoringTrnDisbursementObject.ManualCVNumber) && d.IsLocked == true select d;
+                            var currentDisbursement = from d in db.TrnDisbursements where d.BranchId == branch.FirstOrDefault().Id && d.ManualCVNumber.Equals(folderMonitoringTrnDisbursementObject.ManualCVNumber) && d.IsLocked == true select d;
                             if (currentDisbursement.Any())
                             {
                                 CVId = currentDisbursement.FirstOrDefault().Id;
