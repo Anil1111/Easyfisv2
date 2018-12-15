@@ -162,6 +162,10 @@
                             <dd id="lblCodeInput">
                                 <input type="text" class="form-control" id="inpBankCode" disabled />
                             </dd>
+                            <dt>Manual Code</dt>
+                            <dd>
+                                <input type="text" class="form-control requiredBank" id="inpManualBankCode" placeholder="Manual Code" />
+                            </dd>
                             <dt>Bank</dt>
                             <dd>
                                 <input type="text" class="form-control requiredBank" id="inpBank" placeholder="Bank" />
@@ -273,6 +277,7 @@
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' id='' onclick='btnBankEditOnclick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnBankDeleteOnclick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 Article: results[i]["Article"],
                                 ArticleGroupId: results[i]["ArticleGroupId"],
@@ -313,9 +318,10 @@
 
             bankCollectionView.filter = function (item) {
                 return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
-                                   || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                                   || (item.Address.toLowerCase().indexOf(filterText) > -1)
-                                   || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1);
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
             }
 
             bankCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -366,22 +372,22 @@
                                 "width": 100
                             },
                             {
+                                "header": "Manual Code",
+                                "binding": "ManualArticleCode",
+                                "allowSorting": true,
+                                "width": 120
+                            },
+                            {
                                 "header": "Bank",
                                 "binding": "Article",
                                 "allowSorting": true,
-                                "width": "3*"
-                            },
-                            {
-                                "header": "Address",
-                                "binding": "Address",
-                                "allowSorting": true,
-                                "width": "3*"
+                                "width": "4*"
                             },
                             {
                                 "header": "Contact No.",
                                 "binding": "ContactNumber",
                                 "allowSorting": true,
-                                "width": "2*"
+                                "width": "3*"
                             },
                             {
                                 "header": "Group",
@@ -439,9 +445,10 @@
 
             bankCollectionView.filter = function (item) {
                 return !filterText || (item.ArticleCode.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterText) > -1)
                     || (item.Article.toLowerCase().indexOf(filterText) > -1)
-                    || (item.Address.toLowerCase().indexOf(filterText) > -1)
-                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1);
+                    || (item.ContactNumber.toLowerCase().indexOf(filterText) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterText) > -1);
             }
 
             bankCollectionView.collectionChanged.addHandler(function (sender, args) {
@@ -659,12 +666,14 @@
             $("#lblCodeInput").hide();
 
             bankId = 0;
+            document.getElementById('inpManualBankCode').value = "NA";
             document.getElementById('inpBank').value = "NA";
             createCboBankGroup(0, 0, false);
             document.getElementById('inpBankAddress').value = "NA";
             document.getElementById('inpBankContactNumber').value = "NA";
             document.getElementById('inpBankContactPerson').value = "NA";
             document.getElementById('inpBank').disabled = false;
+            document.getElementById('inpManualBankCode').disabled = false;
             document.getElementById('inpBankAddress').disabled = false;
             document.getElementById('inpBankContactNumber').disabled = false;
             document.getElementById('inpBankContactPerson').disabled = false;
@@ -705,6 +714,7 @@
             $("#lblCodeInput").show();
 
             document.getElementById('inpBankCode').value = bank.ArticleCode;
+            document.getElementById('inpManualBankCode').value = bank.ManualArticleCode;
             document.getElementById('inpBank').value = bank.Article;
             document.getElementById('inpBankAddress').value = bank.Address;
             document.getElementById('inpBankContactNumber').value = bank.ContactNumber;
@@ -780,6 +790,7 @@
         // =========
         function btnBankSaveOnclick() {
             var bankObject = new Object();
+            bankObject.ManualArticleCode = document.getElementById('inpManualBankCode').value;
             bankObject.Article = document.getElementById('inpBank').value;
             bankObject.ArticleGroupId = cboBankGroup.selectedValue;
             bankObject.AccountId = cboBankGroup.selectedItem["AccountId"];
@@ -859,21 +870,18 @@
                             },
                             404: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 404");
-                                $('#bankDetailFormModal').modal('hide');
                                 document.getElementById('btnBankSave').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#btnBankSave").prop("disabled", false);
                                 $("#btnBankCloseDetailFormModal").prop("disabled", false);
                             },
                             400: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 400");
-                                $('#bankDetailFormModal').modal('hide');
                                 document.getElementById('btnBankSave').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#btnBankSave").prop("disabled", false);
                                 $("#btnBankCloseDetailFormModal").prop("disabled", false);
                             },
                             500: function (message) {
                                 toastr.error(message.responseText.replace(/^"(.*)"$/, '$1'), "Error 500");
-                                $('#bankDetailFormModal').modal('hide');
                                 document.getElementById('btnBankSave').innerHTML = "<i class='fa fa-save'></i> Save";
                                 $("#btnBankSave").prop("disabled", false);
                                 $("#btnBankCloseDetailFormModal").prop("disabled", false);

@@ -34,6 +34,7 @@ namespace easyfis.ModifiedApiControllers
                         {
                             Id = d.Id,
                             ArticleCode = d.ArticleCode,
+                            ManualArticleCode = d.ManualArticleCode,
                             Article = d.Article,
                             Address = d.Address,
                             ContactNumber = d.ContactNumber,
@@ -167,53 +168,65 @@ namespace easyfis.ModifiedApiControllers
 
                                         if (terms.Any())
                                         {
-                                            Data.MstArticle newBank = new Data.MstArticle
+                                            var bankByManualCode = from d in db.MstArticles
+                                                                   where d.ArticleTypeId == 5
+                                                                   && d.ManualArticleCode.Equals(objBank.ManualArticleCode)
+                                                                   select d;
+
+                                            if (!bankByManualCode.Any())
                                             {
-                                                ArticleCode = defaultBankCode,
-                                                ManualArticleCode = "NA",
-                                                Article = objBank.Article,
-                                                Category = "NA",
-                                                ArticleTypeId = 5,
-                                                ArticleGroupId = articleGroups.FirstOrDefault().Id,
-                                                AccountId = articleGroups.FirstOrDefault().AccountId,
-                                                SalesAccountId = articleGroups.FirstOrDefault().SalesAccountId,
-                                                CostAccountId = articleGroups.FirstOrDefault().CostAccountId,
-                                                AssetAccountId = articleGroups.FirstOrDefault().AssetAccountId,
-                                                ExpenseAccountId = articleGroups.FirstOrDefault().ExpenseAccountId,
-                                                UnitId = units.FirstOrDefault().Id,
-                                                OutputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                InputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                WTaxTypeId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                Price = 0,
-                                                Cost = 0,
-                                                IsInventory = false,
-                                                Particulars = "NA",
-                                                Address = objBank.Address,
-                                                TermId = terms.FirstOrDefault().Id,
-                                                ContactNumber = objBank.ContactNumber,
-                                                ContactPerson = objBank.ContactPerson,
-                                                EmailAddress = "NA",
-                                                TaxNumber = "NA",
-                                                CreditLimit = 0,
-                                                DateAcquired = DateTime.Now,
-                                                UsefulLife = 0,
-                                                SalvageValue = 0,
-                                                ManualArticleOldCode = "NA",
-                                                Kitting = 0,
-                                                IsLocked = true,
-                                                CreatedById = currentUserId,
-                                                CreatedDateTime = DateTime.Now,
-                                                UpdatedById = currentUserId,
-                                                UpdatedDateTime = DateTime.Now
-                                            };
+                                                Data.MstArticle newBank = new Data.MstArticle
+                                                {
+                                                    ArticleCode = defaultBankCode,
+                                                    ManualArticleCode = objBank.ManualArticleCode,
+                                                    Article = objBank.Article,
+                                                    Category = "NA",
+                                                    ArticleTypeId = 5,
+                                                    ArticleGroupId = articleGroups.FirstOrDefault().Id,
+                                                    AccountId = articleGroups.FirstOrDefault().AccountId,
+                                                    SalesAccountId = articleGroups.FirstOrDefault().SalesAccountId,
+                                                    CostAccountId = articleGroups.FirstOrDefault().CostAccountId,
+                                                    AssetAccountId = articleGroups.FirstOrDefault().AssetAccountId,
+                                                    ExpenseAccountId = articleGroups.FirstOrDefault().ExpenseAccountId,
+                                                    UnitId = units.FirstOrDefault().Id,
+                                                    OutputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    InputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    WTaxTypeId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    Price = 0,
+                                                    Cost = 0,
+                                                    IsInventory = false,
+                                                    Particulars = "NA",
+                                                    Address = objBank.Address,
+                                                    TermId = terms.FirstOrDefault().Id,
+                                                    ContactNumber = objBank.ContactNumber,
+                                                    ContactPerson = objBank.ContactPerson,
+                                                    EmailAddress = "NA",
+                                                    TaxNumber = "NA",
+                                                    CreditLimit = 0,
+                                                    DateAcquired = DateTime.Now,
+                                                    UsefulLife = 0,
+                                                    SalvageValue = 0,
+                                                    ManualArticleOldCode = "NA",
+                                                    Kitting = 0,
+                                                    IsLocked = true,
+                                                    CreatedById = currentUserId,
+                                                    CreatedDateTime = DateTime.Now,
+                                                    UpdatedById = currentUserId,
+                                                    UpdatedDateTime = DateTime.Now
+                                                };
 
-                                            db.MstArticles.InsertOnSubmit(newBank);
-                                            db.SubmitChanges();
+                                                db.MstArticles.InsertOnSubmit(newBank);
+                                                db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newBank);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                                String newObject = at.GetObjectString(newBank);
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
-                                            return Request.CreateResponse(HttpStatusCode.OK, newBank.Id);
+                                                return Request.CreateResponse(HttpStatusCode.OK, newBank.Id);
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                            }
                                         }
                                         else
                                         {
@@ -289,29 +302,43 @@ namespace easyfis.ModifiedApiControllers
 
                             if (bank.Any())
                             {
-                                String oldObject = at.GetObjectString(bank.FirstOrDefault());
+                                var bankByManualCode = from d in db.MstArticles
+                                                       where d.Id != Convert.ToInt32(id)
+                                                       && d.ArticleTypeId == 5
+                                                       && d.ManualArticleCode.Equals(objBank.ManualArticleCode)
+                                                       select d;
 
-                                var lockBank = bank.FirstOrDefault();
-                                lockBank.Article = objBank.Article;
-                                lockBank.ArticleGroupId = objBank.ArticleGroupId;
-                                lockBank.AccountId = objBank.AccountId;
-                                lockBank.SalesAccountId = objBank.SalesAccountId;
-                                lockBank.CostAccountId = objBank.CostAccountId;
-                                lockBank.AssetAccountId = objBank.AssetAccountId;
-                                lockBank.ExpenseAccountId = objBank.ExpenseAccountId;
-                                lockBank.Address = objBank.Address;
-                                lockBank.ContactNumber = objBank.ContactNumber;
-                                lockBank.ContactPerson = objBank.ContactPerson;
-                                lockBank.IsLocked = true;
-                                lockBank.UpdatedById = currentUserId;
-                                lockBank.UpdatedDateTime = DateTime.Now;
+                                if (!bankByManualCode.Any())
+                                {
+                                    String oldObject = at.GetObjectString(bank.FirstOrDefault());
 
-                                db.SubmitChanges();
+                                    var lockBank = bank.FirstOrDefault();
+                                    lockBank.ManualArticleCode = objBank.ManualArticleCode;
+                                    lockBank.Article = objBank.Article;
+                                    lockBank.ArticleGroupId = objBank.ArticleGroupId;
+                                    lockBank.AccountId = objBank.AccountId;
+                                    lockBank.SalesAccountId = objBank.SalesAccountId;
+                                    lockBank.CostAccountId = objBank.CostAccountId;
+                                    lockBank.AssetAccountId = objBank.AssetAccountId;
+                                    lockBank.ExpenseAccountId = objBank.ExpenseAccountId;
+                                    lockBank.Address = objBank.Address;
+                                    lockBank.ContactNumber = objBank.ContactNumber;
+                                    lockBank.ContactPerson = objBank.ContactPerson;
+                                    lockBank.IsLocked = true;
+                                    lockBank.UpdatedById = currentUserId;
+                                    lockBank.UpdatedDateTime = DateTime.Now;
 
-                                String newObject = at.GetObjectString(bank.FirstOrDefault());
-                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                    String newObject = at.GetObjectString(bank.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                }
                             }
                             else
                             {

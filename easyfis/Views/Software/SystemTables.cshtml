@@ -1170,6 +1170,10 @@
                         <dl class="dl-horizontal">
                             <dt id="employee_Code_Label">Code</dt>
                             <dd id="employee_Code_Input"><input type="text" class="form-control  requiredEmployee" id="employee_Code" placeholder="Code" disabled /></dd>
+                            <dt>Manual Code</dt>
+                            <dd>
+                                <input type="text" class="form-control requiredBank" id="inpManualEmployeeCode" placeholder="Manual Code" />
+                            </dd>
                             <dt>Employee</dt>
                             <dd><input type="text" class="form-control requiredEmployee" id="employee_Employee" placeholder="Employee" /></dd>
                             <dt>Employee Group</dt>
@@ -1244,6 +1248,10 @@
                         <dl class="dl-horizontal">
                             <dt id="otherArticle_Code_Label">Code</dt>
                             <dd id="otherArticle_Code_Input"><input type="text" class="form-control  requiredOtherArticle" id="otherArticle_Code" placeholder="Code" disabled /></dd>
+                             <dt>Manual Code</dt>
+                            <dd>
+                                <input type="text" class="form-control requiredBank" id="inpManualOtherArticleCode" placeholder="Manual Code" />
+                            </dd>
                             <dt>Article</dt>
                             <dd><input type="text" class="form-control requiredOtherArticle" id="otherArticle_OtherArticle" placeholder="OtherArticle" /></dd>
                             <dt>Article Group</dt>
@@ -5319,6 +5327,7 @@
                                 EditId: "<button class='btn btn-primary btn-xs btn-block' onclick='btnEditEmployee_OnClick()'><i class='fa fa-edit'></i> Edit</button>",
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteEmployee_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
                                 ArticleCode: results[i]["ArticleCode"],
                                 Article: results[i]["Article"],
                                 ArticleGroupId: results[i]["ArticleGroupId"],
@@ -5535,12 +5544,14 @@
             document.getElementById('employee_Code').value = "NA";
             document.getElementById('employee_ContactPerson').value = "NA";
             document.getElementById('employee_Employee').value = "NA";
+            document.getElementById('inpManualEmployeeCode').value = "NA";
             getArticleEmployeeGroupForComboBox(0, 0);
             document.getElementById('employee_Address').value = "NA";
             document.getElementById('employee_ContactNumber').value = "NA";
 
             document.getElementById('employee_ContactPerson').disabled = false;
             document.getElementById('employee_Employee').disabled = false;
+            document.getElementById('inpManualEmployeeCode').disabled = false;
             document.getElementById('employee_Address').disabled = false;
             document.getElementById('employee_ContactNumber').disabled = false;
         }
@@ -5576,6 +5587,7 @@
             var employee = employees.currentEditItem;
             employeeId = employee.Id;
             document.getElementById('employee_Code').value = employee.ArticleCode;
+            document.getElementById('inpManualEmployeeCode').value = employee.ManualArticleCode;
             document.getElementById('employee_Employee').value = employee.Article;
             getArticleEmployeeGroupForComboBox(employee.ArticleGroupId, employee.AccountId);
             document.getElementById('employee_Address').value = employee.Address ? employee.Address : '';
@@ -5614,12 +5626,16 @@
             employees.pageSize = 15;
 
             var filterTextEmployee = '';
-            $('#InputFilterTerm').keyup(function () {
+            $('#InputFilterEmployee').keyup(function () {
                 filterTextEmployee = this.value.toLowerCase();
                 employees.refresh();
             });
             employees.filter = function (item) {
-                return !filterTextEmployee || (item.Article.toLowerCase().indexOf(filterTextEmployee) > -1);
+                return !filterTextEmployee || (item.ArticleCode.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ContactNumber.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterTextEmployee) > -1);
             }
             employees.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsEmployee();
@@ -5638,6 +5654,7 @@
         function btnEmployeeSaveButton_OnClick() {
             var employeeObject = new Object();
             employeeObject.ArticleCode = document.getElementById('employee_Code').value;
+            employeeObject.ManualArticleCode = document.getElementById('inpManualEmployeeCode').value;
             employeeObject.Article = document.getElementById('employee_Employee').value;
             employeeObject.ArticleGroupId = cboEmployeeGroup.selectedValue;
             employeeObject.AccountId = cboEmployeeAccount.selectedValue;
@@ -5805,7 +5822,11 @@
                 employees.refresh();
             });
             employees.filter = function (item) {
-                return !filterTextEmployee || (item.Article.toLowerCase().indexOf(filterTextEmployee) > -1);
+                return !filterTextEmployee || (item.ArticleCode.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ContactNumber.toLowerCase().indexOf(filterTextEmployee) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterTextEmployee) > -1);
             }
             employees.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsEmployee();
@@ -5853,6 +5874,12 @@
                                 "binding": "ArticleCode",
                                 "allowSorting": true,
                                 "width": 100
+                            },
+                            {
+                                "header": "Manual Code",
+                                "binding": "ManualArticleCode",
+                                "allowSorting": true,
+                                "width": 120
                             },
                             {
                                 "header": "Employee",
@@ -5952,6 +5979,7 @@
                                 DeleteId: "<button class='btn btn-danger btn-xs btn-block' onclick='btnDeleteOtherArticle_OnClick()'><i class='fa fa-trash'></i> Delete</button>",
                                 Id: results[i]["Id"],
                                 ArticleCode: results[i]["ArticleCode"],
+                                ManualArticleCode: results[i]["ManualArticleCode"],
                                 Article: results[i]["Article"],
                                 ArticleGroupId: results[i]["ArticleGroupId"],
                                 ArticleGroup: results[i]["ArticleGroup"],
@@ -6167,12 +6195,14 @@
             otherArticleId = 0;
             document.getElementById('otherArticle_Code').value = "NA";
             document.getElementById('otherArticle_ContactPerson').value = "NA";
+            document.getElementById('inpManualOtherArticleCode').value = "NA";
             document.getElementById('otherArticle_OtherArticle').value = "NA";
             getArticleOtherArticleGroupForComboBox(0, 0, false);
             document.getElementById('otherArticle_Address').value = "NA";
             document.getElementById('otherArticle_ContactNumber').value = "NA";
 
             document.getElementById('otherArticle_ContactPerson').disabled = false;
+            document.getElementById('inpManualOtherArticleCode').disabled = false;
             document.getElementById('otherArticle_OtherArticle').disabled = false;
             document.getElementById('otherArticle_Address').disabled = false;
             document.getElementById('otherArticle_ContactNumber').disabled = false;
@@ -6209,6 +6239,7 @@
             var otherArticle = otherArticles.currentEditItem;
             otherArticleId = otherArticle.Id;
             document.getElementById('otherArticle_Code').value = otherArticle.ArticleCode;
+            document.getElementById('inpManualOtherArticleCode').value = otherArticle.ManualArticleCode;
             document.getElementById('otherArticle_OtherArticle').value = otherArticle.Article;
             getArticleOtherArticleGroupForComboBox(otherArticle.ArticleGroupId, otherArticle.AccountId);
             document.getElementById('otherArticle_Address').value = otherArticle.Address ? otherArticle.Address : '';
@@ -6247,12 +6278,15 @@
             otherArticles.pageSize = 15;
 
             var filterTextOtherArticle = '';
-            $('#InputFilterTerm').keyup(function () {
+            $('#InputFilterOtherArticle').keyup(function () {
                 filterTextOtherArticle = this.value.toLowerCase();
                 otherArticles.refresh();
             });
             otherArticles.filter = function (item) {
-                return !filterTextOtherArticle || (item.Article.toLowerCase().indexOf(filterTextOtherArticle) > -1);
+                return !filterTextOtherArticle || (item.ArticleCode.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterTextOtherArticle) > -1);
             }
             otherArticles.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsOtherArticle();
@@ -6271,6 +6305,7 @@
         function btnOtherArticleSaveButton_OnClick() {
             var otherArticleObject = new Object();
             otherArticleObject.ArticleCode = document.getElementById('otherArticle_Code').value;
+            otherArticleObject.ManualArticleCode = document.getElementById('inpManualOtherArticleCode').value;
             otherArticleObject.Article = document.getElementById('otherArticle_OtherArticle').value;
             otherArticleObject.ArticleGroupId = cboOtherArticleGroup.selectedValue;
             otherArticleObject.AccountId = cboOtherArticleAccount.selectedValue;
@@ -6438,7 +6473,10 @@
                 otherArticles.refresh();
             });
             otherArticles.filter = function (item) {
-                return !filterTextOtherArticle || (item.Article.toLowerCase().indexOf(filterTextOtherArticle) > -1);
+                return !filterTextOtherArticle || (item.ArticleCode.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.ManualArticleCode.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.Article.toLowerCase().indexOf(filterTextOtherArticle) > -1)
+                    || (item.ArticleGroup.toLowerCase().indexOf(filterTextOtherArticle) > -1);
             }
             otherArticles.collectionChanged.addHandler(function (sender, args) {
                 updateNavigateButtonsOtherArticle();
@@ -6486,6 +6524,12 @@
                                 "binding": "ArticleCode",
                                 "allowSorting": true,
                                 "width": 100
+                            },
+                            {
+                                "header": "Manual Code",
+                                "binding": "ManualArticleCode",
+                                "allowSorting": true,
+                                "width": 120
                             },
                             {
                                 "header": "Article",

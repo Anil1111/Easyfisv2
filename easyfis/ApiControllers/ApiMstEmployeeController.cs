@@ -34,6 +34,7 @@ namespace easyfis.ModifiedApiControllers
                             {
                                 Id = d.Id,
                                 ArticleCode = d.ArticleCode,
+                                ManualArticleCode = d.ManualArticleCode,
                                 Article = d.Article,
                                 Address = d.Address,
                                 ContactNumber = d.ContactNumber,
@@ -166,53 +167,65 @@ namespace easyfis.ModifiedApiControllers
 
                                         if (terms.Any())
                                         {
-                                            Data.MstArticle newEmployee = new Data.MstArticle
+                                            var employeeByManualCode = from d in db.MstArticles
+                                                                       where d.ArticleTypeId == 4
+                                                                       && d.ManualArticleCode.Equals(objEmployee.ManualArticleCode)
+                                                                       select d;
+
+                                            if (!employeeByManualCode.Any())
                                             {
-                                                ArticleCode = defaultEmployeeCode,
-                                                ManualArticleCode = "NA",
-                                                Article = objEmployee.Article,
-                                                Category = "NA",
-                                                ArticleTypeId = 4,
-                                                ArticleGroupId = articleGroups.FirstOrDefault().Id,
-                                                AccountId = articleGroups.FirstOrDefault().AccountId,
-                                                SalesAccountId = articleGroups.FirstOrDefault().SalesAccountId,
-                                                CostAccountId = articleGroups.FirstOrDefault().CostAccountId,
-                                                AssetAccountId = articleGroups.FirstOrDefault().AssetAccountId,
-                                                ExpenseAccountId = articleGroups.FirstOrDefault().ExpenseAccountId,
-                                                UnitId = units.FirstOrDefault().Id,
-                                                OutputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                InputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                WTaxTypeId = db.MstTaxTypes.FirstOrDefault().Id,
-                                                Price = 0,
-                                                Cost = 0,
-                                                IsInventory = false,
-                                                Particulars = "NA",
-                                                Address = objEmployee.Address,
-                                                TermId = terms.FirstOrDefault().Id,
-                                                ContactNumber = objEmployee.ContactNumber,
-                                                ContactPerson = objEmployee.ContactPerson,
-                                                EmailAddress = "NA",
-                                                TaxNumber = "NA",
-                                                CreditLimit = 0,
-                                                DateAcquired = DateTime.Now,
-                                                UsefulLife = 0,
-                                                SalvageValue = 0,
-                                                ManualArticleOldCode = "NA",
-                                                Kitting = 0,
-                                                IsLocked = true,
-                                                CreatedById = currentUserId,
-                                                CreatedDateTime = DateTime.Now,
-                                                UpdatedById = currentUserId,
-                                                UpdatedDateTime = DateTime.Now
-                                            };
+                                                Data.MstArticle newEmployee = new Data.MstArticle
+                                                {
+                                                    ArticleCode = defaultEmployeeCode,
+                                                    ManualArticleCode = objEmployee.ManualArticleCode,
+                                                    Article = objEmployee.Article,
+                                                    Category = "NA",
+                                                    ArticleTypeId = 4,
+                                                    ArticleGroupId = articleGroups.FirstOrDefault().Id,
+                                                    AccountId = articleGroups.FirstOrDefault().AccountId,
+                                                    SalesAccountId = articleGroups.FirstOrDefault().SalesAccountId,
+                                                    CostAccountId = articleGroups.FirstOrDefault().CostAccountId,
+                                                    AssetAccountId = articleGroups.FirstOrDefault().AssetAccountId,
+                                                    ExpenseAccountId = articleGroups.FirstOrDefault().ExpenseAccountId,
+                                                    UnitId = units.FirstOrDefault().Id,
+                                                    OutputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    InputTaxId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    WTaxTypeId = db.MstTaxTypes.FirstOrDefault().Id,
+                                                    Price = 0,
+                                                    Cost = 0,
+                                                    IsInventory = false,
+                                                    Particulars = "NA",
+                                                    Address = objEmployee.Address,
+                                                    TermId = terms.FirstOrDefault().Id,
+                                                    ContactNumber = objEmployee.ContactNumber,
+                                                    ContactPerson = objEmployee.ContactPerson,
+                                                    EmailAddress = "NA",
+                                                    TaxNumber = "NA",
+                                                    CreditLimit = 0,
+                                                    DateAcquired = DateTime.Now,
+                                                    UsefulLife = 0,
+                                                    SalvageValue = 0,
+                                                    ManualArticleOldCode = "NA",
+                                                    Kitting = 0,
+                                                    IsLocked = true,
+                                                    CreatedById = currentUserId,
+                                                    CreatedDateTime = DateTime.Now,
+                                                    UpdatedById = currentUserId,
+                                                    UpdatedDateTime = DateTime.Now
+                                                };
 
-                                            db.MstArticles.InsertOnSubmit(newEmployee);
-                                            db.SubmitChanges();
+                                                db.MstArticles.InsertOnSubmit(newEmployee);
+                                                db.SubmitChanges();
 
-                                            String newObject = at.GetObjectString(newEmployee);
-                                            at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
+                                                String newObject = at.GetObjectString(newEmployee);
+                                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, "NA", newObject);
 
-                                            return Request.CreateResponse(HttpStatusCode.OK, newEmployee.Id);
+                                                return Request.CreateResponse(HttpStatusCode.OK, newEmployee.Id);
+                                            }
+                                            else
+                                            {
+                                                return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                            }
                                         }
                                         else
                                         {
@@ -288,29 +301,43 @@ namespace easyfis.ModifiedApiControllers
 
                             if (employee.Any())
                             {
-                                String oldObject = at.GetObjectString(employee.FirstOrDefault());
+                                var employeeByManualCode = from d in db.MstArticles
+                                                           where d.Id != Convert.ToInt32(id)
+                                                           && d.ArticleTypeId == 4
+                                                           && d.ManualArticleCode.Equals(objEmployee.ManualArticleCode)
+                                                           select d;
 
-                                var lockEmployee = employee.FirstOrDefault();
-                                lockEmployee.Article = objEmployee.Article;
-                                lockEmployee.ArticleGroupId = objEmployee.ArticleGroupId;
-                                lockEmployee.AccountId = objEmployee.AccountId;
-                                lockEmployee.SalesAccountId = objEmployee.SalesAccountId;
-                                lockEmployee.CostAccountId = objEmployee.CostAccountId;
-                                lockEmployee.AssetAccountId = objEmployee.AssetAccountId;
-                                lockEmployee.ExpenseAccountId = objEmployee.ExpenseAccountId;
-                                lockEmployee.Address = objEmployee.Address;
-                                lockEmployee.ContactNumber = objEmployee.ContactNumber;
-                                lockEmployee.ContactPerson = objEmployee.ContactPerson;
-                                lockEmployee.IsLocked = true;
-                                lockEmployee.UpdatedById = currentUserId;
-                                lockEmployee.UpdatedDateTime = DateTime.Now;
+                                if (!employeeByManualCode.Any())
+                                {
+                                    String oldObject = at.GetObjectString(employee.FirstOrDefault());
 
-                                db.SubmitChanges();
+                                    var lockEmployee = employee.FirstOrDefault();
+                                    lockEmployee.ManualArticleCode = objEmployee.ManualArticleCode;
+                                    lockEmployee.Article = objEmployee.Article;
+                                    lockEmployee.ArticleGroupId = objEmployee.ArticleGroupId;
+                                    lockEmployee.AccountId = objEmployee.AccountId;
+                                    lockEmployee.SalesAccountId = objEmployee.SalesAccountId;
+                                    lockEmployee.CostAccountId = objEmployee.CostAccountId;
+                                    lockEmployee.AssetAccountId = objEmployee.AssetAccountId;
+                                    lockEmployee.ExpenseAccountId = objEmployee.ExpenseAccountId;
+                                    lockEmployee.Address = objEmployee.Address;
+                                    lockEmployee.ContactNumber = objEmployee.ContactNumber;
+                                    lockEmployee.ContactPerson = objEmployee.ContactPerson;
+                                    lockEmployee.IsLocked = true;
+                                    lockEmployee.UpdatedById = currentUserId;
+                                    lockEmployee.UpdatedDateTime = DateTime.Now;
 
-                                String newObject = at.GetObjectString(employee.FirstOrDefault());
-                                at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+                                    db.SubmitChanges();
 
-                                return Request.CreateResponse(HttpStatusCode.OK);
+                                    String newObject = at.GetObjectString(employee.FirstOrDefault());
+                                    at.InsertAuditTrail(currentUser.FirstOrDefault().Id, GetType().Name, MethodBase.GetCurrentMethod().Name, oldObject, newObject);
+
+                                    return Request.CreateResponse(HttpStatusCode.OK);
+                                }
+                                else
+                                {
+                                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Manual Code is already taken.");
+                                }
                             }
                             else
                             {

@@ -14,7 +14,7 @@ namespace easyfis.Integration.FolderMonitoring.Entities
         public String ArticleCode { get; set; }
         public String Remarks { get; set; }
         public String ManualINNumber { get; set; }
-        public String IsProduce { get; set; }
+        public Boolean IsProduce { get; set; }
         public String UserCode { get; set; }
         public String CreatedDateTime { get; set; }
         public String ItemCode { get; set; }

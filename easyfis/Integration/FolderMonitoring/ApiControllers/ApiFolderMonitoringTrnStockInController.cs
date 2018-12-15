@@ -133,7 +133,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     ArticleId = article.FirstOrDefault().Id,
                                     Particulars = folderMonitoringTrnStockInObject.Remarks,
                                     ManualINNumber = folderMonitoringTrnStockInObject.ManualINNumber,
-                                    IsProduced = false,
+                                    IsProduced = folderMonitoringTrnStockInObject.IsProduce,
                                     PreparedById = user.FirstOrDefault().Id,
                                     CheckedById = user.FirstOrDefault().Id,
                                     ApprovedById = user.FirstOrDefault().Id,

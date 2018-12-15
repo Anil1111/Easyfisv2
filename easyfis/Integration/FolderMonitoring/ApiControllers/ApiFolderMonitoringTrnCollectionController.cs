@@ -193,7 +193,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                             db.TrnCollectionLines.InsertOnSubmit(newCollectionLine);
                             db.SubmitChanges();
 
-                            var collection = from d in db.TrnCollections where d.Id == ORId && d.IsLocked == true select d;
+                            var collection = from d in db.TrnCollections where d.Id == ORId && d.IsLocked == false select d;
                             if (collection.Any())
                             {
                                 var lockCollection = collection.FirstOrDefault();
@@ -202,7 +202,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 lockCollection.UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnCollectionObject.CreatedDateTime);
                                 db.SubmitChanges();
 
-                                var collectionLines = from d in collection.FirstOrDefault().TrnCollectionLines where d.SIId != null select d;
+                                var collectionLines = from d in lockCollection.TrnCollectionLines where d.SIId != null select d;
                                 if (collectionLines.Any())
                                 {
                                     foreach (var collectionLine in collectionLines) { accountsReceivable.UpdateAccountsReceivable(Convert.ToInt32(collectionLine.SIId)); }
