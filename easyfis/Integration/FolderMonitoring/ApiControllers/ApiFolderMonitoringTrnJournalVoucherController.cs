@@ -157,7 +157,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     Status = null,
                                     IsCancelled = false,
                                     IsPrinted = false,
-                                    IsLocked = true,
+                                    IsLocked = false,
                                     CreatedById = user.FirstOrDefault().Id,
                                     CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnJournalVoucherObject.CreatedDateTime),
                                     UpdatedById = user.FirstOrDefault().Id,
@@ -193,7 +193,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                             db.TrnJournalVoucherLines.InsertOnSubmit(newJournalVoucherLine);
                             db.SubmitChanges();
 
-                            var journalVoucher = from d in db.TrnJournalVouchers where d.Id == JVId && d.IsLocked == true select d;
+                            var journalVoucher = from d in db.TrnJournalVouchers where d.Id == JVId && d.IsLocked == false select d;
                             if (journalVoucher.Any())
                             {
                                 var lockJournalVoucher = journalVoucher.FirstOrDefault();
@@ -202,7 +202,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 lockJournalVoucher.UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnJournalVoucherObject.CreatedDateTime);
                                 db.SubmitChanges();
 
-                                var journalVoucherLines = from d in journalVoucher.FirstOrDefault().TrnJournalVoucherLines select d;
+                                var journalVoucherLines = from d in db.TrnJournalVoucherLines where d.JVId == JVId select d;
                                 if (journalVoucherLines.Any())
                                 {
                                     foreach (var journalVoucherLine in journalVoucherLines)
