@@ -84,40 +84,123 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 isSupplierExist = false,
                                 isTermExist = false,
                                 isUserExist = false,
-                                isPurchaseOrderExist = false,
                                 isItemExist = false,
                                 isReceivedBranchExist = false;
 
                         IQueryable<Data.TrnPurchaseOrder> purchaseOrder = null;
+                        IQueryable<Data.MstArticle> supplier = null;
+                        IQueryable<Data.MstTerm> term = null;
+                        IQueryable<Data.MstUser> user = null;
+                        IQueryable<Data.MstArticle> item = null;
+
+                        Int32 POId = 0;
 
                         var branch = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnReceivingReceiptObject.BranchCode) select d;
                         if (branch.Any())
                         {
                             isBranchExist = true;
 
+                            term = from d in db.MstTerms where d.Term.Equals(folderMonitoringTrnReceivingReceiptObject.Term) select d;
+                            if (term.Any()) { isTermExist = true; }
+
                             if (!folderMonitoringTrnReceivingReceiptObject.PONumber.Equals("") || !folderMonitoringTrnReceivingReceiptObject.PONumber.Equals("NA"))
                             {
                                 purchaseOrder = from d in db.TrnPurchaseOrders where d.BranchId == branch.FirstOrDefault().Id && d.PONumber.Equals(folderMonitoringTrnReceivingReceiptObject.PONumber) && d.IsLocked == true select d;
-                                if (purchaseOrder.Any()) { isPurchaseOrderExist = true; }
+                                if (purchaseOrder.Any())
+                                {
+                                    POId = purchaseOrder.FirstOrDefault().Id;
+                                }
+                                else
+                                {
+                                    supplier = from d in db.MstArticles where d.ArticleTypeId == 3 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.SupplierCode) && d.IsLocked == true select d;
+                                    if (supplier.Any())
+                                    {
+                                        isSupplierExist = true;
+
+                                        user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnReceivingReceiptObject.UserCode) select d;
+                                        if (user.Any()) { isUserExist = true; }
+
+                                        var defaultPONumber = "0000000001";
+                                        var lastPurchaseOrder = from d in db.TrnPurchaseOrders.OrderByDescending(d => d.Id) where d.BranchId == branch.FirstOrDefault().Id select d;
+                                        if (lastPurchaseOrder.Any())
+                                        {
+                                            var PONumber = Convert.ToInt32(lastPurchaseOrder.FirstOrDefault().PONumber) + 0000000001;
+                                            defaultPONumber = FillLeadingZeroes(PONumber, 10);
+                                        }
+
+                                        Data.TrnPurchaseOrder newPurchaseOrder = new Data.TrnPurchaseOrder
+                                        {
+                                            BranchId = branch.FirstOrDefault().Id,
+                                            PONumber = defaultPONumber,
+                                            PODate = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.RRDate),
+                                            SupplierId = supplier.FirstOrDefault().Id,
+                                            TermId = term.FirstOrDefault().Id,
+                                            ManualRequestNumber = "NA",
+                                            ManualPONumber = folderMonitoringTrnReceivingReceiptObject.ManualRRNumber,
+                                            DateNeeded = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.PODateNeeded),
+                                            Remarks = folderMonitoringTrnReceivingReceiptObject.Remarks,
+                                            IsClose = false,
+                                            RequestedById = user.FirstOrDefault().Id,
+                                            PreparedById = user.FirstOrDefault().Id,
+                                            CheckedById = user.FirstOrDefault().Id,
+                                            ApprovedById = user.FirstOrDefault().Id,
+                                            Status = null,
+                                            IsCancelled = false,
+                                            IsPrinted = false,
+                                            IsLocked = true,
+                                            CreatedById = user.FirstOrDefault().Id,
+                                            CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime),
+                                            UpdatedById = user.FirstOrDefault().Id,
+                                            UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime)
+                                        };
+
+                                        db.TrnPurchaseOrders.InsertOnSubmit(newPurchaseOrder);
+                                        db.SubmitChanges();
+
+                                        POId = newPurchaseOrder.Id;
+
+                                        item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.ItemCode) && d.IsLocked == true select d;
+                                        if (item.Any()) { isItemExist = true; }
+
+                                        var conversionUnit = from d in db.MstArticleUnits
+                                                             where d.ArticleId == item.FirstOrDefault().Id
+                                                             && d.UnitId == item.FirstOrDefault().UnitId
+                                                             select d;
+
+                                        if (conversionUnit.Any())
+                                        {
+                                            Decimal baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * 1;
+                                            if (conversionUnit.FirstOrDefault().Multiplier > 0) { baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * (1 / conversionUnit.FirstOrDefault().Multiplier); }
+
+                                            Decimal baseCost = folderMonitoringTrnReceivingReceiptObject.Amount;
+                                            if (baseQuantity > 0) { baseCost = folderMonitoringTrnReceivingReceiptObject.Amount / baseQuantity; }
+
+                                            Data.TrnPurchaseOrderItem newPurchaseOrderItem = new Data.TrnPurchaseOrderItem
+                                            {
+                                                POId = POId,
+                                                ItemId = item.FirstOrDefault().Id,
+                                                Particulars = folderMonitoringTrnReceivingReceiptObject.Particulars,
+                                                UnitId = item.FirstOrDefault().UnitId,
+                                                Quantity = folderMonitoringTrnReceivingReceiptObject.Quantity,
+                                                Cost = folderMonitoringTrnReceivingReceiptObject.Cost,
+                                                Amount = folderMonitoringTrnReceivingReceiptObject.Amount,
+                                                BaseUnitId = item.FirstOrDefault().UnitId,
+                                                BaseQuantity = baseQuantity,
+                                                BaseCost = baseCost
+                                            };
+
+                                            db.TrnPurchaseOrderItems.InsertOnSubmit(newPurchaseOrderItem);
+                                            db.SubmitChanges();
+                                        }
+                                    }
+                                }
                             }
                         }
-
-                        var supplier = from d in db.MstArticles where d.ArticleTypeId == 3 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.SupplierCode) && d.IsLocked == true select d;
-                        if (supplier.Any()) { isSupplierExist = true; }
-
-                        var term = from d in db.MstTerms where d.Term.Equals(folderMonitoringTrnReceivingReceiptObject.Term) select d;
-                        if (term.Any()) { isTermExist = true; }
-
-                        var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnReceivingReceiptObject.UserCode) select d;
-                        if (user.Any()) { isUserExist = true; }
-
-                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.ItemCode) && d.IsLocked == true select d;
-                        if (item.Any()) { isItemExist = true; }
 
                         var receivedBranch = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnReceivingReceiptObject.ReceivedBranchCode) select d;
                         if (receivedBranch.Any()) { isReceivedBranchExist = true; }
 
-                        if (isBranchExist && isSupplierExist && isTermExist && isUserExist && isPurchaseOrderExist && isItemExist && isReceivedBranchExist)
+                        if (isBranchExist && isSupplierExist && isTermExist && isUserExist && isItemExist && isReceivedBranchExist)
                         {
                             Int32 RRId = 0;
 

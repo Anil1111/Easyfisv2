@@ -196,9 +196,7 @@ namespace easyfis.Integration.POSIntegration.ApiControllers
                                 var salesInvoice = from d in db.TrnSalesInvoices where d.Id == addSalesInvoice.Id select d;
                                 if (salesInvoice.Any())
                                 {
-                                    var salesInvoiceItems = from d in db.TrnSalesInvoiceItems
-                                                            where d.SIId == addSalesInvoice.Id
-                                                            select d;
+                                    var salesInvoiceItems = from d in db.TrnSalesInvoiceItems where d.SIId == addSalesInvoice.Id select d;
 
                                     Decimal totalSalesInvoiceItemAmount = 0;
                                     if (salesInvoiceItems.Any())
