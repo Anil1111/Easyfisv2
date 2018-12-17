@@ -165,7 +165,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     Status = null,
                                     IsCancelled = false,
                                     IsPrinted = false,
-                                    IsLocked = true,
+                                    IsLocked = false,
                                     CreatedById = user.FirstOrDefault().Id,
                                     CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnDisbursementObject.CreatedDateTime),
                                     UpdatedById = user.FirstOrDefault().Id,
@@ -195,11 +195,11 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                             db.TrnDisbursementLines.InsertOnSubmit(newDisbursementLine);
                             db.SubmitChanges();
 
-                            var disbursement = from d in db.TrnDisbursements where d.Id == CVId && d.IsLocked == true select d;
+                            var disbursement = from d in db.TrnDisbursements where d.Id == CVId && d.IsLocked == false select d;
                             if (disbursement.Any())
                             {
                                 Decimal amount = 0;
-                                var disbursementLines = from d in disbursement.FirstOrDefault().TrnDisbursementLines select d;
+                                var disbursementLines = from d in db.TrnDisbursementLines where d.CVId == CVId select d;
                                 if (disbursementLines.Any()) { amount = disbursementLines.Sum(d => d.Amount); }
 
                                 var lockDisbursement = disbursement.FirstOrDefault();
