@@ -84,87 +84,78 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 isSupplierExist = false,
                                 isTermExist = false,
                                 isUserExist = false,
-                                isItemExist = false,
                                 isReceivedBranchExist = false;
-
-                        IQueryable<Data.TrnPurchaseOrder> purchaseOrder = null;
-                        IQueryable<Data.MstArticle> supplier = null;
-                        IQueryable<Data.MstTerm> term = null;
-                        IQueryable<Data.MstUser> user = null;
-                        IQueryable<Data.MstArticle> item = null;
 
                         Int32 POId = 0;
 
                         var branch = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnReceivingReceiptObject.BranchCode) select d;
-                        if (branch.Any())
+                        if (branch.Any()) { isBranchExist = true; }
+
+                        var supplier = from d in db.MstArticles where d.ArticleTypeId == 3 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.SupplierCode) && d.IsLocked == true select d;
+                        if (supplier.Any()) { isSupplierExist = true; }
+
+                        var term = from d in db.MstTerms where d.Term.Equals(folderMonitoringTrnReceivingReceiptObject.Term) select d;
+                        if (term.Any()) { isTermExist = true; }
+
+                        var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnReceivingReceiptObject.UserCode) select d;
+                        if (user.Any()) { isUserExist = true; }
+
+                        if (isBranchExist)
                         {
-                            isBranchExist = true;
-
-                            term = from d in db.MstTerms where d.Term.Equals(folderMonitoringTrnReceivingReceiptObject.Term) select d;
-                            if (term.Any()) { isTermExist = true; }
-
-                            if (!folderMonitoringTrnReceivingReceiptObject.PONumber.Equals("") || !folderMonitoringTrnReceivingReceiptObject.PONumber.Equals("NA"))
+                            var purchaseOrder = from d in db.TrnPurchaseOrders where d.BranchId == branch.FirstOrDefault().Id && d.PONumber.Equals(folderMonitoringTrnReceivingReceiptObject.PONumber) && d.IsLocked == true select d;
+                            if (purchaseOrder.Any())
                             {
-                                purchaseOrder = from d in db.TrnPurchaseOrders where d.BranchId == branch.FirstOrDefault().Id && d.PONumber.Equals(folderMonitoringTrnReceivingReceiptObject.PONumber) && d.IsLocked == true select d;
-                                if (purchaseOrder.Any())
+                                POId = purchaseOrder.FirstOrDefault().Id;
+                            }
+                            else
+                            {
+                                if (isSupplierExist)
                                 {
-                                    POId = purchaseOrder.FirstOrDefault().Id;
-                                }
-                                else
-                                {
-                                    supplier = from d in db.MstArticles where d.ArticleTypeId == 3 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.SupplierCode) && d.IsLocked == true select d;
-                                    if (supplier.Any())
+                                    var defaultPONumber = "0000000001";
+                                    var lastPurchaseOrder = from d in db.TrnPurchaseOrders.OrderByDescending(d => d.Id) where d.BranchId == branch.FirstOrDefault().Id select d;
+                                    if (lastPurchaseOrder.Any())
                                     {
-                                        isSupplierExist = true;
+                                        var PONumber = Convert.ToInt32(lastPurchaseOrder.FirstOrDefault().PONumber) + 0000000001;
+                                        defaultPONumber = FillLeadingZeroes(PONumber, 10);
+                                    }
 
-                                        user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnReceivingReceiptObject.UserCode) select d;
-                                        if (user.Any()) { isUserExist = true; }
+                                    Data.TrnPurchaseOrder newPurchaseOrder = new Data.TrnPurchaseOrder
+                                    {
+                                        BranchId = branch.FirstOrDefault().Id,
+                                        PONumber = defaultPONumber,
+                                        PODate = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.PODate),
+                                        SupplierId = supplier.FirstOrDefault().Id,
+                                        TermId = term.FirstOrDefault().Id,
+                                        ManualRequestNumber = "NA",
+                                        ManualPONumber = folderMonitoringTrnReceivingReceiptObject.DocumentReference,
+                                        DateNeeded = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.PODateNeeded),
+                                        Remarks = folderMonitoringTrnReceivingReceiptObject.Remarks,
+                                        IsClose = false,
+                                        RequestedById = user.FirstOrDefault().Id,
+                                        PreparedById = user.FirstOrDefault().Id,
+                                        CheckedById = user.FirstOrDefault().Id,
+                                        ApprovedById = user.FirstOrDefault().Id,
+                                        Status = null,
+                                        IsCancelled = false,
+                                        IsPrinted = false,
+                                        IsLocked = true,
+                                        CreatedById = user.FirstOrDefault().Id,
+                                        CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime),
+                                        UpdatedById = user.FirstOrDefault().Id,
+                                        UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime)
+                                    };
 
-                                        var defaultPONumber = "0000000001";
-                                        var lastPurchaseOrder = from d in db.TrnPurchaseOrders.OrderByDescending(d => d.Id) where d.BranchId == branch.FirstOrDefault().Id select d;
-                                        if (lastPurchaseOrder.Any())
-                                        {
-                                            var PONumber = Convert.ToInt32(lastPurchaseOrder.FirstOrDefault().PONumber) + 0000000001;
-                                            defaultPONumber = FillLeadingZeroes(PONumber, 10);
-                                        }
+                                    db.TrnPurchaseOrders.InsertOnSubmit(newPurchaseOrder);
+                                    db.SubmitChanges();
 
-                                        Data.TrnPurchaseOrder newPurchaseOrder = new Data.TrnPurchaseOrder
-                                        {
-                                            BranchId = branch.FirstOrDefault().Id,
-                                            PONumber = defaultPONumber,
-                                            PODate = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.RRDate),
-                                            SupplierId = supplier.FirstOrDefault().Id,
-                                            TermId = term.FirstOrDefault().Id,
-                                            ManualRequestNumber = "NA",
-                                            ManualPONumber = folderMonitoringTrnReceivingReceiptObject.ManualRRNumber,
-                                            DateNeeded = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.PODateNeeded),
-                                            Remarks = folderMonitoringTrnReceivingReceiptObject.Remarks,
-                                            IsClose = false,
-                                            RequestedById = user.FirstOrDefault().Id,
-                                            PreparedById = user.FirstOrDefault().Id,
-                                            CheckedById = user.FirstOrDefault().Id,
-                                            ApprovedById = user.FirstOrDefault().Id,
-                                            Status = null,
-                                            IsCancelled = false,
-                                            IsPrinted = false,
-                                            IsLocked = true,
-                                            CreatedById = user.FirstOrDefault().Id,
-                                            CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime),
-                                            UpdatedById = user.FirstOrDefault().Id,
-                                            UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime)
-                                        };
+                                    POId = newPurchaseOrder.Id;
 
-                                        db.TrnPurchaseOrders.InsertOnSubmit(newPurchaseOrder);
-                                        db.SubmitChanges();
-
-                                        POId = newPurchaseOrder.Id;
-
-                                        item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.ItemCode) && d.IsLocked == true select d;
-                                        if (item.Any()) { isItemExist = true; }
-
+                                    var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.ItemCode) && d.IsLocked == true select d;
+                                    if (item.Any())
+                                    {
                                         var conversionUnit = from d in db.MstArticleUnits
                                                              where d.ArticleId == item.FirstOrDefault().Id
-                                                             && d.UnitId == item.FirstOrDefault().UnitId
+                                                             && d.MstUnit.Unit.Equals(folderMonitoringTrnReceivingReceiptObject.Unit)
                                                              select d;
 
                                         if (conversionUnit.Any())
@@ -180,7 +171,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                                 POId = POId,
                                                 ItemId = item.FirstOrDefault().Id,
                                                 Particulars = folderMonitoringTrnReceivingReceiptObject.Particulars,
-                                                UnitId = item.FirstOrDefault().UnitId,
+                                                UnitId = conversionUnit.FirstOrDefault().UnitId,
                                                 Quantity = folderMonitoringTrnReceivingReceiptObject.Quantity,
                                                 Cost = folderMonitoringTrnReceivingReceiptObject.Cost,
                                                 Amount = folderMonitoringTrnReceivingReceiptObject.Amount,
@@ -200,131 +191,141 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         var receivedBranch = from d in db.MstBranches where d.BranchCode.Equals(folderMonitoringTrnReceivingReceiptObject.ReceivedBranchCode) select d;
                         if (receivedBranch.Any()) { isReceivedBranchExist = true; }
 
-                        if (isBranchExist && isSupplierExist && isTermExist && isUserExist && isItemExist && isReceivedBranchExist)
+                        if (isBranchExist && isSupplierExist && isTermExist && isUserExist && isReceivedBranchExist)
                         {
-                            Int32 RRId = 0;
+                            var purchaseOrderItem = from d in db.TrnPurchaseOrderItems
+                                                    where d.POId == POId
+                                                    && d.TrnPurchaseOrder.IsLocked == true
+                                                    && d.MstArticle.ManualArticleCode.Equals(folderMonitoringTrnReceivingReceiptObject.ItemCode)
+                                                    && d.MstArticle.IsInventory == true
+                                                    select d;
 
-                            var currentReceivingReceipt = from d in db.TrnReceivingReceipts where d.BranchId == branch.FirstOrDefault().Id && d.ManualRRNumber.Equals(folderMonitoringTrnReceivingReceiptObject.ManualRRNumber) && d.IsLocked == true select d;
-                            if (currentReceivingReceipt.Any())
+                            if (purchaseOrderItem.Any())
                             {
-                                RRId = currentReceivingReceipt.FirstOrDefault().Id;
+                                Int32 RRId = 0;
 
-                                var unlockReceivingReceipt = currentReceivingReceipt.FirstOrDefault();
-                                unlockReceivingReceipt.IsLocked = false;
-                                unlockReceivingReceipt.UpdatedById = user.FirstOrDefault().Id;
-                                unlockReceivingReceipt.UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime);
-                                db.SubmitChanges();
-
-                                inventory.DeleteReceivingReceiptInventory(RRId);
-                                journal.DeleteReceivingReceiptJournal(RRId);
-                            }
-                            else
-                            {
-                                var defaultRRNumber = "0000000001";
-                                var lastReceivingReceipt = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id) where d.BranchId == branch.FirstOrDefault().Id select d;
-                                if (lastReceivingReceipt.Any())
+                                var currentReceivingReceipt = from d in db.TrnReceivingReceipts where d.BranchId == branch.FirstOrDefault().Id && d.ManualRRNumber.Equals(folderMonitoringTrnReceivingReceiptObject.ManualRRNumber) && d.IsLocked == true select d;
+                                if (currentReceivingReceipt.Any())
                                 {
-                                    var RRNumber = Convert.ToInt32(lastReceivingReceipt.FirstOrDefault().RRNumber) + 0000000001;
-                                    defaultRRNumber = FillLeadingZeroes(RRNumber, 10);
-                                }
+                                    RRId = currentReceivingReceipt.FirstOrDefault().Id;
 
-                                Data.TrnReceivingReceipt newReceivingReceipt = new Data.TrnReceivingReceipt
-                                {
-                                    BranchId = branch.FirstOrDefault().Id,
-                                    RRNumber = defaultRRNumber,
-                                    RRDate = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.RRDate),
-                                    DocumentReference = folderMonitoringTrnReceivingReceiptObject.DocumentReference,
-                                    SupplierId = supplier.FirstOrDefault().Id,
-                                    TermId = term.FirstOrDefault().Id,
-                                    Remarks = folderMonitoringTrnReceivingReceiptObject.Remarks,
-                                    ManualRRNumber = folderMonitoringTrnReceivingReceiptObject.ManualRRNumber,
-                                    Amount = 0,
-                                    WTaxAmount = 0,
-                                    PaidAmount = 0,
-                                    AdjustmentAmount = 0,
-                                    BalanceAmount = 0,
-                                    ReceivedById = user.FirstOrDefault().Id,
-                                    PreparedById = user.FirstOrDefault().Id,
-                                    CheckedById = user.FirstOrDefault().Id,
-                                    ApprovedById = user.FirstOrDefault().Id,
-                                    Status = null,
-                                    IsCancelled = false,
-                                    IsPrinted = false,
-                                    IsLocked = true,
-                                    CreatedById = user.FirstOrDefault().Id,
-                                    CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime),
-                                    UpdatedById = user.FirstOrDefault().Id,
-                                    UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime)
-                                };
-
-                                db.TrnReceivingReceipts.InsertOnSubmit(newReceivingReceipt);
-                                db.SubmitChanges();
-
-                                RRId = newReceivingReceipt.Id;
-                            }
-
-                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.UnitId == item.FirstOrDefault().UnitId select d;
-                            if (unitConversion.Any())
-                            {
-                                Decimal baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * 1;
-                                if (unitConversion.FirstOrDefault().Multiplier > 0)
-                                {
-                                    baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * (1 / unitConversion.FirstOrDefault().Multiplier);
-                                }
-
-                                Decimal amount = folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost;
-                                Decimal VATAmount = ComputeVATAmount(item.FirstOrDefault().MstTaxType1.IsInclusive, folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost, item.FirstOrDefault().MstTaxType1.TaxRate);
-                                Decimal WTAXAmount = ComputeWTAXAmount(item.FirstOrDefault().MstTaxType2.IsInclusive, folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost, item.FirstOrDefault().MstTaxType2.TaxRate);
-
-                                Decimal baseCost = 0;
-                                if (baseQuantity > 0)
-                                {
-                                    baseCost = (amount - VATAmount + WTAXAmount) / baseQuantity;
-                                }
-
-                                Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
-                                {
-                                    RRId = RRId,
-                                    POId = purchaseOrder.FirstOrDefault().Id,
-                                    ItemId = item.FirstOrDefault().Id,
-                                    Particulars = folderMonitoringTrnReceivingReceiptObject.Particulars,
-                                    UnitId = item.FirstOrDefault().UnitId,
-                                    Quantity = folderMonitoringTrnReceivingReceiptObject.Quantity,
-                                    Cost = folderMonitoringTrnReceivingReceiptObject.Cost,
-                                    Amount = folderMonitoringTrnReceivingReceiptObject.Amount,
-                                    VATId = item.FirstOrDefault().InputTaxId,
-                                    VATPercentage = item.FirstOrDefault().MstTaxType1.TaxRate,
-                                    VATAmount = VATAmount,
-                                    WTAXId = item.FirstOrDefault().WTaxTypeId,
-                                    WTAXPercentage = item.FirstOrDefault().MstTaxType2.TaxRate,
-                                    WTAXAmount = WTAXAmount,
-                                    BranchId = receivedBranch.FirstOrDefault().Id,
-                                    BaseUnitId = item.FirstOrDefault().UnitId,
-                                    BaseQuantity = baseQuantity,
-                                    BaseCost = baseCost
-                                };
-
-                                db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
-                                db.SubmitChanges();
-
-                                var receivingReceipt = from d in db.TrnReceivingReceipts where d.Id == RRId select d;
-                                if (receivingReceipt.Any())
-                                {
-                                    Decimal receivingReceiptAmount = 0, receivingReceiptWTAXAmount = 0;
-                                    var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == RRId select d;
-                                    if (receivingReceiptItems.Any()) { receivingReceiptAmount = receivingReceiptItems.Sum(d => d.Amount); receivingReceiptWTAXAmount = receivingReceiptItems.Sum(d => d.WTAXAmount); }
-
-                                    var lockReceivingReceipt = receivingReceipt.FirstOrDefault();
-                                    lockReceivingReceipt.Amount = receivingReceiptAmount;
-                                    lockReceivingReceipt.WTaxAmount = receivingReceiptWTAXAmount;
-                                    lockReceivingReceipt.IsLocked = true;
-                                    lockReceivingReceipt.UpdatedById = user.FirstOrDefault().Id;
-                                    lockReceivingReceipt.UpdatedDateTime = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.CreatedDateTime);
+                                    var unlockReceivingReceipt = currentReceivingReceipt.FirstOrDefault();
+                                    unlockReceivingReceipt.IsLocked = false;
+                                    unlockReceivingReceipt.UpdatedById = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedById;
+                                    unlockReceivingReceipt.UpdatedDateTime = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedDateTime;
                                     db.SubmitChanges();
 
-                                    accountsPayable.UpdateAccountsPayable(RRId);
-                                    inventory.InsertReceivingReceiptInventory(RRId);
-                                    journal.InsertReceivingReceiptJournal(RRId);
+                                    inventory.DeleteReceivingReceiptInventory(RRId);
+                                    journal.DeleteReceivingReceiptJournal(RRId);
+                                }
+                                else
+                                {
+                                    var defaultRRNumber = "0000000001";
+                                    var lastReceivingReceipt = from d in db.TrnReceivingReceipts.OrderByDescending(d => d.Id) where d.BranchId == branch.FirstOrDefault().Id select d;
+                                    if (lastReceivingReceipt.Any())
+                                    {
+                                        var RRNumber = Convert.ToInt32(lastReceivingReceipt.FirstOrDefault().RRNumber) + 0000000001;
+                                        defaultRRNumber = FillLeadingZeroes(RRNumber, 10);
+                                    }
+
+                                    Data.TrnReceivingReceipt newReceivingReceipt = new Data.TrnReceivingReceipt
+                                    {
+                                        BranchId = branch.FirstOrDefault().Id,
+                                        RRNumber = defaultRRNumber,
+                                        RRDate = Convert.ToDateTime(folderMonitoringTrnReceivingReceiptObject.RRDate),
+                                        DocumentReference = folderMonitoringTrnReceivingReceiptObject.DocumentReference,
+                                        SupplierId = supplier.FirstOrDefault().Id,
+                                        TermId = term.FirstOrDefault().Id,
+                                        Remarks = folderMonitoringTrnReceivingReceiptObject.Remarks,
+                                        ManualRRNumber = folderMonitoringTrnReceivingReceiptObject.ManualRRNumber,
+                                        Amount = 0,
+                                        WTaxAmount = 0,
+                                        PaidAmount = 0,
+                                        AdjustmentAmount = 0,
+                                        BalanceAmount = 0,
+                                        ReceivedById = user.FirstOrDefault().Id,
+                                        PreparedById = user.FirstOrDefault().Id,
+                                        CheckedById = user.FirstOrDefault().Id,
+                                        ApprovedById = user.FirstOrDefault().Id,
+                                        Status = null,
+                                        IsCancelled = false,
+                                        IsPrinted = false,
+                                        IsLocked = false,
+                                        CreatedById = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.CreatedById,
+                                        CreatedDateTime = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.CreatedDateTime,
+                                        UpdatedById = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedById,
+                                        UpdatedDateTime = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedDateTime
+                                    };
+
+                                    db.TrnReceivingReceipts.InsertOnSubmit(newReceivingReceipt);
+                                    db.SubmitChanges();
+
+                                    RRId = newReceivingReceipt.Id;
+                                }
+
+                                var unitConversion = from d in purchaseOrderItem.FirstOrDefault().MstArticle.MstArticleUnits where d.UnitId == purchaseOrderItem.FirstOrDefault().MstArticle.UnitId select d;
+                                if (unitConversion.Any())
+                                {
+                                    Decimal baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * 1;
+                                    if (unitConversion.FirstOrDefault().Multiplier > 0)
+                                    {
+                                        baseQuantity = folderMonitoringTrnReceivingReceiptObject.Quantity * (1 / unitConversion.FirstOrDefault().Multiplier);
+                                    }
+
+                                    Decimal amount = folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost;
+                                    Decimal VATAmount = ComputeVATAmount(purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType1.IsInclusive, folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost, purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType1.TaxRate);
+                                    Decimal WTAXAmount = ComputeWTAXAmount(purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType2.IsInclusive, folderMonitoringTrnReceivingReceiptObject.Quantity * folderMonitoringTrnReceivingReceiptObject.Cost, purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType2.TaxRate);
+
+                                    Decimal baseCost = 0;
+                                    if (baseQuantity > 0)
+                                    {
+                                        baseCost = (amount - VATAmount + WTAXAmount) / baseQuantity;
+                                    }
+
+                                    Data.TrnReceivingReceiptItem newReceivingReceiptItem = new Data.TrnReceivingReceiptItem
+                                    {
+                                        RRId = RRId,
+                                        POId = POId,
+                                        ItemId = purchaseOrderItem.FirstOrDefault().ItemId,
+                                        Particulars = folderMonitoringTrnReceivingReceiptObject.Particulars,
+                                        UnitId = purchaseOrderItem.FirstOrDefault().UnitId,
+                                        Quantity = folderMonitoringTrnReceivingReceiptObject.Quantity,
+                                        Cost = folderMonitoringTrnReceivingReceiptObject.Cost,
+                                        Amount = folderMonitoringTrnReceivingReceiptObject.Amount,
+                                        VATId = purchaseOrderItem.FirstOrDefault().MstArticle.InputTaxId,
+                                        VATPercentage = purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType1.TaxRate,
+                                        VATAmount = VATAmount,
+                                        WTAXId = purchaseOrderItem.FirstOrDefault().MstArticle.WTaxTypeId,
+                                        WTAXPercentage = purchaseOrderItem.FirstOrDefault().MstArticle.MstTaxType2.TaxRate,
+                                        WTAXAmount = WTAXAmount,
+                                        BranchId = receivedBranch.FirstOrDefault().Id,
+                                        BaseUnitId = purchaseOrderItem.FirstOrDefault().MstArticle.UnitId,
+                                        BaseQuantity = baseQuantity,
+                                        BaseCost = baseCost
+                                    };
+
+                                    db.TrnReceivingReceiptItems.InsertOnSubmit(newReceivingReceiptItem);
+                                    db.SubmitChanges();
+
+                                    var receivingReceipt = from d in db.TrnReceivingReceipts where d.Id == RRId && d.IsLocked == false select d;
+                                    if (receivingReceipt.Any())
+                                    {
+                                        Decimal receivingReceiptAmount = 0, receivingReceiptWTAXAmount = 0;
+                                        var receivingReceiptItems = from d in db.TrnReceivingReceiptItems where d.RRId == RRId select d;
+                                        if (receivingReceiptItems.Any()) { receivingReceiptAmount = receivingReceiptItems.Sum(d => d.Amount); receivingReceiptWTAXAmount = receivingReceiptItems.Sum(d => d.WTAXAmount); }
+
+                                        var lockReceivingReceipt = receivingReceipt.FirstOrDefault();
+                                        lockReceivingReceipt.Amount = receivingReceiptAmount;
+                                        lockReceivingReceipt.WTaxAmount = receivingReceiptWTAXAmount;
+                                        lockReceivingReceipt.IsLocked = true;
+                                        lockReceivingReceipt.UpdatedById = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedById;
+                                        lockReceivingReceipt.UpdatedDateTime = purchaseOrderItem.FirstOrDefault().TrnPurchaseOrder.UpdatedDateTime;
+                                        db.SubmitChanges();
+
+                                        accountsPayable.UpdateAccountsPayable(RRId);
+                                        inventory.InsertReceivingReceiptInventory(RRId);
+                                        journal.InsertReceivingReceiptJournal(RRId);
+                                    }
                                 }
                             }
                         }
