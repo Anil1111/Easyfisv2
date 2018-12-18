@@ -93,7 +93,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnStockOutObject.UserCode) select d;
                         if (user.Any()) { isUserExist = true; }
 
-                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockOutObject.ItemCode) && d.IsLocked == true select d;
+                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockOutObject.ItemCode) && d.IsInventory == true && d.IsLocked == true select d;
                         if (item.Any()) { isItemExist = true; }
 
                         if (isBranchExist && isUserExist && isAccountExist && isArticleExist && isItemExist)
@@ -136,8 +136,9 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     PreparedById = user.FirstOrDefault().Id,
                                     CheckedById = user.FirstOrDefault().Id,
                                     ApprovedById = user.FirstOrDefault().Id,
+                                    Status = null,
                                     IsPrinted = false,
-                                    IsLocked = true,
+                                    IsLocked = false,
                                     CreatedById = user.FirstOrDefault().Id,
                                     CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnStockOutObject.CreatedDateTime),
                                     UpdatedById = user.FirstOrDefault().Id,
@@ -150,7 +151,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 OTId = newStockOut.Id;
                             }
 
-                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.UnitId == item.FirstOrDefault().UnitId select d;
+                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.MstUnit.Unit.Equals(folderMonitoringTrnStockOutObject.Unit) select d;
                             if (unitConversion.Any())
                             {
                                 Decimal baseQuantity = folderMonitoringTrnStockOutObject.Quantity * 1;
@@ -178,20 +179,21 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                         ItemId = item.FirstOrDefault().Id,
                                         ItemInventoryId = itemInventoryId,
                                         Particulars = folderMonitoringTrnStockOutObject.Particulars,
-                                        UnitId = item.FirstOrDefault().UnitId,
+                                        UnitId = unitConversion.FirstOrDefault().UnitId,
                                         Quantity = folderMonitoringTrnStockOutObject.Quantity,
                                         Cost = folderMonitoringTrnStockOutObject.Cost,
                                         Amount = folderMonitoringTrnStockOutObject.Amount,
                                         BaseUnitId = item.FirstOrDefault().UnitId,
                                         BaseQuantity = baseQuantity,
-                                        BaseCost = baseCost
+                                        BaseCost = baseCost,
+                                        ExpenseAccountId = account.FirstOrDefault().Id
                                     };
 
                                     db.TrnStockOutItems.InsertOnSubmit(newStockOutItem);
                                     db.SubmitChanges();
                                 }
 
-                                var stockOut = from d in db.TrnStockOuts where d.Id == OTId select d;
+                                var stockOut = from d in db.TrnStockOuts where d.Id == OTId && d.IsLocked == false select d;
                                 if (stockOut.Any())
                                 {
                                     var lockStockOut = stockOut.FirstOrDefault();
