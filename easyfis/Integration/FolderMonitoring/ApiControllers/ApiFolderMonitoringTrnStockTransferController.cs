@@ -51,7 +51,6 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                     {
                         Boolean isBranchExist = false,
                                 isToBranchExist = false,
-                                isAccountExist = false,
                                 isArticleExist = false,
                                 isUserExist = false,
                                 isItemExist = false;
@@ -68,10 +67,10 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnStockTransferObject.UserCode) select d;
                         if (user.Any()) { isUserExist = true; }
 
-                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockTransferObject.ItemCode) && d.IsLocked == true select d;
+                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockTransferObject.ItemCode) && d.IsInventory == true && d.IsLocked == true select d;
                         if (item.Any()) { isItemExist = true; }
 
-                        if (isBranchExist && isToBranchExist && isUserExist && isAccountExist && isArticleExist && isItemExist)
+                        if (isBranchExist && isToBranchExist && isUserExist && isArticleExist && isItemExist)
                         {
                             Int32 STId = 0;
 
@@ -111,8 +110,9 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     PreparedById = user.FirstOrDefault().Id,
                                     CheckedById = user.FirstOrDefault().Id,
                                     ApprovedById = user.FirstOrDefault().Id,
+                                    Status = null,
                                     IsPrinted = false,
-                                    IsLocked = true,
+                                    IsLocked = false,
                                     CreatedById = user.FirstOrDefault().Id,
                                     CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnStockTransferObject.CreatedDateTime),
                                     UpdatedById = user.FirstOrDefault().Id,
@@ -125,7 +125,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 STId = newStockTransfer.Id;
                             }
 
-                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.UnitId == item.FirstOrDefault().UnitId select d;
+                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.MstUnit.Unit.Equals(folderMonitoringTrnStockTransferObject.Unit) select d;
                             if (unitConversion.Any())
                             {
                                 Decimal baseQuantity = folderMonitoringTrnStockTransferObject.Quantity * 1;
@@ -153,7 +153,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                         ItemId = item.FirstOrDefault().Id,
                                         ItemInventoryId = itemInventoryId,
                                         Particulars = folderMonitoringTrnStockTransferObject.Particulars,
-                                        UnitId = item.FirstOrDefault().UnitId,
+                                        UnitId = unitConversion.FirstOrDefault().UnitId,
                                         Quantity = folderMonitoringTrnStockTransferObject.Quantity,
                                         Cost = folderMonitoringTrnStockTransferObject.Cost,
                                         Amount = folderMonitoringTrnStockTransferObject.Amount,
@@ -166,7 +166,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     db.SubmitChanges();
                                 }
 
-                                var stockTransfer = from d in db.TrnStockTransfers where d.Id == STId select d;
+                                var stockTransfer = from d in db.TrnStockTransfers where d.Id == STId && d.IsLocked == false select d;
                                 if (stockTransfer.Any())
                                 {
                                     var lockStockTransfer = stockTransfer.FirstOrDefault();
