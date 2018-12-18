@@ -93,7 +93,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                         var user = from d in db.MstUsers where d.UserName.Equals(folderMonitoringTrnStockInObject.UserCode) select d;
                         if (user.Any()) { isUserExist = true; }
 
-                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockInObject.ItemCode) && d.IsLocked == true select d;
+                        var item = from d in db.MstArticles where d.ArticleTypeId == 1 && d.ManualArticleCode.Equals(folderMonitoringTrnStockInObject.ItemCode) && d.IsInventory == true && d.IsLocked == true select d;
                         if (item.Any()) { isItemExist = true; }
 
                         if (isBranchExist && isUserExist && isAccountExist && isArticleExist && isItemExist)
@@ -137,8 +137,9 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     PreparedById = user.FirstOrDefault().Id,
                                     CheckedById = user.FirstOrDefault().Id,
                                     ApprovedById = user.FirstOrDefault().Id,
+                                    Status = null,
                                     IsPrinted = false,
-                                    IsLocked = true,
+                                    IsLocked = false,
                                     CreatedById = user.FirstOrDefault().Id,
                                     CreatedDateTime = Convert.ToDateTime(folderMonitoringTrnStockInObject.CreatedDateTime),
                                     UpdatedById = user.FirstOrDefault().Id,
@@ -151,7 +152,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 INId = newStockIn.Id;
                             }
 
-                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.UnitId == item.FirstOrDefault().UnitId select d;
+                            var unitConversion = from d in item.FirstOrDefault().MstArticleUnits where d.MstUnit.Unit.Equals(folderMonitoringTrnStockInObject.Unit) select d;
                             if (unitConversion.Any())
                             {
                                 Decimal baseQuantity = folderMonitoringTrnStockInObject.Quantity * 1;
@@ -171,7 +172,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                     INId = INId,
                                     ItemId = item.FirstOrDefault().Id,
                                     Particulars = folderMonitoringTrnStockInObject.Particulars,
-                                    UnitId = item.FirstOrDefault().UnitId,
+                                    UnitId = unitConversion.FirstOrDefault().UnitId,
                                     Quantity = folderMonitoringTrnStockInObject.Quantity,
                                     Cost = folderMonitoringTrnStockInObject.Cost,
                                     Amount = folderMonitoringTrnStockInObject.Amount,
@@ -183,7 +184,7 @@ namespace easyfis.Integration.FolderMonitoring.ApiControllers
                                 db.TrnStockInItems.InsertOnSubmit(newStockInItem);
                                 db.SubmitChanges();
 
-                                var stockIn = from d in db.TrnStockIns where d.Id == INId select d;
+                                var stockIn = from d in db.TrnStockIns where d.Id == INId && d.IsLocked == false select d;
                                 if (stockIn.Any())
                                 {
                                     var lockStockIn = stockIn.FirstOrDefault();
